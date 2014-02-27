@@ -65,7 +65,7 @@ long Path::getNumEdgesOnNetwork(long layer) const {
 }
 
 long Path::length() const {
-	return path.size();
+	return network.size();
 }
 
 long Path::getVertex(long pos) const {
@@ -93,12 +93,11 @@ bool Path::same(const Path& other) const {
 
 std::ostream& operator<<(std::ostream &strm, const Path &path) {
   strm << "Path[ts=" << path.getTimestamp() << "] ";
-  int num_vertexes = path.path.size();
-  for (int i=0; i<num_vertexes-1; i++) {
+  for (int i=0; i<path.length(); i++) {
 	  strm << path.path[i] << " -" << path.network[i];
 	  strm << "-> ";
   }
-  strm << path.path[num_vertexes-1];
+  strm << path.path[path.length()];
 
   /*
   strm << "\n";

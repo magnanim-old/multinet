@@ -85,11 +85,11 @@ std::set<vertex_id> in_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, st
 /** Distances *********************************************************/
 /**********************************************************************/
 
-void pareto_distance(MultipleNetwork& mnet,	vertex_id vertex, std::map<vertex_id,Distance>& distances);
+//void pareto_distance(MultipleNetwork& mnet, vertex_id vertex, std::map<vertex_id,Distance>& distances);
 
 void pareto_distance_single_paths(MultipleNetwork& mnet, vertex_id vertex, std::vector<std::set<Path> >& paths);
 
-void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex, std::vector<std::set<Path> >& paths);
+void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex, std::map<vertex_id,std::set<Path> >& paths);
 
 /**********************************************************************/
 /** Betweenness *******************************************************/
@@ -97,9 +97,7 @@ void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex, std::vec
 
 void pareto_betweenness(MultipleNetwork& mnet, std::map<vertex_id,long>& vertex_betweenness);
 
-void pareto_edge_betweenness(MultipleNetwork& mnet, std::vector<std::map<vertex_id,std::map<vertex_id,long> > >& edge_betweenness);
-
-
+void pareto_edge_betweenness(MultipleNetwork& mnet, std::map<edge, long>& edge_betweenness);
 
 int check_dominance(const Path& p1, const Path& p2);
 

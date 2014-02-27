@@ -17,6 +17,21 @@
 #include <set>
 #include <vector>
 
+struct edge {
+public:
+	vertex_id v1;
+	vertex_id v2;
+	network_id network;
+
+	edge(vertex_id v1, vertex_id v2, network_id network);
+
+	bool operator==(const edge& e2) const;
+
+	bool operator<=(const edge& e2) const;
+
+	bool operator<(const edge& e2) const;
+};
+
 /**********************************************************************/
 /** Network ***********************************************************/
 /**********************************************************************/
@@ -201,7 +216,7 @@ public:
 
 
 	/****************************/
-	/* Iterators                */
+	/* Vertex and edge sets      */
 	/****************************/
 	std::set<vertex_id> getVertexes();
 	/****************************/
@@ -436,6 +451,8 @@ private:
 	std::map<std::string, std::map<edge_id, double> > edge_numeric_attribute;
 };
 
+void print(Network& net);
+
 /**********************************************************************/
 /** Multiple Network **************************************************/
 /**********************************************************************/
@@ -477,6 +494,12 @@ public:
 	 * @throws ElementNotFoundException if the input elements are not present in the network
 	 **/
 	void map(vertex_id global_vertex_id, vertex_id local_vertex_id, network_id nid);
+
+	/****************************/
+	/* Vertex and edge set      */
+	/****************************/
+	void getVertexes(std::set<vertex_id>& vertexes);
+	void getEdges(std::set<edge>& edges);
 	/**
 	 * @brief Finds the identifier of a global vertex inside a local network.
 	 *
@@ -565,8 +588,6 @@ private:
 	std::vector<std::string> vertex_id_to_name;
 
 };
-
-void print(Network& net);
 
 void print(MultipleNetwork& mnet);
 

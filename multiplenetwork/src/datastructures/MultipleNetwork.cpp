@@ -50,6 +50,28 @@ network_id MultipleNetwork::addNetwork(Network& net) {
 	return getNumNetworks()-1;
 }
 
+void MultipleNetwork::getVertexes(std::set<vertex_id>& vertexes) {
+	for (long v=0; v<getNumVertexes(); v++) {
+		vertexes.insert(v);
+	}
+}
+
+void MultipleNetwork::getEdges(std::set<edge>& edges) {
+	for (int network = 0; network < getNumNetworks(); network++) {
+		//long num_edges = mnet.getNetwork(network)->getNumEdges();
+		//cout << "processing network " << network << " (" << num_edges << " edges)\n";
+		std::set<vertex_id> vertexes = getNetwork(network)->getVertexes();
+		for (std::set<vertex_id>::iterator from_iterator = vertexes.begin(); from_iterator != vertexes.end(); from_iterator++) {
+			vertex_id local_from = *from_iterator;
+			std::set<vertex_id> out_neighbors = getNetwork(network)->getOutNeighbors(local_from);
+			for (std::set<vertex_id>::iterator to_iterator = out_neighbors.begin(); to_iterator != out_neighbors.end(); to_iterator++) {
+						vertex_id local_to = *to_iterator;
+						edges.insert(edge(getGlobalVertexId(local_from,network),getGlobalVertexId(local_to,network),network));
+			}
+		}
+	}
+}
+
 void MultipleNetwork::map(vertex_id global_vertex_id, vertex_id local_vertex_id, int nid) {
 	if (!containsVertex(global_vertex_id)) throw ElementNotFoundException("global vertex " + std::to_string(global_vertex_id));
 	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + std::to_string(nid));

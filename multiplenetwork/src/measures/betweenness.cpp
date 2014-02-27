@@ -17,7 +17,9 @@ using namespace std;
 
 void pareto_betweenness(MultipleNetwork& mnet,	std::map<vertex_id, long>& vertex_betweenness) {
 	for (vertex_id i = 0; i < mnet.getNumVertexes(); i++) {
-		vector<set<Path> > paths;
+		// initialize the result structure
+		vertex_betweenness[i] = 0;
+		map<vertex_id,set<Path> > paths;
 		pareto_distance_all_paths(mnet, i, paths);
 		for (unsigned long p = 0; p < paths.size(); p++) {
 			//cout << "Node " << i << " to " << p << ": " << paths[p].size() << " paths\n";
@@ -25,10 +27,8 @@ void pareto_betweenness(MultipleNetwork& mnet,	std::map<vertex_id, long>& vertex
 				//cout << *it << endl;
 				//Path *path = &(*it);
 				//cout << "b" << path << endl;
-				for (long e = 1; e < path->length()-1; e++) {
+				for (long e = 1; e < path->length(); e++) {
 					//long vertex2 = mnet.getGlobalVertexId(*to,net);
-					if (vertex_betweenness.count(path->getVertex(e))==0)
-						vertex_betweenness[path->getVertex(e)]=0;
 					vertex_betweenness[path->getVertex(e)]++;
 					//cout << "Increased " << mnet.getGlobalVertexName(vertex1) << " to " << betweenness[vertex1] << endl;
 					//betweenness[vertex2]++;
@@ -39,30 +39,26 @@ void pareto_betweenness(MultipleNetwork& mnet,	std::map<vertex_id, long>& vertex
 	//cout << "mmm\n";
 }
 
-void pareto_edge_betweenness(MultipleNetwork& mnet, std::vector<std::map<vertex_id, std::map<vertex_id, long> > >& edge_betweenness) {
-	edge_betweenness.resize(mnet.getNumNetworks());
+void pareto_edge_betweenness(MultipleNetwork& mnet, std::map<edge, long>& edge_betweenness) {
 	for (vertex_id i = 0; i < mnet.getNumVertexes(); i++) {
-		vector<set<Path> > paths;
+		map<vertex_id,set<Path> > paths;
 		pareto_distance_all_paths(mnet, i, paths);
 		for (unsigned long p = 0; p < paths.size(); p++) {
 			//cout << "Node " << i << " to " << p << ": " << paths[p].size() << " paths\n";
 			for (std::set<Path>::iterator path = paths[p].begin(); path != paths[p].end(); ++path) {
 				//cout << *it << endl;
 				//Path *path = &(*it);
-				//cout << "b" << path << endl;
-				for (long e = 0; e < path->length()-1; e++) {
+				//cout << *path << endl;
+				for (long e = 0; e < path->length(); e++) {
 					vertex_id from = path->getVertex(e);
 					vertex_id to = path->getVertex(e+1);
 					network_id net = path->getNetwork(e);
+					edge step(from,to,net);
 					//long vertex2 = mnet.getGlobalVertexId(*to,net);
-					if (edge_betweenness[net].count(from)==0) {
-						std::map<vertex_id, long> to_edges;
-						edge_betweenness[net][from]=to_edges;
+					if (edge_betweenness.count(step)==0) {
+						edge_betweenness[step] = 0;
 					}
-					if (edge_betweenness[net][from].count(to)==0) {
-						edge_betweenness[net][from][to] = 0;
-					}
-					edge_betweenness[net][from][to]++;
+					edge_betweenness[step]++;
 					// We store only positive values of edge betweenness
 					//cout << "Increased " << mnet.getGlobalVertexName(vertex1) << " to " << betweenness[vertex1] << endl;
 					//betweenness[vertex2]++;
