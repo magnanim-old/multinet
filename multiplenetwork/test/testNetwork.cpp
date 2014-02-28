@@ -92,11 +92,13 @@ void testNetwork() {
 	log("done!");
 
 	log("Checking neighborhood functions...",false);
-	std::set<vertex_id> neigh_in = uuu_net.getInNeighbors(2);
+	std::set<vertex_id> neigh_in;
+	uuu_net.getInNeighbors(2, neigh_in);
 	if (!neigh_in.count(vd0)==0) throw FailedUnitTestException("Vertex 0 is not 2s neighbor");
 	if (!neigh_in.count(vd1)==1) throw FailedUnitTestException("Vertex 1 should be 2s neighbor");
 	if (!neigh_in.count(vd2)==1) throw FailedUnitTestException("Vertex 2 should be 2s neighbor");
-	std::set<vertex_id> neigh_out = uuu_net.getOutNeighbors(2);
+	std::set<vertex_id> neigh_out;
+	uuu_net.getOutNeighbors(2, neigh_out);
 	if (!neigh_out.count(vd0)==0) throw FailedUnitTestException("Vertex 0 is not 2s neighbor");
 	if (!neigh_out.count(vd1)==1) throw FailedUnitTestException("Vertex 1 should be 2s neighbor");
 	if (!neigh_out.count(vd2)==1) throw FailedUnitTestException("Vertex 2 should be 2s neighbor");
@@ -210,11 +212,13 @@ void testNetwork() {
 	log("done!");
 
 	log("Checking neighborhood functions...",false);
-	std::set<std::string> sneigh_in = dwn_net.getInNeighbors("vd2");
+	std::set<std::string> sneigh_in;
+	dwn_net.getInNeighbors("vd2", sneigh_in);
 	if (!sneigh_in.count("vd0")==0) throw FailedUnitTestException("Vertex vd0 is not vd2s neighbor");
 	if (!sneigh_in.count("vd1")==1) throw FailedUnitTestException("Vertex vd1 should be vd2s neighbor");
 	if (!sneigh_in.count("vd2")==1) throw FailedUnitTestException("Vertex vd2 should be vd2s neighbor");
-	std::set<std::string> sneigh_out = dwn_net.getOutNeighbors("vd2");
+	std::set<std::string> sneigh_out;
+	dwn_net.getOutNeighbors("vd2", sneigh_out);
 	if (!sneigh_out.count("vd0")==1) throw FailedUnitTestException("Vertex vd0 should be vd2s neighbor");
 	if (!sneigh_out.count("vd1")==0) throw FailedUnitTestException("Vertex vd1 is not vd2s neighbor");
 	if (!sneigh_out.count("vd2")==1) throw FailedUnitTestException("Vertex vd2 is not vd2s neighbor");

@@ -22,15 +22,20 @@ const int PATH_DOMINATES = 2;
 /** Degree  ***********************************************************/
 /**********************************************************************/
 
-std::set<vertex_id> out_degree(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
-std::set<vertex_id> out_degree(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
-std::set<vertex_id> out_degree(MultipleNetwork& mnet, vertex_id vertex, network_id network);
-std::set<vertex_id> out_degree(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
+long out_degree(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+long out_degree(MultipleNetwork& mnet, std::string vertex, std::set<std::string> active_networks);
+long out_degree(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+long out_degree(MultipleNetwork& mnet, std::string vertex, std::string network_name);
 
-std::set<vertex_id> in_degree(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
-std::set<vertex_id> in_degree(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
-std::set<vertex_id> in_degree(MultipleNetwork& mnet, vertex_id vertex, network_id network);
-std::set<vertex_id> in_degree(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
+long in_degree(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+long in_degree(MultipleNetwork& mnet, std::string vertex, std::set<std::string> active_networks);
+long in_degree(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+long in_degree(MultipleNetwork& mnet, std::string vertex, std::string network_name);
+
+long degree(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+long degree(MultipleNetwork& mnet, std::string vertex, std::set<std::string> active_networks);
+long degree(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+long degree(MultipleNetwork& mnet, std::string vertex, std::string network_name);
 
 
 /**********************************************************************/

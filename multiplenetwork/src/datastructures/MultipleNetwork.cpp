@@ -63,7 +63,8 @@ void MultipleNetwork::getEdges(std::set<edge>& edges) {
 		std::set<vertex_id> vertexes = getNetwork(network)->getVertexes();
 		for (std::set<vertex_id>::iterator from_iterator = vertexes.begin(); from_iterator != vertexes.end(); from_iterator++) {
 			vertex_id local_from = *from_iterator;
-			std::set<vertex_id> out_neighbors = getNetwork(network)->getOutNeighbors(local_from);
+			std::set<vertex_id> out_neighbors;
+			getNetwork(network)->getOutNeighbors(local_from, out_neighbors);
 			for (std::set<vertex_id>::iterator to_iterator = out_neighbors.begin(); to_iterator != out_neighbors.end(); to_iterator++) {
 						vertex_id local_to = *to_iterator;
 						edges.insert(edge(getGlobalVertexId(local_from,network),getGlobalVertexId(local_to,network),network));

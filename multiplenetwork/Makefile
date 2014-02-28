@@ -6,6 +6,7 @@ OBJS = 	test/*.cpp \
 		src/utils/*.cpp \
 		src/io/*.cpp \
 		src/exceptions/*.cpp \
+		src/community/*.cpp \
 		
 LIBS = -L/usr/local/lib
 

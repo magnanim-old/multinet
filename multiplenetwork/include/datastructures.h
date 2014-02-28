@@ -154,28 +154,69 @@ public:
 	 **/
 	long getNumEdges();
 	/**
+	 * @brief Returns the number of outgoing edges from vertex vid.
+	 * @throws ElementNotFoundException if the input vertex id is not present in the network
+	 **/
+	long getOutDegree(vertex_id vid);
+	/**
+	 * @brief Returns the number of incoming edges from vertex vid.
+	 * @throws ElementNotFoundException if the input vertex id is not present in the network
+	 **/
+	long getInDegree(vertex_id vid);
+	/**
+	 * @brief Returns the number of incoming or outgoing edges from/to vertex vid.
+	 * @throws ElementNotFoundException if the input vertex id is not present in the network
+	 **/
+	long getDegree(vertex_id vid);
+	/**
+	 * @brief Returns the number of outgoing edges from vertex name.
+	 * @throws ElementNotFoundException if the input vertex id is not present in the network
+	 **/
+	long getOutDegree(std::string vertex_name);
+	/**
+	 * @brief Returns the number of incoming edges from vertex name.
+	 * @throws ElementNotFoundException if the input vertex id is not present in the network
+	 **/
+	long getInDegree(std::string vertex_name);
+	/**
+	 * @brief Returns the number of incoming or outgoing edges from/to vertex name.
+	 * @throws ElementNotFoundException if the input vertex id is not present in the network
+	 **/
+	long getDegree(std::string vertex_name);
+	/**
 	 * @brief Returns the identifiers of the vertexes with an edge coming from vertex_id.
 	 * @throws ElementNotFoundException if the input vertex id is not present in the network
 	 **/
-	std::set<vertex_id> getOutNeighbors(vertex_id vid);
+	void getOutNeighbors(vertex_id vid, std::set<vertex_id>& neighbors);
 	/**
 	 * @brief Returns the identifiers of the vertexes with an edge going to vertex_id.
 	 **/
-	std::set<vertex_id> getInNeighbors(vertex_id vid);
+	void getInNeighbors(vertex_id vid, std::set<vertex_id>& neighbors);
+	/**
+	 * @brief Returns the identifiers of the vertexes with an edge coming from or going to vertex_id.
+	 **/
+	void getNeighbors(vertex_id vid, std::set<vertex_id>& neighbors);
 	/**
 	 * @brief Returns the names of the vertexes with an edge coming from vertex_name.
 	 * Notice that vertexes are stored by id, therefore the unnamed version of this function is faster.
 	 * @throws ElementNotFoundException if the input vertex is not present in the network
 	 * @throws OperationNotSupportedException if the network is unnamed
 	 **/
-	std::set<std::string> getOutNeighbors(std::string vertex_name);
+	void getOutNeighbors(std::string vertex_name, std::set<std::string>& neighbors);
 	/**
 	 * @brief Returns the name of the vertexes with an edge going to vertex_name.
 	 * Notice that vertexes are stored by id, therefore the unnamed version of this function is faster.
 	 * @throws ElementNotFoundException if the input vertex is not present in the network
 	 * @throws OperationNotSupportedException if the network is unnamed
 	 **/
-	std::set<std::string> getInNeighbors(std::string vertex_name);
+	void getInNeighbors(std::string vertex_name, std::set<std::string>& neighbors);
+	/**
+	 * @brief Returns the name of the vertexes with an edge coming from or going to vertex_name.
+	 * Notice that vertexes are stored by id, therefore the unnamed version of this function is faster.
+	 * @throws ElementNotFoundException if the input vertex is not present in the network
+	 * @throws OperationNotSupportedException if the network is unnamed
+	 **/
+	void getNeighbors(std::string vertex_name, std::set<std::string>& neighbors);
 	/**
 	 * @brief Returns the weight on this edge.
 	 * @throws OperationNotSupportedException if the network is not weighted
