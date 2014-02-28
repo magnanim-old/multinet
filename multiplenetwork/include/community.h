@@ -12,9 +12,9 @@
 #include <vector>
 #include "datastructures.h"
 
-void girwan_newman(MultipleNetwork& mnet, std::vector<std::map<vertex_id,long> >& communities);
+void girwan_newman(MultipleNetwork& mnet, std::map<network_id,std::map<vertex_id,long> >& communities);
 
-double modularity(MultipleNetwork& mnet, std::vector<std::map<vertex_id,long> > communities);
+double modularity(MultipleNetwork& mnet, std::map<network_id,std::map<vertex_id,long> >& communities);
 
 #endif /* MULTIPLENETWORK_COMMUNITY_H_ */
 

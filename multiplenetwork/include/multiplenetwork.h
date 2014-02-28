@@ -14,5 +14,6 @@
 #import "exceptions.h"
 #import "utils.h"
 #import "io.h"
+#import "community.h"
 
 #endif /* MULTIPLENETWORK_MULTIPLENETWORK_H_ */

@@ -8,11 +8,13 @@
 
 #include "community.h"
 #include "measures.h"
+#include <map>
+#include <iostream>
 
 double modularity(MultipleNetwork& mnet,
-		std::map<network_id,std::map<vertex_id,int> > groups) {
+		 std::map<network_id,std::map<vertex_id,long> >& groups) {
 	double res = 0;
-	for (std::map<network_id,std::map<vertex_id,int> >::iterator network_iterator=groups.begin();
+	for (std::map<network_id,std::map<vertex_id,long> >::iterator network_iterator=groups.begin();
 			network_iterator!=groups.end(); network_iterator++) {
 		network_id net = (*network_iterator).first;
 		double m_net = mnet.getNetwork(net)->getNumEdges();
@@ -20,25 +22,27 @@ double modularity(MultipleNetwork& mnet,
 		if (m_net == 0)
 			continue;
 		std::set<vertex_id> vertexes;
-		mnet.getVertexes(vertexes);
+		mnet.getNetwork(net)->getVertexes(vertexes);
 		for (std::set<vertex_id>::iterator v_i = vertexes.begin();
 				v_i != vertexes.end(); v_i++) {
 			for (std::set<vertex_id>::iterator v_j = vertexes.begin();
 					v_j != vertexes.end(); v_j++) {
-				if (mnet.getNetwork(net)->containsVertex(
-						mnet.getLocalVertexId(*v_i, net))
-						&& mnet.getNetwork(net)->containsVertex(
-								mnet.getLocalVertexId(*v_j, net))
-						&& groups[net][mnet.getLocalVertexId(*v_i, net)]
-								== groups[net][mnet.getLocalVertexId(*v_j, net)]) {
-					long k_i = degree(mnet, *v_i, net);
-					long k_j = degree(mnet, *v_j, net);
+				vertex_id global_v_i = mnet.getGlobalVertexId(*v_i, net);
+				vertex_id global_v_j = mnet.getGlobalVertexId(*v_j, net);
+				std::cout << global_v_i << " " << global_v_j << std::endl;
+
+				if (groups[net][global_v_i] == groups[net][global_v_j]) {
+					std::cout << "Same group!" << std::endl;
+					if (mnet.getNetwork(net)->containsEdge(*v_i,*v_j))
+						std::cout << "Edge" << std::endl;
+					long k_i = degree(mnet, global_v_i, net);
+					long k_j = degree(mnet, global_v_j, net);
 					int a_ij =
 							mnet.getNetwork(net)->containsEdge(
-									mnet.getLocalVertexId(*v_i, net),
-									mnet.getLocalVertexId(*v_j, net)) ? 1 : 0;
+									*v_i,
+									*v_j) ? 1.0 : 0.0;
 					res += a_ij - k_i * k_j / (2 * m_net);
-					//cout << "Nodes " <<  i <<  " and " << j << " -> " << ( 1 - k_i*k_j/(2*m_net)) << "\n";
+					std::cout << global_v_i << " " << global_v_j << " " << res << std::endl;
 				}
 			}
 		}

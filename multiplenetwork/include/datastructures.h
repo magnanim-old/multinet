@@ -144,6 +144,7 @@ public:
 	/***********************/
 	/* Getters and setters */
 	/***********************/
+	void getVertexes(std::set<vertex_id>& vertexes);
 	/**
 	 * @brief Returns the number of vertexes.
 	 **/

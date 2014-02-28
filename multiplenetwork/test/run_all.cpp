@@ -14,6 +14,7 @@ int main(int argn, char* argv[]) {
 	//testNetwork();
 	//testIO();
 	testMeasures();
+	//testModularity(); Still working on this
 
 	return EXIT_SUCCESS;
 }

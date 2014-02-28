@@ -9,6 +9,7 @@
 #ifndef MULTIPLENETWORK_TEST_H_
 #define MULTIPLENETWORK_TEST_H_
 
+#include "multiplenetwork.h"
 #include <exception>
 #include <string>
 
@@ -26,6 +27,8 @@ private:
 void testNetwork();
 void testIO();
 void testMeasures();
+void testModularity();
+
 
 
 #endif /* MULTIPLENETWORK_TEST_H_ */

@@ -148,6 +148,10 @@ bool Network::deleteEdge(std::string vertex_name1, std::string vertex_name2) {
 	return deleteEdge(vertex_name_to_id[vertex_name1], vertex_name_to_id[vertex_name2]);
 }
 
+void Network::getVertexes(std::set<vertex_id>& vertexes) {
+	vertexes = this->vertexes;
+}
+
 long Network::getNumVertexes() {
 	return vertexes.size();
 }
