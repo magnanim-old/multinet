@@ -540,6 +540,7 @@ public:
 	/****************************/
 	/* Vertex and edge set      */
 	/****************************/
+	void getNetworks(std::set<network_id>& networks);
 	void getVertexes(std::set<vertex_id>& vertexes);
 	void getEdges(std::set<edge>& edges);
 	/**

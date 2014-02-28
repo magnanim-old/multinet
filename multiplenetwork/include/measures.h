@@ -106,4 +106,10 @@ void pareto_edge_betweenness(MultipleNetwork& mnet, std::map<edge, long>& edge_b
 
 int check_dominance(const Path& p1, const Path& p2);
 
+/**********************************************************************/
+/** Clustering ********************************************************/
+/**********************************************************************/
+
+double modularity(MultipleNetwork& mnet, std::map<network_id,std::map<vertex_id,long> >& communities, double c);
+
 #endif /* MULTIPLENETWORK_MEASURES_H_ */

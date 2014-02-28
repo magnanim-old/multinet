@@ -50,6 +50,12 @@ network_id MultipleNetwork::addNetwork(Network& net) {
 	return getNumNetworks()-1;
 }
 
+void MultipleNetwork::getNetworks(std::set<network_id>& networks) {
+	for (long v=0; v<getNumNetworks(); v++) {
+		networks.insert(v);
+	}
+}
+
 void MultipleNetwork::getVertexes(std::set<vertex_id>& vertexes) {
 	for (long v=0; v<getNumVertexes(); v++) {
 		vertexes.insert(v);
