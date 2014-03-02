@@ -62,18 +62,19 @@ void MultipleNetwork::getVertexes(std::set<vertex_id>& vertexes) {
 	}
 }
 
-void MultipleNetwork::getEdges(std::set<edge>& edges) {
+void MultipleNetwork::getEdges(std::set<global_edge_id>& edges) {
 	for (int network = 0; network < getNumNetworks(); network++) {
 		//long num_edges = mnet.getNetwork(network)->getNumEdges();
 		//cout << "processing network " << network << " (" << num_edges << " edges)\n";
-		std::set<vertex_id> vertexes = getNetwork(network)->getVertexes();
+		std::set<vertex_id> vertexes;
+		getNetwork(network)->getVertexes(vertexes);
 		for (std::set<vertex_id>::iterator from_iterator = vertexes.begin(); from_iterator != vertexes.end(); from_iterator++) {
 			vertex_id local_from = *from_iterator;
 			std::set<vertex_id> out_neighbors;
 			getNetwork(network)->getOutNeighbors(local_from, out_neighbors);
 			for (std::set<vertex_id>::iterator to_iterator = out_neighbors.begin(); to_iterator != out_neighbors.end(); to_iterator++) {
 						vertex_id local_to = *to_iterator;
-						edges.insert(edge(getGlobalVertexId(local_from,network),getGlobalVertexId(local_to,network),network));
+						edges.insert(global_edge_id(getGlobalVertexId(local_from,network),getGlobalVertexId(local_to,network),getNetwork(network)->isDirected(),network));
 			}
 		}
 	}

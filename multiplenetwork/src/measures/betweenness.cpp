@@ -39,7 +39,7 @@ void pareto_betweenness(MultipleNetwork& mnet,	std::map<vertex_id, long>& vertex
 	//cout << "mmm\n";
 }
 
-void pareto_edge_betweenness(MultipleNetwork& mnet, std::map<edge, long>& edge_betweenness) {
+void pareto_edge_betweenness(MultipleNetwork& mnet, std::map<global_edge_id, long>& edge_betweenness) {
 	for (vertex_id i = 0; i < mnet.getNumVertexes(); i++) {
 		map<vertex_id,set<Path> > paths;
 		pareto_distance_all_paths(mnet, i, paths);
@@ -53,7 +53,7 @@ void pareto_edge_betweenness(MultipleNetwork& mnet, std::map<edge, long>& edge_b
 					vertex_id from = path->getVertex(e);
 					vertex_id to = path->getVertex(e+1);
 					network_id net = path->getNetwork(e);
-					edge step(from,to,net);
+					global_edge_id step(from,to,mnet.getNetwork(net)->isDirected(),net);
 					//long vertex2 = mnet.getGlobalVertexId(*to,net);
 					if (edge_betweenness.count(step)==0) {
 						edge_betweenness[step] = 0;

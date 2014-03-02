@@ -65,7 +65,7 @@ void testMeasures() {
 
 
 	log("Computing Pareto betweenness for all edges...",false);
-	std::map<edge, long> edge_betweenness;
+	std::map<global_edge_id, long> edge_betweenness;
 	pareto_edge_betweenness(mnet, edge_betweenness);
 	log("done!");
 	// UNCOMMENT TO PRINT VALUES
@@ -76,9 +76,9 @@ void testMeasures() {
 	}
 	*/
 	log("Testing sample values (network 1: U0-U1=4, U1-U3=3, network 2: U3-U4=1)...",false);
-	if (edge_betweenness[edge(0,1,0)]!=4) throw FailedUnitTestException("Wrong betweenness for edge U0-U1 on network 1");
-	if (edge_betweenness[edge(3,4,1)]!=1) throw FailedUnitTestException("Wrong betweenness for edge U3-U4 on network 2");
-	if (edge_betweenness[edge(1,3,0)]!=3) throw FailedUnitTestException("Wrong betweenness for edge U1-U3 on network 1");
+	if (edge_betweenness[global_edge_id(0,1,0,mnet.getNetwork(0)->isDirected())]!=4) throw FailedUnitTestException("Wrong betweenness for edge U0-U1 on network 1");
+	if (edge_betweenness[global_edge_id(3,4,1,mnet.getNetwork(1)->isDirected())]!=1) throw FailedUnitTestException("Wrong betweenness for edge U3-U4 on network 2");
+	if (edge_betweenness[global_edge_id(1,3,0,mnet.getNetwork(0)->isDirected())]!=3) throw FailedUnitTestException("Wrong betweenness for edge U1-U3 on network 1");
 	log("done!");
 
 	log("TEST SUCCESSFULLY COMPLETED (distance and betweenness on undirected multiple networks)");

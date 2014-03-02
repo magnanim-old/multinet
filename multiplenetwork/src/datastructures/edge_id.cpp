@@ -8,17 +8,19 @@
 
 #include "datastructures.h"
 
-edge::edge(vertex_id v1, vertex_id v2, network_id network) {
-	edge::v1 = v1;
-	edge::v2 = v2;
-	edge::network = network;
+edge_id::edge_id(vertex_id v1, vertex_id v2, bool directed) {
+	edge_id::v1 = v1;
+	edge_id::v2 = v2;
+	edge_id::directed = directed;
 }
 
-bool edge::operator==(const edge& e2) const {
-    return (v1==e2.v1)&&(v2==e2.v2)&&(network==e2.network);
+bool edge_id::operator==(const edge_id& e2) const {
+    return ((v1==e2.v1)&&(v2==e2.v2)) ||
+    		(!directed && (v1==e2.v2) && (v2==e2.v1));
 }
 
-bool edge::operator<=(const edge& e2) const {
+/*
+bool edge_id::operator<=(const edge_id& e2) const {
     if (v1<e2.v1) return true;
     if (v1==e2.v1) {
     	if (v2<e2.v2) return true;
@@ -28,14 +30,12 @@ bool edge::operator<=(const edge& e2) const {
     }
     return false;
 }
+*/
 
-bool edge::operator<(const edge& e2) const {
+bool edge_id::operator<(const edge_id& e2) const {
     if (v1<e2.v1) return true;
     if (v1==e2.v1) {
     	if (v2<e2.v2) return true;
-    	if (v2==e2.v2) {
-    		if (network<e2.network) return true;
-    	}
     }
     return false;
 }

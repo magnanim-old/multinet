@@ -102,7 +102,7 @@ void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex, std::map
 
 void pareto_betweenness(MultipleNetwork& mnet, std::map<vertex_id,long>& vertex_betweenness);
 
-void pareto_edge_betweenness(MultipleNetwork& mnet, std::map<edge, long>& edge_betweenness);
+void pareto_edge_betweenness(MultipleNetwork& mnet, std::map<global_edge_id, long>& edge_betweenness);
 
 int check_dominance(const Path& p1, const Path& p2);
 

@@ -11,9 +11,7 @@
 #ifndef MULTIPLENETWORK_TYPES_H_
 #define MULTIPLENETWORK_TYPES_H_
 
-typedef long vertex_id;
-typedef int network_id;
-typedef long edge_id;
+
 
 const int MULTIPLENETWORK_DEFAULT_WEIGHT=1;
 

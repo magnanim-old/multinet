@@ -27,7 +27,7 @@ void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
 	/* timestamp, used for efficiency reasons to avoid processing edges when no changes have occurred since the last iteration  */
 	long ts = 0;
 	/* last update timestamp */
-	std::map<edge, long> last_updated;
+	std::map<global_edge_id, long> last_updated;
 	/*
 	for (int network = 0; network < num_networks; network++) {
 		std::map<vertex_id, std::map<vertex_id, long> > edge_timestamps;
@@ -53,20 +53,28 @@ void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
 		changes = false;
 		//int counter = 0;
 
-		set<edge> edges;
+		set<global_edge_id> edges;
 		mnet.getEdges(edges);
-		for (set<edge>::iterator edge_iterator=edges.begin(); edge_iterator!=edges.end(); ++edge_iterator) {
-			edge e=(*edge_iterator);
-		/*
-		for (int network = 0; network < num_networks; network++) {
+		//for (set<global_edge_id>::iterator edge_iterator=edges.begin(); edge_iterator!=edges.end(); ++edge_iterator) {
+		//	global_edge_id e=(*edge_iterator);
+		//	if (!e.directed) {
+		//
+		//	}
+		std::set<network_id> nets;
+		mnet.getNetworks(nets);
+		std::set<network_id>::iterator network_iterator;
+		for (network_iterator=nets.begin(); network_iterator!=nets.end(); ++network_iterator) {
+			network_id network = *network_iterator;
+
 			//long num_edges = mnet.getNetwork(network)->getNumEdges();
 			//cout << "processing network " << network << " (" << num_edges << " edges)\n";
-			set<vertex_id> vertexes = mnet.getNetwork(network)->getVertexes();
+			set<vertex_id> vertexes;
+			mnet.getNetwork(network)->getVertexes(vertexes);
 			for (set<vertex_id>::iterator from_iterator = vertexes.begin();
 					from_iterator != vertexes.end(); from_iterator++) {
 				vertex_id local_from = *from_iterator;
-				set<vertex_id> out_neighbors =
-						mnet.getNetwork(network)->getOutNeighbors(local_from);
+				set<vertex_id> out_neighbors;
+				mnet.getNetwork(network)->getOutNeighbors(local_from, out_neighbors);
 				for (set<vertex_id>::iterator to_iterator =
 						out_neighbors.begin();
 						to_iterator != out_neighbors.end(); to_iterator++) {
@@ -75,8 +83,9 @@ void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
 
 					vertex_id from = mnet.getGlobalVertexId(local_from, network);
 					vertex_id to = mnet.getGlobalVertexId(local_to, network);
+					global_edge_id e(from, to, false, network);
 					// initialize edge timestamp to -1 if first processed
-*/
+
 
 					long lastUpdate;
 					if (last_updated.count(e)==0) lastUpdate = -1;
@@ -169,7 +178,8 @@ void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
 
 				}
 				//System.out.println();
-
+			}
+		}
 		//if (!changes) break;
 	} while (changes);
 	//cout << "here?\n";

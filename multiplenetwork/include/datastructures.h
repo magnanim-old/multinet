@@ -1,11 +1,20 @@
 /*
  * datastructures.h
  *
- * Created on: Feb 6, 2014
- * Author: matteomagnani
+ * Author: Matteo Magnani <matteo.magnani@it.uu.se>
  * Version: 0.0.1
  *
- * CLASSES: Network
+ * This file defines the basic data structures composing networks ("vertex_id" and
+ * "edge_id") and multiple networks ("global_vertex_id" and "global_edge_id", where
+ * global indicates that they are not defined on a single network but on the whole
+ * multiple network structure). The same global vertex (at the multiple network level)
+ * can correspond to multiple vertexes inside different networks.
+ *
+ * The two main classes defined in this file are Network and MultipleNetwork.
+ *
+ * Two classes representing respectively a path and a distance between two global
+ * vertexes, where the path can traverse multiple networks, are also defined here.
+ * CLASSES: Network, Multiple Network, Path
  */
 
 #ifndef MULTIPLENETWORK_DATASTRUCTURES_H_
@@ -17,19 +26,66 @@
 #include <set>
 #include <vector>
 
-struct edge {
+/** The identifier of a network inside a MultipleNetwork data tructure */
+typedef int network_id;
+
+/** The identifier of a vertex inside a (single) network */
+typedef long vertex_id;
+
+/**
+ *  The identifier of an edge inside a (single) network.
+ * An edge is identified by the two nodes it connects and
+ * its directionality. Directionality is used to compute
+ * the equality operator: if an edge is undirected, (u,v)==(v,u)
+ * (i.e., the two edge_ids refer to the same edge: they are equal)
+ */
+struct edge_id {
+public:
+	vertex_id v1;
+	vertex_id v2;
+	bool directed;
+
+	/** Constructor */
+	edge_id(vertex_id v1, vertex_id v2, bool directed);
+
+	/** Comparison operators, to use edge ids as keys in maps */
+	bool operator==(const edge_id& e2) const;
+
+//	bool operator<=(const edge& e2) const;
+
+	bool operator<(const edge_id& e2) const;
+};
+
+/**
+ *  The identifier of a vertex inside a multiple network. This
+ * may correspond to different vertex identifiers inside single
+ * networks
+ */
+typedef long global_vertex_id;
+
+/**
+ *  The identifier of an edge inside a (single) network.
+ * An edge is identified by the two nodes it connects and
+ * its directionality. Directionality is used to compute
+ * the equality operator: if an edge is undirected, (u,v)==(v,u)
+ * (i.e., the two edge_ids refer to the same edge: they are equal)
+ */
+struct global_edge_id {
 public:
 	vertex_id v1;
 	vertex_id v2;
 	network_id network;
+	bool directed;
 
-	edge(vertex_id v1, vertex_id v2, network_id network);
+	/* Constructor */
+	global_edge_id(vertex_id v1, vertex_id v2, bool directed, network_id network);
 
-	bool operator==(const edge& e2) const;
+	/* Comparison operators, to use edge ids as keys in maps */
+	bool operator==(const global_edge_id& e2) const;
 
-	bool operator<=(const edge& e2) const;
+//	bool operator<=(const edge& e2) const;
 
-	bool operator<(const edge& e2) const;
+	bool operator<(const global_edge_id& e2) const;
 };
 
 /**********************************************************************/
@@ -40,15 +96,25 @@ public:
 	/****************************/
 	/* Constructors/destructors */
 	/****************************/
-	/** Not to be used */
+	/** Creates an unnamed, undirected and unweighed empty network */
 	Network();
 	/** Creates an empty network */
 	Network(bool named, bool directed, bool weighted);
 	/** */
 	~Network();
-	/*******************************/
-	/* Basic structural operations */
-	/*******************************/
+	/**************************************************************************************
+	 * Basic structural operations used to add and delete vertexes and edges.
+	 *
+	 * Error-checking depends on the operation: adding a new vertex requires that the
+	 * vertex does not already exist, adding an edge requires that the two vertexes to
+	 * be connected exist. On the contrary, delete operations work also if we try to
+	 * delete a non-existing object: in this case the network is not modified and "false"
+	 * is returned by the function.
+	 *
+	 * There are specific operations for named/unnamed and weighed/unweighed networks.
+	 *
+	 * Each operation automatically adapts to the type of network (directed or undirected).
+	 **************************************************************************************/
 	/**
 	 * @brief Adds a vertex to an unnamed network.
 	 * If the network is named, the appropriate insert function taking the vertex name as a parameter must be used instead.
@@ -63,7 +129,7 @@ public:
 	 * @throws OperationNotSupportedException if the network is not named
 	 * @throws DuplicateElementException if vertex_name already exists
 	 **/
-	vertex_id addVertex(std::string vertex_name);
+	vertex_id addVertex(const std::string& vertex_name);
 	/**
 	 * @brief Adds a new edge.
 	 * The type of edge (directed/undirected) is inherited by the type of network (specified at creation time).
@@ -96,7 +162,7 @@ public:
 	 * @throws ElementNotFoundException if the input elements are not present in the network
 	 * @throws DuplicateElementException if the edge is already present in the network
 	 **/
-	edge_id addEdge(std::string vertex_name1, std::string vertex_name2);
+	edge_id addEdge(const std::string& vertex_name1, const std::string& vertex_name2);
 	/**
 	 * @brief Adds a new edge with an associated double precision weight.
 	 * The type of edge (directed/undirected) is inherited by the type of network (specified at creation time).
@@ -107,8 +173,7 @@ public:
 	 * @throws ElementNotFoundException if the input elements are not present in the network
 	 * @throws DuplicateElementException if the edge is already present in the network
 	 **/
-	edge_id addEdge(std::string vertex_name1, std::string vertex_name2,
-			double weight);
+	edge_id addEdge(const std::string& vertex_name1, const std::string& vertex_name2, double weight);
 	/**
 	 * @brief Deletes an existing vertex.
 	 * All related data, including vertex attributes and edges involving this vertex, are also deleted.
@@ -123,7 +188,7 @@ public:
 	 * @throws OperationNotSupportedException if the network is unnamed
 	 * @return false if the vertex is not present in the network
 	 **/
-	bool deleteVertex(std::string vertex_name);
+	bool deleteVertex(const std::string& vertex_name);
 	/**
 	 * @brief Deletes an existing edge.
 	 * Attribute values associated to this edge are also deleted.
@@ -140,7 +205,7 @@ public:
 	 * @param vertex_name2 the "to" vertex in a directed network, or one end of the edge in an undirected one
 	 * @return false if the edge is not present in the network
 	 **/
-	bool deleteEdge(std::string vertex_name1, std::string vertex_name2);
+	bool deleteEdge(const std::string& vertex_name1, const std::string& vertex_name2);
 	/***********************/
 	/* Getters and setters */
 	/***********************/
@@ -257,10 +322,6 @@ public:
 	vertex_id getVertexId(std::string vertex_name);
 
 
-	/****************************/
-	/* Vertex and edge sets      */
-	/****************************/
-	std::set<vertex_id> getVertexes();
 	/****************************/
 	/* Check network properties */
 	/****************************/
@@ -484,8 +545,8 @@ private:
 	 */
 	std::map<vertex_id, std::string> vertex_id_to_name;
 	std::map<std::string, vertex_id> vertex_name_to_id;
-	std::map<vertex_id, std::map<vertex_id, edge_id> > out_edges;
-	std::map<vertex_id, std::map<vertex_id, edge_id> > in_edges;
+	std::map<vertex_id, std::set<vertex_id> > out_edges;
+	std::map<vertex_id, std::set<vertex_id> > in_edges;
 	/* attributes */
 	std::map<std::string, std::map<vertex_id, std::string> > vertex_string_attribute;
 	std::map<std::string, std::map<edge_id, std::string> > edge_string_attribute;
@@ -542,7 +603,7 @@ public:
 	/****************************/
 	void getNetworks(std::set<network_id>& networks);
 	void getVertexes(std::set<vertex_id>& vertexes);
-	void getEdges(std::set<edge>& edges);
+	void getEdges(std::set<global_edge_id>& edges);
 	/**
 	 * @brief Finds the identifier of a global vertex inside a local network.
 	 *

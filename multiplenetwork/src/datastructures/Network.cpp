@@ -1,9 +1,7 @@
-/*
- * Network.cpp
+/* Network.cpp
  *
- * Created on: Feb 7, 2014
- * Author: matteomagnani
- * Version: 0.0.1
+ * All comments explaining the effect of these functions and not
+ * related to specific implementation choices are in datastructures.h
  */
 
 #include "datastructures.h"
@@ -22,6 +20,7 @@ Network::Network(bool named, bool directed, bool weighed) {
 	is_named=named;
 	is_weighed=weighed;
 	is_directed=directed;
+	// weights are stored in the same way as any other edge attribute
 	if (is_weighed) {
 		newNumericEdgeAttribute("weight");
 	}
@@ -39,7 +38,7 @@ vertex_id Network::addVertex() {
 	return new_vertex_id;
 }
 
-vertex_id Network::addVertex(std::string vertex_name) {
+vertex_id Network::addVertex(const std::string& vertex_name) {
 	if (containsVertex(vertex_name)) throw DuplicateElementException("Vertex " + vertex_name + " already exists");
 	if (!isNamed()) throw OperationNotSupportedException("Cannot add a named vertex to an unnamed network");
 	max_vertex_id++;
@@ -54,34 +53,33 @@ edge_id Network::addEdge(vertex_id vid1, vertex_id vid2) {
 	if (!containsVertex(vid1)) throw ElementNotFoundException("Vertex " + std::to_string(vid1));
 	if (!containsVertex(vid2)) throw ElementNotFoundException("Vertex " + std::to_string(vid2));
 	if (out_edges[vid1].count(vid2)>0) throw DuplicateElementException("Edge (" + std::to_string(vid1) + "," + std::to_string(vid2) +  ") already exists");
-	max_edge_id++;
-	edge_id new_edge_id = max_edge_id;
-	out_edges[vid1][vid2] = new_edge_id;
-	in_edges[vid2][vid1] = new_edge_id;
+	//max_edge_id++;
+	out_edges[vid1].insert(vid2);
+	in_edges[vid2].insert(vid1);
 	if (!isDirected() && vid1!=vid2) {
-		out_edges[vid2][vid1] = new_edge_id;
-		in_edges[vid1][vid2] = new_edge_id;
+		out_edges[vid2].insert(vid1);
+		in_edges[vid1].insert(vid2);
 	}
 	if (isWeighed()) setNumericEdgeAttribute(vid1,vid2,"weight",MULTIPLENETWORK_DEFAULT_WEIGHT); // this will be replaced if this method has been called inside addEdge(vertex_id, vertex_id, double)
 	num_edges++;
-	return new_edge_id;
+	return edge_id(vid1, vid2, isDirected());
 }
 
 edge_id Network::addEdge(vertex_id vid1, vertex_id vid2, double weight) {
 	if (!isWeighed()) throw OperationNotSupportedException("Cannot add a weight: network is unweighed");
 	edge_id new_edge_id = addEdge(vid1, vid2);
 	setNumericEdgeAttribute(vid1, vid2, "weight", weight);
-	return new_edge_id;
+	return edge_id(vid1, vid2, isDirected());
 }
 
-edge_id Network::addEdge(std::string vertex_name1, std::string vertex_name2) {
+edge_id Network::addEdge(const std::string& vertex_name1, const std::string& vertex_name2) {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name1)) throw ElementNotFoundException("Vertex " + vertex_name1);
 	if (!containsVertex(vertex_name2)) throw ElementNotFoundException("Vertex " + vertex_name2);
 	return addEdge(vertex_name_to_id[vertex_name1],vertex_name_to_id[vertex_name2]);
 }
 
-edge_id Network::addEdge(std::string vertex_name1, std::string vertex_name2, double weight) {
+edge_id Network::addEdge(const std::string& vertex_name1, const std::string& vertex_name2, double weight) {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name1)) throw ElementNotFoundException("Vertex " + vertex_name1);
 	if (!containsVertex(vertex_name2)) throw ElementNotFoundException("Vertex " + vertex_name2);
@@ -117,7 +115,7 @@ bool Network::deleteVertex(vertex_id vid) {
 	return true;
 }
 
-bool Network::deleteVertex(std::string vertex_name) {
+bool Network::deleteVertex(const std::string& vertex_name) {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name)) return false;
 	deleteVertex(vertex_name_to_id[vertex_name]);
@@ -126,7 +124,7 @@ bool Network::deleteVertex(std::string vertex_name) {
 
 bool Network::deleteEdge(vertex_id vid1, vertex_id vid2) {
 	if (!containsEdge(vid1,vid2)) return false;
-	edge_id eid = out_edges[vid1][vid2];
+	edge_id eid(vid1,vid2,isDirected());
 	out_edges[vid1].erase(vid2);
 	in_edges[vid2].erase(vid1);
 	if (!isDirected()) {
@@ -142,7 +140,7 @@ bool Network::deleteEdge(vertex_id vid1, vertex_id vid2) {
 	return true;
 }
 
-bool Network::deleteEdge(std::string vertex_name1, std::string vertex_name2) {
+bool Network::deleteEdge(const std::string& vertex_name1, const std::string& vertex_name2) {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsEdge(vertex_name1,vertex_name2)) return false;
 	return deleteEdge(vertex_name_to_id[vertex_name1], vertex_name_to_id[vertex_name2]);
@@ -191,14 +189,14 @@ long Network::getDegree(std::string vertex_name) {
 
 void Network::getOutNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) {
 	if (!containsVertex(vid)) throw ElementNotFoundException("Vertex " + std::to_string(vid));
-	for (std::map<vertex_id,edge_id>::iterator it=out_edges[vid].begin(); it!=out_edges[vid].end(); it++)
-		neighbors.insert(it->first);
+	for (std::set<vertex_id>::iterator it=out_edges[vid].begin(); it!=out_edges[vid].end(); it++)
+		neighbors.insert(*it);
 }
 
 void Network::getInNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) {
 	if (!containsVertex(vid)) throw ElementNotFoundException("Vertex " + std::to_string(vid));
-	for (std::map<vertex_id,edge_id>::iterator it=in_edges[vid].begin(); it!=in_edges[vid].end(); it++)
-		neighbors.insert(it->first);
+	for (std::set<vertex_id>::iterator it=in_edges[vid].begin(); it!=in_edges[vid].end(); it++)
+		neighbors.insert(*it);
 }
 
 void Network::getNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) {
@@ -262,11 +260,6 @@ vertex_id Network::getVertexId(std::string vertex_name) {
 	return vertex_name_to_id[vertex_name];
 }
 
-
-std::set<vertex_id> Network::getVertexes() {
-	return vertexes;
-}
-
 bool Network::isDirected() {
 	return is_directed;
 }
@@ -311,12 +304,12 @@ void Network::newStringVertexAttribute(std::string attribute_name) {
 
 void Network::newNumericEdgeAttribute(std::string attribute_name) {
 	if (edge_numeric_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
-	edge_numeric_attribute[attribute_name] = std::map<vertex_id,double>();
+	edge_numeric_attribute[attribute_name] = std::map<edge_id,double>();
 }
 
 void Network::newStringEdgeAttribute(std::string attribute_name) {
 	if (edge_string_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
-	edge_string_attribute[attribute_name] = std::map<vertex_id,std::string>();
+	edge_string_attribute[attribute_name] = std::map<edge_id,std::string>();
 }
 
 double Network::getNumericVertexAttribute(vertex_id vid, std::string attribute_name) {
@@ -348,7 +341,7 @@ double Network::getNumericEdgeAttribute(vertex_id vid1, vertex_id vid2, std::str
 	if (!containsVertex(vid2)) throw ElementNotFoundException("Vertex " + std::to_string(vid2));
 	if (!containsEdge(vid1, vid2)) throw ElementNotFoundException("Edge (" + std::to_string(vid1) + ", " + std::to_string(vid2) + ")");
 	if (edge_numeric_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
-	edge_id eid = out_edges[vid1][vid2];
+	edge_id eid(vid1, vid2, isDirected());
 	if (edge_numeric_attribute[attribute_name].count(eid)==0)  throw ElementNotFoundException("No attribute value for attribute " + attribute_name + " on edge (" + std::to_string(vid1) + "," +  std::to_string(vid2) + ")");
 	return edge_numeric_attribute[attribute_name][eid];
 }
@@ -365,7 +358,7 @@ std::string Network::getStringEdgeAttribute(vertex_id vid1, vertex_id vid2, std:
 	if (!containsVertex(vid2)) throw ElementNotFoundException("Vertex " + std::to_string(vid2));
 	if (!containsEdge(vid1, vid2)) throw ElementNotFoundException("Edge (" + std::to_string(vid1) + ", " + std::to_string(vid2) + ")");
 	if (edge_string_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
-	edge_id eid = out_edges[vid1][vid2];
+	edge_id eid(vid1, vid2, isDirected());
 	if (edge_string_attribute[attribute_name].count(eid)==0)  throw ElementNotFoundException("No attribute value for attribute " + attribute_name + " on edge (" + std::to_string(vid1) + "," +  std::to_string(vid2) + ")");
 	return edge_string_attribute[attribute_name][eid];
 }
@@ -402,7 +395,7 @@ void Network::setNumericEdgeAttribute(vertex_id vid1, vertex_id vid2, std::strin
 	if (!containsVertex(vid2)) throw ElementNotFoundException("Vertex " + std::to_string(vid2));
 	if (!containsEdge(vid1, vid2)) throw ElementNotFoundException("Edge (" + std::to_string(vid2) + ", " + std::to_string(vid2) + ")");
 	if (edge_numeric_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
-	edge_id eid = out_edges[vid1][vid2];
+	edge_id eid(vid1, vid2, isDirected());
 	edge_numeric_attribute[attribute_name][eid] = val;
 }
 
@@ -418,7 +411,7 @@ void Network::setStringEdgeAttribute(vertex_id vid1, vertex_id vid2, std::string
 	if (!containsVertex(vid2)) throw ElementNotFoundException("Vertex " + std::to_string(vid2));
 	if (!containsEdge(vid1, vid2)) throw ElementNotFoundException("Edge (" + std::to_string(vid2) + ", " + std::to_string(vid2) + ")");
 	if (edge_string_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
-	edge_id eid = out_edges[vid1][vid2];
+	edge_id eid(vid1, vid2, isDirected());
 	edge_string_attribute[attribute_name][eid] = val;
 }
 

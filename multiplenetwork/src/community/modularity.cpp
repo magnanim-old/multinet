@@ -52,8 +52,10 @@ double modularity(MultipleNetwork& mnet,
 				}
 			}
 		}
-		std::cout << "->" << res << std::endl;
+		//std::cout << "->" << res << std::endl;
 	}
+
+	double mod = res;
 
 	std::set<network_id>::iterator network_iterator1, network_iterator2;
 	std::set<vertex_id>::iterator vertex_iterator;
@@ -75,5 +77,8 @@ double modularity(MultipleNetwork& mnet,
 			}
 		}
 	}
+
+	std::cout << "->" << mod << " " << (res-mod) << std::endl;
+
 	return 1 / (2 * mu) * res;
 }
