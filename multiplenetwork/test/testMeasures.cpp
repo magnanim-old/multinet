@@ -52,12 +52,12 @@ void testMeasures() {
 	pareto_betweenness(mnet, vertex_betweenness);
 	log("done!");
 	// UNCOMMENT TO PRINT VALUES
-	/*
+
 	log("Pareto betweenness:");
 	for (std::map<vertex_id, long>::iterator btw=vertex_betweenness.begin(); btw!=vertex_betweenness.end(); btw++) {
 		std::cout << mnet.getVertexName((*btw).first) << ": " << (*btw).second << std::endl;
 	}
-	*/
+
 	log("Testing sample values (U1=9, U3=0)...",false);
 	if (vertex_betweenness[1]!=9) throw FailedUnitTestException("Wrong betweenness for node U1");
 	if (vertex_betweenness[3]!=0) throw FailedUnitTestException("Wrong betweenness for node U3");
@@ -69,16 +69,16 @@ void testMeasures() {
 	pareto_edge_betweenness(mnet, edge_betweenness);
 	log("done!");
 	// UNCOMMENT TO PRINT VALUES
-	/*
+
 	log("Pareto edge betweenness:");
-	for (std::map<edge, long>::iterator bet=edge_betweenness.begin(); bet!=edge_betweenness.end(); bet++) {
+	for (std::map<global_edge_id, long>::iterator bet=edge_betweenness.begin(); bet!=edge_betweenness.end(); bet++) {
 		std::cout << mnet.getVertexName((*bet).first.v1) << " -" << mnet.getNetworkName((*bet).first.network) << "-> " << mnet.getVertexName((*bet).first.v2) << ": " << (*bet).second << std::endl;
 	}
-	*/
+
 	log("Testing sample values (network 1: U0-U1=4, U1-U3=3, network 2: U3-U4=1)...",false);
-	if (edge_betweenness[global_edge_id(0,1,0,mnet.getNetwork(0)->isDirected())]!=4) throw FailedUnitTestException("Wrong betweenness for edge U0-U1 on network 1");
-	if (edge_betweenness[global_edge_id(3,4,1,mnet.getNetwork(1)->isDirected())]!=1) throw FailedUnitTestException("Wrong betweenness for edge U3-U4 on network 2");
-	if (edge_betweenness[global_edge_id(1,3,0,mnet.getNetwork(0)->isDirected())]!=3) throw FailedUnitTestException("Wrong betweenness for edge U1-U3 on network 1");
+	if (edge_betweenness[global_edge_id(0,1,mnet.getNetwork(0)->isDirected(),0)]!=4) throw FailedUnitTestException("Wrong betweenness for edge U0-U1 on network 1");
+	if (edge_betweenness[global_edge_id(3,4,mnet.getNetwork(1)->isDirected(),1)]!=1) throw FailedUnitTestException("Wrong betweenness for edge U3-U4 on network 2");
+	if (edge_betweenness[global_edge_id(1,3,mnet.getNetwork(0)->isDirected(),0)]!=3) throw FailedUnitTestException("Wrong betweenness for edge U1-U3 on network 1");
 	log("done!");
 
 	log("TEST SUCCESSFULLY COMPLETED (distance and betweenness on undirected multiple networks)");

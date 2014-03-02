@@ -53,15 +53,13 @@ void pareto_edge_betweenness(MultipleNetwork& mnet, std::map<global_edge_id, lon
 					vertex_id from = path->getVertex(e);
 					vertex_id to = path->getVertex(e+1);
 					network_id net = path->getNetwork(e);
-					global_edge_id step(from,to,mnet.getNetwork(net)->isDirected(),net);
+					global_edge_id step(from,to,mnet.getNetwork(e)->isDirected(),net);
 					//long vertex2 = mnet.getGlobalVertexId(*to,net);
 					if (edge_betweenness.count(step)==0) {
 						edge_betweenness[step] = 0;
 					}
 					edge_betweenness[step]++;
 					// We store only positive values of edge betweenness
-					//cout << "Increased " << mnet.getGlobalVertexName(vertex1) << " to " << betweenness[vertex1] << endl;
-					//betweenness[vertex2]++;
 				}
 			}
 		}
