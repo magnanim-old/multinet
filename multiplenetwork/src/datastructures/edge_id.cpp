@@ -15,8 +15,13 @@ edge_id::edge_id(vertex_id v1, vertex_id v2, bool directed) {
 }
 
 bool edge_id::operator==(const edge_id& e2) const {
-    return ((v1==e2.v1)&&(v2==e2.v2)) ||
-    		(!directed && (v1==e2.v2) && (v2==e2.v1));
+    return (directed==e2.directed) &&
+    		(((v1==e2.v1)&&(v2==e2.v2)) ||
+    		(!directed && (v1==e2.v2) && (v2==e2.v1)));
+}
+
+bool edge_id::operator!=(const edge_id& e2) const {
+    return ! operator==(e2);
 }
 
 /*

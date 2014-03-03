@@ -12,6 +12,26 @@
 #import "utils.h"
 
 void testNetwork() {
+	log("TESTING basic network components (vertex_id, edge_id)...",false);
+	// vertex identifiers would normally be assigned automatically by functions of the Network class
+	// however we manually create two vertex identijust for testing.
+	vertex_id vid1 = 0;
+	vertex_id vid2 = 1;
+	// a directed edge
+	edge_id e1(vid1,vid2,true);
+	// another directed edge
+	edge_id e2(vid2,vid1,true);
+	// a third directed edge
+	edge_id e3(vid2,vid1,true);
+	// an undirected edge
+	edge_id e4(vid1,vid2,false);
+	// another undirected edge
+	edge_id e5(vid2,vid1,false);
+	if (e1==e2) throw FailedUnitTestException("Wrong edge_id comparison");
+	if (e2!=e3) throw FailedUnitTestException("Wrong edge_id comparison");
+	if (e4!=e5) throw FailedUnitTestException("Wrong edge_id comparison");
+	log("done!");
+
 
 	log("TESTING Network class (undirected, unweighed, unnamed)");
 	log("Creating the network...",false);
