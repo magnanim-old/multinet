@@ -6,7 +6,7 @@ Analysis and mining of multiple(x) networks
 The include directory contains all the classes/functions definitions and detailed comments. To use this as an external library, it is sufficient to include multiplenetwork.h (which just imports all other headers).
 
 - datastructure.h contains the definitions of vertexes, edges, networks and multiple networks, in addition to paths and distances.
-- measures.h contains the definition of the main analysis measures: degree, neoghborhood, network relevance, distance, betweenness, modularity, ... (all in their multiple-network extension).
+- measures.h contains the definition of the main analysis measures: degree, neighborhood, network relevance, distance, betweenness, modularity, ... (all in their multiple-network extension).
 - io.h contains functions to read and write multiple networks from/to file (so far only a simple read function has been implemented).
 - transformation.h
 - evolution.h
