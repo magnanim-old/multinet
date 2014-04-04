@@ -28,7 +28,9 @@ void testNetwork();
 void testIO();
 void testMeasures();
 void testModularity();
-
+void testEvolution();
+void testRandom();
+void testTransformations();
 
 
 #endif /* MULTIPLENETWORK_TEST_H_ */

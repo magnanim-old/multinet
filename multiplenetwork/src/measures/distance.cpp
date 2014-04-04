@@ -21,6 +21,12 @@ using namespace std;
 
 void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
 		std::map<vertex_id,std::set<Path> >& paths) {
+	pareto_distance_all_paths(mnet, vertex, paths, 1000000);
+}
+
+
+void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
+		std::map<vertex_id,std::set<Path> >& paths, int bound) {
 
 	std::set<vertex_id> vertexes;
 	mnet.getVertexes(vertexes);
@@ -111,6 +117,10 @@ void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
 						ts++;
 						// no need to considered them if they where already there when we last checked this edge
 						//debug("TS: " + p.timestamp + " " + lastUpdate);
+
+						// if
+						if (path->length()>=bound)
+							continue;
 
 						//cout << "processing path: " << *path << " "
 						//		<< lastUpdate << "\n";

@@ -16,6 +16,18 @@ void testModularity() {
 	log("TESTING measures");
 	log("Reading the network...",false);
 	// Creating an empty multiple network and initializing it
+	MultipleNetwork mnet_toy;
+	mnet_read_edgelist(mnet_toy, "test/toy.mnet");
+	mnet_toy.getNetwork("l1")->addVertex("U4");
+	mnet_toy.map("U4","U4","l1");
+
+	MultipleNetwork mnet0;
+	//mnet_read_edgelist(mnet, "test/toy.mnet");
+	mnet_read_edgelist(mnet0, "/Users/matteomagnani/Dropbox/Research/13NetworkScience/code/fig6b.mnet");
+	mnet0.getNetwork("l1")->addVertex("v8");
+	mnet0.map("v8","v8","l1");
+	mnet0.getNetwork("l3")->addVertex("v8");
+	mnet0.map("v8","v8","l3");
 	MultipleNetwork mnet;
 	//mnet_read_edgelist(mnet, "test/toy.mnet");
 	mnet_read_edgelist(mnet, "/Users/matteomagnani/Dropbox/Research/13NetworkScience/code/fig6b.mnet");
@@ -23,11 +35,21 @@ void testModularity() {
 	mnet.map("v8","v8","l1");
 	mnet.getNetwork("l3")->addVertex("v8");
 	mnet.map("v8","v8","l3");
+
 	log("done!");
 
-	log("Computing modularity...",false);
-	std::map<network_id,std::map<vertex_id,long> > groups0, groups1, groups2, groups3;
-	groups1[0] = std::map<vertex_id,long>();
+	log("Computing modularity...");
+	std::map<network_id,std::map<vertex_id,long> > groups_toy, groups1, groups2, groups3, groups4;
+
+	groups_toy[0][0]=0;
+	groups_toy[0][1]=0;
+	groups_toy[0][2]=0;
+	groups_toy[0][3]=1;
+	groups_toy[0][4]=1;
+	groups_toy[1][1]=1;
+	groups_toy[1][3]=1;
+	groups_toy[1][4]=1;
+
 	groups1[0][0]=0;
 	groups1[0][1]=0;
 	groups1[0][2]=0;
@@ -52,7 +74,6 @@ void testModularity() {
 	groups1[2][6]=1;
 	groups1[2][7]=1;
 
-	groups2[0] = std::map<vertex_id,long>();
 	groups2[0][0]=0;
 	groups2[0][1]=0;
 	groups2[0][2]=0;
@@ -65,7 +86,7 @@ void testModularity() {
 	groups2[1][2]=0;
 	groups2[1][3]=1;
 	groups2[1][4]=1;
-	groups1[1][5]=1;
+	groups2[1][5]=1;
 	groups2[1][6]=1;
 	groups2[1][7]=1;
 	groups2[2][0]=0;
@@ -77,7 +98,6 @@ void testModularity() {
 	groups2[2][6]=1;
 	groups2[2][7]=1;
 
-	groups3[0] = std::map<vertex_id,long>();
 	groups3[0][0]=0;
 	groups3[0][1]=1;
 	groups3[0][2]=0;
@@ -90,7 +110,7 @@ void testModularity() {
 	groups3[1][2]=0;
 	groups3[1][3]=1;
 	groups3[1][4]=0;
-	groups1[1][5]=1;
+	groups3[1][5]=1;
 	groups3[1][6]=0;
 	groups3[1][7]=1;
 	groups3[2][0]=0;
@@ -102,14 +122,43 @@ void testModularity() {
 	groups3[2][6]=0;
 	groups3[2][7]=1;
 
+	groups4[0][0]=0;
+	groups4[0][1]=1;
+	groups4[0][2]=0;
+	groups4[0][3]=1;
+	groups4[0][4]=0;
+	groups4[0][6]=0;
+	groups4[0][7]=1;
+	groups4[1][0]=1;
+	groups4[1][1]=0;
+	groups4[1][2]=1;
+	groups4[1][3]=0;
+	groups4[1][4]=1;
+	groups4[1][5]=0;
+	groups4[1][6]=1;
+	groups4[1][7]=0;
+	groups4[2][0]=0;
+	groups4[2][1]=1;
+	groups4[2][2]=0;
+	groups4[2][3]=1;
+	groups4[2][4]=0;
+	groups4[2][5]=1;
+	groups4[2][6]=0;
+	groups4[2][7]=1;
+
+	double mod = modularity(mnet_toy,groups_toy,1);
+	log(std::to_string(mod) + " ",false);
+	log("done 1 - toy!");
+
+
 	log("GR1!");
-	double mod = modularity(mnet,groups1,0);
+	mod = modularity(mnet0,groups1,0);
 	log(std::to_string(mod) + " ",false);
 	log("done 0!");
-	mod = modularity(mnet,groups1,.5);
+	mod = modularity(mnet0,groups1,.5);
 	log(std::to_string(mod) + " ",false);
 	log("done .5!");
-	mod = modularity(mnet,groups1,1);
+	mod = modularity(mnet0,groups1,1);
 	log(std::to_string(mod) + " ",false);
 	log("done 1!");
 	log("GR2!");
@@ -130,6 +179,16 @@ void testModularity() {
 	log(std::to_string(mod) + " ",false);
 	log("done .5!");
 	mod = modularity(mnet,groups3,1);
+	log(std::to_string(mod) + " ",false);
+	log("done 1!");
+	log("GR4!");
+	mod = modularity(mnet,groups4,0);
+	log(std::to_string(mod) + " ",false);
+	log("done 0!");
+	mod = modularity(mnet,groups4,.5);
+	log(std::to_string(mod) + " ",false);
+	log("done .5!");
+	mod = modularity(mnet,groups4,1);
 	log(std::to_string(mod) + " ",false);
 	log("done 1!");
 

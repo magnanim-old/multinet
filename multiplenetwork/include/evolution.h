@@ -12,6 +12,7 @@
 #include <vector>
 #include "evolution.h"
 #include "datastructures.h"
+#include "utils.h"
 
 class EvolutionModel {
 public:
@@ -21,9 +22,11 @@ public:
 
 class BAEvolutionModel : public EvolutionModel {
 	int num_of_neighbors;
+	std::set<global_vertex_id> universe;
 public:
 	BAEvolutionModel(int m);
 	virtual ~BAEvolutionModel();
+	void init_step(MultipleNetwork& mnet, network_id net);
 	void evolution_step(MultipleNetwork& mnet, network_id net);
 };
 

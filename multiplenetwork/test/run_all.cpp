@@ -11,10 +11,13 @@
 
 int main(int argn, char* argv[]) {
 
-	testNetwork();
-	testIO();
-	testMeasures();
+	//testNetwork();
+	//testIO();
+	//testMeasures();
 	//testModularity(); //Still testing this, but seems to work (it does for single networks)
+	//testEvolution();
+	//testRandom();
+	testTransformations();
 
 	return EXIT_SUCCESS;
 }

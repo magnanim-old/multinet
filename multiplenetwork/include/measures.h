@@ -94,11 +94,15 @@ std::set<vertex_id> in_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, st
 
 void pareto_distance_single_paths(MultipleNetwork& mnet, vertex_id vertex, std::vector<std::set<Path> >& paths);
 
+void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex, std::map<vertex_id,std::set<Path> >& paths, int bound);
+
 void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex, std::map<vertex_id,std::set<Path> >& paths);
 
 /**********************************************************************/
 /** Betweenness *******************************************************/
 /**********************************************************************/
+
+void pareto_betweenness(MultipleNetwork& mnet, std::map<vertex_id,long>& vertex_betweenness, int bound);
 
 void pareto_betweenness(MultipleNetwork& mnet, std::map<vertex_id,long>& vertex_betweenness);
 

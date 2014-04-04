@@ -12,15 +12,29 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <ctime>
 
 using namespace std;
 
 void pareto_betweenness(MultipleNetwork& mnet,	std::map<vertex_id, long>& vertex_betweenness) {
+	pareto_betweenness(mnet, vertex_betweenness, 1000000);
+}
+
+
+void pareto_betweenness(MultipleNetwork& mnet,	std::map<vertex_id, long>& vertex_betweenness, int bound) {
+	std::clock_t start;
+	    double duration;
+
+	    start = std::clock();
+
+
 	for (vertex_id i = 0; i < mnet.getNumVertexes(); i++) {
+		duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+		std::cout << "Vertex " << i << "," << duration << endl;
 		// initialize the result structure
 		vertex_betweenness[i] = 0;
 		map<vertex_id,set<Path> > paths;
-		pareto_distance_all_paths(mnet, i, paths);
+		pareto_distance_all_paths(mnet, i, paths, bound);
 		for (unsigned long p = 0; p < paths.size(); p++) {
 			//cout << "Node " << i << " to " << p << ": " << paths[p].size() << " paths\n";
 			for (std::set<Path>::iterator path = paths[p].begin(); path != paths[p].end(); ++path) {

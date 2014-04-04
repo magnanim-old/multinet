@@ -15,5 +15,7 @@
 #import "utils.h"
 #import "io.h"
 #import "community.h"
+#import "evolution.h"
+#import "transformation.h"
 
 #endif /* MULTIPLENETWORK_MULTIPLENETWORK_H_ */

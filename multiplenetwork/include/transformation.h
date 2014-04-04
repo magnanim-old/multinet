@@ -13,7 +13,7 @@
 typedef enum {MNET_OR_FLATTENING, MNET_WEIGHED_FLATTENING, MNET_MULTI_FLATTENING}
 MNET_FLATTENING_ALGORITHM;
 
-void mnet_flatten(MultipleNetwork& mnet, MNET_FLATTENING_ALGORITHM algorithm,
+void flatten(MultipleNetwork& mnet, MNET_FLATTENING_ALGORITHM algorithm,
 		Network& net);
 
 #endif /* MULTIPLENETWORK_TRANSFORMATION_H_ */

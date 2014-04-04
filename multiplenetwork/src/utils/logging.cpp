@@ -28,4 +28,3 @@ void log(std::string s, verbosity v, bool new_line) {
 	}
 }
 
-

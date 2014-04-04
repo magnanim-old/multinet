@@ -14,14 +14,14 @@
 double modularity(MultipleNetwork& mnet,
 		 std::map<network_id,std::map<vertex_id,long> >& groups, double c) {
 	double res = 0;
-	double mu = 0;
+	double mu2 = 0;
 	std::set<network_id> networks;
 	mnet.getNetworks(networks);
 	std::set<network_id>::iterator network_iterator;
 	for (network_iterator=networks.begin(); network_iterator!=networks.end(); network_iterator++) {
 		network_id net = *network_iterator;
-		double m_net = mnet.getNetwork(net)->getNumEdges();
-		mu +=m_net;
+		double m_net = 2*mnet.getNetwork(net)->getNumEdges();
+		mu2 += m_net;
 		// FIX TO THE ORIGINAL EQUATION WHEN THERE ARE NO EDGES
 		if (m_net == 0)
 			continue;
@@ -52,7 +52,7 @@ double modularity(MultipleNetwork& mnet,
 				}
 			}
 		}
-		//std::cout << "->" << res << std::endl;
+		std::cout << "->" << m_net << std::endl;
 	}
 
 	double mod = res;
@@ -68,17 +68,18 @@ double modularity(MultipleNetwork& mnet,
 			if (net1==net2) continue;
 			for (vertex_iterator=vertexes.begin(); vertex_iterator!=vertexes.end(); ++vertex_iterator) {
 				 vertex_id v = *vertex_iterator;
-				 mu++;
 				 if (mnet.containsVertex(v,net1) &&
-					mnet.containsVertex(v,net2) &&
-					groups[net1][v] == groups[net2][v]) {
+					mnet.containsVertex(v,net2)) {
+					 mu2+=c;
+					if (groups[net1][v] == groups[net2][v]) {
 					 	 res += c; // or omega
 			 	}
+				 }
 			}
 		}
 	}
 
-	std::cout << "->" << mod << " " << (res-mod) << std::endl;
+	std::cout << "->" << mod << " " << (res-mod) << "-" << mu2 << std::endl;
 
-	return 1 / (2 * mu) * res;
+	return 1 / (mu2) * res;
 }
