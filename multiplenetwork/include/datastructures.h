@@ -6,13 +6,13 @@
  *
  * This file defines the basic data structures composing networks ("vertex_id" and
  * "edge_id") and multiple networks ("global_vertex_id" and "global_edge_id", where
- * global indicates that they are not defined on a single network but on the whole
+ * "global" indicates that they are not defined on a single network but on the whole
  * multiple network structure). The same global vertex (at the multiple network level)
  * can correspond to multiple vertexes inside different networks.
  *
  * The two main classes defined in this file are Network and MultipleNetwork.
  *
- * Two classes representing respectively a path and a distance between two global
+ * A class representing a path between two global
  * vertexes, where the path can traverse multiple networks, are also defined here.
  *
  * BASIC TYPES: network_id, vertex_id, edge_id, global_vertex_id, global_edge_id
@@ -56,7 +56,7 @@ public:
 
 /**
  * The identifier of a vertex inside a multiple network. This
- * may correspond to different vertex identifiers inside single
+ * may correspond to different (local) vertex identifiers inside single
  * networks
  */
 typedef long global_vertex_id;
@@ -525,18 +525,19 @@ public:
 	 **/
 	void setNumericEdgeAttribute(std::string vertex_name1, std::string vertex_name2, std::string attribute_name, double value);
 private:
-	long max_vertex_id;
+	// largest vertex identifier assigned so far
+	vertex_id max_vertex_id;
 	long num_edges;
 	bool is_named, is_directed, is_weighed;
-	/* Used for both named and unnamed networks. (redundant in case of named networks, but allows named functions to be implemented in a simpler way by getting the vertex ids and calling the unnamed functions) */
+	// Set of vertex ids of all vertexes in the network, used for both named and unnamed networks. (redundant in case of named networks)
 	std::set<vertex_id> vertexes;
-	/* edges */
+	/* edges (in an undirected network these two maps contain the same values) */
 	std::map<vertex_id, std::set<vertex_id> > out_edges;
 	std::map<vertex_id, std::set<vertex_id> > in_edges;
 	/* Conversion from numerical to string ids */
 	std::map<vertex_id, std::string> vertex_id_to_name;
 	std::map<std::string, vertex_id> vertex_name_to_id;
-	/* attributes [the key of the outer map is the attribute name] */
+	/* Attributes. All these maps are structured as: map[AttributeName][vertex_or_edge_id][AttributeValue] */
 	std::map<std::string, std::map<vertex_id, std::string> > vertex_string_attribute;
 	std::map<std::string, std::map<edge_id, std::string> > edge_string_attribute;
 	std::map<std::string, std::map<vertex_id, double> > vertex_numeric_attribute;
@@ -556,57 +557,83 @@ public:
 	~MultipleNetwork();
 	/**
 	 * @brief Adds a global vertex to the network.
-	 *
 	 * Global vertexes are global identifiers used to relate vertexes in the local networks.
-	 * For example, a local node "1" in network "0" and a local node "13" in network 1 may refer
+	 * For example, a local node "1" in network "0" and a local node "13" in network "1" may refer
 	 * to the same global vertex.
-	 * This operation is available as soon as a network has been created.
+	 * @return the vertex identifier of the new global vertex
 	 **/
-	vertex_id addVertex();
+	global_vertex_id addVertex();
+	/**
+	 * @brief Adds a named global vertex to the network.
+	 * Global vertexes are global identifiers used to relate vertexes in the local networks.
+	 * For example, a local node "v1" in network "v0" and a local node "v13" in network "v1" may refer
+	 * to the same global vertex.
+	 * @return the vertex identifier of the new global vertex
+	 **/
+	global_vertex_id addVertex(std::string name);
 	/**
 	 * @brief Adds num_new_vertexes global vertexes to the network.
-	 *
 	 * Global vertexes are global identifiers used to relate vertexes in the local networks.
 	 * For example, a local node "1" in network "0" and a local node "13" in network 1 may refer
 	 * to the same global vertex.
-	 * This operation is available as soon as a network has been created.
-	 *
 	 * When global identities have been created they cannot be deleted. However, a global vertex may end up
 	 * having no corresponding local vertexes in any local network.
 	 **/
 	void addVertexes(long num_new_vertexes);
 	/**
-	 * @brief Adds a (directed or indirected) local network to this multiplenetwork data structure.
-	 *
-	 * Only after a local network has been added, nodes and edges can be created.
+	 * @brief Adds a local network to this multiplenetwork data structure.
+	 * @return the identifier of the newly added network
 	 **/
 	network_id addNetwork(Network& net);
 	/**
-	 * @brief
+	 * @brief Adds a named local network to this multiplenetwork data structure.
+	 * @return the identifier of the newly added network
+	 **/
+	network_id addNetwork(std::string network_name, Network& net);
+	/**
+	 * @brief Defines that vertex lvid in network nid corresponds to global_vertex_id gvid.
 	 * @throws ElementNotFoundException if the input elements are not present in the network
 	 **/
-	void map(vertex_id global_vertex_id, vertex_id local_vertex_id, network_id nid);
-
-	/****************************/
-	/* Vertex and edge set      */
-	/****************************/
+	void map(global_vertex_id gvid, vertex_id lvid, network_id nid);
+	/**
+	 * @brief Defines that vertex local_vertex_name in network network_name corresponds to global vertex global_vertex_name.
+	 * @throws ElementNotFoundException if the input elements are not present in the network
+	 **/
+	void map(std::string global_vertex_name, std::string local_vertex_name, std::string network_name);
+	/**
+	 * @brief Inserts into "networks" all the network identifiers.
+	 **/
 	void getNetworks(std::set<network_id>& networks);
-	void getVertexes(std::set<vertex_id>& vertexes);
+	/**
+	 * @brief Inserts into "vertexes" all the (global) vertex identifiers.
+	 **/
+	void getVertexes(std::set<global_vertex_id>& vertexes);
+	/**
+	 * @brief Inserts into "edges" all the (global) edge identifiers.
+	 **/
 	void getEdges(std::set<global_edge_id>& edges);
 	/**
-	 * @brief Finds the identifier of a global vertex inside a local network.
-	 *
+	 * @brief Returns the local vertex identifier in network nid corresponding to global vertex gvid.
 	 * @throws ElementNotFoundException if the vertex of network is not present
 	 **/
-	long getLocalVertexId(vertex_id global_vertex_id, int nid);
+	vertex_id getLocalVertexId(global_vertex_id gvid, network_id nid);
 	/**
-	 * @brief Finds the global identifier of a vertex in a local network.
-	 *
+	 * @brief Returns the local vertex name in network network_name corresponding to global vertex global_vertex_name.
 	 * @throws ElementNotFoundException if the vertex of network is not present
 	 **/
-	long getGlobalVertexId(vertex_id local_vertex_id, int nid);
+	std::string getLocalVertexName(std::string global_vertex_name, std::string network_name);
 	/**
-	 * @brief Returns the number of local networks.
+	 * @brief Finds the global identifier corresponding to vertex lvid in local network nid.
+	 * @throws ElementNotFoundException if the vertex of network is not present
+	 **/
+	global_vertex_id getGlobalVertexId(vertex_id lvid, network_id nid);
+	/**
+	 * @brief Finds the global identifier corresponding to vertex local_vertex_name in local network network_name.
+	 * @throws ElementNotFoundException if the vertex of network is not present
+	 **/
+	std::string getGlobalVertexName(std::string local_vertex_name, std::string network_name);
+	/**
+	 * @brief Returns the number of networks.
 	 **/
 	int getNumNetworks();
 	/**
@@ -615,81 +642,71 @@ public:
 	long getNumVertexes();
 	/**
 	 * @brief Returns the number of edges.
+	 * This function corresponds to computing the sum of the number of edges in each single network.
 	 * In an undirected networks an edge a-b is counted only once (not twice by also considering b-a). This can create confusion
 	 * when some local networks are directed and some are undirected.
 	 **/
 	long getNumEdges();
-
+	/**
+	 * @brief Returns a pointer to the network with identifier nid.
+	 **/
 	Network* getNetwork(network_id nid);
-
-	bool containsVertex(vertex_id global_vertex_id);
-	bool containsNetwork(network_id nid);
-	bool containsVertex(vertex_id global_vertex_id, network_id nid);
-	/*
-	bool containsGlobalEdge(vertex_id global_vertex_id1,
-			vertex_id global_vertex_id2, network_id nid);
-	 */
-
-	// basic conversion functions
-	vertex_id addVertex(std::string name);
-	network_id addNetwork(std::string network_name, Network& net);
 	/**
-	 * @brief
-	 * @throws ElementNotFoundException if the input elements are not present in the network
+	 * @brief Returns a pointer to the network network_name.
 	 **/
-	void map(std::string global_vertex_name1, std::string global_vertex_name2, std::string network_name);
-
-	/**
-	 * @brief Finds the identifier of a global vertex inside a local network.
-	 *
-	 * @throws ElementNotFoundException if the vertex of network is not present
-	 **/
-	std::string getLocalVertexName(std::string global_vertex_name, std::string network_name);
-	/**
-	 * @brief Finds the global identifier of a vertex in a local network.
-	 *
-	 * @throws ElementNotFoundException if the vertex of network is not present
-	 **/
-	std::string getGlobalVertexName(std::string local_vertex_name, std::string network_name);
-
-	bool containsVertex(std::string global_vertex_name);
-
-	bool containsVertex(std::string global_vertex_name, std::string network_name);
-	bool containsNetwork(std::string network_name);
-	std::string getNetworkName(network_id nid);
-	int getNetworkId(std::string network_name);
-
-	std::string getVertexName(vertex_id global_vertex_id);
-	long getVertexId(std::string global_vertex_name);
-
 	Network* getNetwork(std::string network_name);
-
+	/**
+	 * @brief Checks if there is a global vertex with identifier gvid.
+	 **/
+	bool containsVertex(global_vertex_id gvid);
+	/**
+	 * @brief Checks if there is a global vertex global_vertex_name.
+	 **/
+	bool containsVertex(std::string global_vertex_name);
+	/**
+	 * @brief Checks if global vertex gvid is associated to a vertex in network nid.
+	 **/
+	bool containsVertex(global_vertex_id gvid, network_id nid);
+	/**
+	 * @brief Checks if global vertex global_vertex_name is associated to a vertex in network network_name.
+	 **/
+	bool containsVertex(std::string global_vertex_name, std::string network_name);
+	/**
+	 * @brief Checks if there is a network with identifier nid.
+	 **/
+	bool containsNetwork(network_id nid);
+	/**
+	 * @brief Checks if there is a network network_name.
+	 **/
+	bool containsNetwork(std::string network_name);
+	/* Name-ID mapping functions */
+	std::string getNetworkName(network_id nid);
+	network_id getNetworkId(std::string network_name);
+	std::string getVertexName(global_vertex_id global_vertex_id);
+	global_vertex_id getVertexId(std::string global_vertex_name);
 private:
-	std::vector<Network> graphs;
-
-	// how to use: local_to_global_id[nid][local_vertex_id]
+	// The networks composing this multiple network system
+	std::vector<Network> networks;
+	// How to use: local_to_global_id[network_id][local_vertex_id]
 	std::vector<std::map<vertex_id, vertex_id> > local_to_global_id;
-	// how to use: global_to_local_id[global_vertex_id][nid]
+	// How to use: global_to_local_id[global_vertex_id][network_id]
 	std::vector<std::map<network_id, vertex_id> > global_to_local_id;
-
-	// conversion from symbolic names to numerical ids and back
-
+	// Conversion from symbolic names to numerical ids and back
 	std::map<std::string, network_id> network_name_to_id;
 	std::vector<std::string> network_id_to_name;
-
 	std::map<std::string, vertex_id> vertex_name_to_id;
 	std::vector<std::string> vertex_id_to_name;
-
 };
 
 void print(MultipleNetwork& mnet);
+
+/* Path class to be commented */
 
 class Path {
 private:
 	const MultipleNetwork *mnet;
 	std::vector<long> num_edges_per_layer;
 	std::vector<vertex_id> path;
-	// network[i] contains the identifier of the network where the edge path[i],path[i+1] is;
 	std::vector<network_id> network;
 	long timestamp;
 
@@ -725,10 +742,12 @@ public:
 
 };
 
+/*
 class Distance {
 public:
 	Distance();
 	virtual ~Distance();
 };
+*/
 
 #endif /* MULTIPLENETWORK_DATASTRUCTURES_H_ */

@@ -8,6 +8,7 @@
 
 #include <set>
 #include <map>
+#include <array>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -29,34 +30,42 @@ void testRandom() {
 	//unsigned long randomLong;
 	//double randomDouble;
 
-	vertex_id data[] = {1,2,3,4,6,7};
-	std::set<vertex_id> input(data,data+6);
-	std::set<vertex_id> output;
-	r.getKElements(input,output,3);
-	print(output);
+	cout << "Testing random integer in [0,10[, 1000 iterations.." << endl;
+	std::array<int,10> occurrences;
+	occurrences.fill(0);
+	for (int i=0; i<1000; i++) {
+		int value = r.getRandomInt(10);
+		if (value<0 || value>=10) throw FailedUnitTestException("Random number sampled out of range [0,10[");
+		occurrences[value]++;
+	}
+	cout << "done! Hits per value:";
+	for (int& x : occurrences) { std::cout << ' ' << x; }
+	std::cout << std::endl;
+
+	cout << "Testing random double in [0,1[, 1000 iterations.." << endl;
+	for (int i=0; i<1000; i++) {
+		double value = r.getRandomDouble();
+		if (value<0 || value>=1) throw FailedUnitTestException("Random number sampled out of range [0,1[");
+	}
+	cout << "done! 3 examples:";
+	for (int i=0; i<3; i++) {
+		cout << ' ' << r.getRandomDouble();
+	}
+	std::cout << std::endl;
+
+	cout << "Testing random choice, p=.75, 1000 iterations.." << endl;
+	std::array<int,2> outcome;
+	outcome.fill(0);
+	for (int i=0; i<1000; i++) {
+		bool value = r.test(.75);
+		if (value) outcome[0]++;
+		else outcome[1]++;
+	}
+	cout << "done! Positive and negative outcomes:";
+	for (int& x : outcome) { std::cout << ' ' << x; }
+	std::cout << std::endl;
 
 	/*
-	cout << "Testing random long [0,10[, 10000 iterations.." << endl;
-	for (int i=0; i<10000; i++) {
-		randomLong = r.getRandom(10);
-		if (randomLong<0 || randomLong>=10) throw FailedUnitTestException("Random number sampled out of range [0,10[");
-		count[randomLong]++;
-	}
-	cout << "done! Frequencies:" << endl;
-	for (itm=count.begin(); itm!=count.end(); ++itm)
-		    cout << itm->first << " => " << itm->second << endl;
-	count.clear();
-
-	cout << "Testing random double [0,1], 10000 iterations.." << endl;
-	for (int i=0; i<10000; i++) {
-		randomDouble = r.getRandomDouble();
-		if (randomDouble<0 || randomDouble>1) throw FailedUnitTestException("Random number sampled out of range [0,1]");
-	}
-	cout << "done! Examples:" << endl;
-	for (int i=0; i<10; i++) {
-		cout << r.getRandomDouble() << endl;
-	}
-
 	cout << "Testing random set of values in [0,10[, 10000 iterations.." << endl;
 	for (int i=0; i<10000; i++) {
 		res = r.getKRandom(10,5);

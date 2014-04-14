@@ -12,9 +12,12 @@
 #import "utils.h"
 
 void testNetwork() {
+	log("**************************************************************");
 	log("TESTING basic network components (vertex_id, edge_id)...",false);
-	// vertex identifiers would normally be assigned automatically by functions of the Network class
-	// however we manually create two vertex identijust for testing.
+	/*
+	 * vertex and edge identifiers are normally automatically created
+	 * by functions of the Network class.
+	 */
 	vertex_id vid1 = 0;
 	vertex_id vid2 = 1;
 	// a directed edge
@@ -32,7 +35,8 @@ void testNetwork() {
 	if (e4!=e5) throw FailedUnitTestException("Wrong edge_id comparison");
 	log("done!");
 
-
+	/**********************************************************************/
+	log("**************************************************************");
 	log("TESTING Network class (undirected, unweighed, unnamed)");
 	log("Creating the network...",false);
 	Network uuu_net(false,false,false);
@@ -71,7 +75,7 @@ void testNetwork() {
 	log("Adding a duplicate edge: should fail...",false);
 	try {
 		uuu_net.addEdge(vd1,vd0); // this is duplicate because the network is undirected
-		throw FailedUnitTestException("Could insert a duplicate edge");
+		throw FailedUnitTestException("Could insert a duplicate edge (not allowed)");
 	}
 	catch (DuplicateElementException& ex) {
 		log("[FAIL] done!");
@@ -135,7 +139,7 @@ void testNetwork() {
 	uuu_net.setStringEdgeAttribute(vd1,vd2,"name","weak tie");
 	log("done!");
 
-	log("Retrieving sample values (should find everything except redness)...",false);
+	log("Retrieving sample values (should find everything, except redness between vd1 and vd3)...",false);
 	if (uuu_net.getNumericVertexAttribute(vd0,"height")!=35 ||
 		uuu_net.getStringVertexAttribute(vd0,"color")!="blue" ||
 		uuu_net.getNumericEdgeAttribute(vd1,vd2,"redness")!=255 ||
@@ -143,11 +147,11 @@ void testNetwork() {
 		throw FailedUnitTestException("Previously set values could not be retrieved");
 	else try {
 		uuu_net.getNumericEdgeAttribute(vd1,vd3,"redness");
-		throw FailedUnitTestException("No value is associated to edge (0,3), but no exception has been thrown");
-		}
-		catch (ElementNotFoundException& ex) {
-			log("done!");
-		}
+		throw FailedUnitTestException("No value is associated to edge (vd1,vd3), but no exception has been thrown");
+	}
+	catch (ElementNotFoundException& ex) {
+		log("done!");
+	}
 
 	log("Removing a vertex (and as a cascade effect its adjacent edges) ...",false);
 	uuu_net.deleteVertex(2);
@@ -157,6 +161,8 @@ void testNetwork() {
 	if (uuu_net.containsEdge(1,2)) throw FailedUnitTestException("Edge not present, but containsEdge returns true");
 	log("done!");
 
+	/**********************************************************************/
+	log("**************************************************************");
 	log("TESTING Network class (directed, weighed, named)");
 	log("Creating the network...",false);
 	Network dwn_net(true,true,true);
@@ -264,10 +270,10 @@ void testNetwork() {
 	else try {
 		dwn_net.getNumericEdgeAttribute("vd1","vd3","redness");
 		throw FailedUnitTestException("No value is associated to edge (0,3), but no exception has been thrown");
-		}
-		catch (ElementNotFoundException& ex) {
-			log("done!");
-		}
+	}
+	catch (ElementNotFoundException& ex) {
+		log("done!");
+	}
 
 	log("Removing a vertex (and as a cascade effect its adjacent edges) ...",false);
 	dwn_net.deleteVertex("vd2");
@@ -279,6 +285,7 @@ void testNetwork() {
 
 	log("TEST SUCCESSFULLY COMPLETED (Network class)");
 
+	log("Printing the two tested networks:");
 	print(uuu_net);
 	print(dwn_net);
 }

@@ -23,17 +23,14 @@ MultipleNetwork::~MultipleNetwork() {
 	// TODO
 }
 
-vertex_id MultipleNetwork::addVertex() {
+global_vertex_id MultipleNetwork::addVertex() {
 	addVertexes(1);
 	return getNumVertexes()-1;
 }
 
 void MultipleNetwork::addVertexes(long num_new_vertexes) {
 	for (long i=0; i<num_new_vertexes; ++i) {
-		// in map m (stored in global_to_local_id[i]) we will store the local id
-		// of each presence of this global vertex in a local network.
-		// e.g., after inserting a new local vertex "0" in network "2", corresponding
-		// to this global vertex, m[2] will contain "0".
+		// map keeping correspondences between global and local vertex identifiers
 		std::map<network_id,vertex_id> m;
 		global_to_local_id.push_back(m);
 	}
@@ -41,11 +38,10 @@ void MultipleNetwork::addVertexes(long num_new_vertexes) {
 
 network_id MultipleNetwork::addNetwork(Network& net) {
 	int num_current_networks = getNumNetworks();
-	graphs.resize(num_current_networks+1);
-	graphs[num_current_networks] = net;
-	// in map m (stored in local_to_global_id[i]) we will store the global id
-	// of every vertex inserted in this network
-	std::map<vertex_id,vertex_id> m;
+	networks.resize(num_current_networks+1);
+	networks[num_current_networks] = net;
+	// map keeping correspondences between local and global vertex identifiers
+	std::map<vertex_id,global_vertex_id> m;
 	local_to_global_id.push_back(m);
 	return getNumNetworks()-1;
 }
@@ -56,7 +52,7 @@ void MultipleNetwork::getNetworks(std::set<network_id>& networks) {
 	}
 }
 
-void MultipleNetwork::getVertexes(std::set<vertex_id>& vertexes) {
+void MultipleNetwork::getVertexes(std::set<global_vertex_id>& vertexes) {
 	for (long v=0; v<getNumVertexes(); v++) {
 		vertexes.insert(v);
 	}
@@ -64,8 +60,6 @@ void MultipleNetwork::getVertexes(std::set<vertex_id>& vertexes) {
 
 void MultipleNetwork::getEdges(std::set<global_edge_id>& edges) {
 	for (int network = 0; network < getNumNetworks(); network++) {
-		//long num_edges = mnet.getNetwork(network)->getNumEdges();
-		//cout << "processing network " << network << " (" << num_edges << " edges)\n";
 		std::set<vertex_id> vertexes;
 		getNetwork(network)->getVertexes(vertexes);
 		for (std::set<vertex_id>::iterator from_iterator = vertexes.begin(); from_iterator != vertexes.end(); from_iterator++) {
@@ -80,33 +74,33 @@ void MultipleNetwork::getEdges(std::set<global_edge_id>& edges) {
 	}
 }
 
-void MultipleNetwork::map(vertex_id global_vertex_id, vertex_id local_vertex_id, int nid) {
-	if (!containsVertex(global_vertex_id)) throw ElementNotFoundException("global vertex " + std::to_string(global_vertex_id));
+void MultipleNetwork::map(global_vertex_id gvid, vertex_id lvid, int nid) {
+	if (!containsVertex(gvid)) throw ElementNotFoundException("global vertex " + std::to_string(gvid));
 	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + std::to_string(nid));
-	if (!getNetwork(nid)->containsVertex(local_vertex_id)) throw ElementNotFoundException("local vertex " + std::to_string(local_vertex_id));
-	if (global_to_local_id[global_vertex_id].count(nid)>0) throw DuplicateElementException("global vertex " + std::to_string(global_vertex_id) + " in network " + std::to_string(nid));
+	if (!getNetwork(nid)->containsVertex(lvid)) throw ElementNotFoundException("local vertex " + std::to_string(lvid));
+	if (global_to_local_id[gvid].count(nid)>0) throw DuplicateElementException("global vertex " + std::to_string(gvid) + " in network " + std::to_string(nid));
 	// We update the references between global and local identifiers
-	global_to_local_id[global_vertex_id][nid] = local_vertex_id;
-	local_to_global_id[nid][local_vertex_id] = global_vertex_id;
+	global_to_local_id[gvid][nid] = lvid;
+	local_to_global_id[nid][lvid] = gvid;
 }
 
-Network* MultipleNetwork::getNetwork(int nid) {
+Network* MultipleNetwork::getNetwork(network_id nid) {
 	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + std::to_string(nid));
-	return &(graphs[nid]);
+	return &(networks[nid]);
 }
 
-long MultipleNetwork::getLocalVertexId(vertex_id global_vertex_id, network_id nid) {
-	if (!containsVertex(global_vertex_id,nid)) throw ElementNotFoundException("global vertex " + std::to_string(global_vertex_id) + " in network " + std::to_string(nid));
-	return global_to_local_id[global_vertex_id][nid];
+vertex_id MultipleNetwork::getLocalVertexId(global_vertex_id gvid, network_id nid) {
+	if (!containsVertex(gvid,nid)) throw ElementNotFoundException("global vertex " + std::to_string(gvid) + " in network " + std::to_string(nid));
+	return global_to_local_id[gvid][nid];
 }
 
-long MultipleNetwork::getGlobalVertexId(vertex_id local_vertex_id, network_id nid) {
-	if (!getNetwork(nid)->containsVertex(local_vertex_id)) throw ElementNotFoundException("local vertex " + std::to_string(local_vertex_id) + " in network " + std::to_string(nid));
-	return local_to_global_id[nid][local_vertex_id];
+global_vertex_id MultipleNetwork::getGlobalVertexId(vertex_id lvid, network_id nid) {
+	if (!getNetwork(nid)->containsVertex(lvid)) throw ElementNotFoundException("local vertex " + std::to_string(lvid) + " in network " + std::to_string(nid));
+	return local_to_global_id[nid][lvid];
 }
 
 int MultipleNetwork::getNumNetworks() {
-	return graphs.size();
+	return networks.size();
 }
 
 long MultipleNetwork::getNumVertexes() {
@@ -121,9 +115,9 @@ long MultipleNetwork::getNumEdges() {
 	return number_of_edges;
 }
 
-bool MultipleNetwork::containsVertex(vertex_id global_vertex_id) {
+bool MultipleNetwork::containsVertex(global_vertex_id gvid) {
 	// Vertexes are numbered from 0, therefore existing global vertex ids range in [0,getNumGlobalVertexes()[
-	return global_vertex_id < getNumVertexes();
+	return gvid < getNumVertexes();
 }
 
 bool MultipleNetwork::containsNetwork(network_id nid) {
@@ -131,17 +125,17 @@ bool MultipleNetwork::containsNetwork(network_id nid) {
 	return nid < getNumNetworks();
 }
 
-bool MultipleNetwork::containsVertex(vertex_id global_vertex_id, network_id nid) {
+bool MultipleNetwork::containsVertex(global_vertex_id gvid, network_id nid) {
 	// check if global vertex exists
-	if (!containsVertex(global_vertex_id)) return false;
+	if (!containsVertex(gvid)) return false;
 	// now check if it has an associated local vertex on network nid
 	// (if nid does not exist, this condition will always be true)
-	if (global_to_local_id[global_vertex_id].count(nid)==0) return false;
+	if (global_to_local_id[gvid].count(nid)==0) return false;
 	else return true;
 }
 
-vertex_id MultipleNetwork::addVertex(std::string name) {
-	vertex_id new_vertex_id;
+global_vertex_id MultipleNetwork::addVertex(std::string name) {
+	global_vertex_id new_vertex_id;
 	if (vertex_name_to_id.count(name)>0) {
 		throw DuplicateElementException("vertex " + name);
 	}
@@ -174,17 +168,17 @@ std::string MultipleNetwork::getNetworkName(network_id nid) {
 	return network_id_to_name[nid];
 }
 
-int MultipleNetwork::getNetworkId(std::string network_name) {
+network_id MultipleNetwork::getNetworkId(std::string network_name) {
 	if (network_name_to_id.count(network_name)==0) throw ElementNotFoundException("network " + network_name);
 	return network_name_to_id[network_name];
 }
 
-std::string MultipleNetwork::getVertexName(vertex_id global_vertex_id) {
-	if (!containsVertex(global_vertex_id)) throw ElementNotFoundException("global vertex id " + std::to_string(global_vertex_id));
-	return vertex_id_to_name[global_vertex_id];
+std::string MultipleNetwork::getVertexName(global_vertex_id gvid) {
+	if (!containsVertex(gvid)) throw ElementNotFoundException("global vertex id " + std::to_string(gvid));
+	return vertex_id_to_name[gvid];
 }
 
-long MultipleNetwork::getVertexId(std::string global_vertex_name) {
+global_vertex_id MultipleNetwork::getVertexId(std::string global_vertex_name) {
 	if (!containsVertex(global_vertex_name)) throw ElementNotFoundException("global vertex name " + global_vertex_name);
 	return vertex_name_to_id[global_vertex_name];
 }
@@ -194,15 +188,14 @@ bool MultipleNetwork::containsVertex(std::string global_vertex_name) {
 }
 
 bool MultipleNetwork::containsVertex(std::string global_vertex_name, std::string network_name) {
-
-	vertex_id global_id = getVertexId(global_vertex_name);
+	global_vertex_id global_id = getVertexId(global_vertex_name);
 	network_id net = getNetworkId(network_name);
 	return containsVertex(global_id,net);
 }
 
 
 std::string MultipleNetwork::getLocalVertexName(std::string global_vertex_name, std::string network_name) {
-	vertex_id global_id = getVertexId(global_vertex_name);
+	global_vertex_id global_id = getVertexId(global_vertex_name);
 	network_id net = getNetworkId(network_name);
 	vertex_id local_id = getLocalVertexId(global_id, net);
 	return getNetwork(net)->getVertexName(local_id);
@@ -211,7 +204,7 @@ std::string MultipleNetwork::getLocalVertexName(std::string global_vertex_name, 
 std::string MultipleNetwork::getGlobalVertexName(std::string local_vertex_name, std::string network_name) {
 	network_id net = getNetworkId(network_name);
 	vertex_id local_id = getNetwork(net)->getVertexId(local_vertex_name);
-	vertex_id global_id = getGlobalVertexId(local_id, net);
+	global_vertex_id global_id = getGlobalVertexId(local_id, net);
 	return getVertexName(global_id);
 }
 
@@ -221,17 +214,18 @@ bool MultipleNetwork::containsNetwork(std::string network_name) {
 
 Network* MultipleNetwork::getNetwork(std::string network_name) {
 	if (!containsNetwork(network_name)) throw ElementNotFoundException("network " + network_name);
-	return &(graphs[network_name_to_id[network_name]]);
+	return &(networks[network_name_to_id[network_name]]);
 }
 
 void print(MultipleNetwork& mnet) {
-	std::cout << "*Network statistics*\n";
+	std::cout << "*MULTIPLE NETWORK*\n";
 	std::cout << "Number of vertexes: " << mnet.getNumVertexes() << "\n";
 	std::cout << "Number of edges: " << mnet.getNumEdges() << "\n";
 	for (int i=0; i<mnet.getNumNetworks(); ++i) {
 		std::cout << "Network " << i << "\n";
 		print(*mnet.getNetwork(i));
 	}
+	std::cout << "*END (MULTIPLE NETWORK)*\n";
 }
 
 /**

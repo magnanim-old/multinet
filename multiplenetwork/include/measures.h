@@ -42,49 +42,49 @@ long degree(MultipleNetwork& mnet, std::string vertex, std::string network_name)
 /** Neighborhood ******************************************************/
 /**********************************************************************/
 
-std::set<vertex_id> out_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
-std::set<vertex_id> out_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
-std::set<vertex_id> out_neighbors(MultipleNetwork& mnet, vertex_id vertex, network_id network);
-std::set<vertex_id> out_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
+std::set<global_vertex_id> out_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+std::set<global_vertex_id> out_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
+std::set<global_vertex_id> out_neighbors(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+std::set<global_vertex_id> out_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
 
-std::set<vertex_id> in_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
-std::set<vertex_id> in_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
-std::set<vertex_id> in_neighbors(MultipleNetwork& mnet, vertex_id vertex, network_id network);
-std::set<vertex_id> in_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
+std::set<global_vertex_id> in_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+std::set<global_vertex_id> in_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
+std::set<global_vertex_id> in_neighbors(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+std::set<global_vertex_id> in_neighbors(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
 
-std::set<vertex_id> out_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
-std::set<vertex_id> out_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
-std::set<vertex_id> out_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, network_id network);
-std::set<vertex_id> out_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
+std::set<global_vertex_id> out_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+std::set<global_vertex_id> out_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
+std::set<global_vertex_id> out_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+std::set<global_vertex_id> out_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
 
-std::set<vertex_id> in_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
-std::set<vertex_id> in_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
-std::set<vertex_id> in_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, network_id network);
-std::set<vertex_id> in_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
+std::set<global_vertex_id> in_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+std::set<global_vertex_id> in_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
+std::set<global_vertex_id> in_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+std::set<global_vertex_id> in_neighbors_xor(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
 
 /**********************************************************************/
 /** Network relevance *************************************************/
 /**********************************************************************/
 
-std::set<vertex_id> out_relevance(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
-std::set<vertex_id> out_relevance(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
-std::set<vertex_id> out_relevance(MultipleNetwork& mnet, vertex_id vertex, network_id network);
-std::set<vertex_id> out_relevance(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
+double out_relevance(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+double out_relevance(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
+double out_relevance(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+double out_relevance(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
 
-std::set<vertex_id> in_relevance(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
-std::set<vertex_id> in_relevance(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
-std::set<vertex_id> in_relevance(MultipleNetwork& mnet, vertex_id vertex, network_id network);
-std::set<vertex_id> in_relevance(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
+double in_relevance(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+double in_relevance(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
+double in_relevance(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+double in_relevance(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
 
-std::set<vertex_id> out_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
-std::set<vertex_id> out_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
-std::set<vertex_id> out_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, network_id network);
-std::set<vertex_id> out_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
+double out_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+double out_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
+double out_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+double out_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
 
-std::set<vertex_id> in_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
-std::set<vertex_id> in_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
-std::set<vertex_id> in_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, network_id network);
-std::set<vertex_id> in_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
+double in_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<network_id> active_networks);
+double in_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::set<std::string> active_networks);
+double in_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, network_id network);
+double in_relevance_xor(MultipleNetwork& mnet, vertex_id vertex, std::string network_name);
 
 /**********************************************************************/
 /** Distances *********************************************************/

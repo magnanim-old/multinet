@@ -84,12 +84,18 @@ public:
 	 * approximately uniform probability distribution.
 	 * @param max
 	 */
-	long getRandom(unsigned long max);
+	int getRandomInt(int max);
 
 	/**
-	 * Returns a random double number in the range [0,1] using an
-	 * approximately uniform probability distribution. Not all double values
-	 * between 0 and 1 can be returned.
+	 * Returns a random integral number in the range [0,max[ using an
+	 * approximately uniform probability distribution.
+	 * @param max
+	 */
+	long getRandomLong(long max);
+
+	/**
+	 * Returns a random double number in the range [0,1[ using an
+	 * approximately uniform probability distribution.
 	 */
 	double getRandomDouble();
 

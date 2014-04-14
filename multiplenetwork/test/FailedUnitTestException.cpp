@@ -10,12 +10,12 @@
 using namespace std;
 
 FailedUnitTestException::FailedUnitTestException(string value) {
-	FailedUnitTestException::value = value;
+	FailedUnitTestException::message = message;
 }
 FailedUnitTestException::~FailedUnitTestException() throw (){
 	// TODO Auto-generated destructor stub
 }
 const char* FailedUnitTestException::what() const throw()
 {
-    return (string("[FAIL] ") + value).data();
+    return (string("[FAIL] ") + message).data();
 }

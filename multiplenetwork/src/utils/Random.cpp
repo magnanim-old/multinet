@@ -9,12 +9,15 @@
 #include <algorithm>
 #include <iostream>
 #include <random>
+#include <chrono>
 
 using namespace std;
 
 Random::Random() {
-	generator.seed(time(0));
-	srand(time(0));
+	std::chrono::high_resolution_clock::time_point time = std::chrono::high_resolution_clock::now();
+	std::chrono::high_resolution_clock::duration dtn = time.time_since_epoch();
+
+	generator.seed(dtn.count());
 }
 
 Random::~Random() {
@@ -33,22 +36,26 @@ void Random::getKElements(std::set<T>& input, std::set<T>& output, unsigned int 
 	  }
 }*/
 
-long Random::getRandom(unsigned long max) {
-	unsigned long res = (unsigned long)((double)rand()/RAND_MAX*max); // [0,max[
-	return res==max?max-1:res;
+int Random::getRandomInt(int max) {
+	  std::uniform_int_distribution<int> distribution(0,max-1);
+	  return distribution(generator);
+}
+
+long Random::getRandomLong(long max) {
+	  std::uniform_int_distribution<long> distribution(0,max-1);
+	  return distribution(generator);
 }
 
 double Random::getRandomDouble() {
-	double res = (double)rand()/RAND_MAX;
-	std::cout << res << std::endl;
-	return res; // [0,1]
+	  std::uniform_real_distribution<double> distribution(0,1);
+	  return distribution(generator); // [0,1[
 }
 
 set<unsigned long> Random::getKRandom(unsigned long max, unsigned int k) {
 	resizeOptions(max);
 	set<unsigned long> res;
 	for (unsigned int i=0; i<k; i++) {
-		long idx = getRandom(options.size()-i);
+		long idx = getRandomInt(options.size()-i);
 		res.insert(options[idx]);
 		swap(options[idx],options[options.size()-i-1]);
 	}
@@ -57,7 +64,7 @@ set<unsigned long> Random::getKRandom(unsigned long max, unsigned int k) {
 
 bool Random::test(double probability) {
 	std::bernoulli_distribution distribution(probability);
-	return distribution(generator);//getRandomDouble()<=probability;
+	return distribution(generator);
 }
 
 void Random::resizeOptions(unsigned long max) {

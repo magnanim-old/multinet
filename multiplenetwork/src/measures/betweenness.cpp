@@ -1,8 +1,6 @@
 /*
  * distances.cpp
  *
- *  Created on: Jun 11, 2013
- *      Author: magnanim
  */
 
 #include "measures.h"
@@ -30,7 +28,7 @@ void pareto_betweenness(MultipleNetwork& mnet,	std::map<vertex_id, long>& vertex
 
 	for (vertex_id i = 0; i < mnet.getNumVertexes(); i++) {
 		duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-		std::cout << "Vertex " << i << "," << duration << endl;
+		//std::cout << "Vertex " << i << "," << duration << endl;
 		// initialize the result structure
 		vertex_betweenness[i] = 0;
 		map<vertex_id,set<Path> > paths;

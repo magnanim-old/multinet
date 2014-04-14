@@ -16,15 +16,16 @@
 /* Exceptions */
 class FailedUnitTestException: public std::exception {
 public:
-	FailedUnitTestException(std::string value);
+	FailedUnitTestException(std::string message);
 	~FailedUnitTestException() throw ();
 	virtual const char* what() const throw();
 private:
-	std::string value;
+	std::string message;
 };
 
 /* Unit test functions */
 void testNetwork();
+void testMultipleNetwork();
 void testIO();
 void testMeasures();
 void testModularity();

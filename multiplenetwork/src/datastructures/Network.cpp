@@ -438,7 +438,7 @@ void Network::setStringEdgeAttribute(std::string vertex_name1, std::string verte
 }
 
 void print(Network& net) {
-	std::cout << (net.isDirected()?"DIRECTED":"INDIRECTED") << " " << (net.isWeighed()?"WEIGHED":"UNWEIGHED") << " " << (net.isNamed()?"NAMED":"UNNAMED") << std::endl;
+	std::cout << (net.isDirected()?"DIRECTED":"UNDIRECTED") << " " << (net.isWeighed()?"WEIGHED":"UNWEIGHED") << " " << (net.isNamed()?"NAMED":"UNNAMED") << std::endl;
 	std::cout << "Number of vertexes: " << net.getNumVertexes() << std::endl;
 	std::cout << "Number of edges: " << net.getNumEdges() << std::endl;
 }
