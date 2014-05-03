@@ -15,7 +15,7 @@
 void testIO() {
 	log("TESTING IO of multiple networks");
 	log("Reading multiple network from file...",false);
-	MultipleNetwork mnet;
+	MultilayerNetwork mnet;
 	mnet_read_edgelist(mnet, "test/toy.mnet");
 	log("done!");
 	print(mnet);

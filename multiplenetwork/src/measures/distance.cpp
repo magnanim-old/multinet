@@ -19,13 +19,13 @@ using namespace std;
  igraph_integer_t vertex,
  vector<set<MultiDistance> > *distances) {}*/
 
-void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
+void pareto_distance_all_paths(MultilayerNetwork& mnet, vertex_id vertex,
 		std::map<vertex_id,std::set<Path> >& paths) {
 	pareto_distance_all_paths(mnet, vertex, paths, 1000000);
 }
 
 
-void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
+void pareto_distance_all_paths(MultilayerNetwork& mnet, vertex_id vertex,
 		std::map<vertex_id,std::set<Path> >& paths, int bound) {
 
 	std::set<vertex_id> vertexes;
@@ -33,7 +33,7 @@ void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
 	/* timestamp, used for efficiency reasons to avoid processing edges when no changes have occurred since the last iteration  */
 	long ts = 0;
 	/* last update timestamp */
-	std::map<global_edge_id, long> last_updated;
+	std::map<intralayer_edge_id, long> last_updated;
 	/*
 	for (int network = 0; network < num_networks; network++) {
 		std::map<vertex_id, std::map<vertex_id, long> > edge_timestamps;
@@ -59,7 +59,7 @@ void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
 		changes = false;
 		//int counter = 0;
 
-		set<global_edge_id> edges;
+		set<intralayer_edge_id> edges;
 		mnet.getEdges(edges);
 		//for (set<global_edge_id>::iterator edge_iterator=edges.begin(); edge_iterator!=edges.end(); ++edge_iterator) {
 		//	global_edge_id e=(*edge_iterator);
@@ -89,7 +89,7 @@ void pareto_distance_all_paths(MultipleNetwork& mnet, vertex_id vertex,
 
 					vertex_id from = mnet.getGlobalVertexId(local_from, network);
 					vertex_id to = mnet.getGlobalVertexId(local_to, network);
-					global_edge_id e(from, to, false, network);
+					intralayer_edge_id e(from, to, false, network);
 					// initialize edge timestamp to -1 if first processed
 
 

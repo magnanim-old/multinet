@@ -16,12 +16,12 @@ RandomEvolutionModel::~RandomEvolutionModel() {
 }
 
 
-void RandomEvolutionModel::evolution_step(MultipleNetwork& mnet, network_id net) {
+void RandomEvolutionModel::evolution_step(MultilayerNetwork& mnet, network_id net) {
 	// This is a static model that does not evolve!
 }
 
 
-void RandomEvolutionModel::init_step(MultipleNetwork& mnet, network_id net) {
+void RandomEvolutionModel::init_step(MultilayerNetwork& mnet, network_id net) {
 	/*
 	if (mnet.getNumGlobalVertexes()<m0) {
 		// TODO

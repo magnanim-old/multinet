@@ -31,7 +31,7 @@ Path::Path(long num_layers, long timestamp) {
 	Path::timestamp = timestamp;
 }
 
-Path::Path(MultipleNetwork& mnet, long timestamp) {
+Path::Path(MultilayerNetwork& mnet, long timestamp) {
 	Path::mnet = (&mnet);
 	Path::num_edges_per_layer.resize(mnet.getNumNetworks(),0);
 	Path::timestamp = timestamp;
@@ -107,7 +107,7 @@ std::ostream& operator<<(std::ostream &strm, const Path &path) {
   	  strm << path.num_edges_per_layer[i];
   	  if (i!=num_layers-1) strm << ",";
   }*/
-  strm << "\n";
+  //strm << "\n";
 
   return strm;
 }

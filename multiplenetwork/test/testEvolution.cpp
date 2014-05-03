@@ -13,7 +13,7 @@ using namespace std;
 void testEvolution() {
 
 	cout << "Creating a multiple network with two empty undirected networks...";
-	MultipleNetwork mnet;
+	MultilayerNetwork mnet;
 	mnet.addVertexes(100);
 	Network n1, n2;
 	mnet.addNetwork(n1);

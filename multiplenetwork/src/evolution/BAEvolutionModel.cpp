@@ -21,19 +21,19 @@ BAEvolutionModel::~BAEvolutionModel() {
 }
 
 
-void BAEvolutionModel::init_step(MultipleNetwork& mnet, network_id net) {
+void BAEvolutionModel::init_step(MultilayerNetwork& mnet, network_id net) {
 	std::cout << "BA init" << std::endl;
 }
 
-void BAEvolutionModel::evolution_step(MultipleNetwork& mnet, network_id net) {
+void BAEvolutionModel::evolution_step(MultilayerNetwork& mnet, network_id net) {
 
 	Random rand;
 
-	std::set<global_vertex_id> universe;
+	std::set<intralayer_edge_id> universe;
 	mnet.getVertexes(universe);
-	std::set<global_vertex_id> choice;
+	std::set<intralayer_edge_id> choice;
 	rand.getKElements(universe,choice,1);
-	global_vertex_id new_global_vertex = *choice.begin();
+	intralayer_edge_id new_global_vertex = *choice.begin();
 
 	std::cout << "BA add " << new_global_vertex << std::endl;
 

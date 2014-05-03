@@ -10,22 +10,22 @@
 #import "exceptions.h"
 #import "utils.h"
 
-void testMultipleNetwork() {
+void testMultiplex() {
 	log("******************************************");
-	log("TESTING MultipleNetwork");
-	log("REQUIRES Network class to have been tested");
+	log("TESTING Multiplex");
+	log("REQUIRES Network class having been tested");
 
 	log("Creating an empty multiple network...",false);
-	MultipleNetwork mnet;
+	Multiplex mnet;
 	log("done!");
 
 	log("Adding seven global vertexes with different methods...",false);
-	global_vertex_id gv0 = mnet.addVertex();
-	global_vertex_id gv1 = mnet.addVertex();
-	global_vertex_id gv2 = mnet.addVertex();
-	global_vertex_id gv3 = mnet.addVertex();
-	mnet.addVertexes(3);
-	if (mnet.getNumVertexes()!=7) throw FailedUnitTestException("Wrong number of global vertexes");
+	global_identity gv0 = mnet.addIdentity();
+	global_identity gv1 = mnet.addIdentity();
+	global_identity gv2 = mnet.addIdentity();
+	global_identity gv3 = mnet.addIdentity();
+	mnet.addIdentities(3);
+	if (mnet.getNumIdentities()!=7) throw FailedUnitTestException("Wrong number of global vertexes");
 	log("done!");
 
 	log("Creating and adding three anonymous undirected and directed networks...",false);
@@ -64,8 +64,8 @@ void testMultipleNetwork() {
 	mnet.map(gv0,n3v0,n3);
 	mnet.map(gv2,n3v1,n3);
 	mnet.map(gv3,n3v2,n3);
-	if (mnet.getGlobalVertexId(n3v2,n3)!=gv3) throw FailedUnitTestException("Wrong mapping between global and local vertex");
-	if (mnet.getLocalVertexId(gv3,n2)!=n2v2) throw FailedUnitTestException("Wrong mapping between global and local vertex");
+	if (mnet.getGlobalIdentity(n3v2,n3)!=gv3) throw FailedUnitTestException("Wrong mapping between global and local vertex");
+	if (mnet.getVertexId(gv3,n2)!=n2v2) throw FailedUnitTestException("Wrong mapping between global and local vertex");
 	log("done!");
 
 	/* behavior to be decided and tested
@@ -81,11 +81,11 @@ void testMultipleNetwork() {
 	*/
 
 	log("Adding five edges...",false); // they can also be added directly to the single networks
-	mnet.getNetwork(n1)->addEdge(n1v0,n1v1);
-	mnet.getNetwork(n2)->addEdge(n2v0,n2v1);
-	mnet.getNetwork(n2)->addEdge(n2v1,n2v2);
-	mnet.getNetwork(n3)->addEdge(n3v0,n3v2);
-	mnet.getNetwork(n3)->addEdge(n3v1,n3v2);
+	mnet.getNetwork(n1).addEdge(n1v0,n1v1);
+	mnet.getNetwork(n2).addEdge(n2v0,n2v1);
+	mnet.getNetwork(n2).addEdge(n2v1,n2v2);
+	mnet.getNetwork(n3).addEdge(n3v0,n3v2);
+	mnet.getNetwork(n3).addEdge(n3v1,n3v2);
 	if (mnet.getNumEdges()!=5) throw FailedUnitTestException("Wrong number of global edges");
 	log("done!");
 
@@ -98,7 +98,6 @@ void testMultipleNetwork() {
 	catch (ElementNotFoundException& ex) {
 		log("[FAIL] done!");
 	}
-
 	log("Mapping between non existing vertexes...",false);
 	try {
 		mnet.map(gv3,n2v2+1,n2);
@@ -109,9 +108,9 @@ void testMultipleNetwork() {
 		log("[FAIL] done!");
 	}
 
-	log("TEST SUCCESSFULLY COMPLETED (MultipleNetwork class - numeric identifiers)");
+	log("TEST SUCCESSFULLY COMPLETED (Multiplex class - numeric identifiers)");
 
-	log("Printing final multiple network information:");
+	log("Printing final multiplex network information:");
 	print(mnet);
 
 }

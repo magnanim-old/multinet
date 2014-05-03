@@ -102,7 +102,7 @@ bool Network::deleteVertex(vertex_id vid) {
 	vertexes.erase(vid);
 	if (isNamed()) {
 		// some more structures to empty
-		std::string vertex_name=vertex_id_to_name[vid];
+		const std::string& vertex_name=vertex_id_to_name[vid];
 		vertex_id_to_name.erase(vid);
 		vertex_name_to_id.erase(vertex_name);
 	}
@@ -149,7 +149,7 @@ bool Network::containsVertex(vertex_id vid) const {
 	return vertexes.count(vid)>0;
 }
 
-bool Network::containsVertex(std::string vertex_name) const {
+bool Network::containsVertex(const std::string& vertex_name) const {
 	return vertex_name_to_id.count(vertex_name);
 }
 
@@ -158,13 +158,12 @@ bool Network::containsEdge(vertex_id vid1, vertex_id vid2) const {
 	return out_edges.at(vid1).count(vid2)>0;
 }
 
-bool Network::containsEdge(std::string vertex_name1, std::string vertex_name2) const {
+bool Network::containsEdge(const std::string& vertex_name1, const std::string& vertex_name2) const {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named edge in an unnamed network");
 	if (!containsVertex(vertex_name1)) return false;
 	if (!containsVertex(vertex_name2)) return false;
 	return containsEdge(vertex_name_to_id.at(vertex_name1),vertex_name_to_id.at(vertex_name2));
 }
-
 
 bool Network::isDirected() const  {
 	return is_directed;
@@ -184,7 +183,7 @@ std::string Network::getVertexName(vertex_id vid) const  {
 	return vertex_id_to_name.at(vid);
 }
 
-vertex_id Network::getVertexId(std::string vertex_name) const  {
+vertex_id Network::getVertexId(const std::string& vertex_name) const  {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name)) throw ElementNotFoundException("Vertex " + vertex_name);
 	return vertex_name_to_id.at(vertex_name);
@@ -232,21 +231,22 @@ long Network::getDegree(vertex_id vid) const  {
 	return tmp_degree;
 }
 
-long Network::getOutDegree(std::string vertex_name) const  {
+long Network::getOutDegree(const std::string& vertex_name) const  {
 	return getOutDegree(getVertexId(vertex_name));
 }
 
-long Network::getInDegree(std::string vertex_name) const  {
+long Network::getInDegree(const std::string& vertex_name) const  {
 	return getInDegree(getVertexId(vertex_name));
 }
 
-long Network::getDegree(std::string vertex_name) const  {
+long Network::getDegree(const std::string& vertex_name) const  {
 	return getDegree(getVertexId(vertex_name));
 }
 
 void Network::getOutNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) const  {
 	if (!containsVertex(vid)) throw ElementNotFoundException("Vertex " + std::to_string(vid));
 	std::set<vertex_id>::iterator it;
+	if (out_edges.count(vid)==0) return;
 	for (it=out_edges.at(vid).begin(); it!=out_edges.at(vid).end(); it++)
 		neighbors.insert(*it);
 }
@@ -254,6 +254,7 @@ void Network::getOutNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) con
 void Network::getInNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) const  {
 	if (!containsVertex(vid)) throw ElementNotFoundException("Vertex " + std::to_string(vid));
 	std::set<vertex_id>::const_iterator it;
+	if (in_edges.count(vid)==0) return;
 	for (it=in_edges.at(vid).begin(); it!=in_edges.at(vid).end(); it++)
 		neighbors.insert(*it);
 }
@@ -263,7 +264,7 @@ void Network::getNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) const 
 	if (isDirected()) getInNeighbors(vid, neighbors);
 }
 
-void Network::getOutNeighbors(std::string vertex_name, std::set<std::string>& neighbors) const  {
+void Network::getOutNeighbors(const std::string& vertex_name, std::set<std::string>& neighbors) const  {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name)) throw ElementNotFoundException("Vertex " + vertex_name);
 	std::set<vertex_id> tmp_id_result;
@@ -273,7 +274,7 @@ void Network::getOutNeighbors(std::string vertex_name, std::set<std::string>& ne
 		neighbors.insert(vertex_id_to_name.at(*it));
 }
 
-void Network::getInNeighbors(std::string vertex_name, std::set<std::string>& neighbors) const  {
+void Network::getInNeighbors(const std::string& vertex_name, std::set<std::string>& neighbors) const  {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name)) throw ElementNotFoundException("Vertex " + vertex_name);
 	std::set<vertex_id> tmp_id_result;
@@ -282,7 +283,7 @@ void Network::getInNeighbors(std::string vertex_name, std::set<std::string>& nei
 		neighbors.insert(vertex_id_to_name.at(*it));
 }
 
-void Network::getNeighbors(std::string vertex_name, std::set<std::string>& neighbors) const  {
+void Network::getNeighbors(const std::string& vertex_name, std::set<std::string>& neighbors) const  {
 	getOutNeighbors(vertex_name, neighbors);
 	if (isDirected()) getInNeighbors(vertex_name, neighbors);
 }
@@ -297,61 +298,61 @@ void Network::setEdgeWeight(vertex_id vid1, vertex_id vid2, double weight) {
 	setNumericEdgeAttribute(vid1, vid2, "weight", weight);
 }
 
-double Network::getEdgeWeight(std::string vertex_name1, std::string vertex_name2) const {
+double Network::getEdgeWeight(const std::string& vertex_name1, const std::string& vertex_name2) const {
 	if (!isWeighed()) throw OperationNotSupportedException("Network is unweighed");
 	return getNumericEdgeAttribute(vertex_name1, vertex_name2, "weight");
 }
 
-void Network::setEdgeWeight(std::string vertex_name1, std::string vertex_name2, double weight) {
+void Network::setEdgeWeight(const std::string& vertex_name1, const std::string& vertex_name2, double weight) {
 	if (!isWeighed()) throw OperationNotSupportedException("Network is unweighed");
 	setNumericEdgeAttribute(vertex_name1, vertex_name2, "weight", weight);
 }
 
-void Network::newNumericVertexAttribute(std::string attribute_name) {
+void Network::newNumericVertexAttribute(const std::string& attribute_name) {
 	if (vertex_numeric_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
 	vertex_numeric_attribute[attribute_name] = std::map<vertex_id,double>();
 }
 
-void Network::newStringVertexAttribute(std::string attribute_name) {
+void Network::newStringVertexAttribute(const std::string& attribute_name) {
 	if (vertex_string_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
 	vertex_string_attribute[attribute_name] = std::map<vertex_id,std::string>();
 }
 
-void Network::newNumericEdgeAttribute(std::string attribute_name) {
+void Network::newNumericEdgeAttribute(const std::string& attribute_name) {
 	if (edge_numeric_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
 	edge_numeric_attribute[attribute_name] = std::map<edge_id,double>();
 }
 
-void Network::newStringEdgeAttribute(std::string attribute_name) {
+void Network::newStringEdgeAttribute(const std::string& attribute_name) {
 	if (edge_string_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
 	edge_string_attribute[attribute_name] = std::map<edge_id,std::string>();
 }
 
-double Network::getNumericVertexAttribute(vertex_id vid, std::string attribute_name) const {
+double Network::getNumericVertexAttribute(vertex_id vid, const std::string& attribute_name) const {
 	if (vertex_numeric_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
 	if (vertex_numeric_attribute.at(attribute_name).count(vid)==0)  throw ElementNotFoundException("No attribute value for attribute " + attribute_name + " on vertex " + std::to_string(vid));
 	return vertex_numeric_attribute.at(attribute_name).at(vid);
 }
 
-double Network::getNumericVertexAttribute(std::string vertex_name, std::string attribute_name) const {
+double Network::getNumericVertexAttribute(const std::string& vertex_name, const std::string& attribute_name) const {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name)) throw ElementNotFoundException("Vertex " + vertex_name);
 	return getNumericVertexAttribute(vertex_name_to_id.at(vertex_name), attribute_name);
 }
 
-std::string Network::getStringVertexAttribute(vertex_id vid, std::string attribute_name) const {
+std::string Network::getStringVertexAttribute(vertex_id vid, const std::string& attribute_name) const {
 	if (vertex_string_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
 	if (vertex_string_attribute.at(attribute_name).count(vid)==0)  throw ElementNotFoundException("No attribute value for attribute " + attribute_name + " on vertex " + std::to_string(vid));
 	return vertex_string_attribute.at(attribute_name).at(vid);
 }
 
-std::string Network::getStringVertexAttribute(std::string vertex_name, std::string attribute_name) const {
+std::string Network::getStringVertexAttribute(const std::string& vertex_name, const std::string& attribute_name) const {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name)) throw ElementNotFoundException("Vertex " + vertex_name);
 	return getStringVertexAttribute(vertex_name_to_id.at(vertex_name), attribute_name);
 }
 
-double Network::getNumericEdgeAttribute(vertex_id vid1, vertex_id vid2, std::string attribute_name) const {
+double Network::getNumericEdgeAttribute(vertex_id vid1, vertex_id vid2, const std::string& attribute_name) const {
 	if (!containsVertex(vid1)) throw ElementNotFoundException("Vertex " + std::to_string(vid1));
 	if (!containsVertex(vid2)) throw ElementNotFoundException("Vertex " + std::to_string(vid2));
 	if (!containsEdge(vid1, vid2)) throw ElementNotFoundException("Edge (" + std::to_string(vid1) + ", " + std::to_string(vid2) + ")");
@@ -361,14 +362,14 @@ double Network::getNumericEdgeAttribute(vertex_id vid1, vertex_id vid2, std::str
 	return edge_numeric_attribute.at(attribute_name).at(eid);
 }
 
-double Network::getNumericEdgeAttribute(std::string vertex_name1, std::string vertex_name2, std::string attribute_name) const {
+double Network::getNumericEdgeAttribute(const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name) const {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name1)) throw ElementNotFoundException("Vertex " + vertex_name1);
 	if (!containsVertex(vertex_name2)) throw ElementNotFoundException("Vertex " + vertex_name2);
 	return getNumericEdgeAttribute(vertex_name_to_id.at(vertex_name1), vertex_name_to_id.at(vertex_name2), attribute_name);
 }
 
-std::string Network::getStringEdgeAttribute(vertex_id vid1, vertex_id vid2, std::string attribute_name) const {
+std::string Network::getStringEdgeAttribute(vertex_id vid1, vertex_id vid2, const std::string& attribute_name) const {
 	if (!containsVertex(vid1)) throw ElementNotFoundException("Vertex " + std::to_string(vid1));
 	if (!containsVertex(vid2)) throw ElementNotFoundException("Vertex " + std::to_string(vid2));
 	if (!containsEdge(vid1, vid2)) throw ElementNotFoundException("Edge (" + std::to_string(vid1) + ", " + std::to_string(vid2) + ")");
@@ -378,34 +379,34 @@ std::string Network::getStringEdgeAttribute(vertex_id vid1, vertex_id vid2, std:
 	return edge_string_attribute.at(attribute_name).at(eid);
 }
 
-std::string Network::getStringEdgeAttribute(std::string vertex_name1, std::string vertex_name2, std::string attribute_name) const {
+std::string Network::getStringEdgeAttribute(const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name) const {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name1)) throw ElementNotFoundException("Vertex " + vertex_name1);
 	if (!containsVertex(vertex_name2)) throw ElementNotFoundException("Vertex " + vertex_name2);
 	return getStringEdgeAttribute(vertex_name_to_id.at(vertex_name1), vertex_name_to_id.at(vertex_name2), attribute_name);
 }
 
-void Network::setNumericVertexAttribute(vertex_id vid, std::string attribute_name, double val) {
+void Network::setNumericVertexAttribute(vertex_id vid, const std::string& attribute_name, double val) {
 	if (vertex_numeric_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
 	vertex_numeric_attribute.at(attribute_name)[vid] = val;
 }
 
-void Network::setNumericVertexAttribute(std::string vertex_name, std::string attribute_name, double val) {
+void Network::setNumericVertexAttribute(const std::string& vertex_name, const std::string& attribute_name, double val) {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	setNumericVertexAttribute(vertex_name_to_id[vertex_name], attribute_name, val);
 }
 
-void Network::setStringVertexAttribute(vertex_id vid, std::string attribute_name, std::string val) {
+void Network::setStringVertexAttribute(vertex_id vid, const std::string& attribute_name, const std::string& val) {
 	if (vertex_string_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
 	vertex_string_attribute.at(attribute_name)[vid] = val;
 }
 
-void Network::setStringVertexAttribute(std::string vertex_name, std::string attribute_name, std::string val) {
+void Network::setStringVertexAttribute(const std::string& vertex_name, const std::string& attribute_name, const std::string& val) {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	setStringVertexAttribute(vertex_name_to_id[vertex_name], attribute_name, val);
 }
 
-void Network::setNumericEdgeAttribute(vertex_id vid1, vertex_id vid2, std::string attribute_name, double val) {
+void Network::setNumericEdgeAttribute(vertex_id vid1, vertex_id vid2, const std::string& attribute_name, double val) {
 	if (!containsVertex(vid1)) throw ElementNotFoundException("Vertex " + std::to_string(vid1));
 	if (!containsVertex(vid2)) throw ElementNotFoundException("Vertex " + std::to_string(vid2));
 	if (!containsEdge(vid1, vid2)) throw ElementNotFoundException("Edge (" + std::to_string(vid2) + ", " + std::to_string(vid2) + ")");
@@ -414,14 +415,14 @@ void Network::setNumericEdgeAttribute(vertex_id vid1, vertex_id vid2, std::strin
 	edge_numeric_attribute.at(attribute_name)[eid] = val;
 }
 
-void Network::setNumericEdgeAttribute(std::string vertex_name1, std::string vertex_name2, std::string attribute_name, double val) {
+void Network::setNumericEdgeAttribute(const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name, double val) {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name1)) throw ElementNotFoundException("Vertex " + vertex_name1);
 	if (!containsVertex(vertex_name2)) throw ElementNotFoundException("Vertex " + vertex_name2);
 	setNumericEdgeAttribute(vertex_name_to_id.at(vertex_name1), vertex_name_to_id.at(vertex_name2), attribute_name, val);
 }
 
-void Network::setStringEdgeAttribute(vertex_id vid1, vertex_id vid2, std::string attribute_name, std::string val) {
+void Network::setStringEdgeAttribute(vertex_id vid1, vertex_id vid2, const std::string& attribute_name, const std::string& val) {
 	if (!containsVertex(vid1)) throw ElementNotFoundException("Vertex " + std::to_string(vid1));
 	if (!containsVertex(vid2)) throw ElementNotFoundException("Vertex " + std::to_string(vid2));
 	if (!containsEdge(vid1, vid2)) throw ElementNotFoundException("Edge (" + std::to_string(vid2) + ", " + std::to_string(vid2) + ")");
@@ -430,7 +431,7 @@ void Network::setStringEdgeAttribute(vertex_id vid1, vertex_id vid2, std::string
 	edge_string_attribute.at(attribute_name)[eid] = val;
 }
 
-void Network::setStringEdgeAttribute(std::string vertex_name1, std::string vertex_name2, std::string attribute_name, std::string val) {
+void Network::setStringEdgeAttribute(const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name, const std::string& val) {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name1)) throw ElementNotFoundException("Vertex " + vertex_name1);
 	if (!containsVertex(vertex_name2)) throw ElementNotFoundException("Vertex " + vertex_name2);

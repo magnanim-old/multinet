@@ -24,19 +24,6 @@ bool edge_id::operator!=(const edge_id& e2) const {
     return ! operator==(e2);
 }
 
-/*
-bool edge_id::operator<=(const edge_id& e2) const {
-    if (v1<e2.v1) return true;
-    if (v1==e2.v1) {
-    	if (v2<e2.v2) return true;
-    	if (v2==e2.v2) {
-    		if (network<=e2.network) return true;
-    	}
-    }
-    return false;
-}
-*/
-
 bool edge_id::operator<(const edge_id& e2) const {
     if (v1<e2.v1) return true;
     if (v1==e2.v1) {
@@ -45,3 +32,11 @@ bool edge_id::operator<(const edge_id& e2) const {
     return false;
 }
 
+std::ostream& operator<<(std::ostream &strm, const edge_id& eid) {
+	strm << eid.to_string();
+	return strm;
+}
+
+std::string edge_id::to_string() const {
+	return "(" + std::to_string(v1) + "," + std::to_string(v2) + ")";
+}

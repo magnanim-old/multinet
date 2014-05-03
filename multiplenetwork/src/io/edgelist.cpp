@@ -87,7 +87,7 @@ using namespace std;
 }
 */
 
-void mnet_read_edgelist(MultipleNetwork& mnet, string infile) {
+void mnet_read_edgelist(MultilayerNetwork& mnet, string infile) {
 	CSVReader csv;
 	csv.open(infile);
 	while (csv.hasNext()) {

@@ -10,7 +10,7 @@
 #include <iostream>
 #include "evolution.h"
 
-void evolve(MultipleNetwork &mnet,
+void evolve(MultilayerNetwork &mnet,
 		long num_of_steps,
 		double pr_no_event[],
 		double pr_internal_event[],

@@ -11,7 +11,7 @@
 #include <map>
 #include <iostream>
 
-double modularity(MultipleNetwork& mnet,
+double modularity(MultilayerNetwork& mnet,
 		 std::map<network_id,std::map<vertex_id,long> >& groups, double c) {
 	double res = 0;
 	double mu2 = 0;

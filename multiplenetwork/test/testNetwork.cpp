@@ -283,6 +283,22 @@ void testNetwork() {
 	if (dwn_net.containsEdge("vd1","vd2")) throw FailedUnitTestException("Edge not present, but containsEdge returns true");
 	log("done!");
 
+	std::set<vertex_id> vertexes;
+	dwn_net.getVertexes(vertexes);
+	log("Iterating through vertexes:",false);
+	for (vertex_id v: vertexes) {
+		log(" " + dwn_net.getVertexName(v),false);
+	}
+	log(" done!");
+
+	std::set<edge_id> edges;
+	dwn_net.getEdges(edges);
+	log("Iterating through edges:",false);
+	for (edge_id e: edges) {
+		log(" " + e.to_string(),false);
+	}
+	log(" done!");
+
 	log("TEST SUCCESSFULLY COMPLETED (Network class)");
 
 	log("Printing the two tested networks:");

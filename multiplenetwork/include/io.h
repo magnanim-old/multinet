@@ -12,7 +12,7 @@
 #include <string>
 #include "datastructures.h"
 
-void mnet_read_edgelist(MultipleNetwork&, std::string edge_file);
+void mnet_read_edgelist(MultilayerNetwork&, std::string edge_file);
 
 /**
  * Reads a multiple network from a list of edges.

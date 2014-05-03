@@ -16,19 +16,19 @@ void testModularity() {
 	log("TESTING measures");
 	log("Reading the network...",false);
 	// Creating an empty multiple network and initializing it
-	MultipleNetwork mnet_toy;
+	MultilayerNetwork mnet_toy;
 	mnet_read_edgelist(mnet_toy, "test/toy.mnet");
 	mnet_toy.getNetwork("l1")->addVertex("U4");
 	mnet_toy.map("U4","U4","l1");
 
-	MultipleNetwork mnet0;
+	MultilayerNetwork mnet0;
 	//mnet_read_edgelist(mnet, "test/toy.mnet");
 	mnet_read_edgelist(mnet0, "/Users/matteomagnani/Dropbox/Research/13NetworkScience/code/fig6b.mnet");
 	mnet0.getNetwork("l1")->addVertex("v8");
 	mnet0.map("v8","v8","l1");
 	mnet0.getNetwork("l3")->addVertex("v8");
 	mnet0.map("v8","v8","l3");
-	MultipleNetwork mnet;
+	MultilayerNetwork mnet;
 	//mnet_read_edgelist(mnet, "test/toy.mnet");
 	mnet_read_edgelist(mnet, "/Users/matteomagnani/Dropbox/Research/13NetworkScience/code/fig6b.mnet");
 	mnet.getNetwork("l1")->addVertex("v8");

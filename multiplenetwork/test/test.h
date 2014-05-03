@@ -25,7 +25,8 @@ private:
 
 /* Unit test functions */
 void testNetwork();
-void testMultipleNetwork();
+void testMultilayerNetwork();
+void testMultiplex();
 void testIO();
 void testMeasures();
 void testModularity();

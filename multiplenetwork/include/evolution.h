@@ -16,18 +16,18 @@
 
 class EvolutionModel {
 public:
-	virtual void evolution_step(MultipleNetwork& mnet, network_id net) = 0;
-	virtual void init_step(MultipleNetwork& mnet, network_id net) = 0;
+	virtual void evolution_step(MultilayerNetwork& mnet, network_id net) = 0;
+	virtual void init_step(MultilayerNetwork& mnet, network_id net) = 0;
 };
 
 class BAEvolutionModel : public EvolutionModel {
 	int num_of_neighbors;
-	std::set<global_vertex_id> universe;
+	std::set<global_identity> universe;
 public:
 	BAEvolutionModel(int m);
 	virtual ~BAEvolutionModel();
-	void init_step(MultipleNetwork& mnet, network_id net);
-	void evolution_step(MultipleNetwork& mnet, network_id net);
+	void init_step(MultilayerNetwork& mnet, network_id net);
+	void evolution_step(MultilayerNetwork& mnet, network_id net);
 };
 
 std::set<long> ba_choice(Network& net, int m);
@@ -39,11 +39,11 @@ class RandomEvolutionModel : public EvolutionModel {
 public:
 	RandomEvolutionModel(int m0, double p);
 	~RandomEvolutionModel();
-	void evolution_step(MultipleNetwork& mnet, network_id net);
-	void init_step(MultipleNetwork& mnet, network_id net);
+	void evolution_step(MultilayerNetwork& mnet, network_id net);
+	void init_step(MultilayerNetwork& mnet, network_id net);
 };
 
-void evolve(MultipleNetwork &mnet,
+void evolve(MultilayerNetwork &mnet,
 		long num_of_steps,
 		double pr_no_event[],
 		double pr_internal_event[],

@@ -1,6 +1,6 @@
 #include "datastructures.h"
 
-global_edge_id::global_edge_id(vertex_id v1, vertex_id v2, bool directed, network_id network) {
+global_edge_id::global_edge_id(vertex_id v1, vertex_id v2, network_id network, bool directed) {
 	global_edge_id::v1 = v1;
 	global_edge_id::v2 = v2;
 	global_edge_id::directed = directed;
