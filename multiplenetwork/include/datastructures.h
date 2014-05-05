@@ -705,7 +705,7 @@ public:
 	 * to the same global vertex.
 	 * @return the vertex identifier of the new global vertex
 	 **/
-	global_identity addIdentity();
+	global_identity addGlobalIdentity();
 	/**
 	 * @brief Adds a named global vertex to the network.
 	 * Global vertexes are global identifiers used to relate vertexes in the local networks.
@@ -713,7 +713,7 @@ public:
 	 * to the same global vertex.
 	 * @return the vertex identifier of the new global vertex
 	 **/
-	global_identity addIdentity(const std::string& name);
+	global_identity addGlobalName(const std::string& name);
 	/**
 	 * @brief Adds num_new_vertexes global identity to the network.
 	 * Global vertexes are global identifiers used to relate vertexes in the local networks.
@@ -722,37 +722,37 @@ public:
 	 * When global identities have been created they cannot be deleted. However, a global vertex may end up
 	 * having no corresponding local vertexes in any local network.
 	 **/
-	void addIdentities(long num_new_identities);
+	void addGlobalIdentities(long num_new_identities);
 	/**
 	 * @brief Returns the number of global identities.
 	 **/
-	long getNumIdentities() const;
+	long getNumGlobalIdentities() const;
 	/**
 	 * @brief Defines that vertex lvid in network nid corresponds to global_vertex_id gvid.
 	 * @throws ElementNotFoundException if the input elements are not present in the network
 	 **/
-	void map(global_identity gvid, vertex_id lvid, network_id nid);
+	void mapIdentity(global_identity gvid, vertex_id lvid, network_id nid);
 	/**
 	 * @brief Defines that vertex local_vertex_name in network network_name corresponds to global vertex global_vertex_name.
 	 * @throws ElementNotFoundException if the input elements are not present in the network
 	 **/
-	void map(const std::string& global_vertex_name, const std::string& local_vertex_name, const std::string& network_name);
+	void mapIdentity(const std::string& global_vertex_name, const std::string& local_vertex_name, const std::string& network_name);
 	/**
 	 * @brief Inserts into "identities" all the global identities.
 	 **/
-	void getGlobalIdentities(std::set<global_identity>& identities) const;
+	void getGlobalIdntities(std::set<global_identity>& identities) const;
 	/**
 	 * @brief Returns the name of vertex vertex_id.
 	 * @throws OperationNotSupportedException if the network is not named
 	 * @throws ElementNotFoundException if there is no vertex with this id
 	 **/
-	std::string getIdentityName(global_identity gid) const;
+	std::string getGlobalName(global_identity gid) const;
 	/**
 	 * @brief Returns the id of the vertex with name vertex_name.
 	 * @throws OperationNotSupportedException if the network is not named
 	 * @throws ElementNotFoundException if there is no vertex with this name
 	 **/
-	vertex_id getIdentityFromName(const std::string& identity_name) const;
+	vertex_id getGlobalIdentity(const std::string& identity_name) const;
 	/**
 	 * @brief Returns all the vertex identifiers in the network.
 	 * This method is normally used to iterate over all the vertexes
@@ -777,15 +777,15 @@ public:
 	 * @brief Finds the global identifier corresponding to vertex local_vertex_name in local network network_name.
 	 * @throws ElementNotFoundException if the vertex of network is not present
 	 **/
-	std::string getGlobalIdentityName(const std::string& local_vertex_name, const std::string& network_name) const;
+	std::string getGlobalName(const std::string& local_vertex_name, const std::string& network_name) const;
 	/**
 	 * @brief Checks if there is a global vertex with identifier gvid.
 	 **/
-	bool containsIdentity(global_identity gvid) const;
+	bool containsGlobalIdentity(global_identity gvid) const;
 	/**
 	 * @brief Checks if there is a global vertex global_vertex_name.
 	 **/
-	bool containsIdentity(const std::string& global_identity) const;
+	bool containsGlobalName(const std::string& global_identity) const;
 	/**
 	 * @brief Checks if global vertex gvid is associated to a vertex in network nid.
 	 **/
@@ -817,10 +817,16 @@ public:
 	/** */
 	~MultipleNetwork();
 	/**
-	 * @brief Adds a local network to this multiplex data structure.
-	 * @return the identifier of the newly added network
+	 * @brief Creates a link between two vertexes on different networks.
+	 * All interlayer connections are directed (TODO is this OK?)
+	 * @throws ElementNotFoundException if the input elements are not present in the network
+	 * @throws OperationNotSupportedException if the two vertexes lay on the same network
 	 **/
-	// TODO Add specific methods
+	void newInterlayerConnection(global_vertex_id v1, global_vertex_id v2);
+	/**
+	 * @brief Inserts into "connections" all the edge identifiers of interlayer connections.
+	 **/
+	void getInterlayerConnections(std::set<interlayer_edge_id>& connections) const;
 
 };
 

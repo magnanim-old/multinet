@@ -20,12 +20,12 @@ void testMultiplex() {
 	log("done!");
 
 	log("Adding seven global vertexes with different methods...",false);
-	global_identity gv0 = mnet.addIdentity();
-	global_identity gv1 = mnet.addIdentity();
-	global_identity gv2 = mnet.addIdentity();
-	global_identity gv3 = mnet.addIdentity();
-	mnet.addIdentities(3);
-	if (mnet.getNumIdentities()!=7) throw FailedUnitTestException("Wrong number of global vertexes");
+	global_identity gv0 = mnet.addGlobalIdentity();
+	global_identity gv1 = mnet.addGlobalIdentity();
+	global_identity gv2 = mnet.addGlobalIdentity();
+	global_identity gv3 = mnet.addGlobalIdentity();
+	mnet.addGlobalIdentities(3);
+	if (mnet.getNumGlobalIdentities()!=7) throw FailedUnitTestException("Wrong number of global vertexes");
 	log("done!");
 
 	log("Creating and adding three anonymous undirected and directed networks...",false);
@@ -53,17 +53,17 @@ void testMultiplex() {
 
 	log("Specifying vertex mappings...",false);
 	// To network 1
-	mnet.map(gv0,n1v0,n1);
-	mnet.map(gv1,n1v1,n1);
-	mnet.map(gv2,n1v2,n1);
+	mnet.mapIdentity(gv0,n1v0,n1);
+	mnet.mapIdentity(gv1,n1v1,n1);
+	mnet.mapIdentity(gv2,n1v2,n1);
 	// To network 2
-	mnet.map(gv0,n2v0,n2);
-	mnet.map(gv1,n2v1,n2);
-	mnet.map(gv3,n2v2,n2);
+	mnet.mapIdentity(gv0,n2v0,n2);
+	mnet.mapIdentity(gv1,n2v1,n2);
+	mnet.mapIdentity(gv3,n2v2,n2);
 	// To network 3
-	mnet.map(gv0,n3v0,n3);
-	mnet.map(gv2,n3v1,n3);
-	mnet.map(gv3,n3v2,n3);
+	mnet.mapIdentity(gv0,n3v0,n3);
+	mnet.mapIdentity(gv2,n3v1,n3);
+	mnet.mapIdentity(gv3,n3v2,n3);
 	if (mnet.getGlobalIdentity(n3v2,n3)!=gv3) throw FailedUnitTestException("Wrong mapping between global and local vertex");
 	if (mnet.getVertexId(gv3,n2)!=n2v2) throw FailedUnitTestException("Wrong mapping between global and local vertex");
 	log("done!");
@@ -91,7 +91,7 @@ void testMultiplex() {
 
 	log("Mapping to a non existing network...",false);
 	try {
-		mnet.map(gv3,n2v2,n3+1);
+		mnet.mapIdentity(gv3,n2v2,n3+1);
 		// should not arrive here
 		throw FailedUnitTestException("Non existing network non caught");
 	}
@@ -100,7 +100,7 @@ void testMultiplex() {
 	}
 	log("Mapping between non existing vertexes...",false);
 	try {
-		mnet.map(gv3,n2v2+1,n2);
+		mnet.mapIdentity(gv3,n2v2+1,n2);
 		// should not arrive here
 		throw FailedUnitTestException("Non existing vertex non caught");
 	}

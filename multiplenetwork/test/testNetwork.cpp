@@ -16,7 +16,8 @@ void testNetwork() {
 	log("TESTING basic network components (vertex_id, edge_id)...",false);
 	/*
 	 * vertex and edge identifiers are normally automatically created
-	 * by functions of the Network class.
+	 * by functions of the Network class. However, here we test them by
+	 * directly manipulating them.
 	 */
 	vertex_id vid1 = 0;
 	vertex_id vid2 = 1;

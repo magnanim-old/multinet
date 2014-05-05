@@ -11,6 +11,35 @@
 #import "utils.h"
 
 void testMultilayerNetwork() {
+	log("**************************************************************");
+	log("TESTING basic multilayer network components (global_vertex_id, global_edge_id, network_id)...",false);
+	/*
+	 * these are normally automatically created
+	 * by functions of the MultilayerNetwork class.
+	 * However, here we test them by directly manipulating them.
+	 */
+	network_id nid1 = 0;
+	network_id nid2 = 1;
+	vertex_id vid1 = 0;
+	vertex_id vid2 = 1;
+	vertex_id vid3 = 0;
+	global_vertex_id gvid1(vid1,nid1);
+	global_vertex_id gvid2(vid2,nid1);
+	global_vertex_id gvid3(vid3,nid2);
+	// a directed edge
+	global_edge_id e1(vid1,vid2,nid1,true);
+	// another directed edge
+	global_edge_id e2(vid2,vid1,nid1,true);
+	// a third directed edge
+	global_edge_id e3(vid2,vid1,nid1,true);
+	// an undirected edge
+	global_edge_id e4(vid1,vid2,nid1,false);
+	// another undirected edge
+	global_edge_id e5(vid2,vid1,nid1,false);
+	if (e1==e2) throw FailedUnitTestException("Wrong edge_id comparison");
+	if (e2!=e3) throw FailedUnitTestException("Wrong edge_id comparison");
+	if (e4!=e5) throw FailedUnitTestException("Wrong edge_id comparison");
+	log("done!");
 	log("******************************************");
 	log("TESTING MultilayerNetwork");
 	log("REQUIRES Network class having been tested");

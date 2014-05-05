@@ -23,12 +23,12 @@ Multiplex::~Multiplex() {
 	// TODO
 }
 
-global_identity Multiplex::addIdentity() {
-	addIdentities(1);
-	return getNumIdentities()-1;
+global_identity Multiplex::addGlobalIdentity() {
+	addGlobalIdentities(1);
+	return getNumGlobalIdentities()-1;
 }
 
-void Multiplex::addIdentities(long num_new_identities) {
+void Multiplex::addGlobalIdentities(long num_new_identities) {
 	for (long i=0; i<num_new_identities; ++i) {
 		// map keeping correspondences between global and local vertex identifiers
 		std::map<network_id,vertex_id> m;
@@ -36,8 +36,8 @@ void Multiplex::addIdentities(long num_new_identities) {
 	}
 }
 
-void Multiplex::map(global_identity gvid, vertex_id lvid, int nid) {
-	if (!containsIdentity(gvid)) throw ElementNotFoundException("global identity " + std::to_string(gvid));
+void Multiplex::mapIdentity(global_identity gvid, vertex_id lvid, int nid) {
+	if (!containsGlobalIdentity(gvid)) throw ElementNotFoundException("global identity " + std::to_string(gvid));
 	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + std::to_string(nid));
 	if (!getNetwork(nid).containsVertex(lvid)) throw ElementNotFoundException("local vertex " + std::to_string(lvid));
 	if (global_to_local_id[gvid].count(nid)>0) throw DuplicateElementException("global vertex " + std::to_string(gvid) + " in network " + std::to_string(nid));
@@ -56,32 +56,32 @@ global_identity Multiplex::getGlobalIdentity(vertex_id lvid, network_id nid) con
 	return local_to_global_id.at(global_vertex_id(lvid,nid));
 }
 
-long Multiplex::getNumIdentities() const {
+long Multiplex::getNumGlobalIdentities() const {
 	return global_to_local_id.size();
 }
 
-bool Multiplex::containsIdentity(global_identity gvid) const {
+bool Multiplex::containsGlobalIdentity(global_identity gvid) const {
 	// Identities are numbered from 0, therefore existing global vertex ids range in [0,getNumGlobalVertexes()[
-	return gvid < getNumIdentities();
+	return gvid < getNumGlobalIdentities();
 }
 
 bool Multiplex::containsVertex(global_identity gvid, network_id nid) const {
 	// check if global vertex exists
-	if (!containsIdentity(gvid)) return false;
+	if (!containsGlobalIdentity(gvid)) return false;
 	// now check if it has an associated local vertex on network nid
 	// (if nid does not exist, this condition will always be true)
 	if (global_to_local_id[gvid].count(nid)==0) return false;
 	else return true;
 }
 
-global_identity Multiplex::addIdentity(const std::string& name) {
+global_identity Multiplex::addGlobalName(const std::string& name) {
 	global_identity new_identity;
 	if (identity_name_to_id.count(name)>0) {
 		throw DuplicateElementException("vertex " + name);
 	}
 	else {
-		int num_current_identities = getNumIdentities();
-		new_identity = addIdentity();
+		int num_current_identities = getNumGlobalIdentities();
+		new_identity = addGlobalIdentity();
 		identity_name_to_id[name] = num_current_identities;
 		identity_id_to_name[new_identity] = name;
 	}
@@ -89,51 +89,51 @@ global_identity Multiplex::addIdentity(const std::string& name) {
 }
 
 
-std::string Multiplex::getIdentityName(global_identity gid) const {
-	if (!containsIdentity(gid)) throw ElementNotFoundException("identity " + std::to_string(gid));
+std::string Multiplex::getGlobalName(global_identity gid) const {
+	if (!containsGlobalIdentity(gid)) throw ElementNotFoundException("identity " + std::to_string(gid));
 	return identity_id_to_name.at(gid);
 }
 
-vertex_id Multiplex::getIdentityFromName(const std::string& identity_name) const {
-	if (!containsIdentity(identity_name)) throw ElementNotFoundException("identity " + identity_name);
+vertex_id Multiplex::getGlobalIdentity(const std::string& identity_name) const {
+	if (!containsGlobalName(identity_name)) throw ElementNotFoundException("identity " + identity_name);
 	return identity_name_to_id.at(identity_name);
 
 }
 
-void Multiplex::map(const std::string& global_identity_name, const std::string& local_vertex_name, const std::string& network_name) {
-	if (!containsIdentity(global_identity_name)) throw ElementNotFoundException("global identity " + global_identity_name);
+void Multiplex::mapIdentity(const std::string& global_identity_name, const std::string& local_vertex_name, const std::string& network_name) {
+	if (!containsGlobalName(global_identity_name)) throw ElementNotFoundException("global identity " + global_identity_name);
 	if (!getNetwork(network_name).containsVertex(local_vertex_name)) throw ElementNotFoundException("local vertex name " + local_vertex_name);
 	if (!containsNetwork(network_name)) throw ElementNotFoundException("network " + network_name);
-	map(getIdentityFromName(global_identity_name),getNetwork(network_name).getVertexId(local_vertex_name),getNetworkId(network_name));
+	mapIdentity(getGlobalIdentity(global_identity_name),getNetwork(network_name).getVertexId(local_vertex_name),getNetworkId(network_name));
 }
 
-bool Multiplex::containsIdentity(const std::string& global_identity_name) const {
+bool Multiplex::containsGlobalName(const std::string& global_identity_name) const {
 	return identity_name_to_id.count(global_identity_name);
 }
 
 bool Multiplex::containsVertex(const std::string& global_identity_name, const std::string& network_name) const {
-	global_identity global_id = getIdentityFromName(global_identity_name);
+	global_identity global_id = getGlobalIdentity(global_identity_name);
 	network_id net = getNetworkId(network_name);
 	return containsVertex(global_id,net);
 }
 
 std::string Multiplex::getVertexName(const std::string& global_vertex_name, const std::string& network_name) const {
-	global_identity global_id = getIdentityFromName(global_vertex_name);
+	global_identity global_id = getGlobalIdentity(global_vertex_name);
 	network_id net = getNetworkId(network_name);
 	vertex_id local_id = getVertexId(global_id, net);
 	return getNetwork(net).getVertexName(local_id);
 }
 
-std::string Multiplex::getGlobalIdentityName(const std::string& local_vertex_name, const std::string& network_name) const {
+std::string Multiplex::getGlobalName(const std::string& local_vertex_name, const std::string& network_name) const {
 	network_id net = getNetworkId(network_name);
 	vertex_id local_id = getNetwork(net).getVertexId(local_vertex_name);
 	global_identity global_id = getGlobalIdentity(local_id, net);
-	return getIdentityName(global_id);
+	return getGlobalName(global_id);
 }
 
 void print(Multiplex& mnet) {
-	std::cout << "*MULTIPLE NETWORK*\n";
-	std::cout << "Number of global identities: " << mnet.getNumIdentities() << "\n";
+	std::cout << "*MULTIPLEX NETWORK*\n";
+	std::cout << "Number of global identities: " << mnet.getNumGlobalIdentities() << "\n";
 	std::cout << "Number of networks: " << mnet.getNumNetworks() << "\n";
 	std::cout << "Number of vertexes: " << mnet.getNumVertexes() << "\n";
 	std::cout << "Number of edges: " << mnet.getNumEdges() << "\n";
