@@ -1,10 +1,3 @@
-/*
- * exceptions.h
- *
- *  Created on: Feb 5, 2014
- *  Author: Matteo Magnani <matteo.magnani@it.uu.se>
- */
-
 #ifndef MULTIPLENETWORK_IO_H_
 #define MULTIPLENETWORK_IO_H_
 
@@ -12,39 +5,49 @@
 #include <string>
 #include "datastructures.h"
 
-void mnet_read_edgelist(MultilayerNetwork&, std::string edge_file);
-
 /**
- * Reads a multiple network from a list of edges.
+ * Reads a multiplex network from a list of edges. (the current version reads networks without attributes.)
  *
- * An edge is defined by two symbolic vertex names separated
- * by whitespace. (The symbolic vertex names themselves cannot contain
- * whitespaces). They must be followed by the name of the network.
- * They might be followed by an optional number indicating
- * the weight of the edge; the number can be negative and can be in
- * scientific notation. If there is no weight specified to an edge it
- * is assumed to be one.
+ * This is the accepted format:
+ * ----------------------------------
+ * #NETWORKS
+ * Facebook,UNDIRECTED,WEIGHTED
+ * Twitter,DIRECTED,WEIGHTED
  *
- * \param infile Pointer to a stream, it should be readable.
+ * #VERTEX ATTRIBUTES
+ * Facebook,Color,STRING
+ * Facebook,Age,NUMERIC
+ * Twitter,Age,NUMERIC
  *
- * Time complexity:
+ * #EDGE ATTRIBUTES
+ * Twitter,Stars,NUMERIC
  *
- * @version 1.0 (Jun 12, 2013)
- * @author: Matteo Magnani <matteo.magnani@it.uu.se>
+ * #VERTICES
+ * Matteo,Facebook,Blue,34
+ * Matteo,Twitter,33
+ * ...
+ *
+ * #EDGES
+ * Matteo,Mostafa,Twitter,.3,6
+ * ...
+ * ----------------------------------
+ *
+ * If the #NETWORKS section is empty, undirected networks are created as mentioned in the #EDGES section.
+ * Allowed values for #TYPE are "Multiplex" and "MultipleNetwork" (only the first implemented so far).
+ * If the #VERTEX ATTRIBUTES or #EDGE ATTRIBUTES sections are empty, no attributes are created.
+ * The #VERTICES section is useful only if attributes or disconnected nodes are present.
+ *
+ * Therefore, a minimalistic undirected network would look like this:
+ * ----------------------------------
+ * #EDGES
+ * Matteo, Mostafa, Twitter, 32
+ * ...
+ * ----------------------------------
+ *
+ * \param file
+ *
  */
-/*
-void mnet_read_edgelist(MultipleNetwork* mnet,
-		int num_networks,
-		FILE *instream[],
-        std::string graph_names[],
-        igraph_add_weights_t weights[],
-        igraph_bool_t directed[]);
+void read_multiplex(MultiplexNetwork& mnet, const std::string& infile);
 
-void mnet_read_edgelist(MultipleNetwork* mnet,
-		std::string infile,
-        std::string graph_names[],
-        igraph_add_weights_t weights[],
-        igraph_bool_t directed[]);
-*/
 
 #endif /* MULTIPLENETWORK_IO_H_ */

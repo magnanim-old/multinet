@@ -3,8 +3,9 @@ CXXFLAGS = -Iinclude -O2 -g -std=c++11 -Wall -fmessage-length=0
 OBJS = 	src/datastructures/*.cpp \
 		src/exceptions/*.cpp \
 		src/utils/*.cpp \
+		src/io/*.cpp \
 		
-TEST = test/FailedUnitTestException.cpp test/run_all.cpp test/testNetwork.cpp test/testMultilayerNetwork.cpp test/testMultiplex.cpp
+TEST = test/FailedUnitTestException.cpp test/run_all.cpp test/testNetwork.cpp test/testMultilayerNetwork.cpp test/testMultiplex.cpp test/testIO.cpp
 		
 LIBS = -L/usr/local/lib
 

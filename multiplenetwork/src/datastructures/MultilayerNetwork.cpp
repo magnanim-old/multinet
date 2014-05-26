@@ -64,7 +64,6 @@ void MultilayerNetwork::getEdges(std::set<global_edge_id>& edges) const {
 	}
 }
 
-
 const Network& MultilayerNetwork::getNetwork(network_id nid) const {
 	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + std::to_string(nid));
 	return networks[nid];

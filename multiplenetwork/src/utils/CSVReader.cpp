@@ -26,7 +26,7 @@ CSVReader::~CSVReader() {
 void CSVReader::open(string path) {
 	infile.open(path.data());
 	if (infile.fail()) throw FileNotFoundException(path);
-	(getline(infile, next))?has_next=true:has_next=false;
+	do {(getline(infile, next))?has_next=true:has_next=false;} while (next=="" && has_next);
 }
 
 bool CSVReader::hasNext() {
@@ -44,7 +44,7 @@ vector<string> CSVReader::getNext() {
 	}
 
 	// prepare next line for next call
-	(getline(infile, next))?has_next=true:has_next=false;
+	do {(getline(infile, next))?has_next=true:has_next=false;} while (next=="" && has_next);
 
 	return record;
 }

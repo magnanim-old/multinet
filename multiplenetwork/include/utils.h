@@ -56,8 +56,8 @@ template <class T> void print(std::set<T>& input) {
 class CSVReader {
 private:
 	std::ifstream infile;
-	std::string next;
-	bool has_next;
+	std::string next = "";
+	bool has_next = true;
 
 public:
 	CSVReader();

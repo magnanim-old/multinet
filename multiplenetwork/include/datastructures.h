@@ -428,6 +428,16 @@ public:
 	 **/
 	void setEdgeWeight(const std::string& vertex_name1, const std::string& vertex_name2, double weight);
 	/**
+	 * @brief Checks if a vertex attribute with this name already exists.
+	 * @param attribute_name The name of the vertex attribute
+	 **/
+	bool hasVertexAttribute(const std::string& attribute_name);
+	/**
+	 * @brief Checks if an edge attribute with this name already exists.
+	 * @param attribute_name The name of the vertex attribute
+	 **/
+	bool hasEdgeAttribute(const std::string& attribute_name);
+	/**
 	 * @brief Enables the association of a string value to each vertex.
 	 * @param attribute_name The name of the vertex attribute
 	 * @throws DuplicateElementException if a vertex attribute with this name already exists
@@ -694,12 +704,12 @@ void print(MultilayerNetwork& mnet);
 /**********************************************************************/
 /** Multiplex Network *************************************************/
 /**********************************************************************/
-class Multiplex : public MultilayerNetwork {
+class MultiplexNetwork : public MultilayerNetwork {
 public:
 	/** Creates an empty network (with 0 internal networks) */
-	Multiplex();
+	MultiplexNetwork();
 	/** */
-	~Multiplex();
+	~MultiplexNetwork();
 	/**
 	 * @brief Adds a global vertex to the network.
 	 * Global vertexes are global identifiers used to relate vertexes in the local networks.
@@ -807,7 +817,7 @@ private:
 
 };
 
-void print(Multiplex& mnet);
+void print(MultiplexNetwork& mnet);
 
 /**********************************************************************/
 /** Multiple Network *************************************************/

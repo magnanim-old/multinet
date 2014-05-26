@@ -308,6 +308,16 @@ void Network::setEdgeWeight(const std::string& vertex_name1, const std::string& 
 	setNumericEdgeAttribute(vertex_name1, vertex_name2, "weight", weight);
 }
 
+bool Network::hasVertexAttribute(const std::string& attribute_name) {
+	return (vertex_numeric_attribute.count(attribute_name)>0) ||
+			(vertex_string_attribute.count(attribute_name)>0);
+}
+
+bool Network::hasEdgeAttribute(const std::string& attribute_name) {
+	return (edge_numeric_attribute.count(attribute_name)>0) ||
+			(edge_string_attribute.count(attribute_name)>0);
+}
+
 void Network::newNumericVertexAttribute(const std::string& attribute_name) {
 	if (vertex_numeric_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
 	vertex_numeric_attribute[attribute_name] = std::map<vertex_id,double>();
@@ -439,7 +449,7 @@ void Network::setStringEdgeAttribute(const std::string& vertex_name1, const std:
 }
 
 void print(Network& net) {
-	std::cout << (net.isDirected()?"DIRECTED":"UNDIRECTED") << " " << (net.isWeighed()?"WEIGHED":"UNWEIGHED") << " " << (net.isNamed()?"NAMED":"UNNAMED") << std::endl;
+	std::cout << (net.isDirected()?"DIRECTED":"UNDIRECTED") << " " << (net.isWeighed()?"WEIGHTED":"UNWEIGHTED") << " " << (net.isNamed()?"NAMED":"UNNAMED") << std::endl;
 	std::cout << "Number of vertexes: " << net.getNumVertexes() << std::endl;
 	std::cout << "Number of edges: " << net.getNumEdges() << std::endl;
 }

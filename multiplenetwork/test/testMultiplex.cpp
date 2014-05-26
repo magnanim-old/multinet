@@ -16,7 +16,7 @@ void testMultiplex() {
 	log("REQUIRES Network class having been tested");
 
 	log("Creating an empty multiple network...",false);
-	Multiplex mnet;
+	MultiplexNetwork mnet;
 	log("done!");
 
 	log("Adding seven global vertexes with different methods...",false);
