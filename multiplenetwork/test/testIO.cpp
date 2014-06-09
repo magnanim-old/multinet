@@ -20,8 +20,7 @@ void testIO() {
 	read_multiplex(mnet1, "test/io1.mpx");
 	log("done!");
 	print(mnet1);
-	std::set<network_id> nets1;
-	mnet1.getNetworks(nets1);
+	std::set<network_id> nets1 = mnet1.getNetworks();
 	for (network_id nid: nets1) {
 		print(mnet1.getNetwork(nid));
 	}
@@ -31,8 +30,7 @@ void testIO() {
 	read_multiplex(mnet2, "test/io2.mpx");
 	log("done!");
 	print(mnet2);
-	std::set<network_id> nets2;
-	mnet2.getNetworks(nets2);
+	std::set<network_id> nets2 = mnet2.getNetworks();
 	for (network_id nid: nets2) {
 		print(mnet2.getNetwork(nid));
 	}
@@ -42,8 +40,7 @@ void testIO() {
 	read_multiplex(mnet3, "test/io3.mpx");
 	log("done!");
 	print(mnet3);
-	std::set<network_id> nets3;
-	mnet3.getNetworks(nets3);
+	std::set<network_id> nets3 = mnet3.getNetworks();
 	for (network_id nid: nets3) {
 		print(mnet3.getNetwork(nid));
 	}

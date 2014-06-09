@@ -45,7 +45,7 @@ typedef long vertex_id;
  * the equality operator: if an edge is undirected, (u,v)==(v,u)
  * (i.e., the two edge_ids refer to the same edge: they are equal)
  */
-struct edge_id {
+class edge_id {
 public:
 	vertex_id v1;
 	vertex_id v2;
@@ -71,7 +71,7 @@ typedef int network_id;
 /**
  * The global identifier of a vertex inside a multiplex network.
  */
-struct global_vertex_id {
+class global_vertex_id {
 public:
 	vertex_id vid;
 	network_id network;
@@ -79,6 +79,8 @@ public:
 	/* Constructor */
 	global_vertex_id();
 	global_vertex_id(vertex_id vid, network_id network);
+	void set_vertex_id(vertex_id vid);
+	vertex_id get_vertex_id();
 	/* Comparison operators, to use edge ids as keys in maps */
 	bool operator==(const global_vertex_id& e2) const;
 	bool operator!=(const global_vertex_id& e2) const;
@@ -94,7 +96,7 @@ public:
  * the equality operator: if an edge is undirected, (u,v)==(v,u)
  * (i.e., the two edge_ids refer to the same edge: they are equal).
  */
-struct global_edge_id {
+class global_edge_id {
 public:
 	vertex_id v1;
 	vertex_id v2;
@@ -126,7 +128,7 @@ typedef long global_identity;
  * Luca on the "PhD Students" friendship network can be connected by an
  * edge indicating that Matteo supervises Luca).
  */
-struct interlayer_edge_id {
+class interlayer_edge_id {
 public:
 	global_vertex_id v1;
 	global_vertex_id v2;
@@ -320,13 +322,13 @@ public:
 	 * This method is normally used to iterate over all the vertexes
 	 * @param vertexes set where the vertex ids are inserted
 	 **/
-	void getVertexes(std::set<vertex_id>& vertexes) const;
+	std::set<vertex_id> getVertexes() const;
 	/**
 	 * @brief Returns all the edge identifiers in the network.
 	 * This method is normally used to iterate over all the edges
 	 * @param edges set where the edge ids are inserted
 	 **/
-	void getEdges(std::set<edge_id>& edges) const;
+	std::set<edge_id> getEdges() const;
 	/**
 	 * @brief Returns the number of vertexes.
 	 **/
@@ -370,36 +372,36 @@ public:
 	 * @brief Returns the identifiers of the vertexes with an edge from vid.
 	 * @throws ElementNotFoundException if the input vertex id is not present in the network
 	 **/
-	void getOutNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) const;
+	std::set<vertex_id> getOutNeighbors(vertex_id vid) const;
 	/**
 	 * @brief Returns the identifiers of the vertexes with an edge towards vid.
 	 **/
-	void getInNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) const;
+	std::set<vertex_id> getInNeighbors(vertex_id vid) const;
 	/**
 	 * @brief Returns the identifiers of the vertexes with an edge from or towards to vid.
 	 **/
-	void getNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) const;
+	std::set<vertex_id> getNeighbors(vertex_id vid) const;
 	/**
 	 * @brief Returns the names of the vertexes with an edge coming from vertex_name.
 	 * Notice that vertexes are stored by id, therefore the unnamed version of this function is faster.
 	 * @throws ElementNotFoundException if the input vertex is not present in the network
 	 * @throws OperationNotSupportedException if the network is unnamed
 	 **/
-	void getOutNeighbors(const std::string& vertex_name, std::set<std::string>& neighbors) const;
+	std::set<std::string> getOutNeighbors(const std::string& vertex_name) const;
 	/**
 	 * @brief Returns the name of the vertexes with an edge going to vertex_name.
 	 * Notice that vertexes are stored by id, therefore the unnamed version of this function is faster.
 	 * @throws ElementNotFoundException if the input vertex is not present in the network
 	 * @throws OperationNotSupportedException if the network is unnamed
 	 **/
-	void getInNeighbors(const std::string& vertex_name, std::set<std::string>& neighbors) const;
+	std::set<std::string> getInNeighbors(const std::string& vertex_name) const;
 	/**
 	 * @brief Returns the name of the vertexes with an edge coming from or going to vertex_name.
 	 * Notice that vertexes are stored by id, therefore the unnamed version of this function is faster.
 	 * @throws ElementNotFoundException if the input vertex is not present in the network
 	 * @throws OperationNotSupportedException if the network is unnamed
 	 **/
-	void getNeighbors(const std::string& vertex_name, std::set<std::string>& neighbors) const;
+	std::set<std::string> getNeighbors(const std::string& vertex_name) const;
 	/**********************/
 	/* Attribute handling */
 	/**********************/
@@ -633,15 +635,19 @@ public:
 	/**
 	 * @brief Returns into "networks" all the network identifiers.
 	 **/
-	void getNetworks(std::set<network_id>& networks) const;
+	std::set<network_id> getNetworks() const;
+	/**
+	 * @brief Returns into "networks" all the network names.
+	 **/
+	std::set<std::string> getNetworkNames() const;
 	/**
 	 * @brief Inserts into "vertexes" all the (global) vertex identifiers.
 	 **/
-	void getVertexes(std::set<global_vertex_id>& vertexes) const;
+	std::set<global_vertex_id> getVertexes() const;
 	/**
 	 * @brief Inserts into "edges" all the (global) edge identifiers.
 	 **/
-	void getEdges(std::set<global_edge_id>& edges) const;
+	std::set<global_edge_id> getEdges() const;
 	/**
 	 * @brief Returns the number of networks.
 	 **/
@@ -670,6 +676,10 @@ public:
 	 **/
 	Network& getNetwork(const std::string& network_name);
 	/**
+	 * @brief Returns a pointer to the network network_name (const version).
+	 **/
+	const Network& getNetwork(const std::string& network_name) const;
+	/**
 	 * @brief Checks if there is a global vertex with identifier gvid.
 	 **/
 	bool containsVertex(global_vertex_id gvid) const;
@@ -691,6 +701,50 @@ public:
 	 * @throws ElementNotFoundException if the network is not present
 	 **/
 	network_id getNetworkId(const std::string& network_name) const;
+
+	///////////////////////////////////////////////////////////////
+	/// OPERATIONS ON UNDERLYING NETWORKS                      ////
+	/// (the following methods just call the corresponding     ////
+	///  methods on the corresponding networks. For their      ////
+	///  documentation see the Network class above             ////
+	///////////////////////////////////////////////////////////////
+
+	/*
+	vertex_id addVertex(const std::string& network_name, const std::string& vertex_name);
+	edge_id addEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2);
+	edge_id addEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, double weight);
+	bool deleteVertex(const std::string& network_name, const std::string& vertex_name);
+	bool deleteEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2);
+	bool containsVertex(const std::string& network_name, const std::string& vertex_name) const;
+	bool containsEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2) const;
+	bool isDirected(const std::string& network_name) const;
+	bool isWeighed(const std::string& network_name) const;
+	bool isNamed(const std::string& network_name) const;
+	vertex_id getVertexId(const std::string& network_name, const std::string& vertex_name) const;
+	std::set<vertex_id> getVertexes(const std::string& network_name) const;
+	std::set<edge_id> getEdges(const std::string& network_name) const;
+	long getNumVertexes(const std::string& network_name) const;
+	long getNumEdges(const std::string& network_name) const;
+	double getEdgeWeight(vertex_id vid1, vertex_id vid2) const;
+	void setEdgeWeight(vertex_id vid1, vertex_id vid2, double weight);
+	double getEdgeWeight(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2) const;
+	void setEdgeWeight(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, double weight);
+	bool hasVertexAttribute(const std::string& network_name, const std::string& attribute_name);
+	bool hasEdgeAttribute(const std::string& network_name, const std::string& attribute_name);
+	void newStringVertexAttribute(const std::string& network_name, const std::string& attribute_name);
+	std::string getStringVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name) const;
+	void setStringVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name, const std::string& value);
+	void newNumericVertexAttribute(const std::string& network_name, const std::string& attribute_name);
+	double getNumericVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name) const;
+	void setNumericVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name, double value);
+	void newStringEdgeAttribute(const std::string& network_name, const std::string& attribute_name);
+	std::string getStringEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name) const;
+	void setStringEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name, const std::string& value);
+	void newNumericEdgeAttribute(const std::string& network_name, const std::string& attribute_name);
+	double getNumericEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name) const;
+	void setNumericEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name, double value);
+*/
+
 private:
 	// The networks composing this multiple network system
 	std::vector<Network> networks;
@@ -750,9 +804,13 @@ public:
 	 **/
 	void mapIdentity(const std::string& global_vertex_name, const std::string& local_vertex_name, const std::string& network_name);
 	/**
-	 * @brief Inserts into "identities" all the global identities.
+	 * @brief returns all the global identities.
 	 **/
-	void getGlobalIdntities(std::set<global_identity>& identities) const;
+	std::set<global_identity> getGlobalIdentities() const;
+	/**
+	 * @brief returns all the global names.
+	 **/
+	std::set<std::string> getGlobalNames() const;
 	/**
 	 * @brief Returns the name of vertex vertex_id.
 	 * @throws OperationNotSupportedException if the network is not named

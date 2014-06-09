@@ -4,8 +4,10 @@ OBJS = 	src/datastructures/*.cpp \
 		src/exceptions/*.cpp \
 		src/utils/*.cpp \
 		src/io/*.cpp \
+		src/measures/degree.cpp src/measures/neighborhood.cpp src/measures/relevance.cpp \
 		
-TEST = test/FailedUnitTestException.cpp test/run_all.cpp test/testNetwork.cpp test/testMultilayerNetwork.cpp test/testMultiplex.cpp test/testIO.cpp
+TEST = test/FailedUnitTestException.cpp test/run_all.cpp test/testNetwork.cpp \
+	   test/testMultilayerNetwork.cpp test/testMultiplex.cpp test/testIO.cpp test/testMeasures.cpp  \
 		
 LIBS = -L/usr/local/lib
 

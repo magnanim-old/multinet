@@ -15,7 +15,7 @@ int main(int argn, char* argv[]) {
 	testMultilayerNetwork();
 	testMultiplex();
 	testIO();
-	//testMeasures();
+	testMeasures();
 	//testModularity(); //Still testing this, but seems to work (it does for single networks)
 	//testEvolution();
 	//testRandom();

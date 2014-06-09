@@ -87,10 +87,8 @@ edge_id Network::addEdge(const std::string& vertex_name1, const std::string& ver
 
 bool Network::deleteVertex(vertex_id vid) {
 	if (!containsVertex(vid)) return false;
-	std::set<vertex_id> in;
-	getInNeighbors(vid, in);
-	std::set<vertex_id> out;
-	getOutNeighbors(vid, out);
+	std::set<vertex_id> in = getInNeighbors(vid);
+	std::set<vertex_id> out = getOutNeighbors(vid);
 
 	// removing adjacent edges
 	for (std::set<vertex_id>::iterator it=in.begin(); it!=in.end(); it++)
@@ -189,11 +187,14 @@ vertex_id Network::getVertexId(const std::string& vertex_name) const  {
 	return vertex_name_to_id.at(vertex_name);
 }
 
-void Network::getVertexes(std::set<vertex_id>& vertexes) const {
+std::set<vertex_id> Network::getVertexes() const {
+	std::set<vertex_id> vertexes;
 	vertexes = this->vertexes;
+	return vertexes;
 }
 
-void Network::getEdges(std::set<edge_id>& edges) const {
+std::set<edge_id> Network::getEdges() const {
+	std::set<edge_id> edges;
 	std::map<vertex_id,std::set<vertex_id> >::const_iterator from_edge_iterator;
 	std::set<vertex_id>::iterator to_edge_iterator;
 	for (from_edge_iterator=out_edges.begin(); from_edge_iterator!=out_edges.end(); ++from_edge_iterator) {
@@ -203,6 +204,7 @@ void Network::getEdges(std::set<edge_id>& edges) const {
 			edges.insert(edge_id(from,to,isDirected()));
 		}
 	}
+	return edges;
 }
 
 long Network::getNumVertexes() const  {
@@ -243,49 +245,72 @@ long Network::getDegree(const std::string& vertex_name) const  {
 	return getDegree(getVertexId(vertex_name));
 }
 
-void Network::getOutNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) const  {
+std::set<vertex_id> Network::getOutNeighbors(vertex_id vid) const  {
+	std::set<vertex_id> neighbors;
 	if (!containsVertex(vid)) throw ElementNotFoundException("Vertex " + std::to_string(vid));
 	std::set<vertex_id>::iterator it;
-	if (out_edges.count(vid)==0) return;
-	for (it=out_edges.at(vid).begin(); it!=out_edges.at(vid).end(); it++)
-		neighbors.insert(*it);
+	if (out_edges.count(vid)!=0)
+		for (it=out_edges.at(vid).begin(); it!=out_edges.at(vid).end(); it++)
+			neighbors.insert(*it);
+	return neighbors;
 }
 
-void Network::getInNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) const  {
+std::set<vertex_id> Network::getInNeighbors(vertex_id vid) const  {
+	std::set<vertex_id> neighbors;
 	if (!containsVertex(vid)) throw ElementNotFoundException("Vertex " + std::to_string(vid));
 	std::set<vertex_id>::const_iterator it;
-	if (in_edges.count(vid)==0) return;
-	for (it=in_edges.at(vid).begin(); it!=in_edges.at(vid).end(); it++)
-		neighbors.insert(*it);
+	if (in_edges.count(vid)!=0)
+		for (it=in_edges.at(vid).begin(); it!=in_edges.at(vid).end(); it++)
+			neighbors.insert(*it);
+	return neighbors;
 }
 
-void Network::getNeighbors(vertex_id vid, std::set<vertex_id>& neighbors) const  {
-	getOutNeighbors(vid, neighbors);
-	if (isDirected()) getInNeighbors(vid, neighbors);
+std::set<vertex_id> Network::getNeighbors(vertex_id vid) const  {
+	std::set<vertex_id> neighbors;
+	if (!containsVertex(vid)) throw ElementNotFoundException("Vertex " + std::to_string(vid));
+	std::set<vertex_id>::iterator it;
+	if (out_edges.count(vid)!=0)
+		for (it=out_edges.at(vid).begin(); it!=out_edges.at(vid).end(); it++)
+			neighbors.insert(*it);
+	if (isDirected() && in_edges.count(vid)!=0)
+			for (it=in_edges.at(vid).begin(); it!=in_edges.at(vid).end(); it++)
+				neighbors.insert(*it);
+	return neighbors;
 }
 
-void Network::getOutNeighbors(const std::string& vertex_name, std::set<std::string>& neighbors) const  {
+std::set<std::string> Network::getOutNeighbors(const std::string& vertex_name) const  {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name)) throw ElementNotFoundException("Vertex " + vertex_name);
-	std::set<vertex_id> tmp_id_result;
-	getOutNeighbors(vertex_name_to_id.at(vertex_name), tmp_id_result);
-	std::set<std::string> tmp_result;
+	std::set<std::string> neighbors;
+	std::set<vertex_id> tmp_id_result = getOutNeighbors(vertex_name_to_id.at(vertex_name));
 	for (std::set<vertex_id>::iterator it=tmp_id_result.begin(); it!=tmp_id_result.end(); it++)
 		neighbors.insert(vertex_id_to_name.at(*it));
+	return neighbors;
 }
 
-void Network::getInNeighbors(const std::string& vertex_name, std::set<std::string>& neighbors) const  {
+std::set<std::string> Network::getInNeighbors(const std::string& vertex_name) const  {
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name)) throw ElementNotFoundException("Vertex " + vertex_name);
-	std::set<vertex_id> tmp_id_result;
-	getInNeighbors(vertex_name_to_id.at(vertex_name), tmp_id_result);
+	std::set<std::string> neighbors;
+	std::set<vertex_id> tmp_id_result = getInNeighbors(vertex_name_to_id.at(vertex_name));
 	for (std::set<vertex_id>::iterator it=tmp_id_result.begin(); it!=tmp_id_result.end(); it++)
 		neighbors.insert(vertex_id_to_name.at(*it));
+	return neighbors;
 }
 
-void Network::getNeighbors(const std::string& vertex_name, std::set<std::string>& neighbors) const  {
-	getOutNeighbors(vertex_name, neighbors);
-	if (isDirected()) getInNeighbors(vertex_name, neighbors);
+std::set<std::string> Network::getNeighbors(const std::string& vertex_name) const  {
+	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
+	if (!containsVertex(vertex_name)) throw ElementNotFoundException("Vertex " + vertex_name);
+	std::set<std::string> neighbors;
+	std::set<vertex_id> tmp_id_result = getOutNeighbors(vertex_name_to_id.at(vertex_name));
+	for (std::set<vertex_id>::iterator it=tmp_id_result.begin(); it!=tmp_id_result.end(); it++)
+		neighbors.insert(vertex_id_to_name.at(*it));
+	if (isDirected()) {
+		std::set<vertex_id> tmp_id_result = getInNeighbors(vertex_name_to_id.at(vertex_name));
+		for (std::set<vertex_id>::iterator it=tmp_id_result.begin(); it!=tmp_id_result.end(); it++)
+			neighbors.insert(vertex_id_to_name.at(*it));
+	}
+	return neighbors;
 }
 
 double Network::getEdgeWeight(vertex_id vid1, vertex_id vid2) const {

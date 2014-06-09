@@ -28,6 +28,21 @@ global_identity MultiplexNetwork::addGlobalIdentity() {
 	return getNumGlobalIdentities()-1;
 }
 
+std::set<global_identity> MultiplexNetwork::getGlobalIdentities() const {
+	std::set<global_identity> identities;
+	for (std::pair<global_identity,std::string> p: identity_id_to_name)
+		identities.insert(p.first);
+	return identities;
+}
+
+
+std::set<std::string> MultiplexNetwork::getGlobalNames() const {
+	std::set<std::string> names;
+	for (std::pair<std::string,global_identity> p: identity_name_to_id)
+		names.insert(p.first);
+	return names;
+}
+
 void MultiplexNetwork::addGlobalIdentities(long num_new_identities) {
 	for (long i=0; i<num_new_identities; ++i) {
 		// map keeping correspondences between global and local vertex identifiers
