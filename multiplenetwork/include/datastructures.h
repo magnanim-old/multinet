@@ -300,9 +300,9 @@ public:
 	/**
 	 * @brief Returns true if the network is weighted
 	 */
-	bool isWeighed() const;
+	bool isWeighted() const;
 	/**
-	 * @brief Returns true if the network is named
+	 * @brief Returns true if the network is named, i.e., vertexes are identified by their names
 	 */
 	bool isNamed() const;
 	/**
@@ -435,10 +435,30 @@ public:
 	 **/
 	bool hasVertexAttribute(const std::string& attribute_name);
 	/**
+	 * @brief Checks if a string vertex attribute with this name already exists.
+	 * @param attribute_name The name of the vertex attribute
+	 **/
+	bool hasStringVertexAttribute(const std::string& attribute_name);
+	/**
+	 * @brief Checks if a numeric vertex attribute with this name already exists.
+	 * @param attribute_name The name of the vertex attribute
+	 **/
+	bool hasNumericVertexAttribute(const std::string& attribute_name);
+	/**
 	 * @brief Checks if an edge attribute with this name already exists.
 	 * @param attribute_name The name of the vertex attribute
 	 **/
 	bool hasEdgeAttribute(const std::string& attribute_name);
+	/**
+	 * @brief Checks if a string edge attribute with this name already exists.
+	 * @param attribute_name The name of the vertex attribute
+	 **/
+	bool hasStringEdgeAttribute(const std::string& attribute_name);
+	/**
+	 * @brief Checks if a numeric edge attribute with this name already exists.
+	 * @param attribute_name The name of the vertex attribute
+	 **/
+	bool hasNumericEdgeAttribute(const std::string& attribute_name);
 	/**
 	 * @brief Enables the association of a string value to each vertex.
 	 * @param attribute_name The name of the vertex attribute
@@ -591,6 +611,44 @@ public:
 	 * @throws ElementNotFoundException if there is no vertex with this name
 	 **/
 	void setNumericEdgeAttribute(const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name, double value);
+	/**
+	 * @brief Returns the names of the numeric edge attributes defined for this network.
+	 **/
+	std::set<std::string> getNumericEdgeAttributes() const;
+	/**
+	 * @brief Returns the names of the numeric edge attributes defined for this network.
+	 **/
+	std::set<std::string> getStringEdgeAttributes() const;
+	/**
+	 * @brief Returns the names of the numeric edge attributes defined for this network.
+	 **/
+	std::set<std::string> getNumericVertexAttributes() const;
+	/**
+	 * @brief Returns the names of the numeric edge attributes defined for this network.
+	 **/
+	std::set<std::string> getStringVertexAttributes() const;
+	/**
+	 * @brief Returns the number of string vertex attributes defined for this network.
+	 **/
+	int getNumStringVertexAttributes() const;
+	/**
+	 * @brief Returns the number of numeric vertex attributes defined for this network.
+	 **/
+	int getNumNumericVertexAttributes() const;
+	/**
+	 * @brief Returns the number of string edge attributes defined for this network.
+	 **/
+	int getNumStringEdgeAttributes() const;
+	/**
+	 * @brief Returns the number of numeric edge attributes defined for this network.
+	 **/
+	int getNumNumericEdgeAttributes() const;
+	/**
+	 * @brief Returns the number of attributes defined for this network.
+	 **/
+	int getNumAttributes() const;
+
+
 private:
 	// largest vertex identifier assigned so far
 	vertex_id max_vertex_id;
@@ -624,6 +682,7 @@ public:
 	~MultilayerNetwork();
 	/**
 	 * @brief Adds a local network to this multiplenetwork data structure.
+	 * A default name is automatically associated to the new network
 	 * @return the identifier of the newly added network
 	 **/
 	network_id addNetwork(const Network& net);
@@ -631,7 +690,7 @@ public:
 	 * @brief Adds a named local network to this multiplenetwork data structure.
 	 * @return the identifier of the newly added network
 	 **/
-	network_id addNetwork(const std::string& network_name, const Network& net);
+	network_id addNetwork(const std::string& network_name, Network& net);
 	/**
 	 * @brief Returns into "networks" all the network identifiers.
 	 **/
@@ -701,49 +760,6 @@ public:
 	 * @throws ElementNotFoundException if the network is not present
 	 **/
 	network_id getNetworkId(const std::string& network_name) const;
-
-	///////////////////////////////////////////////////////////////
-	/// OPERATIONS ON UNDERLYING NETWORKS                      ////
-	/// (the following methods just call the corresponding     ////
-	///  methods on the corresponding networks. For their      ////
-	///  documentation see the Network class above             ////
-	///////////////////////////////////////////////////////////////
-
-	/*
-	vertex_id addVertex(const std::string& network_name, const std::string& vertex_name);
-	edge_id addEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2);
-	edge_id addEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, double weight);
-	bool deleteVertex(const std::string& network_name, const std::string& vertex_name);
-	bool deleteEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2);
-	bool containsVertex(const std::string& network_name, const std::string& vertex_name) const;
-	bool containsEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2) const;
-	bool isDirected(const std::string& network_name) const;
-	bool isWeighed(const std::string& network_name) const;
-	bool isNamed(const std::string& network_name) const;
-	vertex_id getVertexId(const std::string& network_name, const std::string& vertex_name) const;
-	std::set<vertex_id> getVertexes(const std::string& network_name) const;
-	std::set<edge_id> getEdges(const std::string& network_name) const;
-	long getNumVertexes(const std::string& network_name) const;
-	long getNumEdges(const std::string& network_name) const;
-	double getEdgeWeight(vertex_id vid1, vertex_id vid2) const;
-	void setEdgeWeight(vertex_id vid1, vertex_id vid2, double weight);
-	double getEdgeWeight(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2) const;
-	void setEdgeWeight(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, double weight);
-	bool hasVertexAttribute(const std::string& network_name, const std::string& attribute_name);
-	bool hasEdgeAttribute(const std::string& network_name, const std::string& attribute_name);
-	void newStringVertexAttribute(const std::string& network_name, const std::string& attribute_name);
-	std::string getStringVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name) const;
-	void setStringVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name, const std::string& value);
-	void newNumericVertexAttribute(const std::string& network_name, const std::string& attribute_name);
-	double getNumericVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name) const;
-	void setNumericVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name, double value);
-	void newStringEdgeAttribute(const std::string& network_name, const std::string& attribute_name);
-	std::string getStringEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name) const;
-	void setStringEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name, const std::string& value);
-	void newNumericEdgeAttribute(const std::string& network_name, const std::string& attribute_name);
-	double getNumericEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name) const;
-	void setNumericEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name, double value);
-*/
 
 private:
 	// The networks composing this multiple network system
@@ -864,6 +880,24 @@ public:
 	 * @brief Checks if global vertex global_vertex_name is associated to a vertex in network network_name.
 	 **/
 	bool containsVertex(const std::string& global_identity_name, const std::string& network_name) const;
+
+	// Attribute management
+	bool hasAttribute(const std::string& attribute_name);
+	bool hasNumericAttribute(const std::string& attribute_name);
+	bool hasStringAttribute(const std::string& attribute_name);
+	void newStringAttribute(const std::string& attribute_name);
+	std::string getStringAttribute(const global_identity& global_id, const std::string& attribute_name) const;
+	void setStringAttribute(const global_identity& global_id, const std::string& attribute_name, const std::string& value);
+	std::string getStringAttribute(const std::string& global_name, const std::string& attribute_name) const;
+	void setStringAttribute(const std::string& global_name, const std::string& attribute_name, const std::string& value);
+	void newNumericAttribute(const std::string& attribute_name);
+	double getNumericAttribute(const global_identity& global_id, const std::string& attribute_name) const;
+	void setNumericAttribute(const global_identity& global_id, const std::string& attribute_name, double value);
+	double getNumericAttribute(const std::string& global_name, const std::string& attribute_name) const;
+	void setNumericAttribute(const std::string& global_name, const std::string& attribute_name, double value);
+	std::set<std::string> getNumericAttributes() const;
+	std::set<std::string> getStringAttributes() const;
+
 private:
 	// from a vertex to its global identity
 	std::map<global_vertex_id, global_identity> local_to_global_id;
@@ -872,6 +906,9 @@ private:
 	/* Conversion from numerical to string ids */
 	std::map<global_identity, std::string> identity_id_to_name;
 	std::map<std::string, global_identity> identity_name_to_id;
+	// Global IDs attributes
+	std::map<std::string, std::map<global_identity, std::string> > string_attribute;
+	std::map<std::string, std::map<global_identity, double> > numeric_attribute;
 
 };
 
@@ -897,6 +934,7 @@ public:
 	 * @brief Inserts into "connections" all the edge identifiers of interlayer connections.
 	 **/
 	void getInterlayerConnections(std::set<interlayer_edge_id>& connections) const;
+
 
 };
 

@@ -16,8 +16,7 @@
 void testIO() {
 	log("TESTING IO (MultiplexNetwork)");
 	log("Reading network io1 from file...",false);
-	MultiplexNetwork mnet1;
-	read_multiplex(mnet1, "test/io1.mpx");
+	MultiplexNetwork mnet1 = read_multiplex("test/io1.mpx");
 	log("done!");
 	print(mnet1);
 	std::set<network_id> nets1 = mnet1.getNetworks();
@@ -26,8 +25,7 @@ void testIO() {
 	}
 
 	log("Reading network io2 from file...",false);
-	MultiplexNetwork mnet2;
-	read_multiplex(mnet2, "test/io2.mpx");
+	MultiplexNetwork mnet2 = read_multiplex("test/io2.mpx");
 	log("done!");
 	print(mnet2);
 	std::set<network_id> nets2 = mnet2.getNetworks();
@@ -36,8 +34,7 @@ void testIO() {
 	}
 
 	log("Reading network io3 from file...",false);
-	MultiplexNetwork mnet3;
-	read_multiplex(mnet3, "test/io3.mpx");
+	MultiplexNetwork mnet3 = read_multiplex("test/io3.mpx");
 	log("done!");
 	print(mnet3);
 	std::set<network_id> nets3 = mnet3.getNetworks();

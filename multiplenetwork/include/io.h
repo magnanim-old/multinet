@@ -6,7 +6,7 @@
 #include "datastructures.h"
 
 /**
- * Reads a multiplex network from a list of edges. (the current version reads networks without attributes.)
+ * Reads a multiplex network from a list of edges.
  *
  * This is the accepted format:
  * ----------------------------------
@@ -47,7 +47,11 @@
  * \param file
  *
  */
-void read_multiplex(MultiplexNetwork& mnet, const std::string& infile);
+MultiplexNetwork read_multiplex(const std::string& infile);
 
+/**
+ * Writes a network to file using the graphml format
+ */
+void write_graphml(const Network& net, const std::string& outfile);
 
 #endif /* MULTIPLENETWORK_IO_H_ */

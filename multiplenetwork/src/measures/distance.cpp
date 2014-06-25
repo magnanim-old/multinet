@@ -19,21 +19,20 @@ using namespace std;
  igraph_integer_t vertex,
  vector<set<MultiDistance> > *distances) {}*/
 
-void pareto_distance_all_paths(MultilayerNetwork& mnet, vertex_id vertex,
+void pareto_distance_all_paths(MultiplexNetwork& mnet, vertex_id vertex,
 		std::map<vertex_id,std::set<Path> >& paths) {
 	pareto_distance_all_paths(mnet, vertex, paths, 1000000);
 }
 
 
-void pareto_distance_all_paths(MultilayerNetwork& mnet, vertex_id vertex,
+void pareto_distance_all_paths(MultiplexNetwork& mnet, vertex_id vertex,
 		std::map<vertex_id,std::set<Path> >& paths, int bound) {
 
-	std::set<vertex_id> vertexes;
-	mnet.getVertexes(vertexes);
+	std::set<vertex_id> vertexes = mnet.getVertexes();
 	/* timestamp, used for efficiency reasons to avoid processing edges when no changes have occurred since the last iteration  */
 	long ts = 0;
 	/* last update timestamp */
-	std::map<intralayer_edge_id, long> last_updated;
+	std::map<global_edge_id, long> last_updated;
 	/*
 	for (int network = 0; network < num_networks; network++) {
 		std::map<vertex_id, std::map<vertex_id, long> > edge_timestamps;
@@ -59,37 +58,33 @@ void pareto_distance_all_paths(MultilayerNetwork& mnet, vertex_id vertex,
 		changes = false;
 		//int counter = 0;
 
-		set<intralayer_edge_id> edges;
-		mnet.getEdges(edges);
+		set<global_edge_id> edges = mnet.getEdges();
 		//for (set<global_edge_id>::iterator edge_iterator=edges.begin(); edge_iterator!=edges.end(); ++edge_iterator) {
 		//	global_edge_id e=(*edge_iterator);
 		//	if (!e.directed) {
 		//
 		//	}
-		std::set<network_id> nets;
-		mnet.getNetworks(nets);
+		std::set<network_id> nets = mnet.getNetworks();
 		std::set<network_id>::iterator network_iterator;
 		for (network_iterator=nets.begin(); network_iterator!=nets.end(); ++network_iterator) {
 			network_id network = *network_iterator;
 
 			//long num_edges = mnet.getNetwork(network)->getNumEdges();
 			//cout << "processing network " << network << " (" << num_edges << " edges)\n";
-			set<vertex_id> vertexes;
-			mnet.getNetwork(network)->getVertexes(vertexes);
+			set<vertex_id> vertexes = mnet.getNetwork(network).getVertexes();
 			for (set<vertex_id>::iterator from_iterator = vertexes.begin();
 					from_iterator != vertexes.end(); from_iterator++) {
 				vertex_id local_from = *from_iterator;
-				set<vertex_id> out_neighbors;
-				mnet.getNetwork(network)->getOutNeighbors(local_from, out_neighbors);
+				set<vertex_id> out_neighbors = mnet.getNetwork(network).getOutNeighbors(local_from);
 				for (set<vertex_id>::iterator to_iterator =
 						out_neighbors.begin();
 						to_iterator != out_neighbors.end(); to_iterator++) {
 					vertex_id local_to = *to_iterator;
 					//cout << std::to_string(from) << " " << std::to_string(to) << "\n";
 
-					vertex_id from = mnet.getGlobalVertexId(local_from, network);
-					vertex_id to = mnet.getGlobalVertexId(local_to, network);
-					intralayer_edge_id e(from, to, false, network);
+					vertex_id from = mnet.getGlobalIdentity(local_from, network);
+					vertex_id to = mnet.getGlobalIdentity(local_to, network);
+					global_edge_id e(from, to, false, network);
 					// initialize edge timestamp to -1 if first processed
 
 

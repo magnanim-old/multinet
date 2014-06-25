@@ -46,18 +46,13 @@ template <class T> void print(std::set<T>& input) {
 }
 
 /***********************************/
-/** String manipulation functions **/
-/***********************************/
-//std::string n2s (long number);
-
-/***********************************/
 /** IO                            **/
 /***********************************/
 class CSVReader {
 private:
 	std::ifstream infile;
-	std::string next = "";
-	bool has_next = true;
+	std::string next;
+	bool has_next;
 
 public:
 	CSVReader();
@@ -108,9 +103,9 @@ public:
 	std::set<unsigned long> getKRandom(unsigned long max, unsigned int k);
 
 	template <class T>
-	void getKElements(std::set<T>& input, std::set<T>& output, unsigned int k) {
-
-		  std::uniform_int_distribution<int> distribution(0,input.size());
+	std::set<T> getKElements(const std::set<T>& input, unsigned int k) {
+		std::set<T> output;
+		  std::uniform_int_distribution<int> distribution(0,input.size()-1);
 		  // TODO add check on size
 		  while (output.size()<k) {
 		    int offset = distribution(generator);
@@ -119,10 +114,13 @@ public:
 		    for (it=input.begin(); i<offset; ++it) i++;
 		    output.insert(*it);
 		  }
+		  return output;
 	}
 
 	template <class T>
-	T getElement(std::set<T>& input);
+	T getElement(const std::set<T>& input) {
+		return *getKElements(input, 1).begin();
+	}
 
 	/**
 	 * Random test: returns TRUE with probability probability.

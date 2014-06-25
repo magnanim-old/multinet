@@ -34,8 +34,7 @@ std::set<std::string> out_neighbors(const MultiplexNetwork& mnet, const std::str
 std::set<global_identity> out_neighbors(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
 	std::set<global_identity> res;
 	if (!mnet.containsVertex(identity,network)) return res;
-	std::set<vertex_id> neighbours;
-	mnet.getNetwork(network).getOutNeighbors(mnet.getVertexId(identity,network));
+	std::set<vertex_id> neighbours = mnet.getNetwork(network).getOutNeighbors(mnet.getVertexId(identity,network));
 	for (vertex_id vid: neighbours)
 		res.insert(mnet.getGlobalIdentity(vid,network));
 	return res;
@@ -44,8 +43,7 @@ std::set<global_identity> out_neighbors(const MultiplexNetwork& mnet, global_ide
 std::set<std::string> out_neighbors(const MultiplexNetwork& mnet, const std::string& name, const std::string& network_name) {
 	std::set<std::string> res;
 	if (!mnet.containsVertex(name,network_name)) return res;
-	std::set<std::string> neighbours;
-	mnet.getNetwork(network_name).getOutNeighbors(mnet.getVertexName(name,network_name));
+	std::set<std::string> neighbours = mnet.getNetwork(network_name).getOutNeighbors(mnet.getVertexName(name,network_name));
 	for (std::string neigh: neighbours)
 		res.insert(mnet.getGlobalName(neigh,network_name));
 	return res;
@@ -56,8 +54,7 @@ std::set<global_identity> in_neighbors(const MultiplexNetwork& mnet, global_iden
 	std::set<global_identity> res;
 	for (network_id net: active_networks) {
 		if (!mnet.containsVertex(identity,net)) continue;
-		std::set<vertex_id> neighbours;
-		mnet.getNetwork(net).getInNeighbors(mnet.getVertexId(identity,net));
+		std::set<vertex_id> neighbours = mnet.getNetwork(net).getInNeighbors(mnet.getVertexId(identity,net));
 		for (vertex_id vid: neighbours)
 			res.insert(mnet.getGlobalIdentity(vid,net));
 	}
@@ -68,8 +65,7 @@ std::set<std::string> in_neighbors(const MultiplexNetwork& mnet, const std::stri
 	std::set<std::string> res;
 	for (std::string network_name: active_networks) {
 		if (!mnet.containsVertex(global_name,network_name)) continue;
-		std::set<std::string> neighbours;
-		mnet.getNetwork(network_name).getInNeighbors(mnet.getVertexName(global_name,network_name));
+		std::set<std::string> neighbours = mnet.getNetwork(network_name).getInNeighbors(mnet.getVertexName(global_name,network_name));
 		for (std::string neigh: neighbours)
 			res.insert(mnet.getGlobalName(neigh,network_name));
 	}
@@ -79,8 +75,7 @@ std::set<std::string> in_neighbors(const MultiplexNetwork& mnet, const std::stri
 std::set<global_identity> in_neighbors(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
 	std::set<global_identity> res;
 	if (!mnet.containsVertex(identity,network)) return res;
-	std::set<vertex_id> neighbours;
-	mnet.getNetwork(network).getInNeighbors(mnet.getVertexId(identity,network));
+	std::set<vertex_id> neighbours = mnet.getNetwork(network).getInNeighbors(mnet.getVertexId(identity,network));
 	for (vertex_id vid: neighbours)
 		res.insert(mnet.getGlobalIdentity(vid,network));
 	return res;
@@ -89,8 +84,7 @@ std::set<global_identity> in_neighbors(const MultiplexNetwork& mnet, global_iden
 std::set<std::string> in_neighbors(const MultiplexNetwork& mnet, const std::string& name, const std::string& network_name) {
 	std::set<std::string> res;
 	if (!mnet.containsVertex(name,network_name)) return res;
-	std::set<std::string> neighbours;
-	mnet.getNetwork(network_name).getInNeighbors(mnet.getVertexName(name,network_name));
+	std::set<std::string> neighbours = mnet.getNetwork(network_name).getInNeighbors(mnet.getVertexName(name,network_name));
 	for (std::string neigh: neighbours)
 		res.insert(mnet.getGlobalName(neigh,network_name));
 	return res;
@@ -101,8 +95,7 @@ std::set<global_identity> neighbors(const MultiplexNetwork& mnet, global_identit
 	std::set<global_identity> res;
 	for (network_id net: active_networks) {
 		if (!mnet.containsVertex(identity,net)) continue;
-		std::set<vertex_id> neighbours;
-		mnet.getNetwork(net).getNeighbors(mnet.getVertexId(identity,net));
+		std::set<vertex_id> neighbours = mnet.getNetwork(net).getNeighbors(mnet.getVertexId(identity,net));
 		for (vertex_id vid: neighbours)
 			res.insert(mnet.getGlobalIdentity(vid,net));
 	}

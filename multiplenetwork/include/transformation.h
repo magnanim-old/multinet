@@ -10,9 +10,8 @@
 
 #include "datastructures.h"
 
-typedef enum {MNET_OR_FLATTENING, MNET_WEIGHED_FLATTENING, MNET_MULTI_FLATTENING}
-MNET_FLATTENING_ALGORITHM;
+Network flatten_weighted(const MultiplexNetwork& mnet, const std::set<network_id>& active_networks);
 
-void flatten(MultilayerNetwork& mnet, MNET_FLATTENING_ALGORITHM algorithm, Network& net);
+Network flatten_weighted(const MultiplexNetwork& mnet, const std::set<std::string>& active_networks);
 
 #endif /* MULTIPLENETWORK_TRANSFORMATION_H_ */

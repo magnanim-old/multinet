@@ -9,7 +9,7 @@
 
 using namespace std;
 
-FailedUnitTestException::FailedUnitTestException(string value) {
+FailedUnitTestException::FailedUnitTestException(string message) {
 	FailedUnitTestException::message = message;
 }
 FailedUnitTestException::~FailedUnitTestException() throw (){

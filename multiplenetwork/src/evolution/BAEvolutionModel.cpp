@@ -11,67 +11,53 @@
 
 using namespace std;
 
-void ba_choice(Network& graph, int m, set<vertex_id>& chosen);
-
-BAEvolutionModel::BAEvolutionModel(int m) {
-	num_of_neighbors = m;
+BAEvolutionModel::BAEvolutionModel(int m0, int m) {
+	BAEvolutionModel::m0 = m0;
+	BAEvolutionModel::m = m;
 }
 
 BAEvolutionModel::~BAEvolutionModel() {
 }
 
-
-void BAEvolutionModel::init_step(MultilayerNetwork& mnet, network_id net) {
-	std::cout << "BA init" << std::endl;
-}
-
-void BAEvolutionModel::evolution_step(MultilayerNetwork& mnet, network_id net) {
-
-	Random rand;
-
-	std::set<intralayer_edge_id> universe;
-	mnet.getVertexes(universe);
-	std::set<intralayer_edge_id> choice;
-	rand.getKElements(universe,choice,1);
-	intralayer_edge_id new_global_vertex = *choice.begin();
-
-	std::cout << "BA add " << new_global_vertex << std::endl;
-
-    // Randomly select m nodes with probability proportional to their degree
-
-	/*
-	set<vertex_id> target_nodes;
-	ba_choice(mnet->getNetwork(net),num_of_neighbors,target_nodes);
-
-	// Add a new node to this network, taken from the Universe
-	vertex_id new_vertex = mnet.getNetwork(net)->addVertex();
-	mnet.map(global_vertex,new_vertex,net);
-	//mnet->
-
-	for (set<vertex_id>::iterator node=target_nodes.begin(); node!=target_nodes.end(); ++node) {
-		mnet.getNetwork(layer)->addEdge(new_vertex,*node);
-	}
-	*/
-}
-
-void ba_choice(Network& net, int m, std::set<long>& selected_nodes) {
-	/*
-	long num_nodes = net.getNumVertexes();
-	long num_edges = net.getNumEdges();
-
-
-	if (m>=num_nodes) {
-		for (int i=0; i<num_nodes; i++) {
-			selected_nodes.insert(i);
+void BAEvolutionModel::init_step(MultiplexNetwork& mnet, network_id net) {
+	std::set<std::string> names = rand.getKElements(mnet.getGlobalNames(), m0);
+	for (std::string name: names) {
+		if (!mnet.getNetwork(net).containsVertex(name)) {
+			mnet.getNetwork(net).addVertex(name);
+			mnet.mapIdentity(name,name,mnet.getNetworkName(net));
 		}
 	}
-	else while (selected_nodes.size()<m) {
-		igraph_integer_t nodes[2];
-		igraph_edge(graph,rand()%num_edges,&nodes[0],&nodes[1]);
-		//long fromGlobalId = mnet->getGlobalId(layer,from);
-		//long toGlobalId = mnet->getGlobalId(layer,to);
-		long node = nodes[rand()%2];
-		selected_nodes.insert(node);
+	for (std::string name1: names) {
+		for (std::string name2: names) {
+			if (name1<name2)
+				mnet.getNetwork(net).addEdge(name1,name2);
+		}
 	}
-	return selected_nodes;*/
+}
+
+void BAEvolutionModel::evolution_step(MultiplexNetwork& mnet, network_id net) {
+
+	std::string new_vertex = rand.getElement(mnet.getGlobalNames());
+
+	if (mnet.getNetwork(net).containsVertex(new_vertex))
+		return;
+
+	//std::cout << "Inserting vertex " + new_vertex;
+	mnet.getNetwork(net).addVertex(new_vertex);
+	//std::cout << " " << mnet.getNetwork(net).getNumVertexes() << std::endl;
+	mnet.mapIdentity(new_vertex,new_vertex,mnet.getNetworkName(net));
+
+    // Randomly select m nodes with probability proportional to their degree and connect them to new_vertex
+	std::set<edge_id> all_edges = mnet.getNetwork(net).getEdges();
+	std::set<edge_id> edges = rand.getKElements(all_edges, m);
+
+
+	for (edge_id edge: edges) {
+		global_identity target_id = mnet.getGlobalIdentity(rand.test(.5)?edge.v1:edge.v2, net);
+		std::string target = mnet.getGlobalName(target_id);
+		if (!mnet.getNetwork(net).containsEdge(new_vertex,target)) {
+			mnet.getNetwork(net).addEdge(new_vertex,target);
+		}
+	}
+
 }

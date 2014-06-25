@@ -17,8 +17,7 @@ void testMeasures() {
 	log("TESTING measures");
 	log("Reading the network...",false);
 	// Creating an empty multiple network and initializing it
-	MultiplexNetwork mnet;
-	read_multiplex(mnet, "test/io2.mpx");
+	MultiplexNetwork mnet = read_multiplex("test/io2.mpx");
 	log("done!");
 
 	log("Testing degree...",false);
@@ -30,6 +29,10 @@ void testMeasures() {
 	log("done!");
 	log("Testing neighborhood...",false);
 	if (neighbors(mnet,"U1","l1").size() != 3) throw FailedUnitTestException("Wrong neighborhood, network l1");
+	if (in_neighbors(mnet,"U3","l1").size() != 1) throw FailedUnitTestException("Wrong in_neighborhood, network l1");
+	if (out_neighbors(mnet,"U3","l1").size() != 1) throw FailedUnitTestException("Wrong out_neighborhood, network l1");
+	if (in_neighbors(mnet,"U3","l2").size() != 1) throw FailedUnitTestException("Wrong in_neighborhood, network l2");
+	if (out_neighbors(mnet,"U3","l2").size() != 1) throw FailedUnitTestException("Wrong out_neighborhood, network l2");
 	if (neighbors(mnet,"U1",nets).size() != 4) throw FailedUnitTestException("Wrong neighborhood, both networks");
 	log("done!");
 	log("Testing exclusive neighborhood...",false);
@@ -46,6 +49,23 @@ void testMeasures() {
 	log("done!");
 
 	log("TEST SUCCESSFULLY COMPLETED (node-based analysis measures)");
+
+
+	log("Testing jaccard similarity...",false);
+	MultiplexNetwork und_net = read_multiplex("test/io1.mpx");
+	//std::cout << network_jaccard_similarity(und_net,nets) << std::endl;
+	if (network_jaccard_similarity(mnet,nets) != 1.0/10.0) throw FailedUnitTestException("Wrong network similarity");
+	/*MultiplexNetwork aucs = read_multiplex("data/aucs.mpx");
+	std::set<std::string> aucsnets;
+	aucsnets.insert("lunch");
+	aucsnets.insert("facebook");
+	std::cout << network_jaccard_similarity(aucs,aucsnets) << std::endl;
+	*/
+	log("done!");
+
+	log("TEST SUCCESSFULLY COMPLETED (network comparison measures)");
+
+
 
 	/*
 	log("Computing Pareto distance between all pairs of vertexes...",false);

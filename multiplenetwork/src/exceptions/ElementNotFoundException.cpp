@@ -19,7 +19,7 @@ template <typename T> string number_to_string ( T Number ) {
 }
 
 ElementNotFoundException::ElementNotFoundException(string value) {
-	ElementNotFoundException::value = value;
+	ElementNotFoundException::value = "Not found: " + value;
 }
 ElementNotFoundException::~ElementNotFoundException() throw (){
 	// TODO Auto-generated destructor stub

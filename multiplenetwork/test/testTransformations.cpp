@@ -8,30 +8,30 @@
 
 #import "test.h"
 #import "multiplenetwork.h"
+#import <iostream>
 
 void testTransformations() {
-	log("TESTING transformations...",false);
+	log("TESTING transformations");
 	log("Reading multiple network from file...",false);
-	MultilayerNetwork mnet, output;
-	mnet_read_edgelist(mnet, "test/toy.mnet");
+	// Creating an empty multiple network and initializing it
+	MultiplexNetwork mnet = read_multiplex("test/io2.mpx");
 	log("done!");
 
-	Network net(true,false,false);
+	log("Testing weighted flattening...",false);
+	std::set<std::string> nets;
+	nets.insert("l1");
+	nets.insert("l2");
 
-	flatten(mnet,MNET_OR_FLATTENING,net);
+	Network net = flatten_weighted(mnet,nets);
 
-	output.addNetwork("flattened",net);
-	std::set<intralayer_edge_id> vertexes;
-	mnet.getVertexes(vertexes);
-	std::set<intralayer_edge_id>::const_iterator v_it;
-	for (v_it = vertexes.begin(); v_it != vertexes.end(); ++v_it) {
-		output.addVertex(mnet.getVertexName(*v_it));
-		output.map(mnet.getVertexName(*v_it),mnet.getVertexName(*v_it),"flattened");
-	}
+	std::cout << net.getEdgeWeight("U1","U2") << " " << net.getEdgeWeight("U1","U3") << std::endl;
+	if (!net.isDirected()) throw FailedUnitTestException("Network should be directed");
+	if (net.getNumVertexes() != 6) throw FailedUnitTestException("Wrong number of vertexes");
+	if (net.getNumEdges() != 10) throw FailedUnitTestException("Wrong number of edges");
+	if (net.getEdgeWeight("U1","U2") != 1) throw FailedUnitTestException("Wrong weight, expected 1");
+	if (net.getEdgeWeight("U1","U3") != 2) throw FailedUnitTestException("Wrong weight, expected 2");
+	log("done!");
 
-
-	log("Flattened network:");
-	print(output);
 }
 
 

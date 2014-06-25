@@ -17,6 +17,8 @@ const int PATH_EQUAL = 0;
 const int PATH_INCOMPARABLE = 1;
 const int PATH_DOMINATES = 2;
 
+//std::vector<long> distribution(long (*f)(const MultiplexNetwork&, global_identity, const std::set<network_id>&));
+
 
 /**********************************************************************/
 /** Degree  ***********************************************************/
@@ -107,8 +109,20 @@ double xrelevance(const MultiplexNetwork& mnet, global_identity identity, networ
 double xrelevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
 
 /**********************************************************************/
+/** Network comparison ************************************************/
+/**********************************************************************/
+
+double network_jaccard_similarity(const MultiplexNetwork& mnet, const std::set<network_id>& active_networks);
+double network_jaccard_similarity(const MultiplexNetwork& mnet, const std::set<std::string>& active_networks);
+double network_jaccard_similarity(const MultiplexNetwork& mnet, network_id network1, network_id network2);
+double network_jaccard_similarity(const MultiplexNetwork& mnet, const std::string& network_name1, const std::string& network_name2);
+
+
+/**********************************************************************/
 /** Distances *********************************************************/
 /**********************************************************************/
+
+// FROM HERE, PORTING NOT COMPLETED YET
 
 //void pareto_distance(MultipleNetwork& mnet, global_identity identity, std::map<global_identity,Distance>& distances);
 

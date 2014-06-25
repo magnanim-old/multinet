@@ -5,9 +5,8 @@
 
 using namespace std;
 
-RandomEvolutionModel::RandomEvolutionModel(int m0, double p) {
+RandomEvolutionModel::RandomEvolutionModel(int m0) {
 	RandomEvolutionModel::m0 = m0;
-	RandomEvolutionModel::p = p;
 }
 
 
@@ -16,34 +15,22 @@ RandomEvolutionModel::~RandomEvolutionModel() {
 }
 
 
-void RandomEvolutionModel::evolution_step(MultilayerNetwork& mnet, network_id net) {
-	// This is a static model that does not evolve!
+void RandomEvolutionModel::evolution_step(MultiplexNetwork& mnet, network_id net) {
+	// Randomly pick two vertexes (uniform probability) and connect them
+	vertex_id v1 = rand.getElement(mnet.getNetwork(net).getVertexes());
+	vertex_id v2 = rand.getElement(mnet.getNetwork(net).getVertexes());
+	if (!mnet.getNetwork(net).containsEdge(v1,v2))
+		mnet.getNetwork(net).addEdge(v1,v2);
 }
 
 
-void RandomEvolutionModel::init_step(MultilayerNetwork& mnet, network_id net) {
-	/*
-	if (mnet.getNumGlobalVertexes()<m0) {
-		// TODO
-		m0 = mnet.getNumVertexes();
-	}
+void RandomEvolutionModel::init_step(MultiplexNetwork& mnet, network_id net) {
 
-	set<unsigned long> res = r.getKRandom(mnet.getNumGlobalVertexes(), m0);
-	for (set<unsigned long>::iterator it=res.begin(); it!=res.end(); ++it) {
-		mnet.addLocalVertex(*it,net);
+	std::set<global_identity> ids = rand.getKElements(mnet.getGlobalIdentities(), m0);
+	for (global_identity id: ids) {
+		vertex_id v = mnet.getNetwork(net).addVertex(mnet.getGlobalName(id));
+		mnet.mapIdentity(id,v,net);
 	}
-
-	// Now for each pair of vertexes create a link with probability p
-	for (set<unsigned long>::iterator it1=res.begin(); it1!=res.end(); ++it1) {
-		for (set<unsigned long>::iterator it2=res.begin(); it2!=res.end(); ++it2) {
-			if (r.test(p)) {
-				// create a link
-				// If the network is undirected, do not create it twice (which would raise an exception)
-				if (mnet.isDirected(net) || *it1<*it2)
-					mnet.addGlobalEdge(*it1,*it2,net);
-			}
-		}
-	}*/
 }
 
 

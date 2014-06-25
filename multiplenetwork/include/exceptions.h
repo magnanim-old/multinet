@@ -1,10 +1,3 @@
-/*
- * exceptions.h
- *
- *  Created on: Feb 5, 2014
- *  Author: Matteo Magnani <matteo.magnani@it.uu.se>
- */
-
 #ifndef MULTIPLENETWORK_EXCEPTIONS_H_
 #define MULTIPLENETWORK_EXCEPTIONS_H_
 

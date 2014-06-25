@@ -59,13 +59,13 @@ edge_id Network::addEdge(vertex_id vid1, vertex_id vid2) {
 		out_edges[vid2].insert(vid1);
 		in_edges[vid1].insert(vid2);
 	}
-	if (isWeighed()) setNumericEdgeAttribute(vid1,vid2,"weight",MULTIPLENETWORK_DEFAULT_WEIGHT); // this value will be replaced if this method has been called inside addEdge(vertex_id, vertex_id, double)
+	if (isWeighted()) setNumericEdgeAttribute(vid1,vid2,"weight",MULTIPLENETWORK_DEFAULT_WEIGHT); // this value will be replaced if this method has been called inside addEdge(vertex_id, vertex_id, double)
 	num_edges++;
 	return edge_id(vid1, vid2, isDirected());
 }
 
 edge_id Network::addEdge(vertex_id vid1, vertex_id vid2, double weight) {
-	if (!isWeighed()) throw OperationNotSupportedException("Cannot add a weight: network is unweighed");
+	if (!isWeighted()) throw OperationNotSupportedException("Cannot add a weight: network is unweighed");
 	addEdge(vid1,vid2);
 	setNumericEdgeAttribute(vid1, vid2, "weight", weight);
 	return edge_id(vid1, vid2, isDirected());
@@ -75,6 +75,8 @@ edge_id Network::addEdge(const std::string& vertex_name1, const std::string& ver
 	if (!isNamed()) throw OperationNotSupportedException("Cannot reference a named vertex in an unnamed network");
 	if (!containsVertex(vertex_name1)) throw ElementNotFoundException("Vertex " + vertex_name1);
 	if (!containsVertex(vertex_name2)) throw ElementNotFoundException("Vertex " + vertex_name2);
+	//std::cout << "Edge: " << vertex_name1 << " " << vertex_name_to_id[vertex_name1]
+	//<< " " << vertex_name2 << " " << vertex_name_to_id[vertex_name2] << std::endl;
 	return addEdge(vertex_name_to_id[vertex_name1],vertex_name_to_id[vertex_name2]);
 }
 
@@ -167,7 +169,7 @@ bool Network::isDirected() const  {
 	return is_directed;
 }
 
-bool Network::isWeighed() const  {
+bool Network::isWeighted() const  {
 	return is_weighed;
 }
 
@@ -196,12 +198,15 @@ std::set<vertex_id> Network::getVertexes() const {
 std::set<edge_id> Network::getEdges() const {
 	std::set<edge_id> edges;
 	std::map<vertex_id,std::set<vertex_id> >::const_iterator from_edge_iterator;
-	std::set<vertex_id>::iterator to_edge_iterator;
+	//std::cout << "Getting edges..." << std::endl;
 	for (from_edge_iterator=out_edges.begin(); from_edge_iterator!=out_edges.end(); ++from_edge_iterator) {
 		vertex_id from = from_edge_iterator->first;
-		for (to_edge_iterator=from_edge_iterator->second.begin(); to_edge_iterator!=from_edge_iterator->second.end(); ++to_edge_iterator) {
-			vertex_id to = (*to_edge_iterator);
-			edges.insert(edge_id(from,to,isDirected()));
+		for (vertex_id to: from_edge_iterator->second) {
+			if (isDirected() || from<=to) {
+				edge_id e(from,to,isDirected());
+				edges.insert(e);
+				//std::cout << e << " done!" << std::endl;
+			}
 		}
 	}
 	return edges;
@@ -314,33 +319,48 @@ std::set<std::string> Network::getNeighbors(const std::string& vertex_name) cons
 }
 
 double Network::getEdgeWeight(vertex_id vid1, vertex_id vid2) const {
-	if (!isWeighed()) throw OperationNotSupportedException("Network is unweighed");
+	if (!isWeighted()) throw OperationNotSupportedException("Network is unweighed");
 	return getNumericEdgeAttribute(vid1, vid2, "weight");
 }
 
 void Network::setEdgeWeight(vertex_id vid1, vertex_id vid2, double weight) {
-	if (!isWeighed()) throw OperationNotSupportedException("Network is unweighed");
+	if (!isWeighted()) throw OperationNotSupportedException("Network is unweighed");
 	setNumericEdgeAttribute(vid1, vid2, "weight", weight);
 }
 
 double Network::getEdgeWeight(const std::string& vertex_name1, const std::string& vertex_name2) const {
-	if (!isWeighed()) throw OperationNotSupportedException("Network is unweighed");
+	if (!isWeighted()) throw OperationNotSupportedException("Network is unweighed");
 	return getNumericEdgeAttribute(vertex_name1, vertex_name2, "weight");
 }
 
 void Network::setEdgeWeight(const std::string& vertex_name1, const std::string& vertex_name2, double weight) {
-	if (!isWeighed()) throw OperationNotSupportedException("Network is unweighed");
+	if (!isWeighted()) throw OperationNotSupportedException("Network is unweighed");
 	setNumericEdgeAttribute(vertex_name1, vertex_name2, "weight", weight);
 }
 
+
 bool Network::hasVertexAttribute(const std::string& attribute_name) {
-	return (vertex_numeric_attribute.count(attribute_name)>0) ||
-			(vertex_string_attribute.count(attribute_name)>0);
+	return (hasNumericVertexAttribute(attribute_name) || hasStringVertexAttribute(attribute_name));
+}
+
+bool Network::hasNumericVertexAttribute(const std::string& attribute_name) {
+	return (vertex_numeric_attribute.count(attribute_name)>0);
+}
+
+bool Network::hasStringVertexAttribute(const std::string& attribute_name) {
+	return (vertex_string_attribute.count(attribute_name)>0);
 }
 
 bool Network::hasEdgeAttribute(const std::string& attribute_name) {
-	return (edge_numeric_attribute.count(attribute_name)>0) ||
-			(edge_string_attribute.count(attribute_name)>0);
+	return (hasNumericEdgeAttribute(attribute_name) || hasStringEdgeAttribute(attribute_name));
+}
+
+bool Network::hasNumericEdgeAttribute(const std::string& attribute_name) {
+	return (edge_numeric_attribute.count(attribute_name)>0);
+}
+
+bool Network::hasStringEdgeAttribute(const std::string& attribute_name) {
+	return (edge_string_attribute.count(attribute_name)>0);
 }
 
 void Network::newNumericVertexAttribute(const std::string& attribute_name) {
@@ -473,8 +493,70 @@ void Network::setStringEdgeAttribute(const std::string& vertex_name1, const std:
 	setStringEdgeAttribute(vertex_name_to_id.at(vertex_name1), vertex_name_to_id.at(vertex_name2), attribute_name, val);
 }
 
+std::set<std::string> Network::getNumericEdgeAttributes() const {
+	std::set<std::string> res;
+	std::map<std::string, std::map<edge_id, double> >::const_iterator pair;
+	for (pair = edge_numeric_attribute.begin(); pair != edge_numeric_attribute.end(); ++pair)  {
+		res.insert((*pair).first);
+	}
+	return res;
+}
+
+std::set<std::string> Network::getStringEdgeAttributes() const {
+	std::set<std::string> res;
+	std::map<std::string, std::map<edge_id, std::string> >::const_iterator pair;
+	for (pair = edge_string_attribute.begin(); pair != edge_string_attribute.end(); ++pair)  {
+		res.insert((*pair).first);
+	}
+	return res;
+
+}
+
+std::set<std::string> Network::getNumericVertexAttributes() const {
+	std::set<std::string> res;
+	std::map<std::string, std::map<vertex_id, double> >::const_iterator pair;
+	for (pair = vertex_numeric_attribute.begin(); pair != vertex_numeric_attribute.end(); ++pair)  {
+			res.insert((*pair).first);
+	}
+	return res;
+
+}
+
+std::set<std::string> Network::getStringVertexAttributes() const {
+	std::set<std::string> res;
+	std::map<std::string, std::map<vertex_id, std::string> >::const_iterator pair;
+	for (pair = vertex_string_attribute.begin(); pair != vertex_string_attribute.end(); ++pair)  {
+		res.insert((*pair).first);
+	}
+	return res;
+
+}
+
+
+
+int Network::getNumStringVertexAttributes() const {
+	return vertex_string_attribute.size();
+}
+
+int Network::getNumNumericVertexAttributes() const {
+	return vertex_numeric_attribute.size();
+}
+
+int Network::getNumStringEdgeAttributes() const {
+	return edge_string_attribute.size();
+}
+
+int Network::getNumNumericEdgeAttributes() const {
+	return edge_numeric_attribute.size();
+}
+
+int Network::getNumAttributes() const {
+	return getNumStringVertexAttributes() + getNumNumericVertexAttributes() +
+			getNumStringEdgeAttributes() + getNumNumericEdgeAttributes();
+}
+
 void print(Network& net) {
-	std::cout << (net.isDirected()?"DIRECTED":"UNDIRECTED") << " " << (net.isWeighed()?"WEIGHTED":"UNWEIGHTED") << " " << (net.isNamed()?"NAMED":"UNNAMED") << std::endl;
+	std::cout << (net.isDirected()?"DIRECTED":"UNDIRECTED") << " " << (net.isWeighted()?"WEIGHTED":"UNWEIGHTED") << " " << (net.isNamed()?"NAMED":"UNNAMED") << std::endl;
 	std::cout << "Number of vertexes: " << net.getNumVertexes() << std::endl;
 	std::cout << "Number of edges: " << net.getNumEdges() << std::endl;
 }

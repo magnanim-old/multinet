@@ -146,6 +146,88 @@ std::string MultiplexNetwork::getGlobalName(const std::string& local_vertex_name
 	return getGlobalName(global_id);
 }
 
+
+bool MultiplexNetwork::hasAttribute(const std::string& attribute_name) {
+	return (hasStringAttribute(attribute_name) || hasNumericAttribute(attribute_name));
+}
+
+bool MultiplexNetwork::hasStringAttribute(const std::string& attribute_name) {
+	return (string_attribute.count(attribute_name)>0);
+}
+
+bool MultiplexNetwork::hasNumericAttribute(const std::string& attribute_name) {
+	return (numeric_attribute.count(attribute_name)>0);
+}
+
+void MultiplexNetwork::newNumericAttribute(const std::string& attribute_name) {
+	if (numeric_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
+	numeric_attribute[attribute_name] = std::map<vertex_id,double>();
+}
+
+void MultiplexNetwork::newStringAttribute(const std::string& attribute_name) {
+	if (string_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
+	string_attribute[attribute_name] = std::map<vertex_id,std::string>();
+}
+
+double MultiplexNetwork::getNumericAttribute(const global_identity& gid, const std::string& attribute_name) const {
+	if (numeric_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
+	if (numeric_attribute.at(attribute_name).count(gid)==0)  throw ElementNotFoundException("No attribute value for attribute " + attribute_name + " on global name " + std::to_string(gid));
+	return numeric_attribute.at(attribute_name).at(gid);
+}
+
+double MultiplexNetwork::getNumericAttribute(const std::string& global_name, const std::string& attribute_name) const {
+	if (!containsGlobalName(global_name)) throw ElementNotFoundException("Vertex " + global_name);
+	return getNumericAttribute(identity_name_to_id.at(global_name), attribute_name);
+}
+
+std::string MultiplexNetwork::getStringAttribute(const global_identity& gid, const std::string& attribute_name) const {
+	if (string_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
+	if (string_attribute.at(attribute_name).count(gid)==0)  throw ElementNotFoundException("No attribute value for attribute " + attribute_name + " on global name " + std::to_string(gid));
+	return string_attribute.at(attribute_name).at(gid);
+}
+
+std::string MultiplexNetwork::getStringAttribute(const std::string& global_name, const std::string& attribute_name) const {
+	if (!containsGlobalName(global_name)) throw ElementNotFoundException("Global name " + global_name);
+	return getStringAttribute(identity_name_to_id.at(global_name), attribute_name);
+}
+
+void MultiplexNetwork::setNumericAttribute(const global_identity& gid, const std::string& attribute_name, double val) {
+	if (numeric_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
+	numeric_attribute.at(attribute_name)[gid] = val;
+}
+
+void MultiplexNetwork::setNumericAttribute(const std::string& global_name, const std::string& attribute_name, double val) {
+	setNumericAttribute(identity_name_to_id[global_name], attribute_name, val);
+}
+
+void MultiplexNetwork::setStringAttribute(const global_identity& gid, const std::string& attribute_name, const std::string& val) {
+	if (string_attribute.count(attribute_name)==0) throw ElementNotFoundException("Attribute " + attribute_name);
+	string_attribute.at(attribute_name)[gid] = val;
+}
+
+void MultiplexNetwork::setStringAttribute(const std::string& global_name, const std::string& attribute_name, const std::string& val) {
+	setStringAttribute(identity_name_to_id[global_name], attribute_name, val);
+}
+
+
+std::set<std::string> MultiplexNetwork::getNumericAttributes() const {
+	std::set<std::string> res;
+	std::map<std::string, std::map<vertex_id, double> >::const_iterator pair;
+	for (pair = numeric_attribute.begin(); pair != numeric_attribute.end(); ++pair)  {
+			res.insert((*pair).first);
+	}
+	return res;
+}
+
+std::set<std::string> MultiplexNetwork::getStringAttributes() const {
+	std::set<std::string> res;
+	std::map<std::string, std::map<vertex_id, std::string> >::const_iterator pair;
+	for (pair = string_attribute.begin(); pair != string_attribute.end(); ++pair)  {
+		res.insert((*pair).first);
+	}
+	return res;
+}
+
 void print(MultiplexNetwork& mnet) {
 	std::cout << "*MULTIPLEX NETWORK*\n";
 	std::cout << "Number of global identities: " << mnet.getNumGlobalIdentities() << "\n";

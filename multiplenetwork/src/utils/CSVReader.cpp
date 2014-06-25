@@ -16,7 +16,8 @@
 using namespace std;
 
 CSVReader::CSVReader() {
-	// TODO Exceptions
+	next = "";
+	has_next = true;
 }
 
 CSVReader::~CSVReader() {

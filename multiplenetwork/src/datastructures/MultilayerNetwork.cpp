@@ -27,12 +27,19 @@ network_id MultilayerNetwork::addNetwork(const Network& net) {
 	int num_current_networks = getNumNetworks();
 	networks.resize(num_current_networks+1);
 	networks[num_current_networks] = net;
-	return getNumNetworks()-1;
+	int new_network_id = getNumNetworks()-1;
+	std::string network_name = std::to_string(new_network_id); // default name
+	network_name_to_id[network_name] = new_network_id;
+	network_id_to_name.push_back(network_name);
+	return new_network_id;
 }
 
-network_id MultilayerNetwork::addNetwork(const std::string& network_name, const Network& net) {
+network_id MultilayerNetwork::addNetwork(const std::string& network_name, Network& net) {
 	if (containsNetwork(network_name)) throw DuplicateElementException("network " + network_name);
-	network_id new_network_id = addNetwork(net);
+	int num_current_networks = getNumNetworks();
+	networks.resize(num_current_networks+1);
+	networks[num_current_networks] = net;
+	int new_network_id = getNumNetworks()-1;
 	network_name_to_id[network_name] = new_network_id;
 	network_id_to_name.push_back(network_name);
 	return new_network_id;
@@ -122,6 +129,7 @@ bool MultilayerNetwork::containsNetwork(network_id nid) const {
 }
 
 std::string MultilayerNetwork::getNetworkName(network_id nid) const {
+	// TODO problem if network has been added without a name
 	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + std::to_string(nid));
 	return network_id_to_name[nid];
 }
@@ -135,102 +143,7 @@ bool MultilayerNetwork::containsNetwork(const std::string& network_name) const {
 	return network_name_to_id.count(network_name)>0;
 }
 
-///////////////////////////////////////////////////////////////
-/// OPERATIONS ON UNDERLYING NETWORKS                      ////
-/// (the following methods just call the corresponding     ////
-///  methods on the corresponding networks)                ////
-///////////////////////////////////////////////////////////////
 
-/*
-
-vertex_id MultilayerNetwork::addVertex(const std::string& network_name, const std::string& vertex_name) {
-	return getNetwork(network_name).addVertex(vertex_name);
-}
-edge_id MultilayerNetwork::addEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2) {
-	return getNetwork(network_name).addEdge(vertex_name1,vertex_name2);
-}
-edge_id MultilayerNetwork::addEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, double weight) {
-	return getNetwork(network_name).addEdge(vertex_name1,vertex_name2,weight);
-}
-bool MultilayerNetwork::deleteVertex(const std::string& network_name, const std::string& vertex_name) {
-	return getNetwork(network_name).deleteVertex(vertex_name);
-}
-bool MultilayerNetwork::deleteEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2) {
-	return getNetwork(network_name).deleteEdge(vertex_name1,vertex_name2);
-}
-bool MultilayerNetwork::containsVertex(const std::string& network_name, const std::string& vertex_name) const {
-	return getNetwork(network_name).containsVertex(vertex_name);
-}
-bool MultilayerNetwork::containsEdge(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2) const {
-	return getNetwork(network_name).containsEdge(vertex_name1,vertex_name2);
-}
-bool MultilayerNetwork::isDirected(const std::string& network_name) const {
-	return getNetwork(network_name).isDirected();
-}
-bool MultilayerNetwork::isWeighed(const std::string& network_name) const {
-	return getNetwork(network_name).isWeighed();
-}
-bool MultilayerNetwork::isNamed(const std::string& network_name) const {
-	return getNetwork(network_name).isNamed();
-}
-vertex_id MultilayerNetwork::getVertexId(const std::string& network_name, const std::string& vertex_name) const {
-	return getNetwork(network_name).getVertexId(vertex_name);
-}
-long MultilayerNetwork::getNumVertexes(const std::string& network_name) const {
-	return getNetwork(network_name).getNumVertexes();
-}
-long MultilayerNetwork::getNumEdges(const std::string& network_name) const {
-	return getNetwork(network_name).getNumEdges();
-}
-double MultilayerNetwork::getEdgeWeight(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2) const {
-	return getNetwork(network_name).getEdgeWeight(vertex_name1,vertex_name2);
-}
-void MultilayerNetwork::setEdgeWeight(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, double weight) {
-	getNetwork(network_name).setEdgeWeight(vertex_name1,vertex_name2,weight);
-}
-bool MultilayerNetwork::hasVertexAttribute(const std::string& network_name, const std::string& attribute_name) {
-	return getNetwork(network_name).hasVertexAttribute(attribute_name);
-}
-bool MultilayerNetwork::hasEdgeAttribute(const std::string& network_name, const std::string& attribute_name) {
-	return getNetwork(network_name).hasVertexAttribute(attribute_name);
-}
-void MultilayerNetwork::newStringVertexAttribute(const std::string& network_name, const std::string& attribute_name) {
-	getNetwork(network_name).newStringVertexAttribute(attribute_name);
-}
-std::string MultilayerNetwork::getStringVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name) const {
-	return getNetwork(network_name).getStringVertexAttribute(vertex_name,attribute_name);
-}
-void MultilayerNetwork::setStringVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name, const std::string& value) {
-	getNetwork(network_name).setStringVertexAttribute(vertex_name,attribute_name,value);
-}
-void MultilayerNetwork::newNumericVertexAttribute(const std::string& network_name, const std::string& attribute_name) {
-	getNetwork(network_name).newNumericVertexAttribute(attribute_name);
-}
-double MultilayerNetwork::getNumericVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name) const {
-	return getNetwork(network_name).getNumericVertexAttribute(vertex_name,attribute_name);
-}
-void MultilayerNetwork::setNumericVertexAttribute(const std::string& network_name, const std::string& vertex_name, const std::string& attribute_name, double value) {
-	getNetwork(network_name).setNumericVertexAttribute(vertex_name,attribute_name,value);
-}
-void MultilayerNetwork::newStringEdgeAttribute(const std::string& network_name, const std::string& attribute_name) {
-	getNetwork(network_name).newStringEdgeAttribute(attribute_name);
-}
-std::string MultilayerNetwork::getStringEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name) const {
-	return getNetwork(network_name).getStringEdgeAttribute(vertex_name1,vertex_name2,attribute_name);
-}
-void MultilayerNetwork::setStringEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name, const std::string& value) {
-	getNetwork(network_name).setStringEdgeAttribute(vertex_name1,vertex_name2,attribute_name,value);
-}
-void MultilayerNetwork::newNumericEdgeAttribute(const std::string& network_name, const std::string& attribute_name) {
-	getNetwork(network_name).newNumericEdgeAttribute(attribute_name);
-}
-double MultilayerNetwork::getNumericEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name) const {
-	return getNetwork(network_name).getNumericEdgeAttribute(vertex_name1,vertex_name2,attribute_name);
-}
-void MultilayerNetwork::setNumericEdgeAttribute(const std::string& network_name, const std::string& vertex_name1, const std::string& vertex_name2, const std::string& attribute_name, double value) {
-	getNetwork(network_name).setNumericEdgeAttribute(vertex_name1,vertex_name2,attribute_name,value);
-}
-*/
 
 void print(MultilayerNetwork& mnet) {
 	std::cout << "MULTILAYER NETWORK" << std::endl;

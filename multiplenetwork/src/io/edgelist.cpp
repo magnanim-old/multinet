@@ -17,7 +17,8 @@
 
 using namespace std;
 
-void read_multiplex(MultiplexNetwork& mnet, const string& infile) {
+MultiplexNetwork read_multiplex(const string& infile) {
+	MultiplexNetwork mnet;
 	enum Section {NETWORKS, EDGE_ATTRS, VERTEX_ATTRS, EDGES, VERTEXES};
 	map<string,vector<bool> > network_edge_attr_type;
 	map<string,vector<string> > network_edge_attr_names;
@@ -145,7 +146,7 @@ void read_multiplex(MultiplexNetwork& mnet, const string& infile) {
 				//cout << "added local to\n";
 			}
 			if (!mnet.getNetwork(network_name).containsEdge(from,to)) {
-				if (mnet.getNetwork(network_name).isWeighed()) {
+				if (mnet.getNetwork(network_name).isWeighted()) {
 					double weight = std::stod(v[3],NULL);
 					mnet.getNetwork(network_name).addEdge(from,to,weight);
 				}
@@ -156,7 +157,7 @@ void read_multiplex(MultiplexNetwork& mnet, const string& infile) {
 			// indexes of current attribute in the local vectors and in the csv file.
 			int attr_i=0;
 			int csv_i=3;
-			if (mnet.getNetwork(network_name).isWeighed()) csv_i++;
+			if (mnet.getNetwork(network_name).isWeighted()) csv_i++;
 			if (csv_i+network_edge_attr_names[network_name].size()>v.size())
 				throw ElementNotFoundException("not enough attribute values for edge (" + from + "," + to + ") on network " + network_name);
 
@@ -168,4 +169,5 @@ void read_multiplex(MultiplexNetwork& mnet, const string& infile) {
 			}
 		}
 	}
+	return mnet;
 }
