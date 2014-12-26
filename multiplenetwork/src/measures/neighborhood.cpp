@@ -9,8 +9,8 @@
 #include "measures.h"
 #include <iostream>
 
-std::set<global_identity> out_neighbors(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
-	std::set<global_identity> res;
+std::set<entity_id> out_neighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
+	std::set<entity_id> res;
 	for (network_id net: active_networks) {
 		if (!mnet.containsVertex(identity,net)) continue;
 		std::set<vertex_id> neighbours = mnet.getNetwork(net).getOutNeighbors(mnet.getVertexId(identity,net));
@@ -31,8 +31,8 @@ std::set<std::string> out_neighbors(const MultiplexNetwork& mnet, const std::str
 	return res;
 }
 
-std::set<global_identity> out_neighbors(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
-	std::set<global_identity> res;
+std::set<entity_id> out_neighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
+	std::set<entity_id> res;
 	if (!mnet.containsVertex(identity,network)) return res;
 	std::set<vertex_id> neighbours = mnet.getNetwork(network).getOutNeighbors(mnet.getVertexId(identity,network));
 	for (vertex_id vid: neighbours)
@@ -50,8 +50,8 @@ std::set<std::string> out_neighbors(const MultiplexNetwork& mnet, const std::str
 }
 
 
-std::set<global_identity> in_neighbors(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
-	std::set<global_identity> res;
+std::set<entity_id> in_neighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
+	std::set<entity_id> res;
 	for (network_id net: active_networks) {
 		if (!mnet.containsVertex(identity,net)) continue;
 		std::set<vertex_id> neighbours = mnet.getNetwork(net).getInNeighbors(mnet.getVertexId(identity,net));
@@ -72,8 +72,8 @@ std::set<std::string> in_neighbors(const MultiplexNetwork& mnet, const std::stri
 	return res;
 }
 
-std::set<global_identity> in_neighbors(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
-	std::set<global_identity> res;
+std::set<entity_id> in_neighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
+	std::set<entity_id> res;
 	if (!mnet.containsVertex(identity,network)) return res;
 	std::set<vertex_id> neighbours = mnet.getNetwork(network).getInNeighbors(mnet.getVertexId(identity,network));
 	for (vertex_id vid: neighbours)
@@ -91,8 +91,8 @@ std::set<std::string> in_neighbors(const MultiplexNetwork& mnet, const std::stri
 }
 
 
-std::set<global_identity> neighbors(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
-	std::set<global_identity> res;
+std::set<entity_id> neighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
+	std::set<entity_id> res;
 	for (network_id net: active_networks) {
 		if (!mnet.containsVertex(identity,net)) continue;
 		std::set<vertex_id> neighbours = mnet.getNetwork(net).getNeighbors(mnet.getVertexId(identity,net));
@@ -113,8 +113,8 @@ std::set<std::string> neighbors(const MultiplexNetwork& mnet, const std::string&
 	return res;
 }
 
-std::set<global_identity> neighbors(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
-	std::set<global_identity> res;
+std::set<entity_id> neighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
+	std::set<entity_id> res;
 	if (!mnet.containsVertex(identity,network)) return res;
 	std::set<vertex_id> neighbours = mnet.getNetwork(network).getNeighbors(mnet.getVertexId(identity,network));
 	for (vertex_id vid: neighbours)
@@ -133,15 +133,15 @@ std::set<std::string> neighbors(const MultiplexNetwork& mnet, const std::string&
 
 ///////////////////////////////////
 
-std::set<global_identity> out_xneighbors(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
+std::set<entity_id> out_xneighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
 	std::set<network_id> other_networks = mnet.getNetworks();
 	for (network_id net: active_networks)
 			other_networks.erase(net);
 
-	std::set<global_identity> neighbors_on_active_networks = out_neighbors(mnet, identity, active_networks);
-	std::set<global_identity> neighbors_on_other_networks = out_neighbors(mnet, identity, other_networks);
+	std::set<entity_id> neighbors_on_active_networks = out_neighbors(mnet, identity, active_networks);
+	std::set<entity_id> neighbors_on_other_networks = out_neighbors(mnet, identity, other_networks);
 
-	for (global_identity neighbor: neighbors_on_other_networks)
+	for (entity_id neighbor: neighbors_on_other_networks)
 		neighbors_on_active_networks.erase(neighbor);
 	return neighbors_on_active_networks;
 }
@@ -159,7 +159,7 @@ std::set<std::string> out_xneighbors(const MultiplexNetwork& mnet, const std::st
 	return neighbors_on_active_networks;
 }
 
-std::set<global_identity> out_xneighbors(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
+std::set<entity_id> out_xneighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
 	std::set<network_id> active_networks;
 	active_networks.insert(network);
 	return out_xneighbors(mnet, identity, active_networks);
@@ -171,15 +171,15 @@ std::set<std::string> out_xneighbors(const MultiplexNetwork& mnet, const std::st
 	return out_xneighbors(mnet, global_name, active_networks);
 }
 
-std::set<global_identity> in_xneighbors(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
+std::set<entity_id> in_xneighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
 	std::set<network_id> other_networks = mnet.getNetworks();
 	for (network_id net: active_networks)
 			other_networks.erase(net);
 
-	std::set<global_identity> neighbors_on_active_networks = in_neighbors(mnet, identity, active_networks);
-	std::set<global_identity> neighbors_on_other_networks = in_neighbors(mnet, identity, other_networks);
+	std::set<entity_id> neighbors_on_active_networks = in_neighbors(mnet, identity, active_networks);
+	std::set<entity_id> neighbors_on_other_networks = in_neighbors(mnet, identity, other_networks);
 
-	for (global_identity neighbor: neighbors_on_other_networks)
+	for (entity_id neighbor: neighbors_on_other_networks)
 		neighbors_on_active_networks.erase(neighbor);
 	return neighbors_on_active_networks;
 }
@@ -197,7 +197,7 @@ std::set<std::string> in_xneighbors(const MultiplexNetwork& mnet, const std::str
 	return neighbors_on_active_networks;
 }
 
-std::set<global_identity> in_xneighbors(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
+std::set<entity_id> in_xneighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
 	std::set<network_id> active_networks;
 	active_networks.insert(network);
 	return in_xneighbors(mnet, identity, active_networks);
@@ -209,15 +209,15 @@ std::set<std::string> in_xneighbors(const MultiplexNetwork& mnet, const std::str
 	return in_xneighbors(mnet, global_name, active_networks);
 }
 
-std::set<global_identity> xneighbors(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
+std::set<entity_id> xneighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
 	std::set<network_id> other_networks = mnet.getNetworks();
 	for (network_id net: active_networks)
 		other_networks.erase(net);
 
-	std::set<global_identity> neighbors_on_active_networks = neighbors(mnet, identity, active_networks);
-	std::set<global_identity> neighbors_on_other_networks = neighbors(mnet, identity, other_networks);
+	std::set<entity_id> neighbors_on_active_networks = neighbors(mnet, identity, active_networks);
+	std::set<entity_id> neighbors_on_other_networks = neighbors(mnet, identity, other_networks);
 
-	for (global_identity neighbor: neighbors_on_other_networks)
+	for (entity_id neighbor: neighbors_on_other_networks)
 		neighbors_on_active_networks.erase(neighbor);
 	return neighbors_on_active_networks;
 }
@@ -235,7 +235,7 @@ std::set<std::string> xneighbors(const MultiplexNetwork& mnet, const std::string
 	return neighbors_on_active_networks;
 }
 
-std::set<global_identity> xneighbors(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
+std::set<entity_id> xneighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
 	std::set<network_id> active_networks;
 	active_networks.insert(network);
 	return xneighbors(mnet, identity, active_networks);

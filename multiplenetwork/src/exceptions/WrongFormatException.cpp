@@ -11,13 +11,13 @@
 
 using namespace std;
 
-ElementNotFoundException::ElementNotFoundException(string value) {
-	ElementNotFoundException::value = "Not found: " + value;
+WrongFormatException::WrongFormatException(string value) {
+	WrongFormatException::value = "Format error: " + value;
 }
-ElementNotFoundException::~ElementNotFoundException() throw (){
+WrongFormatException::~WrongFormatException() throw (){
 	// TODO Auto-generated destructor stub
 }
-const char* ElementNotFoundException::what() const throw()
+const char* WrongFormatException::what() const throw()
 {
     return value.data();
 }

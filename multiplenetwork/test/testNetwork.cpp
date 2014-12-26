@@ -48,7 +48,7 @@ void testNetwork() {
 	vertex_id vd1 = uuu_net.addVertex();
 	vertex_id vd2 = uuu_net.addVertex();
 	vertex_id vd3 = uuu_net.addVertex();
-	if (uuu_net.getNumVertexes()!=4) throw FailedUnitTestException("Wrong number of vertexes: " + std::to_string(uuu_net.getNumVertexes()) + " instead of 4");
+	if (uuu_net.getNumVertexes()!=4) throw FailedUnitTestException("Wrong number of vertexes: " + to_string(uuu_net.getNumVertexes()) + " instead of 4");
 	log("done!");
 
 	log("Trying to add a named vertex (should fail)...",false);
@@ -91,10 +91,10 @@ void testNetwork() {
 		log("[FAIL] done!");
 	}
 
-	log("Trying to add a weighed edge (should fail)...",false);
+	log("Trying to add a weighted edge (should fail)...",false);
 	try {
 		uuu_net.addEdge(vd2,vd0,.45);
-		throw FailedUnitTestException("Unsupported operation (add weighed edge) was allowed");
+		throw FailedUnitTestException("Unsupported operation: add weighted edge to un-weighted network");
 	}
 	catch (OperationNotSupportedException& ex) {
 		log("[FAIL] done!");
@@ -104,7 +104,7 @@ void testNetwork() {
 	try {
 		uuu_net.addEdge("a vertex name","another vertex name");
 		//uuu_net.addEdge("a vertex name","another vertex name",.45);
-		throw FailedUnitTestException("Unsupported operation (add named edge) was allowed");
+		throw FailedUnitTestException("Unsupported operation: add named edge to unnamed network");
 	}
 	catch (OperationNotSupportedException& ex) {
 		log("[FAIL] done!");
@@ -118,13 +118,13 @@ void testNetwork() {
 
 	log("Checking neighborhood functions...",false);
 	std::set<vertex_id> neigh_in = uuu_net.getInNeighbors(2);
-	if (!neigh_in.count(vd0)==0) throw FailedUnitTestException("Vertex 0 is not 2s neighbor");
-	if (!neigh_in.count(vd1)==1) throw FailedUnitTestException("Vertex 1 should be 2s neighbor");
-	if (!neigh_in.count(vd2)==1) throw FailedUnitTestException("Vertex 2 should be 2s neighbor");
+	if (!(neigh_in.count(vd0)==0)) throw FailedUnitTestException("Vertex 0 is not 2s neighbor");
+	if (!(neigh_in.count(vd1)==1)) throw FailedUnitTestException("Vertex 1 should be 2s neighbor");
+	if (!(neigh_in.count(vd2)==1)) throw FailedUnitTestException("Vertex 2 should be 2s neighbor");
 	std::set<vertex_id> neigh_out = uuu_net.getOutNeighbors(2);
-	if (!neigh_out.count(vd0)==0) throw FailedUnitTestException("Vertex 0 is not 2s neighbor");
-	if (!neigh_out.count(vd1)==1) throw FailedUnitTestException("Vertex 1 should be 2s neighbor");
-	if (!neigh_out.count(vd2)==1) throw FailedUnitTestException("Vertex 2 should be 2s neighbor");
+	if (!(neigh_out.count(vd0)==0)) throw FailedUnitTestException("Vertex 0 is not 2s neighbor");
+	if (!(neigh_out.count(vd1)==1)) throw FailedUnitTestException("Vertex 1 should be 2s neighbor");
+	if (!(neigh_out.count(vd2)==1)) throw FailedUnitTestException("Vertex 2 should be 2s neighbor");
 	log("done!");
 
 	log("Adding attributes (v:color, v:height, e:name, e:redness) to node 0 and edge (1,2)...",false);
@@ -154,10 +154,17 @@ void testNetwork() {
 
 	log("Removing a vertex (and as a cascade effect its adjacent edges) ...",false);
 	uuu_net.deleteVertex(2);
-	if (uuu_net.getNumVertexes()!=3) throw FailedUnitTestException("Wrong number of vertexes: " + std::to_string(uuu_net.getNumVertexes()));
+	if (uuu_net.getNumVertexes()!=3) throw FailedUnitTestException("Wrong number of vertexes: " + to_string(uuu_net.getNumVertexes()));
 	// two edges (1-2) and (2-2) must also have disappeared
-	if (uuu_net.getNumEdges()!=2) throw FailedUnitTestException("Wrong number of edges: " + std::to_string(uuu_net.getNumEdges()));
+	if (uuu_net.getNumEdges()!=2) throw FailedUnitTestException("Wrong number of edges: " + to_string(uuu_net.getNumEdges()));
 	if (uuu_net.containsEdge(1,2)) throw FailedUnitTestException("Edge not present, but containsEdge returns true");
+	log("done!");
+
+	log("Iterating through the vertexes...",false);
+	int num_vertexes = 0;
+	for (vertex_id v: uuu_net.getVertexes())
+		num_vertexes++;
+	if (num_vertexes!=3) throw FailedUnitTestException("Wrong number of vertexes from iterator: " + to_string(num_vertexes));
 	log("done!");
 
 	/**********************************************************************/
@@ -172,7 +179,7 @@ void testNetwork() {
 	dwn_net.addVertex("vd1");
 	dwn_net.addVertex("vd2");
 	dwn_net.addVertex("vd3");
-	if (dwn_net.getNumVertexes()!=4) throw FailedUnitTestException("Wrong number of vertexes: " + std::to_string(dwn_net.getNumVertexes()) + " instead of 4");
+	if (dwn_net.getNumVertexes()!=4) throw FailedUnitTestException("Wrong number of vertexes: " + to_string(dwn_net.getNumVertexes()) + " instead of 4");
 	if (vid!=0) throw FailedUnitTestException("Function not returning the id of the inserted vertex");
 	log("done!");
 
@@ -227,8 +234,8 @@ void testNetwork() {
 
 	log("Adding a weighed edge...",false);
 	dwn_net.addEdge("vd2","vd0",.45);
-	if (dwn_net.getEdgeWeight("vd2","vd0")!=.45) throw FailedUnitTestException("Incorrect weight found on edge (vd2,vd0): " + std::to_string(dwn_net.getEdgeWeight("vd2","vd0")));
-	if (dwn_net.getEdgeWeight("vd2","vd2")!=1) throw FailedUnitTestException("Incorrect default weight found on edge (vd2,vd2): " + std::to_string(dwn_net.getEdgeWeight("vd2","vd2")));
+	if (dwn_net.getEdgeWeight("vd2","vd0")!=.45) throw FailedUnitTestException("Incorrect weight found on edge (vd2,vd0): " + to_string(dwn_net.getEdgeWeight("vd2","vd0")));
+	if (dwn_net.getEdgeWeight("vd2","vd2")!=1) throw FailedUnitTestException("Incorrect default weight found on edge (vd2,vd2): " + to_string(dwn_net.getEdgeWeight("vd2","vd2")));
 	log("done!");
 
 	log("Checking containsEdge function...",false);
@@ -238,13 +245,13 @@ void testNetwork() {
 
 	log("Checking neighborhood functions...",false);
 	std::set<std::string> sneigh_in = dwn_net.getInNeighbors("vd2");
-	if (!sneigh_in.count("vd0")==0) throw FailedUnitTestException("Vertex vd0 is not vd2s neighbor");
-	if (!sneigh_in.count("vd1")==1) throw FailedUnitTestException("Vertex vd1 should be vd2s neighbor");
-	if (!sneigh_in.count("vd2")==1) throw FailedUnitTestException("Vertex vd2 should be vd2s neighbor");
+	if (!(sneigh_in.count("vd0")==0)) throw FailedUnitTestException("Vertex vd0 is not vd2s neighbor");
+	if (!(sneigh_in.count("vd1")==1)) throw FailedUnitTestException("Vertex vd1 should be vd2s neighbor");
+	if (!(sneigh_in.count("vd2")==1)) throw FailedUnitTestException("Vertex vd2 should be vd2s neighbor");
 	std::set<std::string> sneigh_out = dwn_net.getOutNeighbors("vd2");
-	if (!sneigh_out.count("vd0")==1) throw FailedUnitTestException("Vertex vd0 should be vd2s neighbor");
-	if (!sneigh_out.count("vd1")==0) throw FailedUnitTestException("Vertex vd1 is not vd2s neighbor");
-	if (!sneigh_out.count("vd2")==1) throw FailedUnitTestException("Vertex vd2 is not vd2s neighbor");
+	if (!(sneigh_out.count("vd0")==1)) throw FailedUnitTestException("Vertex vd0 should be vd2s neighbor");
+	if (!(sneigh_out.count("vd1")==0)) throw FailedUnitTestException("Vertex vd1 is not vd2s neighbor");
+	if (!(sneigh_out.count("vd2")==1)) throw FailedUnitTestException("Vertex vd2 is not vd2s neighbor");
 	log("done!");
 
 	log("Adding attributes (v:color, v:height, e:name, e:redness) to node 0 and edge (1,2)...",false);
@@ -274,9 +281,9 @@ void testNetwork() {
 
 	log("Removing a vertex (and as a cascade effect its adjacent edges) ...",false);
 	dwn_net.deleteVertex("vd2");
-	if (dwn_net.getNumVertexes()!=3) throw FailedUnitTestException("Wrong number of vertexes: " + std::to_string(dwn_net.getNumVertexes()));
+	if (dwn_net.getNumVertexes()!=3) throw FailedUnitTestException("Wrong number of vertexes: " + to_string(dwn_net.getNumVertexes()));
 	// edges adjacent to vd2 must also have disappeared
-	if (dwn_net.getNumEdges()!=2) throw FailedUnitTestException("Wrong number of edges: " + std::to_string(dwn_net.getNumEdges()));
+	if (dwn_net.getNumEdges()!=2) throw FailedUnitTestException("Wrong number of edges: " + to_string(dwn_net.getNumEdges()));
 	if (dwn_net.containsEdge("vd1","vd2")) throw FailedUnitTestException("Edge not present, but containsEdge returns true");
 	log("done!");
 
@@ -290,7 +297,7 @@ void testNetwork() {
 	std::set<edge_id> edges = dwn_net.getEdges();
 	log("Iterating through edges:",false);
 	for (edge_id e: edges) {
-		log(" " + e.to_string(),false);
+		log(" (" + to_string(e.v1) + "," + to_string(e.v2) + ")",false);
 	}
 	log(" done!");
 

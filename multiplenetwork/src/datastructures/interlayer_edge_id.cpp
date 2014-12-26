@@ -1,36 +1,43 @@
 #include "datastructures.h"
+#include <sstream>
 
-/*
- * interlayer_edge_id.cpp
- *
- * Created on: Feb 27, 2014
- * Author: matteomagnani
- * Version: 0.0.1
- */
+inter_edge_id::inter_edge_id(global_vertex_id v1, global_vertex_id v2, bool directed) :
+	v1(directed?v1:std::min(v1,v2)),
+	v2(directed?v2:std::max(v1,v2)),
+	directed(directed) {}
 
-#include "datastructures.h"
-
-interlayer_edge_id::interlayer_edge_id(global_vertex_id v1, global_vertex_id v2, bool directed) {
-	interlayer_edge_id::v1 = v1;
-	interlayer_edge_id::v2 = v2;
-	interlayer_edge_id::directed = directed;
+bool inter_edge_id::operator==(const inter_edge_id& e2) const {
+    return (directed==e2.directed) && (v1==e2.v1) && (v2==e2.v2);
 }
 
-bool interlayer_edge_id::operator==(const interlayer_edge_id& e2) const {
-    return (directed==e2.directed) &&
-    		(((v1==e2.v1)&&(v2==e2.v2)) ||
-    		(!directed && (v1==e2.v2) && (v2==e2.v1)));
-}
-
-bool interlayer_edge_id::operator!=(const interlayer_edge_id& e2) const {
+bool inter_edge_id::operator!=(const inter_edge_id& e2) const {
     return ! operator==(e2);
 }
 
-bool interlayer_edge_id::operator<(const interlayer_edge_id& e2) const {
-    if (v1<e2.v1) return true;
-    if (v1==e2.v1) {
-    	if (v2<e2.v2) return true;
-    }
+bool inter_edge_id::operator<(const inter_edge_id& e2) const {
+	if (directed<e2.directed) return true;
+	else if (directed>e2.directed) return false;
+
+	if (v1<e2.v1) return true;
+	else if (v1>e2.v1) return false;
+
+	if (v2<e2.v2) return true;
+	else if (v1>e2.v1) return false;
+
     return false;
 }
 
+bool inter_edge_id::operator>(const inter_edge_id& e) const {
+    return ! operator<(e) && ! operator==(e);
+}
+
+std::ostream& operator<<(std::ostream &strm, const inter_edge_id& eid) {
+	strm << "(" << eid.v1 << "," << eid.v2 << ")";
+	return strm;
+}
+
+std::string inter_edge_id::to_string() const {
+	std::stringstream ss;
+	ss << *this;
+	return ss.str();
+}

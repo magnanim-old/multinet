@@ -12,6 +12,8 @@
 
 void testModularity() {
 
+	/*
+
 	// We need to read the network from a file: testIO() must have been passed
 	log("TESTING measures");
 	log("Reading the network...",false);
@@ -193,6 +195,7 @@ void testModularity() {
 	log("done 1!");
 
 	log("TEST SUCCESSFULLY COMPLETED (modularity)");
+	*/
 }
 
 

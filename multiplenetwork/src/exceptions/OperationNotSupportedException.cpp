@@ -12,7 +12,7 @@
 using namespace std;
 
 OperationNotSupportedException::OperationNotSupportedException(string value) {
-	OperationNotSupportedException::value = value;
+	OperationNotSupportedException::value = "Operation not supported: " + value;
 }
 OperationNotSupportedException::~OperationNotSupportedException() throw (){
 	// TODO Auto-generated destructor stub

@@ -22,7 +22,7 @@ void testTransformations() {
 	nets.insert("l1");
 	nets.insert("l2");
 
-	Network net = flatten_weighted(mnet,nets);
+	Network net = flatten_weighted(mnet,nets,false);
 
 	std::cout << net.getEdgeWeight("U1","U2") << " " << net.getEdgeWeight("U1","U3") << std::endl;
 	if (!net.isDirected()) throw FailedUnitTestException("Network should be directed");

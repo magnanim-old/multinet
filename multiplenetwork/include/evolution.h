@@ -6,8 +6,6 @@
  * 1) no action (the network remains unchanged - used to set different evolution speeds)
  * 2) internal evolution (the network evolves according to some internal dynamics)
  * 3) external evolution (the network imports vertexes and edges from another)
- *
- *
  */
 
 #ifndef EVOLUTION_H_
@@ -19,12 +17,28 @@
 #include "datastructures.h"
 #include "utils.h"
 
+
+typedef int evolution_strategy;
+
+const int EVOLUTION_DEGREE=0;
+
+/**********************************************************************/
+/** edge closure strategy *********************************************/
+/**********************************************************************/
+entity_id choice_uniform(Random rand, MultiplexNetwork& mnet);
+vertex_id choice_uniform(Random rand, MultiplexNetwork& mnet, network_id net);
+vertex_id choice_common_friends(Random rand, MultiplexNetwork& mnet, network_id net, vertex_id vertex);
+vertex_id choice_degree(Random rand, MultiplexNetwork& mnet, network_id net);
+
+
 /**********************************************************************/
 /** Evolution models **************************************************/
 /**********************************************************************/
 class EvolutionModel {
 public:
+	virtual ~EvolutionModel() = 0;
 	virtual void evolution_step(MultiplexNetwork& mnet, network_id net) = 0;
+	virtual void evolution_step(MultiplexNetwork& mnet, network_id net, std::set<global_vertex_id>& new_vertexes, std::set<global_edge_id>& new_edges) = 0;
 	virtual void init_step(MultiplexNetwork& mnet, network_id net) = 0;
 protected:
 	Random rand;
@@ -40,17 +54,19 @@ public:
 	~BAEvolutionModel();
 	void init_step(MultiplexNetwork& mnet, network_id net);
 	void evolution_step(MultiplexNetwork& mnet, network_id net);
+	void evolution_step(MultiplexNetwork& mnet, network_id net, std::set<global_vertex_id>& new_vertexes, std::set<global_edge_id>& new_edges);
 };
 
 /**
- * @brief Grows a network by first creating all the vertexes and then at every step choosing two (uniform probabilty) to connect with an edge.
+ * @brief Grows a network by first creating all the vertexes and then at every step choosing two (uniform probability) to connect with an edge.
  **/
-class RandomEvolutionModel : public EvolutionModel {
+class UniformEvolutionModel : public EvolutionModel {
 	int m0;
 public:
-	RandomEvolutionModel(int m0);
-	~RandomEvolutionModel();
+	UniformEvolutionModel(int m0);
+	~UniformEvolutionModel();
 	void evolution_step(MultiplexNetwork& mnet, network_id net);
+	void evolution_step(MultiplexNetwork& mnet, network_id net, std::set<global_vertex_id>& new_vertexes, std::set<global_edge_id>& new_edges);
 	void init_step(MultiplexNetwork& mnet, network_id net);
 };
 
@@ -66,11 +82,26 @@ public:
  * @param dependency[][] The (i,j) element of this matrix indicates the probability that, given an external evolution event, network i will consider network j as a potential candidate to import edges from
  * @param evolution_model[] for each network, a specification of how the network should evolve when an internal event happens
  **/
-void evolve(MultiplexNetwork &mnet,
+void evolve_edge_import(MultiplexNetwork &mnet,
 		long num_of_steps,
-		double pr_no_event[],
-		double pr_internal_event[],
+		std::vector<double> pr_no_event,
+		std::vector<double> pr_internal_event,
 		std::vector<std::vector<double> > dependency,
 		std::vector<EvolutionModel*> evolution_model);
+
+void evolve_edge_copy(MultiplexNetwork &mnet,
+		long num_of_steps,
+		std::vector<double> pr_no_event,
+		std::vector<double> pr_internal_event,
+		std::vector<std::vector<double> > dependency,
+		std::vector<EvolutionModel*> evolution_model);
+
+void evolve(MultiplexNetwork &mnet,
+		long num_of_steps,
+		std::vector<int> num_new_vertexes_per_step,
+		std::vector<double> pr_internal_event,
+		std::vector<evolution_strategy> strategy,
+		std::vector<double> pr_external_event,
+		std::vector<std::vector<double> > dependency);
 
 #endif /* EVOLUTION_H_ */

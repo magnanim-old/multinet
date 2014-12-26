@@ -23,9 +23,9 @@ MultipleNetwork::~MultipleNetwork() {
 	// TODO
 }
 
-void print(MultipleNetwork& mnet) {
-	std::cout << "*MULTIPLE NETWORK*\n";
-	std::cout << "Number of vertexes: " << mnet.getNumVertexes() << "\n";
-	std::cout << "Number of edges: " << mnet.getNumEdges() << "\n";
+std::ostream& operator<<(std::ostream &strm, const MultipleNetwork& mnet) {
+	strm << "multiple network (";
+	strm << ", vertexes: " << mnet.getNumVertexes();
+	strm << ", edges: " << mnet.getNumEdges() << ")";
 }
 

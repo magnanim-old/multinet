@@ -6,12 +6,9 @@ OBJS = 	src/datastructures/*.cpp \
 		src/io/*.cpp \
 		src/transformation/*.cpp \
 		src/evolution/*.cpp \
-		src/measures/degree.cpp src/measures/neighborhood.cpp \
-		src/measures/relevance.cpp src/measures/network_comparison.cpp \
+		src/measures/*.cpp \
 		
-TEST = test/FailedUnitTestException.cpp test/run_all.cpp test/testNetwork.cpp \
-	   test/testMultilayerNetwork.cpp test/testMultiplex.cpp test/testIO.cpp test/testMeasures.cpp  \
-	   test/testTransformations.cpp test/testRandom.cpp test/testEvolution.cpp \
+TEST = test/*.cpp
 		
 LIBS = -L/usr/local/lib
 

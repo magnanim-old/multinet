@@ -9,7 +9,7 @@
 #include "measures.h"
 #include <iostream>
 
-double relevance(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
+double relevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
 	std::set<network_id> all_networks = mnet.getNetworks();
 
 	double num_neighbors_on_active_networks = neighbors(mnet, identity, active_networks).size();
@@ -31,7 +31,7 @@ double relevance(const MultiplexNetwork& mnet, const std::string& global_name, c
 	return num_neighbors_on_active_networks/num_neighbors_on_all_networks;
 }
 
-double relevance(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
+double relevance(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
 	std::set<network_id> active_networks;
 	active_networks.insert(network);
 	return relevance(mnet, identity, active_networks);
@@ -43,7 +43,7 @@ double relevance(const MultiplexNetwork& mnet, const std::string& global_name, c
 	return relevance(mnet, global_name, active_networks);
 }
 
-double in_relevance(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
+double in_relevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
 	std::set<network_id> all_networks = mnet.getNetworks();
 
 	double num_neighbors_on_active_networks = in_neighbors(mnet, identity, active_networks).size();
@@ -65,7 +65,7 @@ double in_relevance(const MultiplexNetwork& mnet, const std::string& global_name
 	return num_neighbors_on_active_networks/num_neighbors_on_all_networks;
 }
 
-double in_relevance(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
+double in_relevance(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
 	std::set<network_id> active_networks;
 	active_networks.insert(network);
 	return in_relevance(mnet, identity, active_networks);
@@ -77,7 +77,7 @@ double in_relevance(const MultiplexNetwork& mnet, const std::string& global_name
 	return in_relevance(mnet, global_name, active_networks);
 }
 
-double out_relevance(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
+double out_relevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
 	std::set<network_id> all_networks = mnet.getNetworks();
 
 	double num_neighbors_on_active_networks = out_neighbors(mnet, identity, active_networks).size();
@@ -99,7 +99,7 @@ double out_relevance(const MultiplexNetwork& mnet, const std::string& global_nam
 	return num_neighbors_on_active_networks/num_neighbors_on_all_networks;
 }
 
-double out_relevance(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
+double out_relevance(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
 	std::set<network_id> active_networks;
 	active_networks.insert(network);
 	return out_relevance(mnet, identity, active_networks);
@@ -114,7 +114,7 @@ double out_relevance(const MultiplexNetwork& mnet, const std::string& global_nam
 // EXCLUSIVE NETWORK RELEVANCE
 
 
-double xrelevance(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
+double xrelevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
 	std::set<network_id> all_networks = mnet.getNetworks();
 
 	double num_neighbors_only_on_active_networks = xneighbors(mnet, identity, active_networks).size();
@@ -136,7 +136,7 @@ double xrelevance(const MultiplexNetwork& mnet, const std::string& global_name, 
 	return num_neighbors_only_on_active_networks/num_neighbors_on_all_networks;
 }
 
-double xrelevance(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
+double xrelevance(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
 	std::set<network_id> active_networks;
 	active_networks.insert(network);
 	return xrelevance(mnet, identity, active_networks);
@@ -148,7 +148,7 @@ double xrelevance(const MultiplexNetwork& mnet, const std::string& global_name, 
 	return xrelevance(mnet, global_name, active_networks);
 }
 
-double in_xrelevance(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
+double in_xrelevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
 	std::set<network_id> all_networks = mnet.getNetworks();
 
 	double num_neighbors_only_on_active_networks = in_xneighbors(mnet, identity, active_networks).size();
@@ -170,7 +170,7 @@ double in_xrelevance(const MultiplexNetwork& mnet, const std::string& global_nam
 	return num_neighbors_only_on_active_networks/num_neighbors_on_all_networks;
 }
 
-double in_xrelevance(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
+double in_xrelevance(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
 	std::set<network_id> active_networks;
 	active_networks.insert(network);
 	return in_xrelevance(mnet, identity, active_networks);
@@ -182,7 +182,7 @@ double in_xrelevance(const MultiplexNetwork& mnet, const std::string& global_nam
 	return in_xrelevance(mnet, global_name, active_networks);
 }
 
-double out_xrelevance(const MultiplexNetwork& mnet, global_identity identity, const std::set<network_id>& active_networks) {
+double out_xrelevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks) {
 	std::set<network_id> all_networks = mnet.getNetworks();
 
 	double num_neighbors_only_on_active_networks = out_xneighbors(mnet, identity, active_networks).size();
@@ -204,7 +204,7 @@ double out_xrelevance(const MultiplexNetwork& mnet, const std::string& global_na
 	return num_neighbors_only_on_active_networks/num_neighbors_on_all_networks;
 }
 
-double out_xrelevance(const MultiplexNetwork& mnet, global_identity identity, network_id network) {
+double out_xrelevance(const MultiplexNetwork& mnet, entity_id identity, network_id network) {
 	std::set<network_id> active_networks;
 	active_networks.insert(network);
 	return out_xrelevance(mnet, identity, active_networks);

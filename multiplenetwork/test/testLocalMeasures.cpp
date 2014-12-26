@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 
-void testMeasures() {
+void testLocalMeasures() {
 
 	// We need to read the network from a file: testIO() must have been passed
 	log("TESTING measures");

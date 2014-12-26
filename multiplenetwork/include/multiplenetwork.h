@@ -1,21 +1,19 @@
 /*
  * multiplenetwork.h
  *
- * Created on: Feb 26, 2014
- * Author: matteomagnani
- * Version: 0.0.1
+ * General header file: include this to get access to the whole library
  */
 
 #ifndef MULTIPLENETWORK_MULTIPLENETWORK_H_
 #define MULTIPLENETWORK_MULTIPLENETWORK_H_
 
-#import "datastructures.h"
-#import "measures.h"
-#import "exceptions.h"
-#import "utils.h"
-#import "io.h"
-#import "community.h"
-#import "evolution.h"
-#import "transformation.h"
+#include "datastructures.h"
+#include "measures.h"
+#include "exceptions.h"
+#include "utils.h"
+#include "io.h"
+#include "community.h"
+#include "evolution.h"
+#include "transformation.h"
 
 #endif /* MULTIPLENETWORK_MULTIPLENETWORK_H_ */

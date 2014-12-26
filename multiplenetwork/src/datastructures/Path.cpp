@@ -31,7 +31,7 @@ Path::Path(long num_layers, long timestamp) {
 	Path::timestamp = timestamp;
 }
 
-Path::Path(MultilayerNetwork& mnet, long timestamp) {
+Path::Path(const MultipleNetwork& mnet, long timestamp) {
 	Path::mnet = (&mnet);
 	Path::num_edges_per_layer.resize(mnet.getNumNetworks(),0);
 	Path::timestamp = timestamp;

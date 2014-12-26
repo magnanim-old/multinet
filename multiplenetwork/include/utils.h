@@ -1,21 +1,20 @@
 /*
  * utils.h
  *
- * Created on: Feb 8, 2014
- * Author: matteomagnani
- * Version: 0.0.1
- *
  * Contains:
  * - logging functions
- * - string manipulation functions
+ * - basic IO (csv file reading)
+ * - random functions
  */
 
 #ifndef MULTIPLENETWORK_UTILS_H_
 #define MULTIPLENETWORK_UTILS_H_
 
 #include "datastructures.h"
+#include "exceptions.h"
 #include <string>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <vector>
 #include <set>
@@ -36,7 +35,7 @@ void log(std::string s, verbosity v, bool new_line);
 void warn(std::string s);
 void err(std::string s);
 
-template <class T> void print(std::set<T>& input) {
+template <class T> void print_set(std::set<T>& input) {
 	typename std::set<T>::iterator it;
 	for (it=input.begin(); it!=input.end(); ++it) {
 		if (it!=input.begin()) std::cout << ",";
@@ -53,6 +52,8 @@ private:
 	std::ifstream infile;
 	std::string next;
 	bool has_next;
+	bool remove_trailing_spaces;
+	int row_number;
 
 public:
 	CSVReader();
@@ -61,6 +62,8 @@ public:
 	void open(std::string path);
 	bool hasNext();
 	std::vector<std::string> getNext();
+	int rowNum();
+	void trimFields(bool value);
 };
 
 
@@ -78,6 +81,7 @@ public:
 	 * Returns a random integral number in the range [0,max[ using an
 	 * approximately uniform probability distribution.
 	 * @param max
+	 * @throws OperationNotSupprtedException if the range is larger than the number of random numbers that can be returned by the system
 	 */
 	int getRandomInt(int max);
 
@@ -85,6 +89,7 @@ public:
 	 * Returns a random integral number in the range [0,max[ using an
 	 * approximately uniform probability distribution.
 	 * @param max
+	 * @throws OperationNotSupprtedException if the range is larger than the number of random numbers that can be returned by the system
 	 */
 	long getRandomLong(long max);
 
@@ -100,21 +105,23 @@ public:
 	* @param max
 	* @param k
 	*/
-	std::set<unsigned long> getKRandom(unsigned long max, unsigned int k);
+	std::set<unsigned int> getKRandom(unsigned int max, unsigned int k);
 
+	/**
+	* Returns K random elements from the input set
+	* chosen with an approximately uniform probability distribution.
+	* @param input
+	* @param k
+	*/
 	template <class T>
 	std::set<T> getKElements(const std::set<T>& input, unsigned int k) {
 		std::set<T> output;
-		  std::uniform_int_distribution<int> distribution(0,input.size()-1);
-		  // TODO add check on size
-		  while (output.size()<k) {
-		    int offset = distribution(generator);
-		    typename std::set<T>::iterator it;
-		    int i = 0;
-		    for (it=input.begin(); i<offset; ++it) i++;
-		    output.insert(*it);
-		  }
-		  return output;
+		std::set<unsigned int> choices = getKRandom(input.size(),k);
+		std::vector<T> v(input.begin(),input.end());
+		for (int choice: choices) {
+		    output.insert(v.at(choice));
+		}
+		return output;
 	}
 
 	template <class T>
@@ -137,5 +144,18 @@ private:
 	void resizeOptions(unsigned long max);
 
 };
+
+template <typename T> std::string to_string ( T Number ) {
+	std::ostringstream ss;
+    ss << Number;
+    return ss.str();
+}
+
+double to_double(const std::string &double_as_string);
+
+std::set<network_id> network_names_to_ids(const MultiplexNetwork& mnet, const std::vector<std::string>& names);
+
+std::set<entity_id> identity_names_to_ids(const MultiplexNetwork& mnet, const std::vector<std::string>& names);
+
 
 #endif /* MULTIPLENETWORK_UTILS_H_ */

@@ -13,6 +13,16 @@ private:
 	std::string path;
 };
 
+class WrongFormatException: public std::exception {
+public:
+	WrongFormatException(std::string path);
+	~WrongFormatException() throw ();
+	virtual const char* what() const throw();
+private:
+	std::string value;
+};
+
+
 class ElementNotFoundException: public std::exception {
 public:
 	ElementNotFoundException(std::string value);
@@ -39,4 +49,5 @@ public:
 private:
 	std::string value;
 };
+
 #endif /* MULTIPLENETWORK_EXCEPTIONS_H_ */

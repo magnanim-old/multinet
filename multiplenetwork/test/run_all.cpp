@@ -8,18 +8,26 @@
 
 #include "test.h"
 #include <stdlib.h>
+#include <iostream>
 
 int main(int argn, char* argv[]) {
 
+	try {
 	testNetwork();
-	testMultilayerNetwork();
+	/*testMultilayerNetwork();
 	testMultiplex();
 	testIO();
 	testTransformations();
-	testMeasures();
-	//testModularity(); //Still testing this, but seems to work (it does for single networks)
+	testLocalMeasures();
+	testDistanceMeasures();
+	//testModularity(); //Still testing this, but seems to work so far (it does for single networks)
 	testRandom();
-	testEvolution();
+	testEvolution();*/
+	}
+	catch (std::exception& e) {
+		std::cout << "[Error] UNIT TEST NOT PASSED: " << e.what() << std::endl;
+		return EXIT_FAILURE;
+	}
 
 	return EXIT_SUCCESS;
 }

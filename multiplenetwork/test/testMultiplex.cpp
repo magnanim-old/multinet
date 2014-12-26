@@ -20,10 +20,10 @@ void testMultiplex() {
 	log("done!");
 
 	log("Adding seven global vertexes with different methods...",false);
-	global_identity gv0 = mnet.addGlobalIdentity();
-	global_identity gv1 = mnet.addGlobalIdentity();
-	global_identity gv2 = mnet.addGlobalIdentity();
-	global_identity gv3 = mnet.addGlobalIdentity();
+	identity gv0 = mnet.addGlobalIdentity();
+	identity gv1 = mnet.addGlobalIdentity();
+	identity gv2 = mnet.addGlobalIdentity();
+	identity gv3 = mnet.addGlobalIdentity();
 	mnet.addGlobalIdentities(3);
 	if (mnet.getNumGlobalIdentities()!=7) throw FailedUnitTestException("Wrong number of global vertexes");
 	log("done!");

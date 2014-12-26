@@ -8,7 +8,7 @@
 
 #include "measures.h"
 
-long out_degree(const MultiplexNetwork& mnet, global_identity global_id, const std::set<network_id>& active_networks) {
+long out_degree(const MultiplexNetwork& mnet, entity_id global_id, const std::set<network_id>& active_networks) {
 	int tmp_degree = 0;
 	for (network_id net: active_networks) {
 		if (!mnet.containsVertex(global_id,net)) continue;
@@ -26,7 +26,7 @@ long out_degree(const MultiplexNetwork& mnet, const std::string& global_name, co
 	return tmp_degree;
 }
 
-long out_degree(const MultiplexNetwork& mnet, global_identity global_id, network_id network) {
+long out_degree(const MultiplexNetwork& mnet, entity_id global_id, network_id network) {
 	if (!mnet.containsVertex(global_id,network)) return 0;
 	return mnet.getNetwork(network).getOutDegree(mnet.getVertexId(global_id,network));
 }
@@ -36,7 +36,7 @@ long out_degree(const MultiplexNetwork& mnet, const std::string& global_name, co
 	return mnet.getNetwork(network_name).getOutDegree(mnet.getVertexName(global_name,network_name));
 }
 
-long in_degree(const MultiplexNetwork& mnet, global_identity global_id, const std::set<network_id>& active_networks) {
+long in_degree(const MultiplexNetwork& mnet, entity_id global_id, const std::set<network_id>& active_networks) {
 	int tmp_degree = 0;
 	for (network_id net: active_networks) {
 		if (!mnet.containsVertex(global_id,net)) continue;
@@ -54,7 +54,7 @@ long in_degree(const MultiplexNetwork& mnet, const std::string& global_name, con
 	return tmp_degree;
 }
 
-long in_degree(const MultiplexNetwork& mnet, global_identity global_id, network_id network) {
+long in_degree(const MultiplexNetwork& mnet, entity_id global_id, network_id network) {
 	if (!mnet.containsVertex(global_id,network)) return 0;
 	return mnet.getNetwork(network).getInDegree(mnet.getVertexId(global_id,network));
 }
@@ -64,7 +64,7 @@ long in_degree(const MultiplexNetwork& mnet, const std::string& global_name, con
 	return mnet.getNetwork(network_name).getInDegree(mnet.getVertexName(global_name,network_name));
 }
 
-long degree(const MultiplexNetwork& mnet, global_identity global_id, const std::set<network_id>& active_networks) {
+long degree(const MultiplexNetwork& mnet, entity_id global_id, const std::set<network_id>& active_networks) {
 	int tmp_degree = 0;
 	for (network_id net: active_networks) {
 		if (!mnet.containsVertex(global_id,net)) continue;
@@ -82,7 +82,7 @@ long degree(const MultiplexNetwork& mnet, const std::string& global_name, const 
 	return tmp_degree;
 }
 
-long degree(const MultiplexNetwork& mnet, global_identity global_id, network_id network) {
+long degree(const MultiplexNetwork& mnet, entity_id global_id, network_id network) {
 	if (!mnet.containsVertex(global_id,network)) return 0;
 	return mnet.getNetwork(network).getDegree(mnet.getVertexId(global_id,network));
 }

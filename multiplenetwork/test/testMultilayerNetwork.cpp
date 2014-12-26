@@ -45,7 +45,7 @@ void testMultilayerNetwork() {
 	log("REQUIRES Network class having been tested");
 
 	log("Creating an empty multiple network...",false);
-	MultilayerNetwork mnet;
+	MultipleNetwork mnet;
 	log("done!");
 
 	log("Creating and adding three anonymous undirected and directed networks...",false);

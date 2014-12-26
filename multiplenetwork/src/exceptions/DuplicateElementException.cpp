@@ -12,7 +12,7 @@
 using namespace std;
 
 DuplicateElementException::DuplicateElementException(string value) {
-	DuplicateElementException::value = value;
+	DuplicateElementException::value = "Duplicate element: " + value;
 }
 DuplicateElementException::~DuplicateElementException() throw (){
 	// TODO Auto-generated destructor stub

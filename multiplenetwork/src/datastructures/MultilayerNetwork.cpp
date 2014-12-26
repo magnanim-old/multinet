@@ -17,24 +17,24 @@
 #include <iostream>
 #include <sstream>
 
-MultilayerNetwork::MultilayerNetwork() {}
+MultipleNetwork::MultipleNetwork() {}
 
-MultilayerNetwork::~MultilayerNetwork() {
+MultipleNetwork::~MultipleNetwork() {
 	// TODO
 }
 
-network_id MultilayerNetwork::addNetwork(const Network& net) {
+network_id MultipleNetwork::addNetwork(const Network& net) {
 	int num_current_networks = getNumNetworks();
 	networks.resize(num_current_networks+1);
 	networks[num_current_networks] = net;
 	int new_network_id = getNumNetworks()-1;
-	std::string network_name = std::to_string(new_network_id); // default name
+	std::string network_name = to_string(new_network_id); // default name
 	network_name_to_id[network_name] = new_network_id;
 	network_id_to_name.push_back(network_name);
 	return new_network_id;
 }
 
-network_id MultilayerNetwork::addNetwork(const std::string& network_name, Network& net) {
+network_id MultipleNetwork::addNetwork(const std::string& network_name, Network& net) {
 	if (containsNetwork(network_name)) throw DuplicateElementException("network " + network_name);
 	int num_current_networks = getNumNetworks();
 	networks.resize(num_current_networks+1);
@@ -45,7 +45,7 @@ network_id MultilayerNetwork::addNetwork(const std::string& network_name, Networ
 	return new_network_id;
 }
 
-std::set<network_id> MultilayerNetwork::getNetworks() const {
+std::set<network_id> MultipleNetwork::getNetworks() const {
 	std::set<network_id> networks;
 	for (long v=0; v<getNumNetworks(); v++) {
 		networks.insert(v);
@@ -53,7 +53,7 @@ std::set<network_id> MultilayerNetwork::getNetworks() const {
 	return networks;
 }
 
-std::set<std::string> MultilayerNetwork::getNetworkNames() const {
+std::set<std::string> MultipleNetwork::getNetworkNames() const {
 	std::set<std::string> networkNames;
 	for (std::pair<std::string,network_id> name: network_name_to_id) {
 		networkNames.insert(name.first);
@@ -61,7 +61,7 @@ std::set<std::string> MultilayerNetwork::getNetworkNames() const {
 	return networkNames;
 }
 
-std::set<global_vertex_id> MultilayerNetwork::getVertexes() const {
+std::set<global_vertex_id> MultipleNetwork::getVertexes() const {
 	std::set<global_vertex_id> vertexes;
 	for (int network = 0; network < getNumNetworks(); network++) {
 		std::set<vertex_id> local_vertexes = networks[network].getVertexes();
@@ -72,7 +72,7 @@ std::set<global_vertex_id> MultilayerNetwork::getVertexes() const {
 	return vertexes;
 }
 
-std::set<global_edge_id> MultilayerNetwork::getEdges() const {
+std::set<global_edge_id> MultipleNetwork::getEdges() const {
 	std::set<global_edge_id> edges;
 	for (int network = 0; network < getNumNetworks(); network++) {
 		std::set<edge_id> local_edges = networks[network].getEdges();
@@ -83,31 +83,31 @@ std::set<global_edge_id> MultilayerNetwork::getEdges() const {
 	return edges;
 }
 
-const Network& MultilayerNetwork::getNetwork(network_id nid) const {
-	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + std::to_string(nid));
+const Network& MultipleNetwork::getNetwork(network_id nid) const {
+	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + to_string(nid));
 	return networks[nid];
 }
 
-Network& MultilayerNetwork::getNetwork(network_id nid) {
-	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + std::to_string(nid));
+Network& MultipleNetwork::getNetwork(network_id nid) {
+	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + to_string(nid));
 	return networks[nid];
 }
 
-Network& MultilayerNetwork::getNetwork(const std::string& network_name) {
+Network& MultipleNetwork::getNetwork(const std::string& network_name) {
 	if (!containsNetwork(network_name)) throw ElementNotFoundException("network " + network_name);
 	return networks.at(network_name_to_id.at(network_name));
 }
 
-const Network& MultilayerNetwork::getNetwork(const std::string& network_name) const {
+const Network& MultipleNetwork::getNetwork(const std::string& network_name) const {
 	if (!containsNetwork(network_name)) throw ElementNotFoundException("network " + network_name);
 	return networks.at(network_name_to_id.at(network_name));
 }
 
-int MultilayerNetwork::getNumNetworks() const {
+int MultipleNetwork::getNumNetworks() const {
 	return networks.size();
 }
 
-long MultilayerNetwork::getNumVertexes() const {
+long MultipleNetwork::getNumVertexes() const {
 	long number_of_vertexes = 0;
 	for (int net=0; net<getNumNetworks(); net++) {
 		number_of_vertexes += networks[net].getNumVertexes();
@@ -115,7 +115,7 @@ long MultilayerNetwork::getNumVertexes() const {
 	return number_of_vertexes;
 }
 
-long MultilayerNetwork::getNumEdges() const {
+long MultipleNetwork::getNumEdges() const {
 	long number_of_edges = 0;
 	for (int net=0; net<getNumNetworks(); net++) {
 		number_of_edges += networks[net].getNumEdges();
@@ -123,31 +123,30 @@ long MultilayerNetwork::getNumEdges() const {
 	return number_of_edges;
 }
 
-bool MultilayerNetwork::containsNetwork(network_id nid) const {
+bool MultipleNetwork::containsNetwork(network_id nid) const {
 	// Networks are numbered from 0, therefore existing network ids range in [0,getNumNetworks()[
 	return nid < getNumNetworks();
 }
 
-std::string MultilayerNetwork::getNetworkName(network_id nid) const {
+std::string MultipleNetwork::getNetworkName(network_id nid) const {
 	// TODO problem if network has been added without a name
-	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + std::to_string(nid));
+	if (!containsNetwork(nid)) throw ElementNotFoundException("network " + to_string(nid));
 	return network_id_to_name[nid];
 }
 
-network_id MultilayerNetwork::getNetworkId(const std::string& network_name) const {
+network_id MultipleNetwork::getNetworkId(const std::string& network_name) const {
 	if (network_name_to_id.count(network_name)==0) throw ElementNotFoundException("network " + network_name);
 	return network_name_to_id.at(network_name);
 }
 
-bool MultilayerNetwork::containsNetwork(const std::string& network_name) const {
+bool MultipleNetwork::containsNetwork(const std::string& network_name) const {
 	return network_name_to_id.count(network_name)>0;
 }
 
-
-
-void print(MultilayerNetwork& mnet) {
-	std::cout << "MULTILAYER NETWORK" << std::endl;
-	std::cout << " -Number of networks: " << mnet.getNumNetworks() << std::endl;
-	std::cout << " -Number of vertexes: " << mnet.getNumVertexes() << std::endl;
-	std::cout << " -Number of edges: " << mnet.getNumEdges() << std::endl;
+std::ostream& operator<<(std::ostream &strm, const MultipleNetwork& mnet) {
+	strm << "multilayer network (";
+	strm << ", networks: " << mnet.getNumNetworks();
+	strm << ", vertexes: " << mnet.getNumVertexes();
+	strm << ", edges: " << mnet.getNumEdges() << ")";
+	return strm;
 }

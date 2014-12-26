@@ -24,7 +24,7 @@ void BAEvolutionModel::init_step(MultiplexNetwork& mnet, network_id net) {
 	for (std::string name: names) {
 		if (!mnet.getNetwork(net).containsVertex(name)) {
 			mnet.getNetwork(net).addVertex(name);
-			mnet.mapIdentity(name,name,mnet.getNetworkName(net));
+			mnet.map(name,name,mnet.getNetworkName(net));
 		}
 	}
 	for (std::string name1: names) {
@@ -35,7 +35,14 @@ void BAEvolutionModel::init_step(MultiplexNetwork& mnet, network_id net) {
 	}
 }
 
-void BAEvolutionModel::evolution_step(MultiplexNetwork& mnet, network_id net) {
+void BAEvolutionModel::evolution_step(MultiplexNetwork& mnet, network_id net)  {
+	std::set<global_vertex_id> new_vertexes;
+	std::set<global_edge_id> new_edges;
+	evolution_step(mnet, net, new_vertexes, new_edges);
+}
+
+
+void BAEvolutionModel::evolution_step(MultiplexNetwork& mnet, network_id net, std::set<global_vertex_id>& new_vertexes, std::set<global_edge_id>& new_edges) {
 
 	std::string new_vertex = rand.getElement(mnet.getGlobalNames());
 
@@ -43,9 +50,11 @@ void BAEvolutionModel::evolution_step(MultiplexNetwork& mnet, network_id net) {
 		return;
 
 	//std::cout << "Inserting vertex " + new_vertex;
-	mnet.getNetwork(net).addVertex(new_vertex);
+	vertex_id vid = mnet.getNetwork(net).addVertex(new_vertex);
 	//std::cout << " " << mnet.getNetwork(net).getNumVertexes() << std::endl;
-	mnet.mapIdentity(new_vertex,new_vertex,mnet.getNetworkName(net));
+	mnet.map(new_vertex,new_vertex,mnet.getNetworkName(net));
+	global_vertex_id new_vertex_id(vid,net);
+	new_vertexes.insert(new_vertex_id);
 
     // Randomly select m nodes with probability proportional to their degree and connect them to new_vertex
 	std::set<edge_id> all_edges = mnet.getNetwork(net).getEdges();
@@ -53,10 +62,13 @@ void BAEvolutionModel::evolution_step(MultiplexNetwork& mnet, network_id net) {
 
 
 	for (edge_id edge: edges) {
-		global_identity target_id = mnet.getGlobalIdentity(rand.test(.5)?edge.v1:edge.v2, net);
+		entity_id target_id = mnet.getGlobalIdentity(rand.test(.5)?edge.v1:edge.v2, net);
 		std::string target = mnet.getGlobalName(target_id);
 		if (!mnet.getNetwork(net).containsEdge(new_vertex,target)) {
 			mnet.getNetwork(net).addEdge(new_vertex,target);
+			global_edge_id new_edge_id(vid,mnet.getVertexId(target_id,net),net,mnet.getNetwork(net).isDirected());
+			//std::cout << "I " << vid << " " << mnet.getVertexId(target_id,net) << std::endl;
+			new_edges.insert(new_edge_id);
 		}
 	}
 
