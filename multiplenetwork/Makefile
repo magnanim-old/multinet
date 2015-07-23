@@ -1,14 +1,15 @@
 CXXFLAGS = -Iinclude -O2 -g -std=c++11 -Wall -fmessage-length=0
 
 OBJS = 	src/datastructures/*.cpp \
-		src/exceptions/*.cpp \
-		src/utils/*.cpp \
+		src/datastructures/components/*.cpp \
+		src/datastructures/iterators/*.cpp \
+		src/datastructures/attributes/*.cpp \
 		src/io/*.cpp \
-		src/transformation/*.cpp \
-		src/evolution/*.cpp \
-		src/measures/*.cpp \
+		src/measures/degree.cpp src/measures/neighborhood.cpp src/measures/relevance.cpp \
+		src/exceptions/*.cpp \
+		src/utils/logging.cpp src/utils/printing.cpp src/utils/math.cpp src/utils/string.cpp src/utils/CSVReader.cpp \
 		
-TEST = test/*.cpp
+TEST = test/run_all.cpp test/testMLNetwork.cpp test/testIO.cpp test/testLocalMeasures.cpp test/FailedUnitTestException.cpp
 		
 LIBS = -L/usr/local/lib
 

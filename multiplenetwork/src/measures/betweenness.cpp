@@ -14,7 +14,7 @@
 
 using namespace std;
 
-std::map<entity_id, long> pareto_betweenness(const MultiplexNetwork& mnet) {
+std::map<entity_id, long> pareto_betweenness(const MLNetwork& mnet) {
 	std::map<entity_id, long> vertex_betweenness;
 	std::clock_t start;
 	    double duration;
@@ -46,7 +46,7 @@ std::map<entity_id, long> pareto_betweenness(const MultiplexNetwork& mnet) {
 	//cout << "mmm\n";
 }
 
-std::map<global_edge_id, long> pareto_edge_betweenness(const MultiplexNetwork& mnet) {
+std::map<global_edge_id, long> pareto_edge_betweenness(const MLNetwork& mnet) {
 	std::map<global_edge_id, long> edge_betweenness;
 	for (vertex_id i = 0; i < mnet.getNumVertexes(); i++) {
 		map<vertex_id,set<Path> > paths = pareto_distance_all_paths(mnet, i);

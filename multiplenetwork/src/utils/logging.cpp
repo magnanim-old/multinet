@@ -23,8 +23,13 @@ void log(std::string s, verbosity v) {
 
 void log(std::string s, verbosity v, bool new_line) {
 	if (VERBOSITY >= v) {
-		std::cout << s;
+		std::cout << "" << s;
 		if (new_line) std::cout << std::endl;
 	}
 }
+
+void warn(std::string s) {
+	std::cout << "[Warning] " << s << std::endl;
+}
+
 

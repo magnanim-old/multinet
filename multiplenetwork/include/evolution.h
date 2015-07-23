@@ -18,6 +18,8 @@
 #include "utils.h"
 
 
+namespace mlnet {
+
 typedef int evolution_strategy;
 
 const int EVOLUTION_DEGREE=0;
@@ -25,10 +27,10 @@ const int EVOLUTION_DEGREE=0;
 /**********************************************************************/
 /** edge closure strategy *********************************************/
 /**********************************************************************/
-entity_id choice_uniform(Random rand, MultiplexNetwork& mnet);
-vertex_id choice_uniform(Random rand, MultiplexNetwork& mnet, network_id net);
-vertex_id choice_common_friends(Random rand, MultiplexNetwork& mnet, network_id net, vertex_id vertex);
-vertex_id choice_degree(Random rand, MultiplexNetwork& mnet, network_id net);
+entity_id choice_uniform(Random rand, MLNetwork& mnet);
+node_id choice_uniform(Random rand, MLNetwork& mnet, layer_id net);
+node_id choice_common_friends(Random rand, MLNetwork& mnet, layer_id net, node_id vertex);
+node_id choice_degree(Random rand, MLNetwork& mnet, layer_id net);
 
 
 /**********************************************************************/
@@ -37,9 +39,9 @@ vertex_id choice_degree(Random rand, MultiplexNetwork& mnet, network_id net);
 class EvolutionModel {
 public:
 	virtual ~EvolutionModel() = 0;
-	virtual void evolution_step(MultiplexNetwork& mnet, network_id net) = 0;
-	virtual void evolution_step(MultiplexNetwork& mnet, network_id net, std::set<global_vertex_id>& new_vertexes, std::set<global_edge_id>& new_edges) = 0;
-	virtual void init_step(MultiplexNetwork& mnet, network_id net) = 0;
+	virtual void evolution_step(MLNetwork& mnet, layer_id net) = 0;
+	virtual void evolution_step(MLNetwork& mnet, layer_id net, std::set<node_id>& new_vertexes, std::set<edge_id>& new_edges) = 0;
+	virtual void init_step(MLNetwork& mnet, layer_id net) = 0;
 protected:
 	Random rand;
 };
@@ -52,9 +54,9 @@ class BAEvolutionModel : public EvolutionModel {
 public:
 	BAEvolutionModel(int m0, int m);
 	~BAEvolutionModel();
-	void init_step(MultiplexNetwork& mnet, network_id net);
-	void evolution_step(MultiplexNetwork& mnet, network_id net);
-	void evolution_step(MultiplexNetwork& mnet, network_id net, std::set<global_vertex_id>& new_vertexes, std::set<global_edge_id>& new_edges);
+	void init_step(MLNetwork& mnet, layer_id net);
+	void evolution_step(MLNetwork& mnet, layer_id net);
+	void evolution_step(MLNetwork& mnet, layer_id net, std::set<node_id>& new_vertexes, std::set<edge_id>& new_edges);
 };
 
 /**
@@ -65,9 +67,9 @@ class UniformEvolutionModel : public EvolutionModel {
 public:
 	UniformEvolutionModel(int m0);
 	~UniformEvolutionModel();
-	void evolution_step(MultiplexNetwork& mnet, network_id net);
-	void evolution_step(MultiplexNetwork& mnet, network_id net, std::set<global_vertex_id>& new_vertexes, std::set<global_edge_id>& new_edges);
-	void init_step(MultiplexNetwork& mnet, network_id net);
+	void evolution_step(MLNetwork& mnet, layer_id net);
+	void evolution_step(MLNetwork& mnet, layer_id net, std::set<node_id>& new_vertexes, std::set<edge_id>& new_edges);
+	void init_step(MLNetwork& mnet, layer_id net);
 };
 
 /**********************************************************************/
@@ -75,33 +77,35 @@ public:
 /**********************************************************************/
 /**
  * @brief Grows the input multiplex network.
- * @param mnet MultiplexNetwork to grow
+ * @param mnet MLNetwork to grow
  * @param num_of_steps number of evolution steps
  * @param pr_no_event[] for each network, the probability that an evolution step does not change the network
  * @param pr_internal_event[] for each network, the probability that if something happens this is an internal evolution according to the evolution_model[] parameter
  * @param dependency[][] The (i,j) element of this matrix indicates the probability that, given an external evolution event, network i will consider network j as a potential candidate to import edges from
  * @param evolution_model[] for each network, a specification of how the network should evolve when an internal event happens
  **/
-void evolve_edge_import(MultiplexNetwork &mnet,
+void evolve_edge_import(MLNetwork &mnet,
 		long num_of_steps,
 		std::vector<double> pr_no_event,
 		std::vector<double> pr_internal_event,
 		std::vector<std::vector<double> > dependency,
 		std::vector<EvolutionModel*> evolution_model);
 
-void evolve_edge_copy(MultiplexNetwork &mnet,
+void evolve_edge_copy(MLNetwork &mnet,
 		long num_of_steps,
 		std::vector<double> pr_no_event,
 		std::vector<double> pr_internal_event,
 		std::vector<std::vector<double> > dependency,
 		std::vector<EvolutionModel*> evolution_model);
 
-void evolve(MultiplexNetwork &mnet,
+void evolve(MLNetwork &mnet,
 		long num_of_steps,
 		std::vector<int> num_new_vertexes_per_step,
 		std::vector<double> pr_internal_event,
 		std::vector<evolution_strategy> strategy,
 		std::vector<double> pr_external_event,
 		std::vector<std::vector<double> > dependency);
+
+} // namespace
 
 #endif /* EVOLUTION_H_ */

@@ -23,113 +23,56 @@
 #include <string>
 #include "datastructures.h"
 
+namespace mlnet {
+
 const int P_DOMINATED = -1;
 const int P_EQUAL = 0;
 const int P_INCOMPARABLE = 1;
 const int P_DOMINATES = 2;
 
-
 /**********************************************************************/
 /** Degree  ***********************************************************/
 /**********************************************************************/
 
-long out_degree(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-long out_degree(const MultiplexNetwork& mnet, const std::string& vertex, const std::set<std::string>& active_networks);
-long out_degree(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-long out_degree(const MultiplexNetwork& mnet, const std::string& vertex, const std::string& network_name);
+long degree(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
+long degree(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
-long in_degree(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-long in_degree(const MultiplexNetwork& mnet, const std::string& vertex, const std::set<std::string>& active_networks);
-long in_degree(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-long in_degree(const MultiplexNetwork& mnet, const std::string& vertex, const std::string& network_name);
-
-long degree(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-long degree(const MultiplexNetwork& mnet, const std::string& vertex, const std::set<std::string>& active_networks);
-long degree(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-long degree(const MultiplexNetwork& mnet, const std::string& vertex, const std::string& network_name);
-
+double degree_mean(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
+double degree_deviation(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
 
 /**********************************************************************/
 /** Neighborhood ******************************************************/
 /**********************************************************************/
 
-std::set<entity_id> out_neighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-std::set<std::string> out_neighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-std::set<entity_id> out_neighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-std::set<std::string> out_neighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
+actor_list neighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
+actor_list neighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
-std::set<entity_id> in_neighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-std::set<std::string> in_neighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-std::set<entity_id> in_neighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-std::set<std::string> in_neighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
-
-std::set<entity_id> neighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-std::set<std::string> neighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-std::set<entity_id> neighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-std::set<std::string> neighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
-
-std::set<entity_id> out_xneighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-std::set<std::string> out_xneighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-std::set<entity_id> out_xneighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-std::set<std::string> out_xneighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
-
-std::set<entity_id> in_xneighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-std::set<std::string> in_xneighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-std::set<entity_id> in_xneighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-std::set<std::string> in_xneighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
-
-std::set<entity_id> xneighbors(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-std::set<std::string> xneighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-std::set<entity_id> xneighbors(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-std::set<std::string> xneighbors(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
+actor_list xneighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
+actor_list xneighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
 /**********************************************************************/
-/** Network relevance *************************************************/
+/** Layer relevance *************************************************/
 /**********************************************************************/
 
-double out_relevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-double out_relevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-double out_relevance(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-double out_relevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
+double relevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
+double relevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
-double in_relevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-double in_relevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-double in_relevance(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-double in_relevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
-
-double relevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-double relevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-double relevance(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-double relevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
-
-double out_xrelevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-double out_xrelevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-double out_xrelevance(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-double out_xrelevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
-
-double in_xrelevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-double in_xrelevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-double in_xrelevance(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-double in_xrelevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
-
-double xrelevance(const MultiplexNetwork& mnet, entity_id identity, const std::set<network_id>& active_networks);
-double xrelevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks);
-double xrelevance(const MultiplexNetwork& mnet, entity_id identity, network_id network);
-double xrelevance(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name);
+double xrelevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
+double xrelevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
 /**********************************************************************/
 /** Network comparison ************************************************/
 /**********************************************************************/
 
-double network_jaccard_similarity(const MultiplexNetwork& mnet, const std::set<network_id>& active_networks);
-double network_jaccard_similarity(const MultiplexNetwork& mnet, const std::set<std::string>& active_networks);
-double network_jaccard_similarity(const MultiplexNetwork& mnet, network_id network1, network_id network2);
-double network_jaccard_similarity(const MultiplexNetwork& mnet, const std::string& network_name1, const std::string& network_name2);
+double network_jaccard_similarity(const MLNetworkSharedPtr mnet, const std::set<LayerSharedPtr>& layers);
+double network_jaccard_similarity(const MLNetworkSharedPtr mnet, const std::set<std::string>& active_networks);
+double network_jaccard_similarity(const MLNetworkSharedPtr mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double network_jaccard_similarity(const MLNetworkSharedPtr mnet, const std::string& network_name1, const std::string& network_name2);
 
-double network_coverage(const MultiplexNetwork& mnet, const std::set<network_id>& n1, const std::set<network_id>& n2);
-double network_coverage(const MultiplexNetwork& mnet, const std::set<std::string>& n1, const std::set<std::string>& n2);
-double network_coverage(const MultiplexNetwork& mnet, network_id network1, network_id network2);
-double network_coverage(const MultiplexNetwork& mnet, const std::string& network_name1, const std::string& network_name2);
+double network_coverage(const MLNetworkSharedPtr mnet, const std::set<layer_id>& n1, const std::set<layer_id>& n2);
+double network_coverage(const MLNetworkSharedPtr mnet, const std::set<std::string>& n1, const std::set<std::string>& n2);
+double network_coverage(const MLNetworkSharedPtr mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+double network_coverage(const MLNetworkSharedPtr mnet, const std::string& network_name1, const std::string& network_name2);
 
 // FROM HERE, PORTING NOT COMPLETED YET
 
@@ -139,29 +82,35 @@ double network_coverage(const MultiplexNetwork& mnet, const std::string& network
 
 //void pareto_distance(MultipleNetwork& mnet, global_identity identity, std::map<global_identity,Distance>& distances);
 
-std::map<entity_id,std::set<Distance> > pareto_distance(const MultiplexNetwork& mnet, entity_id identity);
+/*
+std::map<actor_id,std::set<Distance> > pareto_distance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor,);
 
-std::map<entity_id,std::set<Path> > pareto_distance_all_paths(const MultiplexNetwork& mnet, entity_id vertex);
+std::map<actor_id,std::set<Path> > pareto_distance_all_paths(const MLNetworkSharedPtr mnet, actor_id vertex);
+*/
 
 /**********************************************************************/
 /** Betweenness *******************************************************/
 /**********************************************************************/
 
-std::map<entity_id,long> pareto_betweenness(const MultiplexNetwork& mnet);
+/*
+std::map<actor_id,long> pareto_betweenness(const MLNetworkSharedPtr mnet);
 
-std::map<global_edge_id, long> pareto_edge_betweenness(const MultiplexNetwork& mnet);
+std::map<global_edge_id, long> pareto_edge_betweenness(const MLNetworkSharedPtr mnet);
 
 int check_dominance(const Distance& d1, const Distance& d2);
 
 int check_dominance(const Path& p1, const Path& p2);
 
+*/
+
 /**********************************************************************/
 /** Clustering ********************************************************/
 /**********************************************************************/
 
-double modularity(const MultiplexNetwork& mnet, std::map<network_id,std::map<entity_id,long> >& communities, double c);
+double modularity(const MLNetworkSharedPtr mnet, std::map<layer_id,std::map<actor_id,long> >& communities, double c);
 
-//std::vector<long> distribution(long (*f)(const MultiplexNetwork&, global_identity, const std::set<network_id>&));
+//std::vector<long> distribution(long (*f)(const MLNetworkSharedPtr, global_identity, const std::set<layer_id>&));
 
+} // namespace mlnet
 
 #endif /* MULTIPLENETWORK_MEASURES_H_ */

@@ -7,87 +7,52 @@
  */
 
 #include "measures.h"
+#include "utils.h"
+#include <vector>
+#include <iostream>
 
-long out_degree(const MultiplexNetwork& mnet, entity_id global_id, const std::set<network_id>& active_networks) {
-	int tmp_degree = 0;
-	for (network_id net: active_networks) {
-		if (!mnet.containsVertex(global_id,net)) continue;
-		tmp_degree += mnet.getNetwork(net).getOutDegree(mnet.getVertexId(global_id,net));
+namespace mlnet {
+
+long degree(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
+	int degree = 0;
+	node_list nodes = mnet->get_nodes(actor);
+	for (NodeSharedPtr node: nodes) {
+		node_list neighbors = mnet->neighbors(node, mode);
+		for (NodeSharedPtr neighbor: neighbors) {
+			if (layers.count(neighbor->layer)>0)
+				degree += 1;
+		}
 	}
-	return tmp_degree;
+	return degree;
 }
 
-long out_degree(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks) {
-	int tmp_degree = 0;
-	for (std::string network_name: active_networks) {
-		if (!mnet.containsVertex(global_name,network_name)) continue;
-		tmp_degree += mnet.getNetwork(network_name).getOutDegree(mnet.getVertexName(global_name,network_name));
+long degree(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
+	int degree = 0;
+	node_list nodes = mnet->get_nodes(actor);
+	for (NodeSharedPtr node: nodes) {
+		node_list neighbors = mnet->neighbors(node, mode);
+		for (NodeSharedPtr neighbor: neighbors) {
+			if (neighbor->layer==layer)
+				degree += 1;
+		}
 	}
-	return tmp_degree;
+	return degree;
 }
 
-long out_degree(const MultiplexNetwork& mnet, entity_id global_id, network_id network) {
-	if (!mnet.containsVertex(global_id,network)) return 0;
-	return mnet.getNetwork(network).getOutDegree(mnet.getVertexId(global_id,network));
-}
-
-long out_degree(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name) {
-	if (!mnet.containsVertex(global_name,network_name)) return 0;
-	return mnet.getNetwork(network_name).getOutDegree(mnet.getVertexName(global_name,network_name));
-}
-
-long in_degree(const MultiplexNetwork& mnet, entity_id global_id, const std::set<network_id>& active_networks) {
-	int tmp_degree = 0;
-	for (network_id net: active_networks) {
-		if (!mnet.containsVertex(global_id,net)) continue;
-		tmp_degree += mnet.getNetwork(net).getInDegree(mnet.getVertexId(global_id,net));
+double degree_mean(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
+	std::vector<double> degrees;
+	for (LayerSharedPtr layer: layers) {
+		degrees.push_back((double)degree(mnet,actor,layer,mode));
 	}
-	return tmp_degree;
+	return mean(degrees);
 }
 
-long in_degree(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks) {
-	int tmp_degree = 0;
-	for (std::string network_name: active_networks) {
-		if (!mnet.containsVertex(global_name,network_name)) continue;
-		tmp_degree += mnet.getNetwork(network_name).getInDegree(mnet.getVertexName(global_name,network_name));
+double degree_deviation(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
+	std::vector<double> degrees;
+	for (LayerSharedPtr layer: layers) {
+		degrees.push_back((double)degree(mnet,actor,layer,mode));
 	}
-	return tmp_degree;
+	return stdev(degrees);
 }
+} // Namespace mlnet
 
-long in_degree(const MultiplexNetwork& mnet, entity_id global_id, network_id network) {
-	if (!mnet.containsVertex(global_id,network)) return 0;
-	return mnet.getNetwork(network).getInDegree(mnet.getVertexId(global_id,network));
-}
-
-long in_degree(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name) {
-	if (!mnet.containsVertex(global_name,network_name)) return 0;
-	return mnet.getNetwork(network_name).getInDegree(mnet.getVertexName(global_name,network_name));
-}
-
-long degree(const MultiplexNetwork& mnet, entity_id global_id, const std::set<network_id>& active_networks) {
-	int tmp_degree = 0;
-	for (network_id net: active_networks) {
-		if (!mnet.containsVertex(global_id,net)) continue;
-		tmp_degree += mnet.getNetwork(net).getDegree(mnet.getVertexId(global_id,net));
-	}
-	return tmp_degree;
-}
-
-long degree(const MultiplexNetwork& mnet, const std::string& global_name, const std::set<std::string>& active_networks) {
-	int tmp_degree = 0;
-	for (std::string network_name: active_networks) {
-		if (!mnet.containsVertex(global_name,network_name)) continue;
-		tmp_degree += mnet.getNetwork(network_name).getDegree(mnet.getVertexName(global_name,network_name));
-	}
-	return tmp_degree;
-}
-
-long degree(const MultiplexNetwork& mnet, entity_id global_id, network_id network) {
-	if (!mnet.containsVertex(global_id,network)) return 0;
-	return mnet.getNetwork(network).getDegree(mnet.getVertexId(global_id,network));
-}
-
-long degree(const MultiplexNetwork& mnet, const std::string& global_name, const std::string& network_name) {
-	if (!mnet.containsVertex(global_name,network_name)) return 0;
-	return mnet.getNetwork(network_name).getDegree(mnet.getVertexName(global_name,network_name));
-}

@@ -16,7 +16,7 @@ using namespace std;
 /**
  * @param p a MultiDistance that is cloned to initialize the new one
  * @param timestamp creation timestamp
- */
+ *
 Distance::Distance(const Distance& p, long timestamp) {
 	Distance::mnet = p.mnet;
 	num_edges_per_layer.insert(num_edges_per_layer.begin(),p.num_edges_per_layer.begin(),p.num_edges_per_layer.end());
@@ -24,7 +24,7 @@ Distance::Distance(const Distance& p, long timestamp) {
 	num_steps = p.num_steps;
 }
 
-/* only for debugging */
+ only for debugging *
 Distance::Distance(long num_layers, long timestamp) {
 	Distance::num_edges_per_layer.resize(num_layers,0);
 	Distance::timestamp = timestamp;
@@ -86,4 +86,4 @@ std::ostream& operator<<(std::ostream &strm, const Distance &dist) {
   strm << ")";
 
   return strm;
-}
+}*/

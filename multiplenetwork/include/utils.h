@@ -54,6 +54,7 @@ private:
 	bool has_next;
 	bool remove_trailing_spaces;
 	int row_number;
+	char field_separator;
 
 public:
 	CSVReader();
@@ -64,8 +65,14 @@ public:
 	std::vector<std::string> getNext();
 	int rowNum();
 	void trimFields(bool value);
+	void setFieldSeparator(char separator);
 };
 
+
+/***********************************/
+/** Pretty printing               **/
+/***********************************/
+void print(const mlnet::MLNetworkSharedPtr mnet);
 
 /***********************************/
 /** Random                        **/
@@ -153,9 +160,17 @@ template <typename T> std::string to_string ( T Number ) {
 
 double to_double(const std::string &double_as_string);
 
-std::set<network_id> network_names_to_ids(const MultiplexNetwork& mnet, const std::vector<std::string>& names);
 
-std::set<entity_id> identity_names_to_ids(const MultiplexNetwork& mnet, const std::vector<std::string>& names);
+/***********************************/
+/** Math                          **/
+/***********************************/
+
+double mean(const std::vector<double>& vec);
+double stdev(const std::vector<double>& vec);
+
+//std::set<network_id> network_names_to_ids(const MultiplexNetwork& mnet, const std::vector<std::string>& names);
+
+//std::set<entity_id> identity_names_to_ids(const MultiplexNetwork& mnet, const std::vector<std::string>& names);
 
 
 #endif /* MULTIPLENETWORK_UTILS_H_ */

@@ -12,8 +12,8 @@
 #include "exceptions.h"
 #include "utils.h"
 #include "io.h"
-#include "community.h"
-#include "evolution.h"
-#include "transformation.h"
+//#include "community.h"
+//#include "evolution.h"
+//#include "transformation.h"
 
 #endif /* MULTIPLENETWORK_MULTIPLENETWORK_H_ */

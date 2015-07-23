@@ -9,7 +9,7 @@
 #ifndef MULTIPLENETWORK_TEST_H_
 #define MULTIPLENETWORK_TEST_H_
 
-#include "multiplenetwork.h"
+//#include "multiplenetwork.h"
 #include <exception>
 #include <string>
 
@@ -24,16 +24,15 @@ private:
 };
 
 /* Unit test functions */
-void testNetwork();
-void testMultilayerNetwork();
-void testMultiplex();
+//void testNetwork();
+void testMLNetwork();
 void testIO();
 void testLocalMeasures();
-void testDistanceMeasures();
+/*void testDistanceMeasures();
 void testModularity();
 void testEvolution();
 void testRandom();
-void testTransformations();
+void testTransformations();*/
 
 
 #endif /* MULTIPLENETWORK_TEST_H_ */

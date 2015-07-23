@@ -13,10 +13,11 @@
 
 using namespace std;
 
+namespace mlnet {
 /**
  * @param p a MultiPath that is cloned to initialize the new one
  * @param timestamp creation timestamp
- */
+ *
 Path::Path(const Path& p, long timestamp) {
 	Path::mnet = p.mnet;
 	num_edges_per_layer.insert(num_edges_per_layer.begin(),p.num_edges_per_layer.begin(),p.num_edges_per_layer.end());
@@ -25,22 +26,35 @@ Path::Path(const Path& p, long timestamp) {
 	Path::timestamp = timestamp;
 }
 
-/* only for debugging */
+only for debugging *
 Path::Path(long num_layers, long timestamp) {
 	Path::num_edges_per_layer.resize(num_layers,0);
 	Path::timestamp = timestamp;
 }
 
-Path::Path(const MultipleNetwork& mnet, long timestamp) {
-	Path::mnet = (&mnet);
-	Path::num_edges_per_layer.resize(mnet.getNumNetworks(),0);
-	Path::timestamp = timestamp;
+*/
+
+Path::Path(const MLNetworkSharedPtr mnet) : mnet(mnet) {}
+
+Path::~Path() {}
+
+void Path::step(EdgeSharedPtr e) {
+	path.push_back(e);
 }
 
-Path::~Path() {
-	// TODO Auto-generated destructor stub
+EdgeSharedPtr Path::get_step(long pos) const {
+
 }
 
+long Path::length() const;
+
+bool Path::operator<(const Path& other) const {}
+
+Path Path::operator=(const Path& other) const {}
+
+bool Path::operator==(const Path& other) const {}
+
+/*
 void Path::start(vertex_id first) {
 	// TODO Check it's empty -> well, or move to constructor...
 	path.push_back(first);
@@ -99,7 +113,7 @@ std::ostream& operator<<(std::ostream &strm, const Path &path) {
   }
   strm << path.path[path.length()];
 
-  /*
+
   strm << "\n";
   strm << "- edges per layer: ";
   int num_layers = path.num_edges_per_layer.size();
@@ -109,5 +123,4 @@ std::ostream& operator<<(std::ostream &strm, const Path &path) {
   }*/
   //strm << "\n";
 
-  return strm;
-}
+} // namespace

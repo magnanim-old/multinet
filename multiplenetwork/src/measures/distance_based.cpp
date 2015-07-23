@@ -21,7 +21,7 @@ using namespace std;
  vector<set<MultiDistance> > *distances) {}
 */
 
-std::map<entity_id,std::set<Distance> > pareto_distance(const MultiplexNetwork& mnet, entity_id identity)  {
+std::map<entity_id,std::set<Distance> > pareto_distance(const MLNetwork& mnet, entity_id identity)  {
 	std::map<entity_id,std::set<Distance> > distances;
 	std::set<entity_id> identities = mnet.getGlobalIdentities();
 	/* timestamps, used for efficiency reasons to avoid processing edges when no changes have occurred since the last iteration  */
@@ -141,7 +141,7 @@ std::map<entity_id,std::set<Distance> > pareto_distance(const MultiplexNetwork& 
 	//cout << "here?\n";
 }
 
-std::map<entity_id,std::set<Path> > pareto_distance_all_paths(const MultiplexNetwork& mnet, entity_id vertex) {
+std::map<entity_id,std::set<Path> > pareto_distance_all_paths(const MLNetwork& mnet, entity_id vertex) {
 	std::map<entity_id,std::set<Path> > paths;
 	std::set<entity_id> vertexes = mnet.getGlobalIdentities();
 	/* timestamp, used for efficiency reasons to avoid processing edges when no changes have occurred since the last iteration  */

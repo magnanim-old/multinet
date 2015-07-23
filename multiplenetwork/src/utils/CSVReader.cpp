@@ -19,6 +19,8 @@ CSVReader::CSVReader() {
 	next = "";
 	has_next = true;
 	remove_trailing_spaces = false;
+	row_number = 0;
+	field_separator = ',';
 }
 
 CSVReader::~CSVReader() {
@@ -51,7 +53,7 @@ vector<string> CSVReader::getNext() {
 
 	while (line) {
 		string field;
-		if (!getline(line, field, ',')) break;
+		if (!getline(line, field, field_separator)) break;
 		if (remove_trailing_spaces) {
 			field.erase(field.find_last_not_of(" \n\r\t")+1);
 			field.erase(0,field.find_first_not_of(" \n\r\t"));
@@ -68,4 +70,8 @@ vector<string> CSVReader::getNext() {
 
 int CSVReader::rowNum() {
 	return row_number;
+}
+
+void CSVReader::setFieldSeparator(char separator) {
+	field_separator = separator;
 }

@@ -13,43 +13,39 @@
 #import "utils.h"
 #import "io.h"
 
+using namespace mlnet;
+
 void testIO() {
-	log("TESTING IO (MultiplexNetwork)");
+	log("TESTING IO (MLNetwork)");
 	log("Reading network io1 from file...",false);
-	MultiplexNetwork mnet1 = read_multiplex("test/io1.mpx");
-	log("done!");
-	print(mnet1);
-	std::set<network_id> nets1 = mnet1.getNetworks();
-	for (network_id nid: nets1) {
-		print(mnet1.getNetwork(nid));
-	}
+	MLNetworkSharedPtr mnet1 = read_multilayer("test/io1.mpx","mlnet 1",',');
+	log("done! ",false);
+	log(mnet1->to_string());
 
 	log("Reading network io2 from file...",false);
-	MultiplexNetwork mnet2 = read_multiplex("test/io2.mpx");
-	log("done!");
-	print(mnet2);
-	std::set<network_id> nets2 = mnet2.getNetworks();
-	for (network_id nid: nets2) {
-		print(mnet2.getNetwork(nid));
-	}
+	MLNetworkSharedPtr mnet2 = read_multilayer("test/io2.mpx","mlnet 2",',');
+	log("done! ",false);
+	log(mnet2->to_string());
 
 	log("Reading network io3 from file...",false);
-	MultiplexNetwork mnet3 = read_multiplex("test/io3.mpx");
-	log("done!");
-	print(mnet3);
-	std::set<network_id> nets3 = mnet3.getNetworks();
-	for (network_id nid: nets3) {
-		print(mnet3.getNetwork(nid));
-	}
+	MLNetworkSharedPtr mnet3 = read_multilayer("test/io3.mpx","mlnet 3",',');
+	log("done! ",false);
+	log(mnet3->to_string());
 
 	log("Testing attribute values...",false);
-	if (mnet3.getNetwork("l1").getStringVertexAttribute("U0","Color")!="Blue") throw FailedUnitTestException("vertex string attribute not correctly read from file");
-	if (mnet3.getNetwork("l1").getNumericVertexAttribute("U0","Age")!=34) throw FailedUnitTestException("vertex numeric attribute not correctly read from file");
-	if (mnet3.getNetwork("l2").getEdgeWeight("U1","U3")!=3) throw FailedUnitTestException("edge weight not correctly read from file");
-	if (mnet3.getNetwork("l2").getNumericEdgeAttribute("U1","U3","Stars")!=4) throw FailedUnitTestException("edge numeric attribute not correctly read from file");
+	LayerSharedPtr layer = mnet3->get_layer("l1");
+	NodeSharedPtr node = mnet3->get_node("U0",layer);
+	if (mnet3->node_features(layer)->getString(node->id,"Color")!="Blue") throw FailedUnitTestException("Node string attribute not correctly read from file");
+	if (mnet3->node_features(layer)->getNumeric(node->id,"Age")!=34) throw FailedUnitTestException("Node numeric attribute not correctly read from file");
+	layer = mnet3->get_layer("l2");
+	NodeSharedPtr node1 = mnet3->get_node("U1",layer);
+	NodeSharedPtr node2 = mnet3->get_node("U3",layer);
+	EdgeSharedPtr edge = mnet3->get_edge(node1,node2);
+	if (mnet3->edge_features(layer,layer)->getNumeric(edge->id,"Weight")!=3) throw FailedUnitTestException("Edge weight not correctly read from file");
+	if (mnet3->edge_features(layer,layer)->getNumeric(edge->id,"Stars")!=4) throw FailedUnitTestException("Edge numeric attribute not correctly read from file");
 	log("done!");
 
-	log("TEST SUCCESSFULLY COMPLETED (IO - MultiplexNetwork, edgelist)");
+	log("TEST SUCCESSFULLY COMPLETED (IO)");
 }
 
 

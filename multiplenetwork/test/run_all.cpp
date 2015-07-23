@@ -13,12 +13,11 @@
 int main(int argn, char* argv[]) {
 
 	try {
-	testNetwork();
-	/*testMultilayerNetwork();
-	testMultiplex();
+	testMLNetwork();
 	testIO();
-	testTransformations();
 	testLocalMeasures();
+	/*
+	testTransformations();
 	testDistanceMeasures();
 	//testModularity(); //Still testing this, but seems to work so far (it does for single networks)
 	testRandom();
