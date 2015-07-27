@@ -16,11 +16,12 @@ int main(int argn, char* argv[]) {
 	testMLNetwork();
 	testIO();
 	testLocalMeasures();
+	testRandom();
+	testRandomWalks();
 	/*
 	testTransformations();
 	testDistanceMeasures();
 	//testModularity(); //Still testing this, but seems to work so far (it does for single networks)
-	testRandom();
 	testEvolution();*/
 	}
 	catch (std::exception& e) {

@@ -17,10 +17,8 @@ namespace mlnet {
 double relevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
 	set<actor_id> neighbors_on_selected_layers;
 	set<actor_id> all_neighbors;
-	node_list nodes = mnet->get_nodes(actor);
-	for (NodeSharedPtr node: nodes) {
-		node_list neighbors = mnet->neighbors(node, mode);
-		for (NodeSharedPtr neighbor: neighbors) {
+	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
+		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
 			all_neighbors.insert(neighbor->actor->id);
 			if (layers.count(neighbor->layer)>0)
 				neighbors_on_selected_layers.insert(neighbor->actor->id);
@@ -34,10 +32,8 @@ double relevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, con
 double relevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
 	set<actor_id> neighbors_on_selected_layers;
 	set<actor_id> all_neighbors;
-	node_list nodes = mnet->get_nodes(actor);
-	for (NodeSharedPtr node: nodes) {
-		node_list neighbors = mnet->neighbors(node, mode);
-		for (NodeSharedPtr neighbor: neighbors) {
+	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
+		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
 			all_neighbors.insert(neighbor->actor->id);
 			if (layer == neighbor->layer)
 				neighbors_on_selected_layers.insert(neighbor->actor->id);
@@ -52,10 +48,8 @@ double xrelevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, co
 	set<actor_id> neighbors_on_selected_layers;
 	set<actor_id> neighbors_on_other_layers;
 	set<actor_id> all_neighbors;
-	node_list nodes = mnet->get_nodes(actor);
-	for (NodeSharedPtr node: nodes) {
-		node_list neighbors = mnet->neighbors(node, mode);
-		for (NodeSharedPtr neighbor: neighbors) {
+	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
+		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
 			all_neighbors.insert(neighbor->actor->id);
 			if (layers.count(neighbor->layer)>0)
 				neighbors_on_selected_layers.insert(neighbor->actor->id);
@@ -74,10 +68,8 @@ double xrelevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, co
 	set<actor_id> neighbors_on_selected_layers;
 	set<actor_id> neighbors_on_other_layers;
 	set<actor_id> all_neighbors;
-	node_list nodes = mnet->get_nodes(actor);
-	for (NodeSharedPtr node: nodes) {
-		node_list neighbors = mnet->neighbors(node, mode);
-		for (NodeSharedPtr neighbor: neighbors) {
+	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
+		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
 			all_neighbors.insert(neighbor->actor->id);
 			if (layer==neighbor->layer)
 				neighbors_on_selected_layers.insert(neighbor->actor->id);

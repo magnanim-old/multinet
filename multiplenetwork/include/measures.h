@@ -44,11 +44,11 @@ double degree_deviation(const MLNetworkSharedPtr mnet, const ActorSharedPtr& act
 /** Neighborhood ******************************************************/
 /**********************************************************************/
 
-actor_list neighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
-actor_list neighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
+ObjectStore<ActorSharedPtr> neighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
+ObjectStore<ActorSharedPtr> neighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
-actor_list xneighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
-actor_list xneighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
+ObjectStore<ActorSharedPtr> xneighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode);
+ObjectStore<ActorSharedPtr> xneighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
 /**********************************************************************/
 /** Layer relevance *************************************************/

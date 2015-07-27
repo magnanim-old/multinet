@@ -28,10 +28,11 @@ private:
 void testMLNetwork();
 void testIO();
 void testLocalMeasures();
+void testRandom();
+void testRandomWalks();
 /*void testDistanceMeasures();
 void testModularity();
 void testEvolution();
-void testRandom();
 void testTransformations();*/
 
 

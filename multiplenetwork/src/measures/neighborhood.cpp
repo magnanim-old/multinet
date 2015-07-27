@@ -13,66 +13,60 @@ using namespace std;
 
 namespace mlnet {
 
-	actor_list neighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
-		map<actor_id,ActorSharedPtr> neighbors_on_selected_layers;
-		node_list nodes = mnet->get_nodes(actor);
-		for (NodeSharedPtr node: nodes) {
-			node_list neighbors = mnet->neighbors(node, mode);
-			for (NodeSharedPtr neighbor: neighbors) {
-				if (layers.count(neighbor->layer)>0)
-					neighbors_on_selected_layers[neighbor->actor->id] = neighbor->actor;
+ObjectStore<ActorSharedPtr> neighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
+	ObjectStore<ActorSharedPtr> neighbors_on_selected_layers;
+	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
+		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
+			if (layers.count(neighbor->layer)>0) {
+				neighbors_on_selected_layers.insert(neighbor->actor->id,neighbor->actor);
 			}
 		}
-		return actor_list(neighbors_on_selected_layers);
 	}
+	return neighbors_on_selected_layers;
+}
 
-	actor_list neighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
-		map<actor_id,ActorSharedPtr> neighbors_on_selected_layers;
-		node_list nodes = mnet->get_nodes(actor);
-		for (NodeSharedPtr node: nodes) {
-			node_list neighbors = mnet->neighbors(node, mode);
-			for (NodeSharedPtr neighbor: neighbors) {
+ObjectStore<ActorSharedPtr> neighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
+		ObjectStore<ActorSharedPtr> neighbors_on_selected_layer;
+		for (NodeSharedPtr node: mnet->get_nodes(actor)) {
+			for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
 				if (neighbor->layer==layer)
-					neighbors_on_selected_layers[neighbor->actor->id] = neighbor->actor;
+					neighbors_on_selected_layer.insert(neighbor->actor->id,neighbor->actor);
 			}
 		}
-		return actor_list(neighbors_on_selected_layers);
+		return neighbors_on_selected_layer;
 	}
 
 ///////////////////////////////////
 
-	actor_list xneighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
-		map<actor_id,ActorSharedPtr> neighbors_on_selected_layers;
-		map<actor_id,ActorSharedPtr> neighbors_on_other_layers;
-		node_list nodes = mnet->get_nodes(actor);
-		for (NodeSharedPtr node: nodes) {
-			node_list neighbors = mnet->neighbors(node, mode);
-			for (NodeSharedPtr neighbor: neighbors) {
+	ObjectStore<ActorSharedPtr> xneighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
+		ObjectStore<ActorSharedPtr> neighbors_on_selected_layers;
+		std::set<ActorSharedPtr> neighbors_on_other_layers;
+		for (NodeSharedPtr node: mnet->get_nodes(actor)) {
+			for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
 				if (layers.count(neighbor->layer)>0)
-					neighbors_on_selected_layers[neighbor->actor->id] = neighbor->actor;
-				else neighbors_on_other_layers[neighbor->actor->id] = neighbor->actor;
+					neighbors_on_selected_layers.insert(neighbor->actor->id,neighbor->actor);
+				else neighbors_on_other_layers.insert(neighbor->actor);
 			}
 		}
-		for (pair<actor_id,ActorSharedPtr> entry: neighbors_on_other_layers)
-			neighbors_on_selected_layers.erase(entry.first);
-		return actor_list(neighbors_on_selected_layers);
+		for (ActorSharedPtr entry: neighbors_on_other_layers)
+			neighbors_on_selected_layers.erase(entry->id);
+		return neighbors_on_selected_layers;
 	}
 
-	actor_list xneighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
-		map<actor_id,ActorSharedPtr> neighbors_on_selected_layers;
-		map<actor_id,ActorSharedPtr> neighbors_on_other_layers;
-		node_list nodes = mnet->get_nodes(actor);
-		for (NodeSharedPtr node: nodes) {
-			node_list neighbors = mnet->neighbors(node, mode);
-			for (NodeSharedPtr neighbor: neighbors) {
+	ObjectStore<ActorSharedPtr> xneighbors(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
+		ObjectStore<ActorSharedPtr> neighbors_on_selected_layer;
+		std::set<ActorSharedPtr> neighbors_on_other_layers;
+		for (NodeSharedPtr node: mnet->get_nodes(actor)) {
+			for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
 				if (neighbor->layer==layer)
-					neighbors_on_selected_layers[neighbor->actor->id] = neighbor->actor;
-				else neighbors_on_other_layers[neighbor->actor->id] = neighbor->actor;
+					neighbors_on_selected_layer.insert(neighbor->actor->id,neighbor->actor);
+				else neighbors_on_other_layers.insert(neighbor->actor);
 			}
 		}
-		for (pair<actor_id,ActorSharedPtr> entry: neighbors_on_other_layers)
-			neighbors_on_selected_layers.erase(entry.first);
-		return actor_list(neighbors_on_selected_layers);
+		for (ActorSharedPtr entry: neighbors_on_other_layers) {
+			neighbors_on_selected_layer.erase(entry->id);
+		}
+		return neighbors_on_selected_layer;
 	}
 
 } // namespace

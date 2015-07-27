@@ -35,9 +35,13 @@
 
 #include <string>
 #include <map>
+#include "exceptions.h"
+#include "random.h"
+#include <cmath>
 #include <set>
 #include <vector>
 #include <memory>
+#include <cstdlib>
 
 namespace mlnet {
 
@@ -166,108 +170,258 @@ public:
 
 typedef std::shared_ptr<edge> EdgeSharedPtr;
 
-
 /**********************************************************************/
 /** Iterators *********************************************************/
 /**********************************************************************/
 
-class actor_list {
-public:
-	actor_list();
-	actor_list(const std::map<actor_id,ActorSharedPtr>& data);
-	~actor_list();
-	class iterator {
-	    typedef std::forward_iterator_tag iterator_category;
-		public:
-		iterator(const std::map<actor_id,ActorSharedPtr>::const_iterator& iter);
-		ActorSharedPtr operator*();
-		iterator operator++();
-		iterator operator++(int);
-	    bool operator==(const actor_list::iterator& rhs);
-	    bool operator!=(const actor_list::iterator& rhs);
-		private:
-		std::map<actor_id,ActorSharedPtr>::const_iterator current;
-	};
-	actor_list::iterator begin() const;
-	actor_list::iterator end() const;
-	int size();
-private:
-	std::map<actor_id,ActorSharedPtr> data;
+const float P = 0.5;
+const int MAX_LEVEL = 6;
+
+template <class T>
+struct Entry {
+	object_id value;
+	T obj_ptr;
+    std::vector<Entry<T>*> forward; // array of pointers
+    std::vector<int> link_length;
+
+    Entry(int level, object_id value, T obj_ptr) {
+        forward.resize(level+1);
+        link_length.resize(level+1);
+        this->value = value;
+        this->obj_ptr = obj_ptr;
+    }
+
+    ~Entry() {}
 };
 
-class layer_list {
-public:
-	layer_list();
-	layer_list(const std::map<layer_id,LayerSharedPtr>& data);
-	~layer_list();
+template <class T>
+struct ObjectStore {
+    Entry<T> *header;
+    int level;
+    long num_entries=0;
+
+    ObjectStore() {
+        header = new Entry<T>(MAX_LEVEL, 0, NULL);
+        level = 0;
+    }
+    ~ObjectStore() {
+        delete header;
+    }
+
 	class iterator {
 	    typedef std::forward_iterator_tag iterator_category;
 		public:
 		iterator();
-		iterator(const std::map<layer_id,LayerSharedPtr>::const_iterator& iter);
-		LayerSharedPtr operator*();
+		iterator(Entry<T>* iter);
+		T operator*();
 		iterator operator++();
 		iterator operator++(int);
-	    bool operator==(const layer_list::iterator& rhs);
-	    bool operator!=(const layer_list::iterator& rhs);
+	    bool operator==(const ObjectStore<T>::iterator& rhs);
+	    bool operator!=(const ObjectStore<T>::iterator& rhs);
 		private:
-		std::map<layer_id,LayerSharedPtr>::const_iterator current;
+		Entry<T>* current;
 	};
-	layer_list::iterator begin() const;
-	layer_list::iterator end() const;
-	int size();
-private:
-	std::map<layer_id,LayerSharedPtr> data;
+	ObjectStore<T>::iterator begin() const;
+	ObjectStore<T>::iterator end() const;
+    long size() const;
+    bool contains(object_id) const;
+    T get(object_id) const;
+    T get_at_index(long) const;
+    //T& operator[](object_id);
+    void insert(object_id,T);
+    void erase(object_id);
+    //void print(int);
 };
 
-class node_list {
-public:
-	node_list();
-	node_list(const std::map<node_id,NodeSharedPtr>& data);
-	~node_list();
-	class iterator {
-	    typedef std::forward_iterator_tag iterator_category;
-		public:
-		iterator(const std::map<node_id,NodeSharedPtr>::const_iterator& iter);
-		NodeSharedPtr operator*();
-		iterator operator++();
-		iterator operator++(int);
-	    bool operator==(const node_list::iterator& rhs);
-	    bool operator!=(const node_list::iterator& rhs);
-		private:
-		std::map<node_id,NodeSharedPtr>::const_iterator current;
-	};
-	node_list::iterator begin() const;
-	node_list::iterator end() const;
-	int size();
-private:
-	std::map<node_id,NodeSharedPtr> data;
-};
 
-class edge_list {
-public:
-	edge_list();
-	edge_list(const std::map<edge_id,EdgeSharedPtr>& data);
-	~edge_list();
-	class iterator {
-	    typedef std::forward_iterator_tag iterator_category;
-		public:
-		iterator();
-		iterator(const std::map<edge_id,EdgeSharedPtr>::const_iterator& iter);
-		EdgeSharedPtr operator*();
-		iterator operator++();
-		iterator operator++(int);
-	    bool operator==(const edge_list::iterator& rhs);
-	    bool operator!=(const edge_list::iterator& rhs);
-		private:
-		std::map<edge_id,EdgeSharedPtr>::const_iterator current;
-	};
-	edge_list::iterator begin() const;
-	edge_list::iterator end() const;
-	int size();
-private:
-	std::map<edge_id,EdgeSharedPtr> data;
-};
+
+template <class T>
+typename ObjectStore<T>::iterator ObjectStore<T>::begin() const {
+	return iterator(header->forward[0]);
+}
+
+template <class T>
+typename ObjectStore<T>::iterator ObjectStore<T>::end() const {
+	return iterator(NULL);
+}
+
+template <class T>
+T ObjectStore<T>::iterator::operator*() {
+	return current->obj_ptr;
+}
+
+template <class T>
+ObjectStore<T>::iterator::iterator(Entry<T>* iter) : current(iter) {
+}
+
+template <class T>
+typename ObjectStore<T>::iterator ObjectStore<T>::iterator::operator++() { // PREFIX
+	current=current->forward[0];
+	return *this;
+}
+
+template <class T>
+typename ObjectStore<T>::iterator ObjectStore<T>::iterator::operator++(int) { // POSTFIX
+	ObjectStore<T>::iterator tmp(current);
+	current=current->forward[0];
+	return tmp;
+}
+
+template <class T>
+bool ObjectStore<T>::iterator::operator==(const ObjectStore<T>::iterator& rhs) {
+	return current == rhs.current;
+}
+
+template <class T>
+bool ObjectStore<T>::iterator::operator!=(const ObjectStore<T>::iterator& rhs) {
+	return current != rhs.current;
+}
+
+template <class T>
+long ObjectStore<T>::size() const {
+	return num_entries;
+}
+
+template <class T>
+bool ObjectStore<T>::contains(object_id search_value) const {
+    const Entry<T> *x = header;
+    for (int i = level; i >= 0; i--) {
+        while (x->forward[i] != NULL && x->forward[i]->value < search_value) {
+            x = x->forward[i];
+        }
+    }
+    x = x->forward[0];
+    return x != NULL && x->value == search_value;
+}
+
+template <class T>
+T ObjectStore<T>::get(object_id search_value) const {
+    const Entry<T> *x = header;
+    for (int i = level; i >= 0; i--) {
+        while (x->forward[i] != NULL && x->forward[i]->value < search_value) {
+            x = x->forward[i];
+        }
+    }
+    x = x->forward[0];
+    if (x != NULL && x->value == search_value)
+    	return x->obj_ptr;
+    else return NULL;
+}
+
+template <class T>
+T ObjectStore<T>::get_at_index(long pos) const {
+	if (pos < 0 || pos >= num_entries)
+		throw ElementNotFoundException("ObjectStore: out of bounds");
+    const Entry<T> *x = header;
+    long so_far=0;
+    for (int i = level; i >= 0; i--) {
+        while (x->forward[i] != NULL && x->link_length[i] + so_far <= pos + 1) {
+        	so_far+= x->link_length[i];
+            x = x->forward[i];
+        }
+    }
+    return x->obj_ptr;
+}
+
+//template <class T>
+//void ObjectStore<T>::print(int lev) {
+//    const Entry<T> *x = header;
+//    while (x!=NULL) {
+//    	std::cout << x->value << "(" << x->link_length[lev] << ") ";
+//    	for (int i=0; i<x->link_length[lev]-1; i++) std::cout << "     ";
+//        x = x->forward[lev];
+//    }
+//    std::cout << "X\n";
+//}
+
+template <class T>
+void ObjectStore<T>::insert(object_id value, T obj_ptr) {
+    Entry<T> *x = header;
+    std::vector<Entry<T>*> update;
+    update.resize(MAX_LEVEL+1);
+    std::vector<int> skipped_positions_per_level;
+    int skipped_positions = 0;
+    skipped_positions_per_level.resize(MAX_LEVEL+1,0);
+
+
+    for (int i = level; i >= 0; i--) {
+    	skipped_positions_per_level[i] = skipped_positions;
+        while (x->forward[i] != NULL && x->forward[i]->value < value) {
+        	skipped_positions_per_level[i] += x->link_length[i];
+        	skipped_positions += x->link_length[i];
+            x = x->forward[i];
+        }
+        update[i] = x;
+    }
+    x = x->forward[0];
+
+    if (x == NULL || x->value != value) {
+    	num_entries++;
+        int lvl = random_utils::random_level(MAX_LEVEL,P);
+
+        if (lvl > level) {
+        	for (int i = level + 1; i <= lvl; i++) {
+        		update[i] = header;
+        		update[i]->link_length[i] = num_entries;
+        	}
+        	level = lvl;
+        }
+        x = new Entry<T>(lvl, value, obj_ptr);
+        for (int i = 0; i <= lvl; i++) {
+        	int offset = skipped_positions-skipped_positions_per_level[i];
+
+        	x->forward[i] = update[i]->forward[i];
+        	if (update[i]->forward[i]==NULL)
+        		x->link_length[i] = num_entries - skipped_positions;
+        	else {
+        		x->link_length[i] = update[i]->link_length[i]-offset;
+        	}
+
+        	update[i]->forward[i] = x;
+        	update[i]->link_length[i] = offset+1;
+        }
+        for (int i = lvl+1; i <= level; i++) {
+        	update[i]->link_length[i]++;
+        }
+    }
+    else {
+    	x->obj_ptr = obj_ptr;
+    }
+}
+
+template <class T>
+void ObjectStore<T>::erase(object_id value) {
+	Entry<T> *x = header;
+	std::vector<Entry<T>*> update;
+	update.resize(MAX_LEVEL+1);
+
+	for (int i = level; i >= 0; i--) {
+		while (x->forward[i] != NULL && x->forward[i]->value < value) {
+			x = x->forward[i];
+		}
+		update[i] = x;
+	}
+	x = x->forward[0];
+
+	if (x== NULL) return;
+
+	if (x->value == value) {
+		for (int i = 0; i <= level; i++) {
+			if (update[i]->forward[i] != x) {
+				update[i]->link_length[i]--;
+			}
+			else {
+				update[i]->forward[i] = x->forward[i];
+				update[i]->link_length[i] += x->link_length[i]-1;
+			}
+		}
+		delete x;
+		num_entries--;
+		while (level > 0 && header->forward[level] == NULL) {
+			level--;
+		}
+	}
+}
 
 /**********************************************************************/
 /** Attribute handling ************************************************/
@@ -485,7 +639,7 @@ public:
 	 * @brief Returns all the actors in the MLNetwork.
 	 * @return a pointer to an actor iterator
 	 **/
-	actor_list get_actors() const;
+	const ObjectStore<ActorSharedPtr>& get_actors() const;
 
 	/**
 	 * @brief Adds a new layer to the MLNetwork.
@@ -538,7 +692,7 @@ public:
 	 * @brief Returns all the layers in the MLNetwork.
 	 * @return a layer iterator
 	 **/
-	layer_list get_layers() const;
+	const ObjectStore<LayerSharedPtr>& get_layers() const;
 
 	/**
 	 * @brief Adds a new node to the MLNetwork.
@@ -582,21 +736,21 @@ public:
 	 * @brief Returns all the nodes in the MLNetwork.
 	 * @return a node iterator
 	 **/
-	node_list get_nodes() const;
+	const ObjectStore<NodeSharedPtr>& get_nodes() const;
 
 	/**
 	 * @brief Returns all the nodes in a layer.
 	 * @param layer pointer to the layer where this node is located
 	 * @return a node iterator
 	 **/
-	node_list get_nodes(const LayerSharedPtr& layer) const;
+	const ObjectStore<NodeSharedPtr>& get_nodes(const LayerSharedPtr& layer) const;
 
 	/**
 	 * @brief Returns the nodes associated to the input actor.
 	 * @param actor pointer to the actor
 	 * @return an iterator containing pointers to nodes
 	 **/
-	node_list get_nodes(const ActorSharedPtr& actor) const;
+	const ObjectStore<NodeSharedPtr>& get_nodes(const ActorSharedPtr& actor) const;
 
 	/**
 	 * @brief Adds a new edge to the MLNetwork.
@@ -622,7 +776,7 @@ public:
 	 * @brief Returns all the edges in the MLNetwork.
 	 * @return an edge iterator
 	 **/
-	edge_list get_edges() const;
+	const ObjectStore<EdgeSharedPtr>& get_edges() const;
 
 	/**
 	 * @brief Returns all the edges from a layer A to a layer B.
@@ -631,7 +785,7 @@ public:
 	 * @param layer2 pointer to the layer where the second ends of the edges are located
 	 * @return an edge iterator
 	 **/
-	edge_list get_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
+	const ObjectStore<EdgeSharedPtr>& get_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
 
 	/**
 	 * @brief Deletes an existing node.
@@ -654,48 +808,13 @@ public:
 	 *****************************************************************************************/
 
 	/**
-	 * @brief Returns the number of actors.
-	 **/
-	long num_actors() const;
-
-	/**
-	 * @brief Returns the number of layers.
-	 **/
-	long num_layers() const;
-
-	/**
-	 * @brief Returns the number of nodes.
-	 **/
-	long num_nodes() const;
-
-	/**
-	 * @brief Returns the number of nodes in the layer.
-	 * @param layer pointer to the layer where the nodes are located
-	 **/
-	long num_nodes(const LayerSharedPtr& layer) const;
-
-	/**
-	 * @brief Returns the number of edges.
-	 * In an undirected networks an edge a-b is counted only once (not twice by also considering b-a).
-	 **/
-	long num_edges() const;
-
-	/**
-	 * @brief Returns the number of edges.
-	 * An undirected edge a-b is counted only once (not twice by also considering b-a).
-	 * @param layer1 pointer to the layer where the first ends of the edges are located
-	 * @param layer2 pointer to the layer where the second ends of the edges are located
-	 **/
-	long num_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
-
-	/**
 	 * @brief Returns the nodes with an edge from/to the input node.
 	 * @param node pointer to the node
 	 * @param mode IN, OUT or INOUT
 	 * @return an iterator containing pointers to nodes
 	 * @throws WrongParameterException if mode is not one of IN, OUT or INOUT
 	 **/
-	node_list neighbors(const NodeSharedPtr& node, int mode) const;
+	const ObjectStore<NodeSharedPtr>& neighbors(const NodeSharedPtr& node, int mode) const;
 
 	/******************************
 	 * Attribute handling
@@ -756,23 +875,23 @@ private:
 	std::map<layer_id, std::map<layer_id, bool> > edge_directionality;
 
 	/* Indexes on internal entities, by id and by name */
-	std::map<layer_id, LayerSharedPtr> layers_by_id;
+	ObjectStore<LayerSharedPtr> layers_by_id;
 	std::map<std::string, LayerSharedPtr> layers_by_name;
 
-	std::map<actor_id, ActorSharedPtr> actors_by_id;
+	ObjectStore<ActorSharedPtr> actors_by_id;
 	std::map<std::string, ActorSharedPtr> actors_by_name;
 
-	std::map<node_id, NodeSharedPtr> nodes_by_id;
-	std::map<layer_id, std::map<node_id, NodeSharedPtr> > nodes_by_layer_and_id;
-	std::map<actor_id, std::map<node_id, NodeSharedPtr> > nodes_by_actor_and_id;
+	ObjectStore<NodeSharedPtr> nodes_by_id;
+	std::map<layer_id, ObjectStore<NodeSharedPtr> > nodes_by_layer_and_id;
+	std::map<actor_id, ObjectStore<NodeSharedPtr> > nodes_by_actor_and_id;
 	std::map<layer_id, std::map<std::string, NodeSharedPtr> > nodes_by_layer_and_name;
 
-	std::map<edge_id, EdgeSharedPtr> edges_by_id;
-	std::map<layer_id, std::map<layer_id, std::map<edge_id, EdgeSharedPtr> > > edges_by_layers_and_id;
+	ObjectStore<EdgeSharedPtr> edges_by_id;
+	std::map<layer_id, std::map<layer_id, ObjectStore<EdgeSharedPtr> > > edges_by_layers_and_id;
 	std::map<node_id, std::map<node_id, EdgeSharedPtr> > edges_by_nodes;
-	std::map<node_id, std::map<node_id, NodeSharedPtr> > neighbors_out;
-	std::map<node_id, std::map<node_id, NodeSharedPtr> > neighbors_in;
-	std::map<node_id, std::map<node_id, NodeSharedPtr> > neighbors_all;
+	std::map<node_id, ObjectStore<NodeSharedPtr> >  neighbors_out;
+	std::map<node_id, ObjectStore<NodeSharedPtr> > neighbors_in;
+	std::map<node_id, ObjectStore<NodeSharedPtr> > neighbors_all;
 
 	/* objects storing the feature vectors of the different components */
 	AttributeStoreSharedPtr actor_attributes;
@@ -833,15 +952,20 @@ private:
 	const MLNetworkSharedPtr mnet;
 	//std::vector<long> num_edges_per_layer;
 	std::vector<EdgeSharedPtr> path;
+	NodeSharedPtr origin;
 	//long timestamp;
 
 public:
-	Path(const MLNetworkSharedPtr mnet);
+	Path(const MLNetworkSharedPtr mnet, NodeSharedPtr origin);
 	/*Path(const Path& p, long timestamp);
 	Path(const MLNetwork& mnet, long timestamp);
 	Path(long num_layers, long timestamp);
 	*/
 	~Path();
+
+	NodeSharedPtr begin();
+
+	NodeSharedPtr end();
 
 	//long getTimestamp() const;
 

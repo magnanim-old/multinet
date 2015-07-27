@@ -53,13 +53,12 @@ void testMLNetwork() {
 	ActorSharedPtr a3 = mnet->add_actor("Matteo"); // new ID automatically assigned, name "Matteo"
 	//if ((*mnet->getActor(3))!=(*a2)) throw FailedUnitTestException("Could not retrieve actor");
 	if ((*mnet->get_actor("Matteo"))!=(*a3)) throw FailedUnitTestException("Could not retrieve actor");
-	actor_list actors = mnet->get_actors();
 	int num_actors=0;
-	for (ActorSharedPtr actor : actors) {
+	for (ActorSharedPtr actor : mnet->get_actors()) {
 		num_actors++;
 		log(actor->to_string() + " ",false);
 	}
-	if (num_actors!=3 || num_actors!=mnet->num_actors()) throw FailedUnitTestException("Could not retrieve all actors");
+	if (num_actors!=3 || num_actors!=mnet->get_actors().size()) throw FailedUnitTestException("Could not retrieve all actors");
 	log("done!");
 	log("Adding duplicate actors (should fail)...",false);
 	// the following instruction should generate an error: the actor already exists
@@ -79,13 +78,12 @@ void testMLNetwork() {
 	LayerSharedPtr l3 = mnet->add_layer("Facebook",true);
 	mnet->set_directed(l2,l3,true);
 	if ((*mnet->get_layer("Facebook"))!=(*l3)) throw FailedUnitTestException("Could not retrieve layer");
-	layer_list layers = mnet->get_layers();
 	int num_layers=0;
-	for (LayerSharedPtr layer : layers) {
+	for (LayerSharedPtr layer : mnet->get_layers()) {
 		num_layers++;
 		log(layer->to_string() + " ",false);
 	}
-	if (num_layers!=3 || num_layers!=mnet->num_layers()) throw FailedUnitTestException("Could not retrieve all layers");
+	if (num_layers!=3 || num_layers!=mnet->get_layers().size()) throw FailedUnitTestException("Could not retrieve all layers");
 	log("");
 	log("done!");
 
@@ -114,13 +112,12 @@ void testMLNetwork() {
 	NodeSharedPtr n3v1 = mnet->add_node("v1",a2,l3);
 	NodeSharedPtr n3v2 = mnet->add_node("v2",a3,l3);
 
-	node_list nodes = mnet->get_nodes();
 	int num_nodes=0;
-	for (NodeSharedPtr node : nodes) {
+	for (NodeSharedPtr node : mnet->get_nodes()) {
 		num_nodes++;
 		log(node->to_string() + " ",false);
 	}
-	if (num_nodes!=9 || num_nodes!=mnet->num_nodes()) throw FailedUnitTestException("Could not retrieve all nodes");
+	if (num_nodes!=9 || num_nodes!=mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	log("");
 	log("done!");
 
@@ -133,13 +130,12 @@ void testMLNetwork() {
 
 	mnet->add_edge(n2v2,n3v1);
 
-	edge_list edges = mnet->get_edges();
 	int num_edges=0;
-	for (EdgeSharedPtr edge : edges) {
+	for (EdgeSharedPtr edge : mnet->get_edges()) {
 		num_edges++;
 		log(edge->to_string() + " ",false);
 	}
-	if (num_edges!=6 || num_nodes!=mnet->num_nodes()) throw FailedUnitTestException("Could not retrieve all nodes");
+	if (num_edges!=6 || num_nodes!=mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	log("done!");
 
 	log("TESTING attribute management");
@@ -166,45 +162,40 @@ void testMLNetwork() {
 	log("done!");
 
 	log("Getting in-neighbors: ",false);
-	node_list neigh_in = mnet->neighbors(n3v2,IN);
 	int num_neighbors=0;
-	for (NodeSharedPtr node : neigh_in) {
+	for (NodeSharedPtr node : mnet->neighbors(n3v2,IN)) {
 		num_neighbors++;
 		log(node->to_string() + " ",false);
 	}
 	if (num_neighbors!=1) throw FailedUnitTestException("Could not retrieve neighbors");
 	log("");
 	log("Getting out-neighbors: ",false);
-	node_list neigh_out = mnet->neighbors(n3v2,OUT);
 	num_neighbors=0;
-	for (NodeSharedPtr node : neigh_out) {
+	for (NodeSharedPtr node : mnet->neighbors(n3v2,OUT)) {
 		num_neighbors++;
 		log(node->to_string() + " ",false);
 	}
 	if (num_neighbors!=1) throw FailedUnitTestException("Could not retrieve neighbors");
 	log("done!");
 	log("Getting in/out-neighbors: ",false);
-	node_list neigh_all = mnet->neighbors(n3v2,INOUT);
 	num_neighbors=0;
-	for (NodeSharedPtr node : neigh_all) {
+	for (NodeSharedPtr node : mnet->neighbors(n3v2,INOUT)) {
 		num_neighbors++;
 		log(node->to_string() + " ",false);
 	}
 	if (num_neighbors!=2) throw FailedUnitTestException("Could not retrieve neighbors");
 	log("done!");
 	log("Getting out-neighbors with undirected edges: ",false);
-	node_list neigh_out_undirected = mnet->neighbors(n2v1,OUT);
 	num_neighbors=0;
-	for (NodeSharedPtr node : neigh_out_undirected) {
+	for (NodeSharedPtr node : mnet->neighbors(n2v1,OUT)) {
 		num_neighbors++;
 		log(node->to_string() + " ",false);
 	}
 	if (num_neighbors!=2) throw FailedUnitTestException("Could not retrieve neighbors");
 	log("done!");
 	log("Getting in/out-neighbors with undirected edges: ",false);
-	node_list neigh_all_undirected = mnet->neighbors(n2v1,INOUT);
 	num_neighbors=0;
-	for (NodeSharedPtr node : neigh_all_undirected) {
+	for (NodeSharedPtr node : mnet->neighbors(n2v1,INOUT)) {
 		num_neighbors++;
 		log(node->to_string() + " ",false);
 	}

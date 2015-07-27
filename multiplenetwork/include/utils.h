@@ -18,7 +18,6 @@
 #include <iostream>
 #include <vector>
 #include <set>
-#include <random>
 
 typedef int verbosity;
 
@@ -68,89 +67,12 @@ public:
 	void setFieldSeparator(char separator);
 };
 
-
 /***********************************/
 /** Pretty printing               **/
 /***********************************/
 void print(const mlnet::MLNetworkSharedPtr mnet);
 
-/***********************************/
-/** Random                        **/
-/***********************************/
-class Random {
-	std::vector<long> options;
 
-public:
-	Random();
-	~Random();
-
-	/**
-	 * Returns a random integral number in the range [0,max[ using an
-	 * approximately uniform probability distribution.
-	 * @param max
-	 * @throws OperationNotSupprtedException if the range is larger than the number of random numbers that can be returned by the system
-	 */
-	int getRandomInt(int max);
-
-	/**
-	 * Returns a random integral number in the range [0,max[ using an
-	 * approximately uniform probability distribution.
-	 * @param max
-	 * @throws OperationNotSupprtedException if the range is larger than the number of random numbers that can be returned by the system
-	 */
-	long getRandomLong(long max);
-
-	/**
-	 * Returns a random double number in the range [0,1[ using an
-	 * approximately uniform probability distribution.
-	 */
-	double getRandomDouble();
-
-	/**
-	* Returns K random integral numbers in the range [0,max[ using an
-	* approximately uniform probability distribution.
-	* @param max
-	* @param k
-	*/
-	std::set<unsigned int> getKRandom(unsigned int max, unsigned int k);
-
-	/**
-	* Returns K random elements from the input set
-	* chosen with an approximately uniform probability distribution.
-	* @param input
-	* @param k
-	*/
-	template <class T>
-	std::set<T> getKElements(const std::set<T>& input, unsigned int k) {
-		std::set<T> output;
-		std::set<unsigned int> choices = getKRandom(input.size(),k);
-		std::vector<T> v(input.begin(),input.end());
-		for (int choice: choices) {
-		    output.insert(v.at(choice));
-		}
-		return output;
-	}
-
-	template <class T>
-	T getElement(const std::set<T>& input) {
-		return *getKElements(input, 1).begin();
-	}
-
-	/**
-	 * Random test: returns TRUE with probability probability.
-	 */
-	bool test(double probability);
-
-private:
-	std::default_random_engine generator;
-	/**
-	 * This class keeps an array of long values called options (from 0 to options.size()-1)
-	 * used to return random numbers. When a set of numbers is requested in the interval
-	 * [0,max[, the array is resized accordingly if necessary.
-	 */
-	void resizeOptions(unsigned long max);
-
-};
 
 template <typename T> std::string to_string ( T Number ) {
 	std::ostringstream ss;

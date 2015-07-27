@@ -321,8 +321,7 @@ void write_multilayer(const MLNetworkSharedPtr mnet, const string& path, char se
 	outfile << std::endl;
 
 	outfile << "#LAYERS" << std::endl;
-	layer_list layers = mnet->get_layers();
-	for (LayerSharedPtr layer: layers) {
+	for (LayerSharedPtr layer: mnet->get_layers()) {
 		outfile << layer->name << sep << "DIRECTED" << std::endl; // FIXME
 	}
 
@@ -332,15 +331,15 @@ void write_multilayer(const MLNetworkSharedPtr mnet, const string& path, char se
 	}
 
 	outfile << "#NODE ATTRIBUTES" << std::endl;
-	for (LayerSharedPtr layer: layers) {
+	for (LayerSharedPtr layer: mnet->get_layers()) {
 		for (AttributeSharedPtr attr: mnet->node_features(layer)->attributes()) {
 			outfile << layer->name << sep << attr->name()<< sep << attr->type_as_string() << std::endl;
 		}
 	}
 
 	outfile << "#EDGE ATTRIBUTES" << std::endl;
-	for (LayerSharedPtr layer1: layers) {
-		for (LayerSharedPtr layer2: layers) {
+	for (LayerSharedPtr layer1: mnet->get_layers()) {
+		for (LayerSharedPtr layer2: mnet->get_layers()) {
 			for (AttributeSharedPtr attr: mnet->edge_features(layer1,layer2)->attributes()) {
 				outfile << layer1->name << sep << layer2->name << sep << attr->name()<< sep << attr->type_as_string() << std::endl;
 			}
@@ -348,8 +347,7 @@ void write_multilayer(const MLNetworkSharedPtr mnet, const string& path, char se
 	}
 
 	outfile << "#ACTORS" << std::endl;
-	actor_list actors = mnet->get_actors();
-	for (ActorSharedPtr actor: actors) {
+	for (ActorSharedPtr actor: mnet->get_actors()) {
 		outfile << actor->name;
 		AttributeStoreSharedPtr actor_attrs = mnet->actor_features();
 		for (AttributeSharedPtr attr: actor_attrs->attributes()) {
@@ -366,9 +364,8 @@ void write_multilayer(const MLNetworkSharedPtr mnet, const string& path, char se
 	}
 
 	outfile << "#NODES" << std::endl;
-	for (LayerSharedPtr layer: layers) {
-		node_list nodes = mnet->get_nodes(layer);
-		for (NodeSharedPtr node: nodes) {
+	for (LayerSharedPtr layer: mnet->get_layers()) {
+		for (NodeSharedPtr node: mnet->get_nodes(layer)) {
 			outfile << node->name << sep << node->layer->name;
 			AttributeStoreSharedPtr node_attrs = mnet->node_features(layer);
 			for (AttributeSharedPtr attr: node_attrs->attributes()) {
@@ -386,10 +383,9 @@ void write_multilayer(const MLNetworkSharedPtr mnet, const string& path, char se
 	}
 
 	outfile << "#EDGES" << std::endl;
-	for (LayerSharedPtr layer1: layers) {
-		for (LayerSharedPtr layer2: layers) {
-			edge_list edges = mnet->get_edges(layer1,layer2);
-			for (EdgeSharedPtr edge: edges) {
+	for (LayerSharedPtr layer1: mnet->get_layers()) {
+		for (LayerSharedPtr layer2: mnet->get_layers()) {
+			for (EdgeSharedPtr edge: mnet->get_edges(layer1,layer2)) {
 				outfile << edge->v1->name << sep << edge->v2->name << sep << edge->v2->layer->name;
 				AttributeStoreSharedPtr edge_attrs = mnet->edge_features(layer1,layer2);
 				for (AttributeSharedPtr attr: edge_attrs->attributes()) {

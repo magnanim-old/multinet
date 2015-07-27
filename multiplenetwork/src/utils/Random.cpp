@@ -5,7 +5,8 @@
  *      Author: stud10
  */
 
-#include "utils.h"
+#include "random.h"
+#include "exceptions.h"
 #include <algorithm>
 #include <iostream>
 #include <stdlib.h>
@@ -15,7 +16,8 @@
 
 using namespace std;
 
-Random::Random() {
+namespace random_utils {
+//Random::Random() {
 	/*
 	// C++11 version:
 	std::chrono::high_resolution_clock::time_point time = std::chrono::high_resolution_clock::now();
@@ -23,14 +25,12 @@ Random::Random() {
 	generator.seed(dtn.count());
 	*/
 
-	srand(time(NULL));
-}
+//	srand(time(NULL));
+//}
 
-Random::~Random() {
-	// TODO Auto-generated destructor stub
-}
+//Random::~Random() {}
 
-int Random::getRandomInt(int max) {
+int getRandomInt(int max) {
 	if (max>RAND_MAX) throw OperationNotSupportedException("Requested random value " + to_string(max) + "larger than RAND_MAX constant");
 	return rand() % max;
 	/*
@@ -40,7 +40,7 @@ int Random::getRandomInt(int max) {
 	*/
 }
 
-long Random::getRandomLong(long max) {
+long getRandomLong(long max) {
 	if (max>RAND_MAX) throw OperationNotSupportedException("Requested random value " + to_string(max) + "larger than RAND_MAX constant");
 	return rand() % max;
 	/*
@@ -50,7 +50,7 @@ long Random::getRandomLong(long max) {
 	*/
 }
 
-double Random::getRandomDouble() {
+double drand() {
 	return double(rand()) / RAND_MAX;
 	/*
 	 // C++11 version:
@@ -59,7 +59,19 @@ double Random::getRandomDouble() {
 	  */
 }
 
-set<unsigned int> Random::getKRandom(unsigned int max, unsigned int k) {
+int random_level(int MAX_LEVEL, double P) {
+    static bool first = true;
+
+    if (first) {
+        srand( (unsigned)time( NULL ) );
+        first = false;
+    }
+
+    int lvl = (int)(log(drand())/log(1.-P));
+    return lvl < MAX_LEVEL ? lvl : MAX_LEVEL;
+}
+
+set<unsigned int> getKRandom(unsigned int max, unsigned int k) {
 	set<unsigned int> res;
 	while (res.size()<k)
 		res.insert(getRandomInt(max));
@@ -76,8 +88,8 @@ set<unsigned int> Random::getKRandom(unsigned int max, unsigned int k) {
 	return res;
 }
 
-bool Random::test(double probability) {
-	return (getRandomDouble()<probability);
+bool test(double probability) {
+	return (drand()<probability);
 	/*
 	// C++11 version:
 	std::bernoulli_distribution distribution(probability);
@@ -85,6 +97,7 @@ bool Random::test(double probability) {
 	*/
 }
 
+/*
 void Random::resizeOptions(unsigned long max) {
 	if (max<options.size()) {
 		options.clear();
@@ -92,4 +105,6 @@ void Random::resizeOptions(unsigned long max) {
 	while (max>options.size()) {
 			options.push_back(options.size());
 	}
+}*/
+
 }

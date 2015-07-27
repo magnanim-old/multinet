@@ -34,25 +34,38 @@ Path::Path(long num_layers, long timestamp) {
 
 */
 
-Path::Path(const MLNetworkSharedPtr mnet) : mnet(mnet) {}
+Path::Path(const MLNetworkSharedPtr mnet, NodeSharedPtr origin) : mnet(mnet), origin(origin) {}
 
 Path::~Path() {}
+
+
+NodeSharedPtr Path::begin() {
+	return origin;
+}
+
+NodeSharedPtr Path::end() {
+	if (path.size()==0)
+		return origin;
+	else return path[path.size()-1]->v2;
+}
 
 void Path::step(EdgeSharedPtr e) {
 	path.push_back(e);
 }
 
 EdgeSharedPtr Path::get_step(long pos) const {
-
+	return path.at(pos);
 }
 
-long Path::length() const;
+long Path::length() const {
+	return path.size();
+}
 
-bool Path::operator<(const Path& other) const {}
+/*bool Path::operator<(const Path& other) const {}
 
 Path Path::operator=(const Path& other) const {}
 
-bool Path::operator==(const Path& other) const {}
+bool Path::operator==(const Path& other) const {}*/
 
 /*
 void Path::start(vertex_id first) {
