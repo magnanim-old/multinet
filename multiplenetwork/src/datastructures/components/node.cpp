@@ -2,32 +2,13 @@
 
 namespace mlnet {
 
-node::node(const node_id& id, const std::string& name, const ActorSharedPtr& actor, const LayerSharedPtr& layer) :
-	id(id),
-	name(name),
+node::node(const node_id& id, const ActorSharedPtr& actor, const LayerSharedPtr& layer) :
+	basic_component(id),
 	actor(actor),
 	layer(layer) {}
 
-node::~node() {}
-
-bool node::operator==(const node& e) const {
-    return id==e.id;
-}
-
-bool node::operator!=(const node& e) const {
-    return id!=e.id;
-}
-
-bool node::operator<(const node& e) const {
-    return id<e.id;
-}
-
-bool node::operator>(const node& e) const {
-    return id>e.id;
-}
-
 std::string node::to_string() const {
-	return "N[" + name + "," + layer->to_string() + "]";
+	return "Node: " + basic_component::to_string() + " as " + actor->to_string() + " on " + layer->to_string();
 }
 
 }

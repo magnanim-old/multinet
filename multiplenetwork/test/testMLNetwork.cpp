@@ -24,10 +24,10 @@ void testMLNetwork() {
 	LayerSharedPtr layer2(new layer(2,"Twitter"));
 	log("done!");
 	log("...creating four nodes...",false);
-	NodeSharedPtr node1(new node(1,"Matteo Magnani",actor1,layer1));
-	NodeSharedPtr node2(new node(2,"mmagnani",actor1,layer2));
-	NodeSharedPtr node3(new node(3,"matmagnani",actor1,layer2));
-	NodeSharedPtr node4(new node(4,"Luca Rossi",actor2,layer1));
+	NodeSharedPtr node1(new node(1,actor1,layer1));
+	NodeSharedPtr node2(new node(2,actor1,layer2));
+	NodeSharedPtr node3(new node(3,actor1,layer2));
+	NodeSharedPtr node4(new node(4,actor2,layer1));
 	log("done!");
 	log("...creating five edges...",false);
 	EdgeSharedPtr e1(new edge(1,node1,node2,true)); // directed
@@ -48,9 +48,9 @@ void testMLNetwork() {
 	MLNetworkSharedPtr mnet = MLNetwork::create("friends");
 	log(mnet->to_string() + " done!");
 	log("Adding three actors...",false);
-	ActorSharedPtr a1 = mnet->add_actor(); // new ID and name automatically assigned
-	ActorSharedPtr a2 = mnet->add_actor(); // new ID and name automatically assigned
-	ActorSharedPtr a3 = mnet->add_actor("Matteo"); // new ID automatically assigned, name "Matteo"
+	ActorSharedPtr a1 = mnet->add_actor("a1");
+	ActorSharedPtr a2 = mnet->add_actor("a2");
+	ActorSharedPtr a3 = mnet->add_actor("Matteo");
 	//if ((*mnet->getActor(3))!=(*a2)) throw FailedUnitTestException("Could not retrieve actor");
 	if ((*mnet->get_actor("Matteo"))!=(*a3)) throw FailedUnitTestException("Could not retrieve actor");
 	int num_actors=0;
@@ -73,8 +73,8 @@ void testMLNetwork() {
 	log("done!");
 
 	log("Adding three layers: ",false);
-	LayerSharedPtr l1 = mnet->add_layer(false);
-	LayerSharedPtr l2 = mnet->add_layer(false);
+	LayerSharedPtr l1 = mnet->add_layer("l1",false);
+	LayerSharedPtr l2 = mnet->add_layer("l2",false);
 	LayerSharedPtr l3 = mnet->add_layer("Facebook",true);
 	mnet->set_directed(l2,l3,true);
 	if ((*mnet->get_layer("Facebook"))!=(*l3)) throw FailedUnitTestException("Could not retrieve layer");
@@ -100,17 +100,17 @@ void testMLNetwork() {
 
 	log("Adding 9 nodes: ",false);
 	// Layer 1
-	NodeSharedPtr n1v0 = mnet->add_node("v0",a1,l1);
-	NodeSharedPtr n1v1 = mnet->add_node("v1",a2,l1);
-	NodeSharedPtr n1v2 = mnet->add_node("v2",a3,l1);
+	NodeSharedPtr n1v0 = mnet->add_node(a1,l1);
+	NodeSharedPtr n1v1 = mnet->add_node(a2,l1);
+	NodeSharedPtr n1v2 = mnet->add_node(a3,l1);
 	// Layer 2
-	NodeSharedPtr n2v0 = mnet->add_node("v0",a1,l2);
-	NodeSharedPtr n2v1 = mnet->add_node("v1",a2,l2);
-	NodeSharedPtr n2v2 = mnet->add_node("v2",a3,l2);
+	NodeSharedPtr n2v0 = mnet->add_node(a1,l2);
+	NodeSharedPtr n2v1 = mnet->add_node(a2,l2);
+	NodeSharedPtr n2v2 = mnet->add_node(a3,l2);
 	// Layer 3
-	NodeSharedPtr n3v0 = mnet->add_node("v0",a1,l3);
-	NodeSharedPtr n3v1 = mnet->add_node("v1",a2,l3);
-	NodeSharedPtr n3v2 = mnet->add_node("v2",a3,l3);
+	NodeSharedPtr n3v0 = mnet->add_node(a1,l3);
+	NodeSharedPtr n3v1 = mnet->add_node(a2,l3);
+	NodeSharedPtr n3v2 = mnet->add_node(a3,l3);
 
 	int num_nodes=0;
 	for (NodeSharedPtr node : mnet->get_nodes()) {

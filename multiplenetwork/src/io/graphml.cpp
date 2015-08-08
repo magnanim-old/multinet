@@ -63,7 +63,7 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::set<LayerSharedPtr>
 		}
 	}
 
-	outfile << "  <graph id=\"" << mnet->name() << "\">" << std::endl;
+	outfile << "  <graph id=\"" << mnet->name << "\">" << std::endl;
 	// REMOVED:  edgedefault=\"" << (directed?"directed":"undirected") << "\"
 
 	// Nodes (one for each actor)

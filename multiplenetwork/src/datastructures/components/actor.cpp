@@ -2,30 +2,10 @@
 
 namespace mlnet {
 
-actor::actor(actor_id id, const std::string& name) :
-	id(id),
-	name(name) {}
-
-actor::~actor() {}
-
-bool actor::operator==(const actor& a) const {
-    return id==a.id;
-}
-
-bool actor::operator!=(const actor& a) const {
-    return id!=a.id;
-}
-
-bool actor::operator<(const actor& a) const {
-    return id<a.id;
-}
-
-bool actor::operator>(const actor& a) const {
-    return id>a.id;
-}
+actor::actor(const actor_id& id, const std::string& name) : named_component(id,name) {}
 
 std::string actor::to_string() const {
-	return "@[" + std::to_string(id) + "]";
+	return "Actor: " + named_component::to_string();
 }
 
 }
