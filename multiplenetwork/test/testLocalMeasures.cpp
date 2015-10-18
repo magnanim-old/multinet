@@ -23,7 +23,7 @@ void testLocalMeasures() {
 	LayerSharedPtr l2 = mnet->get_layer("l2");
 	ActorSharedPtr u1 = mnet->get_actor("U1");
 	ActorSharedPtr u3 = mnet->get_actor("U3");
-	std::set<LayerSharedPtr> nets = {l1,l2};
+	std::unordered_set<LayerSharedPtr> nets = {l1,l2};
 	log("done!");
 
 	//print(mnet);

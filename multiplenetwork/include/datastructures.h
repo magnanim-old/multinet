@@ -38,21 +38,18 @@
 
 #include <string>
 #include <map>
-#include "exceptions.h"
-#include "random.h"
-#include <cmath>
+#include <unordered_map>
 #include <set>
 #include <vector>
 #include <memory>
-#include <cstdlib>
+#include "sortedsets.h"
+#include "exceptions.h"
+#include <cmath>
 
 namespace mlnet {
 
-class MLNetwork;
-/** A smart pointer to objects of type MLNetwork */
-typedef std::shared_ptr<MLNetwork> MLNetworkSharedPtr;
-/** A smart pointer to constant objects of type MLNetwork */
-typedef std::shared_ptr<const MLNetwork> constMLNetworkSharedPtr;
+template <class T>
+using matrix = std::vector<std::vector<T> >;
 
 /**********************************************************************/
 /** Constants and Function Parameters *********************************/
@@ -66,11 +63,25 @@ enum edge_mode {INOUT=0, IN=1, OUT=2};
 /** Supported attribute types */
 enum attribute_type {STRING_TYPE = 0, NUMERIC_TYPE = 1};
 
+/** Type of comparison between multidimensional distances, considering more or less information */
+enum comparison_type {FULL_COMPARISON = 0, SWITCH_COMPARISON = 1, MULTIPLEX_COMPARISON = 2, SIMPLE_COMPARISON = 3};
+
+/** Outcome of the comparison between two numbers, or vectors, or matrices... */
+enum domination {P_DOMINATED=0, P_EQUAL=1, P_INCOMPARABLE=2, P_DOMINATES=3};
+
 /**********************************************************************/
 /** MLNetwork components **********************************************/
 /**********************************************************************/
 
-// MLNetwork component identifiers
+// MLNetwork (full definition later)
+
+class MLNetwork;
+/** A smart pointer to objects of type MLNetwork */
+typedef std::shared_ptr<MLNetwork> MLNetworkSharedPtr;
+/** A smart pointer to constant objects of type MLNetwork */
+typedef std::shared_ptr<const MLNetwork> constMLNetworkSharedPtr;
+
+// Identifiers of a MLNetwork basic components
 
 /** A generic identifier for all objects in a MLNetwork (nodes, edges, ...) */
 typedef long object_id;
@@ -190,113 +201,6 @@ public:
 typedef std::shared_ptr<edge> EdgeSharedPtr;
 
 /**********************************************************************/
-/** Sorted Set ********************************************************/
-/**********************************************************************/
-
-/**
- * A SortedSet is a class used to store a set of components that:
- * 1. can be accessed by id in log time.
- * 2. can be accessed by index (position) in the set in constant time.
- * 3. can be accessed using a const iterator, so that it is not necessary to duplicate them. As an example,
- * it is not necessary to duplicate nodes when the neighbors of a node are accessed: a SortedSet on those
- * nodes is returned instead.
- *
- * A SortedSet is implemented as a skip list.
- */
-template <class T> class SortedSet;
-
-/**
- * An entry in a SortedSet, which is implemented as a skip list.
- */
-template <class T>
-class Entry {
-	friend class SortedSet<T>;
-
-private:
-	/** The id of the object corresponding to this entry */
-	object_id id;
-	/** The object corresponding to this entry */
-	T obj_ptr;
-	/** An array of pointers to the next entry, for each level in the skip list */
-    std::vector<Entry<T>*> forward; // array of pointers
-    /** The number of entries before the next entry on each level, used for positional access */
-    std::vector<int> link_length;
-
-public:
-    /**
-     * Constructor.
-     * @param level height of the entry in the skip list
-     * @param id id of the object corresponding to this entry
-     * @param obj the object corresponding to this entry
-     */
-    Entry(int level, object_id id, T obj);
-};
-
-/**
- * A SortedSet is a class used to store a set of components that:
- * 1. can be accessed by id in log time.
- * 2. can be accessed by index (position) in the set in constant time.
- * 3. can be accessed using a const iterator, so that it is not necessary to duplicate them. As an example,
- * it is not necessary to duplicate nodes when the neighbors of a node are accessed: a SortedSet on those
- * nodes is returned instead.
- *
- * A SortedSet is implemented as a skip list.
- */
-template <class T>
-class SortedSet {
-private:
-	int MAX_LEVEL = 15;
-	float P = 0.5;
-
-    Entry<T> *header;
-    int level;
-    long num_entries=0;
-
-public:
-    SortedSet();
-
-    /** Iterator over the obects in this collection */
-	class iterator {
-	    typedef std::forward_iterator_tag iterator_category;
-		public:
-		iterator();
-		/** Returns an iterator pointing at the input object */
-		iterator(Entry<T>* iter);
-		/** Return the object pointed by this iterator */
-		T operator*();
-		/** Moves the iterator to the next object in the collection (prefix) */
-		iterator operator++();
-		/** Moves the iterator to the next object in the collection (postfix) */
-		iterator operator++(int);
-		/** Checks if this iterator equals the input one */
-	    bool operator==(const SortedSet<T>::iterator& rhs);
-		/** Checks if this iterator differs from the input one */
-	    bool operator!=(const SortedSet<T>::iterator& rhs);
-		private:
-		/** Entry currently pointed to by this iterator */
-		Entry<T>* current;
-	};
-	/** Returns an iterator to the first object in the collection */
-	SortedSet<T>::iterator begin() const;
-	/** Returns an iterator after the last object in the collection */
-	SortedSet<T>::iterator end() const;
-	/** Returns the number of objects in the collection */
-    long size() const;
-	/** Returns true if an obect with the input id is present in the collection */
-    bool contains(object_id) const;
-	/** Returns the obect with the input id if it is present in the collection, or NULL */
-    T get(object_id) const;
-	/** Returns the obect at the given position in the collection, or NULL */
-    T get_at_index(long) const;
-	/** Inserts a new object in the collection */
-    void insert(object_id,T);
-	/** Removes the input object from the collection */
-    void erase(object_id);
-};
-
-#include "sortedset.cpp"
-
-/**********************************************************************/
 /** Attribute handling ************************************************/
 /**********************************************************************/
 
@@ -371,7 +275,7 @@ public:
 	/**
 	 * @brief Returns an attribute by name.
 	 * @param name The name of the queried attribute.
-	 * @return an object of type Attribute, or NULL if an attribute with this name does not exist.
+	 * @return an object of type AttributeSharedPtr, or NULL if an attribute with this name does not exist.
 	 **/
 	AttributeSharedPtr attribute(const std::string& name) const;
 
@@ -471,6 +375,9 @@ private:
 
 public:
 
+	/** Name of the multilayer network */
+	const std::string name;
+
 	/**
 	 * Creates an empty MLNetwork and returns a pointer to it. This is the only way to create a network,
 	 * so that it cannot be duplicated.
@@ -512,22 +419,7 @@ public:
 	 * @brief Returns all the actors in the MLNetwork.
 	 * @return a pointer to an actor iterator
 	 **/
-	const SortedSet<ActorSharedPtr>& get_actors() const;
-
-	/**
-	 * @brief Sets the default edge directionality depending on the layers of the connected nodes.
-	 * @param layer1 a pointer to the "from" layer
-	 * @param layer2 a pointer to the "to" layer
-	 * @param directed TRUE or FALSE
-	 * @return a pointer to the new layer
-	 **/
-	void set_directed(LayerSharedPtr layer1, LayerSharedPtr layer2, bool directed);
-
-	/**
-	 * @brief Gets the default edge directionality depending on the layers of the connected nodes.
-	 * @return a Boolean value indicating if edges among these two layers are directed or not.
-	 **/
-	bool is_directed(LayerSharedPtr layer1, LayerSharedPtr layer2) const;
+	const SortedSet<actor_id, ActorSharedPtr>& get_actors() const;
 
 	/**
 	 * @brief Adds a new layer to the MLNetwork.
@@ -559,7 +451,24 @@ public:
 	 * @brief Returns all the layers in the MLNetwork.
 	 * @return a layer iterator
 	 **/
-	const SortedSet<LayerSharedPtr>& get_layers() const;
+	const SortedSet<layer_id, LayerSharedPtr>& get_layers() const;
+
+	/**
+	 * @brief Sets the default edge directionality depending on the layers of the connected nodes.
+	 * The directionality of (layer1,layer2) is the same as (layer2,layer1) - that is, if edges are directed
+	 * in one direction, they must be directed also in the other.
+	 * @param layer1 a pointer to the "from" layer
+	 * @param layer2 a pointer to the "to" layer
+	 * @param directed TRUE or FALSE
+	 * @return a pointer to the new layer
+	 **/
+	void set_directed(LayerSharedPtr layer1, LayerSharedPtr layer2, bool directed);
+
+	/**
+	 * @brief Gets the default edge directionality depending on the layers of the connected nodes.
+	 * @return a Boolean value indicating if edges among these two layers are directed or not.
+	 **/
+	bool is_directed(LayerSharedPtr layer1, LayerSharedPtr layer2) const;
 
 	/**
 	 * @brief Adds a new node to the MLNetwork.
@@ -570,17 +479,6 @@ public:
 	 * @throws ElementNotFoundException if the input layer or actor are not present in the network
 	 **/
 	NodeSharedPtr add_node(const ActorSharedPtr& actor, const LayerSharedPtr& layer);
-
-	/**
-	 * @brief Adds a new node to the MLNetwork.
-	 * A new identifier is automatically associated to the new node
-	 * @param layer pointer to the layer where this node is located
-	 * @param actor pointer to the actor corresponding to this node
-	 * @param name name of the node
-	 * @return a pointer to the new node
-	 * @throws ElementNotFoundException if the input layer or actor are not present in the network
-	 **/
-	NodeSharedPtr add_node(const std::string& name, const ActorSharedPtr& actor, const LayerSharedPtr& layer);
 
 	/**
 	 * @brief Returns a node by ID.
@@ -603,21 +501,21 @@ public:
 	 * @brief Returns all the nodes in the MLNetwork.
 	 * @return a node iterator
 	 **/
-	const SortedSet<NodeSharedPtr>& get_nodes() const;
+	const SortedSet<node_id, NodeSharedPtr>& get_nodes() const;
 
 	/**
 	 * @brief Returns all the nodes in a layer.
 	 * @param layer pointer to the layer where this node is located
 	 * @return a node iterator
 	 **/
-	const SortedSet<NodeSharedPtr>& get_nodes(const LayerSharedPtr& layer) const;
+	const SortedSet<node_id, NodeSharedPtr>& get_nodes(const LayerSharedPtr& layer) const;
 
 	/**
 	 * @brief Returns the nodes associated to the input actor.
 	 * @param actor pointer to the actor
 	 * @return an iterator containing pointers to nodes
 	 **/
-	const SortedSet<NodeSharedPtr>& get_nodes(const ActorSharedPtr& actor) const;
+	const SortedSet<node_id, NodeSharedPtr>& get_nodes(const ActorSharedPtr& actor) const;
 
 	/**
 	 * @brief Adds a new edge to the MLNetwork.
@@ -643,7 +541,7 @@ public:
 	 * @brief Returns all the edges in the MLNetwork.
 	 * @return an edge iterator
 	 **/
-	const SortedSet<EdgeSharedPtr>& get_edges() const;
+	const SortedSet<edge_id, EdgeSharedPtr>& get_edges() const;
 
 	/**
 	 * @brief Returns all the edges from a layer A to a layer B.
@@ -652,27 +550,39 @@ public:
 	 * @param layer2 pointer to the layer where the second ends of the edges are located
 	 * @return an edge iterator
 	 **/
-	const SortedSet<EdgeSharedPtr>& get_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
+	const SortedSet<edge_id, EdgeSharedPtr>& get_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
 
 	/**
 	 * @brief Deletes an existing node.
 	 * All related data, including node attributes and edges involving this node, are also deleted.
 	 * @param node a pointer to the node to be deleted
+	 * @return true if the object has been removed, false if it was not present in the network.
 	 **/
-	void erase(const NodeSharedPtr& node);
+	bool erase(const NodeSharedPtr& node);
 
 	/**
 	 * @brief Deletes an existing edge.
 	 * Attribute values associated to this edge are also deleted.
 	 * @param edge a pointer to the edge to be deleted
+	 * @return true if the object has been removed, false if it was not present in the network.
 	 **/
-	void erase(const EdgeSharedPtr& edge);
+	bool erase(const EdgeSharedPtr& edge);
 
-	// deleteActor and deleteLayer are not considered necessary
+	/**
+	 * @brief Deletes an existing actor.
+	 * All related data, including node attributes and edges involving this actor, are also deleted.
+	 * @param actor a pointer to the actor to be deleted
+	 * @return true if the object has been removed, false if it was not present in the network.
+	 **/
+	bool erase(const ActorSharedPtr& actor);
 
-	/*****************************************************************************************
-	 * Functions returning information about the MLNetwork.
-	 *****************************************************************************************/
+	/**
+	 * @brief Deletes an existing layer.
+	 * Attribute values associated to this edge are also deleted.
+	 * @param layer a pointer to the layer to be deleted
+	 * @return true if the object has been removed, false if it was not present in the network.
+	 **/
+	bool erase(const LayerSharedPtr& layer);
 
 	/**
 	 * @brief Returns the nodes with an edge from/to the input node.
@@ -681,7 +591,7 @@ public:
 	 * @return an iterator containing pointers to nodes
 	 * @throws WrongParameterException if mode is not one of IN, OUT or INOUT
 	 **/
-	const SortedSet<NodeSharedPtr>& neighbors(const NodeSharedPtr& node, int mode) const;
+	const SortedSet<node_id, NodeSharedPtr>& neighbors(const NodeSharedPtr& node, edge_mode mode) const;
 
 	/******************************
 	 * Attribute handling
@@ -749,11 +659,8 @@ public:
 	 **/
 	const AttributeStoreSharedPtr edge_features(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
 
-	/** Returns a string represenation of this MLNetwork */
+	/** Returns a string representation of this MLNetwork */
 	std::string to_string() const;
-
-	/** Name of the multilayer network */
-	const std::string name;
 
 private:
 	// largest identifier assigned so far
@@ -766,32 +673,36 @@ private:
 	std::map<layer_id, std::map<layer_id, bool> > edge_directionality;
 
 	// Components:
-	SortedSet<LayerSharedPtr> layers;
-	SortedSet<ActorSharedPtr> actors;
-	SortedSet<NodeSharedPtr> nodes;
-	SortedSet<EdgeSharedPtr> edges;
+	SortedSet<layer_id,LayerSharedPtr> layers;
+	SortedSet<actor_id,ActorSharedPtr> actors;
+	SortedSet<node_id,NodeSharedPtr> nodes;
+	SortedSet<edge_id,EdgeSharedPtr> edges;
 
-	// Indexes to components:
-	std::map<std::string, LayerSharedPtr> cidx_layer_by_name;
-	std::map<std::string, ActorSharedPtr> cidx_actor_by_name;
-	std::map<actor_id, std::map<layer_id, NodeSharedPtr > > cidx_node_by_actor_and_layer;
-	std::map<node_id, std::map<node_id, EdgeSharedPtr> > cidx_edge_by_nodes;
+	// Indexes to components (Component IDX):
+	std::unordered_map<std::string, LayerSharedPtr> cidx_layer_by_name;
+	std::unordered_map<std::string, ActorSharedPtr> cidx_actor_by_name;
+	std::unordered_map<actor_id, std::unordered_map<layer_id, NodeSharedPtr > > cidx_node_by_actor_and_layer;
+	std::unordered_map<node_id, std::unordered_map<node_id, EdgeSharedPtr> > cidx_edge_by_nodes;
 
-	// Indexes to sets of components:
-	std::map<layer_id, SortedSet<NodeSharedPtr> > sidx_nodes_by_layer;
-	std::map<actor_id, SortedSet<NodeSharedPtr> > sidx_nodes_by_actor;
-	std::map<layer_id, std::map<layer_id, SortedSet<EdgeSharedPtr> > > sidx_edges_by_layer_pair;
+	// Indexes to sets of components (Set IDX):
+	std::unordered_map<layer_id, SortedSet<node_id,NodeSharedPtr> > sidx_nodes_by_layer;
+	std::unordered_map<actor_id, SortedSet<node_id,NodeSharedPtr> > sidx_nodes_by_actor;
+	std::unordered_map<layer_id, std::map<layer_id, SortedSet<edge_id,EdgeSharedPtr> > > sidx_edges_by_layer_pair;
 
-	std::map<node_id, SortedSet<NodeSharedPtr> > sidx_neighbors_out;
-	std::map<node_id, SortedSet<NodeSharedPtr> > sidx_neighbors_in;
-	std::map<node_id, SortedSet<NodeSharedPtr> > sidx_neighbors_all;
+	std::unordered_map<node_id, SortedSet<node_id,NodeSharedPtr> > sidx_neighbors_out;
+	std::unordered_map<node_id, SortedSet<node_id,NodeSharedPtr> > sidx_neighbors_in;
+	std::unordered_map<node_id, SortedSet<node_id,NodeSharedPtr> > sidx_neighbors_all;
 
 	/* objects storing the feature vectors of the different components */
 	AttributeStoreSharedPtr actor_attributes;
 	AttributeStoreSharedPtr layer_attributes;
-	std::map<layer_id, AttributeStoreSharedPtr> node_attributes;
-	std::map<layer_id, std::map<layer_id, AttributeStoreSharedPtr> > edge_attributes;
+	std::unordered_map<layer_id, AttributeStoreSharedPtr> node_attributes;
+	std::unordered_map<layer_id, std::map<layer_id, AttributeStoreSharedPtr> > edge_attributes;
 
+	/* An empty set of nodes, conveniently returned by const methods
+	 * instead of creating a new empty SortedSet object.
+	 */
+	SortedSet<node_id,NodeSharedPtr> empty;
 };
 
 
@@ -836,50 +747,104 @@ private:
 //	long length() const;
 //};
 
-/**********************************************************************/
-/** Path **************************************************************/
-/**********************************************************************/
-
-class Path {
+/**
+ * This class represents a sequence of consecutive edges in a multilayer network.
+ */
+class distance {
 private:
+	/** The multilayer network to which this distance refers. */
 	const MLNetworkSharedPtr mnet;
-	//std::vector<long> num_edges_per_layer;
-	std::vector<EdgeSharedPtr> path;
-	NodeSharedPtr origin;
-	//long timestamp;
+	/** Number of steps for each pair of layers. (This includes intra-layer steps). */
+	std::unordered_map<layer_id,std::unordered_map<layer_id,long> > num_edges;
+	/** Total number of steps, irrespective of the layers */
+	long total_length;
 
 public:
-	Path(const MLNetworkSharedPtr mnet, NodeSharedPtr origin);
-	/*Path(const Path& p, long timestamp);
-	Path(const MLNetwork& mnet, long timestamp);
-	Path(long num_layers, long timestamp);
-	*/
-	~Path();
+	/** Constructs an empty distance. */
+	distance(const MLNetworkSharedPtr& mnet);
 
-	NodeSharedPtr begin();
+	/**
+	 * Increases this distance by a new step from a node to another.
+	 * For efficiency reasons, and also to allow steps not following
+	 * the known connections, there is no check that this nodes are reachable
+	 * in the underlying network.
+	 * @param n1 the starting node of the new step.
+	 * @param n2 the arrival node of the new step.
+	 */
+	void step(const NodeSharedPtr& n1, const NodeSharedPtr& n2);
 
-	NodeSharedPtr end();
-
-	//long getTimestamp() const;
-
-	//long getNumNetworks() const;
-
-	//long num_steps(LayerSharedPtr from_layer, LayerSharedPtr to_layer) const;
-
-	//void start(node_id first);
-
-	void step(EdgeSharedPtr e);
-
-	EdgeSharedPtr get_step(long pos) const;
-
+	/**
+	 * @return The total number of steps (that is, traversed edges).
+	 */
 	long length() const;
 
-	bool operator<(const Path& other) const;
+	/**
+	 * @return The number of steps (that is, traversed edges) from a node in layer from to a node in layer to.
+	 * @param from first layer.
+	 * @param to second layer.
+	 */
+	long length(const layer_id& from, const layer_id& to) const;
 
-	Path operator=(const Path& other) const;
+	/**
+	 * @brief Compares two distances according to the comp parameter:
+	 * @param other The distance to be compared to.
+	 * @param comp This parameter specifies the amount of information used while comparing the two distances:
+	 * - FULL_COMPARISON: all steps among each pair of layers
+	 *   (including the same layer) are considered as distinct entities,
+	 *   and a Pareto relationship is returned (that is, the two distances may be incomparable).
+	 * - SWITCH_COMPARISON: all steps inside the same layer and the steps between any two
+	 *   different layers are considered as distinct entities, and a Pareto relationship is returned
+	 *   (that is, the two distances may be incomparable).
+	 * - MULTIPLEX_COMPARISON: all steps inside the same layer are considered as distinct entities.
+	 *   Inter-layer steps are not counted, and a Pareto relationship is returned (that is, the two distances may be incomparable).
+	 * - SIMPLE_COMPARISON: the total number of steps is considered. The two distances will always be comparable (<, >, == or !=).
+	 * @return One of the relationship types: P_DOMINATED, P_EQUAL, P_INCOMPARABLE, or P_DOMINATES
+	 */
+	domination compare(const distance& other, comparison_type comp) const;
 
-	bool operator==(const Path& other) const;
+	/**
+	 * Compare the absolute length of the two distances. For a comparison considering steps
+	 * on different layers as incomparable entities, use compare()
+	 * @param other The distance to be compared to.
+	 * @return true if this distance is shorter than the input one.
+	 */
+	bool operator<(const distance& other) const;
 
+	/**
+	 * Compare the absolute length of the two distances. For a comparison considering steps
+	 * on different layers as incomparable entities, use compare()
+	 * @param other The distance to be compared to.
+	 * @return true if this distance is longer than the input one.
+	 */
+	bool operator>(const distance& other) const;
+
+	/**
+	 * Compare the absolute length of the two distances. For a comparison considering steps
+	 * on different layers as incomparable entities, use compare()
+	 * @param other The distance to be compared to.
+	 * @return true if this distance is the same as the input one.
+	 */
+	bool operator==(const distance& other) const;
+
+	/**
+	 * Compare the absolute length of the two distances. For a comparison considering steps
+	 * on different layers as incomparable entities, use compare()
+	 * @param other The distance to be compared to.
+	 * @return true if this distance is different from the input one.
+	 */
+	bool operator!=(const distance& other) const;
+
+	/** Returns a string representation of this object */
+	std::string to_string() const;
+
+private:
+	domination compare_full(const distance& other) const;
+
+	domination compare_switch(const distance& other) const;
+
+	domination compare_multiplex(const distance& other) const;
+
+	domination compare_simple(const distance& other) const;
 };
 
 } // namespace mlnet

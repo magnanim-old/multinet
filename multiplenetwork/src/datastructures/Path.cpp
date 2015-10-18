@@ -32,36 +32,35 @@ Path::Path(long num_layers, long timestamp) {
 	Path::timestamp = timestamp;
 }
 
-*/
 
-Path::Path(const MLNetworkSharedPtr mnet, NodeSharedPtr origin) : mnet(mnet), origin(origin) {}
+path::path(const MLNetworkSharedPtr mnet, NodeSharedPtr origin) : mnet(mnet), origin(origin) {}
 
-Path::~Path() {}
+path::~path() {}
 
 
-NodeSharedPtr Path::begin() {
+NodeSharedPtr path::begin() {
 	return origin;
 }
 
-NodeSharedPtr Path::end() {
+NodeSharedPtr path::end() {
 	if (path.size()==0)
 		return origin;
 	else return path[path.size()-1]->v2;
 }
 
-void Path::step(EdgeSharedPtr e) {
+void path::step(EdgeSharedPtr e) {
 	path.push_back(e);
 }
 
-EdgeSharedPtr Path::get_step(long pos) const {
+EdgeSharedPtr path::get_step(long pos) const {
 	return path.at(pos);
 }
 
-long Path::length() const {
+long path::length() const {
 	return path.size();
 }
 
-/*bool Path::operator<(const Path& other) const {}
+bool Path::operator<(const Path& other) const {}
 
 Path Path::operator=(const Path& other) const {}
 

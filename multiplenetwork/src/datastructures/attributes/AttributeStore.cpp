@@ -14,13 +14,13 @@ const std::vector<AttributeSharedPtr>& AttributeStore::attributes() const {
 AttributeSharedPtr AttributeStore::attribute(int idx) const {
 	if (attribute_vector.size()>idx)
 		return attribute_vector.at(idx);
-	else return NULL;
+	else return AttributeSharedPtr();
 }
 
 AttributeSharedPtr AttributeStore::attribute(const std::string& attribute_name) const {
 	if (attribute_ids.count(attribute_name)>0)
 		return attribute_vector.at(attribute_ids.at(attribute_name));
-	else return NULL;
+	else return AttributeSharedPtr();
 }
 
 void AttributeStore::add(const std::string& attribute_name, attribute_type type) {

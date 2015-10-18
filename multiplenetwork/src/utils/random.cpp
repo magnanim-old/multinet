@@ -5,7 +5,7 @@
  *      Author: stud10
  */
 
-#include "random.h"
+#include "utils.h"
 #include "exceptions.h"
 #include <algorithm>
 #include <iostream>
@@ -16,7 +16,7 @@
 
 using namespace std;
 
-namespace random_utils {
+namespace mlnet {
 //Random::Random() {
 	/*
 	// C++11 version:
@@ -67,7 +67,7 @@ int random_level(int MAX_LEVEL, double P) {
         first = false;
     }
 
-    int lvl = (int)(log(drand())/log(1.-P));
+    int lvl = (int)(std::log(drand())/std::log(1.0-P));
     return lvl < MAX_LEVEL ? lvl : MAX_LEVEL;
 }
 
@@ -95,6 +95,17 @@ bool test(double probability) {
 	std::bernoulli_distribution distribution(probability);
 	return distribution(generator);
 	*/
+}
+
+int test(const std::vector<double>& options) {
+	double prob_failing_previous_tests=1;
+	for (int idx=0; idx<options.size()-1; idx++) {
+		double adjusted_prob = options.at(idx)/prob_failing_previous_tests;
+		if (test(adjusted_prob))
+			return idx;
+		prob_failing_previous_tests *= (1-adjusted_prob);
+	}
+	return options.size()-1;
 }
 
 /*

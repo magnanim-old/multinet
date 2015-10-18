@@ -10,6 +10,9 @@
 #include <sstream>
 #include <stdexcept>
 
+namespace mlnet {
+
+
 double to_double(const std::string &double_as_string) {
     std::istringstream converted(double_as_string);
     double double_as_double;
@@ -18,4 +21,6 @@ double to_double(const std::string &double_as_string) {
     if (!converted)
         throw std::runtime_error("Error converting to double");
     return double_as_double;
+}
+
 }

@@ -13,7 +13,7 @@
 
 namespace mlnet {
 
-long degree(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
+long degree(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
 	int degree = 0;
 	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
 		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
@@ -24,7 +24,7 @@ long degree(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const st
 	return degree;
 }
 
-long degree(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
+long degree(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
 	int degree = 0;
 	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
 		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
@@ -35,7 +35,7 @@ long degree(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const La
 	return degree;
 }
 
-double degree_mean(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
+double degree_mean(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
 	std::vector<double> degrees;
 	for (LayerSharedPtr layer: layers) {
 		degrees.push_back((double)degree(mnet,actor,layer,mode));
@@ -43,7 +43,7 @@ double degree_mean(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, c
 	return mean(degrees);
 }
 
-double degree_deviation(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
+double degree_deviation(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
 	std::vector<double> degrees;
 	for (LayerSharedPtr layer: layers) {
 		degrees.push_back((double)degree(mnet,actor,layer,mode));

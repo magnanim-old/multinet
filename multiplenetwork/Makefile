@@ -4,9 +4,9 @@ OBJS = 	src/datastructures/*.cpp \
 		src/datastructures/components/*.cpp \
 		src/datastructures/attributes/*.cpp \
 		src/io/*.cpp \
-		src/measures/degree.cpp src/measures/neighborhood.cpp src/measures/relevance.cpp \
+		src/measures/*.cpp \
 		src/exceptions/*.cpp \
-		src/utils/logging.cpp src/utils/printing.cpp src/utils/math.cpp src/utils/string.cpp src/utils/CSVReader.cpp src/utils/Random.cpp \
+		src/utils/*.cpp \
 		
 TEST = test/run_all.cpp test/testMLNetwork.cpp test/testIO.cpp test/testLocalMeasures.cpp test/testRandom.cpp test/testRandomWalks.cpp test/FailedUnitTestException.cpp
 		

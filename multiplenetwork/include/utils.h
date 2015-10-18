@@ -19,6 +19,8 @@
 #include <vector>
 #include <set>
 
+namespace mlnet {
+
 typedef int verbosity;
 
 const int VERBOSITY=2;
@@ -72,8 +74,6 @@ public:
 /***********************************/
 void print(const mlnet::MLNetworkSharedPtr mnet);
 
-
-
 template <typename T> std::string to_string ( T Number ) {
 	std::ostringstream ss;
     ss << Number;
@@ -94,5 +94,6 @@ double stdev(const std::vector<double>& vec);
 
 //std::set<entity_id> identity_names_to_ids(const MultiplexNetwork& mnet, const std::vector<std::string>& names);
 
+}
 
 #endif /* MULTIPLENETWORK_UTILS_H_ */

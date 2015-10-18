@@ -9,6 +9,8 @@
 #include "utils.h"
 #include <iostream>
 
+namespace mlnet {
+
 void log(std::string s) {
 	log(s,2,true);
 }
@@ -32,4 +34,4 @@ void warn(std::string s) {
 	std::cout << "[Warning] " << s << std::endl;
 }
 
-
+}

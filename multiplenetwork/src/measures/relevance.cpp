@@ -14,7 +14,7 @@ using namespace std;
 
 namespace mlnet {
 
-double relevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
+double relevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
 	set<actor_id> neighbors_on_selected_layers;
 	set<actor_id> all_neighbors;
 	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
@@ -29,7 +29,7 @@ double relevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, con
 }
 
 
-double relevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
+double relevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
 	set<actor_id> neighbors_on_selected_layers;
 	set<actor_id> all_neighbors;
 	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
@@ -44,7 +44,7 @@ double relevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, con
 }
 
 
-double xrelevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const std::set<LayerSharedPtr>& layers, edge_mode mode) {
+double xrelevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
 	set<actor_id> neighbors_on_selected_layers;
 	set<actor_id> neighbors_on_other_layers;
 	set<actor_id> all_neighbors;
@@ -64,7 +64,7 @@ double xrelevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, co
 	}
 }
 
-double xrelevance(const MLNetworkSharedPtr mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
+double xrelevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
 	set<actor_id> neighbors_on_selected_layers;
 	set<actor_id> neighbors_on_other_layers;
 	set<actor_id> all_neighbors;

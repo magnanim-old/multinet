@@ -14,25 +14,24 @@
 #include <iostream>
 #include "test.h"
 #include "utils.h"
-#include "random.h"
 #include "exceptions.h"
 
-using namespace random_utils;
 using namespace std;
+using namespace mlnet;
 
 void testRandom() {
 
 	// WORK IN PROGRESS
 
-	set<unsigned long>::iterator it;
-	map<unsigned long, int>::iterator itm;
+	//set<unsigned long>::iterator it;
+	//map<unsigned long, int>::iterator itm;
 	//Random r;
-	map<unsigned long, int> count;
-	set<unsigned long> res;
+	//map<unsigned long, int> count;
+	//set<unsigned long> res;
 	//unsigned long randomLong;
 	//double randomDouble;
 
-	cout << "Testing random integer in [0,10[, 1000 iterations.." << endl;
+	cout << "Testing random integer in [0,3[, 1000 iterations.." << endl;
 	std::array<int,10> occurrences;
 	occurrences.fill(0);
 	for (int i=0; i<1000; i++) {
@@ -65,6 +64,21 @@ void testRandom() {
 	}
 	cout << "done! Positive and negative outcomes:";
 	for (int& x : outcome) { std::cout << ' ' << x; }
+	std::cout << std::endl;
+
+	cout << "Testing index selection, prob: 0:0.25, 1:0.25, 2:0.5, 1000 iterations.." << endl;
+	std::vector<double> options;
+	options.resize(3);
+	options[0] = .25;
+	options[1] = .25;
+	options[2] = .50;
+	std::array<int,3> hits;
+	hits.fill(0);
+	for (int i=0; i<1000; i++) {
+		hits[test(options)]++;
+	}
+	cout << "done! Hits per value:";
+	for (int& x : hits) { std::cout << ' ' << x; }
 	std::cout << std::endl;
 
 	/*

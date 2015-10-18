@@ -15,6 +15,9 @@
 
 using namespace std;
 
+
+namespace mlnet {
+
 CSVReader::CSVReader() {
 	next = "";
 	has_next = true;
@@ -74,4 +77,6 @@ int CSVReader::rowNum() {
 
 void CSVReader::setFieldSeparator(char separator) {
 	field_separator = separator;
+}
+
 }

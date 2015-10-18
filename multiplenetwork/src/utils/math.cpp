@@ -8,7 +8,11 @@
 
 #include "utils.h"
 #include <sstream>
+#include <numeric>
 #include <stdexcept>
+
+
+namespace mlnet {
 
 double mean(const std::vector<double>& vec) {
 	// mean
@@ -27,5 +31,7 @@ double stdev(const std::vector<double>& vec) {
 	}
 	variance /= vec.size();
 	// standard deviation
-	return sqrt(variance);
+	return std::sqrt(variance);
+}
+
 }

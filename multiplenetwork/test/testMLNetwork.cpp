@@ -9,6 +9,7 @@
 #import "datastructures.h"
 #import "exceptions.h"
 #import "utils.h"
+#import <array>
 
 using namespace mlnet;
 
@@ -30,13 +31,13 @@ void testMLNetwork() {
 	NodeSharedPtr node4(new node(4,actor2,layer1));
 	log("done!");
 	log("...creating five edges...",false);
-	EdgeSharedPtr e1(new edge(1,node1,node2,true)); // directed
-	EdgeSharedPtr e2(new edge(2,node2,node1,true)); // directed
-	EdgeSharedPtr e3(new edge(3,node1,node2,false)); // indirected
-	EdgeSharedPtr e4(new edge(3,node2,node1,false)); // indirected
-	if (*e1==*e2) throw FailedUnitTestException("Wrong edge comparison");
-	if (*e2==*e3) throw FailedUnitTestException("Wrong edge comparison");
-	if (*e3!=*e4) throw FailedUnitTestException("Wrong edge comparison");
+	EdgeSharedPtr edge1(new edge(1,node1,node2,true)); // directed
+	EdgeSharedPtr edge2(new edge(2,node2,node1,true)); // directed
+	EdgeSharedPtr edge3(new edge(3,node1,node2,false)); // indirected
+	EdgeSharedPtr edge4(new edge(3,node2,node1,false)); // indirected
+	if (*edge1==*edge2) throw FailedUnitTestException("Wrong edge comparison");
+	if (*edge2==*edge3) throw FailedUnitTestException("Wrong edge comparison");
+	if (*edge3!=*edge4) throw FailedUnitTestException("Wrong edge comparison");
 	log("done!");
 	log("TEST SUCCESSFULLY COMPLETED (basic MLNetwork components)");
 
@@ -122,20 +123,20 @@ void testMLNetwork() {
 	log("done!");
 
 	log("Adding five intra-layer edges and one inter-layer edge: ",false);
-	mnet->add_edge(n1v0,n1v1);
-	mnet->add_edge(n2v0,n2v1);
-	mnet->add_edge(n2v1,n2v2);
-	mnet->add_edge(n3v0,n3v2);
-	mnet->add_edge(n3v2,n3v1);
+	EdgeSharedPtr e1 = mnet->add_edge(n1v0,n1v1);
+	EdgeSharedPtr e2 = mnet->add_edge(n2v0,n2v1);
+	EdgeSharedPtr e3 = mnet->add_edge(n2v1,n2v2);
+	EdgeSharedPtr e4 = mnet->add_edge(n3v0,n3v2);
+	EdgeSharedPtr e5 = mnet->add_edge(n3v2,n3v1);
 
-	mnet->add_edge(n2v2,n3v1);
+	EdgeSharedPtr e6 = mnet->add_edge(n2v2,n3v1);
 
 	int num_edges=0;
 	for (EdgeSharedPtr edge : mnet->get_edges()) {
 		num_edges++;
 		log(edge->to_string() + " ",false);
 	}
-	if (num_edges!=6 || num_nodes!=mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
+	if (num_edges!=6 || num_edges!=mnet->get_edges().size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	log("done!");
 
 	log("TESTING attribute management");
@@ -202,8 +203,19 @@ void testMLNetwork() {
 	if (num_neighbors!=2) throw FailedUnitTestException("Could not retrieve neighbors");
 	log("done!");
 
-	log("Printing final multiple network information: " + mnet->to_string());
-	print(mnet);
+	log("Erasing components: ",false);
+	mnet->erase(n3v2);
+	if (8 != mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
+	mnet->erase(e3);
+	if (3 != mnet->get_edges().size()) throw FailedUnitTestException("Could not retrieve all edges");
+	mnet->erase(a1);
+	if (2 != mnet->get_actors().size()) throw FailedUnitTestException("Could not retrieve all actor");
+	if (5 != mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
+	mnet->erase(l1);
+	log(mnet->to_string());
+	if (2 != mnet->get_layers().size()) throw FailedUnitTestException("Could not retrieve all layers");
+	if (3 != mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
+	log("done!");
 	log("TEST SUCCESSFULLY COMPLETED (MLNetwork)");
 }
 
