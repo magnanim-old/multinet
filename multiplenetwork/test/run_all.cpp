@@ -16,13 +16,14 @@ int main(int argn, char* argv[]) {
 	testMLNetwork();
 	testIO();
 	testLocalMeasures();
+	testDistanceMeasures();
 	testRandom();
 	testRandomWalks();
+	testEvolution();
+	testModularity();
 	/*
 	testTransformations();
-	testDistanceMeasures();
-	//testModularity(); //Still testing this, but seems to work so far (it does for single networks)
-	testEvolution();*/
+	*/
 	}
 	catch (std::exception& e) {
 		std::cout << "[Error] UNIT TEST NOT PASSED: " << e.what() << std::endl;

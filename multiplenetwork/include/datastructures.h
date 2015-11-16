@@ -43,6 +43,7 @@
 #include <vector>
 #include <memory>
 #include "sortedsets.h"
+#include "counter.h"
 #include "exceptions.h"
 #include <cmath>
 
@@ -50,6 +51,9 @@ namespace mlnet {
 
 template <class T>
 using matrix = std::vector<std::vector<T> >;
+
+template <class T1, class T2>
+using hash = std::unordered_map<T1,T2>;
 
 /**********************************************************************/
 /** Constants and Function Parameters *********************************/
@@ -710,56 +714,21 @@ private:
 /** Distance **********************************************************/
 /**********************************************************************/
 
-//class Distance {
-//private:
-//	const MultipleNetwork *mnet;
-//	std::vector<long> num_edges_per_layer;
-//	long timestamp;
-//	long num_steps;
-//
-//	friend std::ostream& operator<<(std::ostream &strm, const Distance &dist);
-//
-//public:
-//	/**
-//	 * @brief Constructs a
-//	 * @throws ElementNotFoundException if the input elements are not present in the network
-//	 * @throws OperationNotSupportedException if the two nodes lay on the same network
-//	 **/
-//	Distance(const Distance& p, long timestamp);
-//	Distance(const MultipleNetwork& mnet, long timestamp);
-//	Distance(long num_layers, long timestamp);
-//	virtual ~Distance();
-//
-//	long getNumNetworks() const;
-//
-//	long getTimestamp() const;
-//
-//	long getNumEdgesOnNetwork(long layer) const;
-//
-//	void extend(network_id nid);
-//
-//	bool operator<(const Distance& other) const;
-//
-//	Distance operator=(const Distance& other) const;
-//
-//	bool same(const Distance& other) const;
-//
-//	long length() const;
-//};
-
 /**
  * This class represents a sequence of consecutive edges in a multilayer network.
  */
 class distance {
 private:
 	/** The multilayer network to which this distance refers. */
-	const MLNetworkSharedPtr mnet;
+	MLNetworkSharedPtr mnet;
 	/** Number of steps for each pair of layers. (This includes intra-layer steps). */
-	std::unordered_map<layer_id,std::unordered_map<layer_id,long> > num_edges;
+	PairCounter<layer_id,layer_id> num_edges;
 	/** Total number of steps, irrespective of the layers */
 	long total_length;
 
 public:
+	long ts;
+
 	/** Constructs an empty distance. */
 	distance(const MLNetworkSharedPtr& mnet);
 
@@ -779,11 +748,17 @@ public:
 	long length() const;
 
 	/**
+	 * @return The number of steps (that is, traversed edges) inside a given layer.
+	 * @param layer only edges between nodes in this layer are considered.
+	 */
+	long length(const LayerSharedPtr& layer) const;
+
+	/**
 	 * @return The number of steps (that is, traversed edges) from a node in layer from to a node in layer to.
 	 * @param from first layer.
 	 * @param to second layer.
 	 */
-	long length(const layer_id& from, const layer_id& to) const;
+	long length(const LayerSharedPtr& from, const LayerSharedPtr& to) const;
 
 	/**
 	 * @brief Compares two distances according to the comp parameter:
@@ -803,7 +778,7 @@ public:
 	domination compare(const distance& other, comparison_type comp) const;
 
 	/**
-	 * Compare the absolute length of the two distances. For a comparison considering steps
+	 * Comparison by id. For a comparison considering steps
 	 * on different layers as incomparable entities, use compare()
 	 * @param other The distance to be compared to.
 	 * @return true if this distance is shorter than the input one.
@@ -811,7 +786,7 @@ public:
 	bool operator<(const distance& other) const;
 
 	/**
-	 * Compare the absolute length of the two distances. For a comparison considering steps
+	 * Comparison by id. For a comparison considering steps
 	 * on different layers as incomparable entities, use compare()
 	 * @param other The distance to be compared to.
 	 * @return true if this distance is longer than the input one.
@@ -819,7 +794,7 @@ public:
 	bool operator>(const distance& other) const;
 
 	/**
-	 * Compare the absolute length of the two distances. For a comparison considering steps
+	 * Comparison by id. For a comparison considering steps
 	 * on different layers as incomparable entities, use compare()
 	 * @param other The distance to be compared to.
 	 * @return true if this distance is the same as the input one.
@@ -838,6 +813,7 @@ public:
 	std::string to_string() const;
 
 private:
+
 	domination compare_full(const distance& other) const;
 
 	domination compare_switch(const distance& other) const;

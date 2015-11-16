@@ -10,6 +10,7 @@
 #include <iostream>
 #include "evolution.h"
 
+/*
 vertex_id choice_degree(Random rand, MultiplexNetwork& mnet, network_id net) {
 	std::set<edge_id> all_edges = mnet.getNetwork(net).getEdges();
 	//std::cout << "Found " << all_edges.size() << " edges." << std::endl;
@@ -23,3 +24,4 @@ vertex_id choice_degree(Random rand, MultiplexNetwork& mnet, network_id net) {
 	//std::cout << "Got edge " << edge << std::endl;
 	return rand.test(.5)?edge.v1:edge.v2;
 }
+*/

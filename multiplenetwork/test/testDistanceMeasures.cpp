@@ -11,29 +11,39 @@
 #include <iostream>
 #include <string>
 
+using namespace mlnet;
+
 void testDistanceMeasures() {
 
 	// We need to read the network from a file: testIO() must have been passed
-	log("TESTING distance measures");
-	log("Reading the network...",false);
-	MultiplexNetwork mnet = read_multiplex("test/io2.mpx");
+	log("TESTING measures (single actor)");
+	log("Reading the multilayer network...",false);
+	MLNetworkSharedPtr mnet = read_multilayer("test/io2.mpx","mlnet 2",',');
+	LayerSharedPtr l1 = mnet->get_layer("l1");
+	LayerSharedPtr l2 = mnet->get_layer("l2");
 	log("done!");
 
 	log("Computing Pareto distance between all pairs of vertexes...",false);
 	// The result is stored in the variable paths, where for each target vertex (from source U0) we obtain a set of shortest paths
-	std::map<identity,std::set<Distance> > dists = pareto_distance(mnet, mnet.getGlobalIdentity("U0"));
+	std::unordered_map<ActorSharedPtr,std::set<distance> > dists = pareto_distance(mnet, mnet->get_actor("U0"));
 	log("done!");
 
+	for (auto p: dists) {
+		for (auto dist: p.second) {
+			log("dist to " +  p.first->name + ": "+ dist.to_string());
+		}
+	}
+
 	log("Testing sample values (U0->U3: 2 shortest paths expected)...",false);
-	if (dists[mnet.getGlobalIdentity("U3")].size()!=2) throw FailedUnitTestException("Expected 2 paths, found " + to_string(dists[3].size()));
-	Distance p1 = *dists[mnet.getGlobalIdentity("U3")].begin();
-	Distance p2 = *++dists[mnet.getGlobalIdentity("U3")].begin();
-	if (p1.length()!=2) throw FailedUnitTestException("Wrong length: path 1, " + to_string(p1.length()));
-	if (p2.length()!=2) throw FailedUnitTestException("Wrong length: path 2, " + to_string(p2.length()));
-	if (p1.getNumEdgesOnNetwork(0)!=2) throw FailedUnitTestException("Wrong number of edges: path 1 on network l1");
-	if (p1.getNumEdgesOnNetwork(1)!=0) throw FailedUnitTestException("Wrong number of edges: path 1 on network l2");
-	if (p2.getNumEdgesOnNetwork(0)!=1) throw FailedUnitTestException("Wrong number of edges: path 2 on network l1");
-	if (p2.getNumEdgesOnNetwork(1)!=1) throw FailedUnitTestException("Wrong number of edges: path 2 on network l2");
+	if (dists[mnet->get_actor("U3")].size()!=2) throw FailedUnitTestException("Expected 2 distances, found " + to_string(dists[mnet->get_actor("U3")].size()));
+	distance p1 = *dists[mnet->get_actor("U3")].begin();
+	distance p2 = *++dists[mnet->get_actor("U3")].begin();
+	if (p1.length()!=2) throw FailedUnitTestException("Wrong length: distance 1, " + to_string(p1.length()));
+	if (p2.length()!=2) throw FailedUnitTestException("Wrong length: distance 2, " + to_string(p2.length()));
+	if (p1.length(l1,l1)!=2) throw FailedUnitTestException("Wrong number of edges: distance 1 on layer l1");
+	if (p1.length(l2,l2)!=0) throw FailedUnitTestException("Wrong number of edges: distance 1 on layer l2");
+	if (p2.length(l1,l1)!=1) throw FailedUnitTestException("Wrong number of edges: distance 2 on layer l1");
+	if (p2.length(l2,l2)!=1) throw FailedUnitTestException("Wrong number of edges: distance 2 on layer l2");
 	log("done!");
 
 	/*
@@ -58,7 +68,7 @@ void testDistanceMeasures() {
 	if (edge_betweenness[global_edge_id(1,3,mnet.getNetwork(0).isDirected(),0)]!=3) throw FailedUnitTestException("Wrong betweenness for edge U1-U3 on network 1");
 	log("done!");
 	 */
-	log("TEST SUCCESSFULLY COMPLETED (distance and betweenness on multiple networks)");
+	log("TEST SUCCESSFULLY COMPLETED (distance on multiple networks)");
 }
 
 

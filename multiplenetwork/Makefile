@@ -5,10 +5,12 @@ OBJS = 	src/datastructures/*.cpp \
 		src/datastructures/attributes/*.cpp \
 		src/io/*.cpp \
 		src/measures/*.cpp \
+		src/community/*.cpp \
+		src/evolution/*.cpp \
 		src/exceptions/*.cpp \
 		src/utils/*.cpp \
 		
-TEST = test/run_all.cpp test/testMLNetwork.cpp test/testIO.cpp test/testLocalMeasures.cpp test/testRandom.cpp test/testRandomWalks.cpp test/FailedUnitTestException.cpp
+TEST = test/run_all.cpp test/testModularity.cpp test/testMLNetwork.cpp test/testIO.cpp test/testDistanceMeasures.cpp test/testLocalMeasures.cpp test/testRandom.cpp test/testRandomWalks.cpp test/FailedUnitTestException.cpp test/testEvolution.cpp
 		
 LIBS = -L/usr/local/lib
 

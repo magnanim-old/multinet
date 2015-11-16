@@ -6,196 +6,115 @@
  * Version: 0.0.1
  */
 
-#import "test.h"
+#include "test.h"
+#include "multiplenetwork.h"
 #include <iostream>
 #include <string>
 
-void testModularity() {
+using namespace mlnet;
 
-	/*
+void testModularity() {
 
 	// We need to read the network from a file: testIO() must have been passed
 	log("TESTING measures");
 	log("Reading the network...",false);
 	// Creating an empty multiple network and initializing it
-	MultilayerNetwork mnet_toy;
-	mnet_read_edgelist(mnet_toy, "test/toy.mnet");
-	mnet_toy.getNetwork("l1")->addVertex("U4");
-	mnet_toy.map("U4","U4","l1");
+	MLNetworkSharedPtr mnet = read_multilayer("test/toy.mpx","toy",',');
 
-	MultilayerNetwork mnet0;
+	MLNetworkSharedPtr mnet_a = read_multilayer("/Users/matteomagnani/Dropbox/Research/Archive/13NetworkScience/code/fig6a.mnet","6a",',');
+	MLNetworkSharedPtr mnet_b = read_multilayer("/Users/matteomagnani/Dropbox/Research/Archive/13NetworkScience/code/fig6b.mnet","6b",',');
+
 	//mnet_read_edgelist(mnet, "test/toy.mnet");
-	mnet_read_edgelist(mnet0, "/Users/matteomagnani/Dropbox/Research/13NetworkScience/code/fig6b.mnet");
-	mnet0.getNetwork("l1")->addVertex("v8");
-	mnet0.map("v8","v8","l1");
-	mnet0.getNetwork("l3")->addVertex("v8");
-	mnet0.map("v8","v8","l3");
-	MultilayerNetwork mnet;
-	//mnet_read_edgelist(mnet, "test/toy.mnet");
-	mnet_read_edgelist(mnet, "/Users/matteomagnani/Dropbox/Research/13NetworkScience/code/fig6b.mnet");
-	mnet.getNetwork("l1")->addVertex("v8");
-	mnet.map("v8","v8","l1");
-	mnet.getNetwork("l3")->addVertex("v8");
-	mnet.map("v8","v8","l3");
 
 	log("done!");
 
 	log("Computing modularity...");
-	std::map<network_id,std::map<vertex_id,long> > groups_toy, groups1, groups2, groups3, groups4;
+	hash<NodeSharedPtr,long> groups_toy, groups1, groups2, groups3, groups4;
 
-	groups_toy[0][0]=0;
-	groups_toy[0][1]=0;
-	groups_toy[0][2]=0;
-	groups_toy[0][3]=1;
-	groups_toy[0][4]=1;
-	groups_toy[1][1]=1;
-	groups_toy[1][3]=1;
-	groups_toy[1][4]=1;
 
-	groups1[0][0]=0;
-	groups1[0][1]=0;
-	groups1[0][2]=0;
-	groups1[0][3]=1;
-	groups1[0][4]=1;
-	groups1[0][6]=1;
-	groups1[0][7]=1;
-	groups1[1][0]=0;
-	groups1[1][1]=0;
-	groups1[1][2]=0;
-	groups1[1][3]=1;
-	groups1[1][4]=1;
-	groups1[1][5]=1;
-	groups1[1][6]=1;
-	groups1[1][7]=1;
-	groups1[2][0]=0;
-	groups1[2][1]=0;
-	groups1[2][2]=0;
-	groups1[2][3]=1;
-	groups1[2][4]=1;
-	groups1[2][5]=1;
-	groups1[2][6]=1;
-	groups1[2][7]=1;
-
-	groups2[0][0]=0;
-	groups2[0][1]=0;
-	groups2[0][2]=0;
-	groups2[0][3]=1;
-	groups2[0][4]=0;
-	groups2[0][6]=1;
-	groups2[0][7]=1;
-	groups2[1][0]=0;
-	groups2[1][1]=0;
-	groups2[1][2]=0;
-	groups2[1][3]=1;
-	groups2[1][4]=1;
-	groups2[1][5]=1;
-	groups2[1][6]=1;
-	groups2[1][7]=1;
-	groups2[2][0]=0;
-	groups2[2][1]=0;
-	groups2[2][2]=0;
-	groups2[2][3]=0;
-	groups2[2][4]=1;
-	groups2[2][5]=1;
-	groups2[2][6]=1;
-	groups2[2][7]=1;
-
-	groups3[0][0]=0;
-	groups3[0][1]=1;
-	groups3[0][2]=0;
-	groups3[0][3]=1;
-	groups3[0][4]=0;
-	groups3[0][6]=0;
-	groups3[0][7]=1;
-	groups3[1][0]=0;
-	groups3[1][1]=1;
-	groups3[1][2]=0;
-	groups3[1][3]=1;
-	groups3[1][4]=0;
-	groups3[1][5]=1;
-	groups3[1][6]=0;
-	groups3[1][7]=1;
-	groups3[2][0]=0;
-	groups3[2][1]=1;
-	groups3[2][2]=0;
-	groups3[2][3]=1;
-	groups3[2][4]=0;
-	groups3[2][5]=1;
-	groups3[2][6]=0;
-	groups3[2][7]=1;
-
-	groups4[0][0]=0;
-	groups4[0][1]=1;
-	groups4[0][2]=0;
-	groups4[0][3]=1;
-	groups4[0][4]=0;
-	groups4[0][6]=0;
-	groups4[0][7]=1;
-	groups4[1][0]=1;
-	groups4[1][1]=0;
-	groups4[1][2]=1;
-	groups4[1][3]=0;
-	groups4[1][4]=1;
-	groups4[1][5]=0;
-	groups4[1][6]=1;
-	groups4[1][7]=0;
-	groups4[2][0]=0;
-	groups4[2][1]=1;
-	groups4[2][2]=0;
-	groups4[2][3]=1;
-	groups4[2][4]=0;
-	groups4[2][5]=1;
-	groups4[2][6]=0;
-	groups4[2][7]=1;
-
-	double mod = modularity(mnet_toy,groups_toy,1);
+	/*double mod = modularity(mnet,groups_toy,1);
 	log(std::to_string(mod) + " ",false);
 	log("done 1 - toy!");
+	*/
 
+	LayerSharedPtr l1 = mnet_a->get_layer("l1");
+	LayerSharedPtr l2 = mnet_a->get_layer("l2");
+	LayerSharedPtr l3 = mnet_a->get_layer("l3");
+
+	ActorSharedPtr v1 = mnet_a->get_actor("v1");
+	ActorSharedPtr v2 = mnet_a->get_actor("v2");
+	ActorSharedPtr v3 = mnet_a->get_actor("v3");
+	ActorSharedPtr v4 = mnet_a->get_actor("v4");
+	ActorSharedPtr v5 = mnet_a->get_actor("v5");
+	ActorSharedPtr v6 = mnet_a->get_actor("v6");
+	ActorSharedPtr v7 = mnet_a->get_actor("v7");
+	ActorSharedPtr v8 = mnet_a->get_actor("v8");
+
+	groups1[mnet_a->get_node(v1,l1)] = 0;
+	groups1[mnet_a->get_node(v2,l1)] = 0;
+	groups1[mnet_a->get_node(v3,l1)] = 0;
+	groups1[mnet_a->get_node(v4,l1)] = 1;
+	groups1[mnet_a->get_node(v5,l1)] = 1;
+	groups1[mnet_a->get_node(v7,l1)] = 1;
+	groups1[mnet_a->get_node(v8,l1)] = 1;
+	groups1[mnet_a->get_node(v1,l2)] = 0;
+	groups1[mnet_a->get_node(v2,l2)] = 0;
+	groups1[mnet_a->get_node(v3,l2)] = 0;
+	groups1[mnet_a->get_node(v4,l2)] = 1;
+	groups1[mnet_a->get_node(v5,l2)] = 1;
+	groups1[mnet_a->get_node(v6,l2)] = 1;
+	groups1[mnet_a->get_node(v7,l2)] = 1;
+	groups1[mnet_a->get_node(v8,l2)] = 1;
+	groups1[mnet_a->get_node(v1,l3)] = 0;
+	groups1[mnet_a->get_node(v2,l3)] = 0;
+	groups1[mnet_a->get_node(v3,l3)] = 0;
+	groups1[mnet_a->get_node(v4,l3)] = 1;
+	groups1[mnet_a->get_node(v5,l3)] = 1;
+	groups1[mnet_a->get_node(v6,l3)] = 1;
+	groups1[mnet_a->get_node(v7,l3)] = 1;
+	groups1[mnet_a->get_node(v8,l3)] = 1;
 
 	log("GR1!");
-	mod = modularity(mnet0,groups1,0);
+	double mod = modularity(mnet_a,groups1,0);
 	log(std::to_string(mod) + " ",false);
 	log("done 0!");
-	mod = modularity(mnet0,groups1,.5);
+	mod = modularity(mnet_a,groups1,.5);
 	log(std::to_string(mod) + " ",false);
 	log("done .5!");
-	mod = modularity(mnet0,groups1,1);
+	mod = modularity(mnet_a,groups1,1);
 	log(std::to_string(mod) + " ",false);
 	log("done 1!");
+	/*
 	log("GR2!");
-	mod = modularity(mnet,groups2,0);
+	mod = modularity(mnet_b,groups2,0);
 	log(std::to_string(mod) + " ",false);
 	log("done 0!");
-	mod = modularity(mnet,groups2,.5);
+	mod = modularity(mnet_b,groups2,.5);
 	log(std::to_string(mod) + " ",false);
 	log("done .5!");
-	mod = modularity(mnet,groups2,1);
+	mod = modularity(mnet_b,groups2,1);
 	log(std::to_string(mod) + " ",false);
 	log("done 1!");
 	log("GR3!");
-	mod = modularity(mnet,groups3,0);
+	mod = modularity(mnet_b,groups3,0);
 	log(std::to_string(mod) + " ",false);
 	log("done 0!");
-	mod = modularity(mnet,groups3,.5);
+	mod = modularity(mnet_b,groups3,.5);
 	log(std::to_string(mod) + " ",false);
 	log("done .5!");
-	mod = modularity(mnet,groups3,1);
+	mod = modularity(mnet_b,groups3,1);
 	log(std::to_string(mod) + " ",false);
 	log("done 1!");
 	log("GR4!");
-	mod = modularity(mnet,groups4,0);
+	mod = modularity(mnet_b,groups4,0);
 	log(std::to_string(mod) + " ",false);
 	log("done 0!");
-	mod = modularity(mnet,groups4,.5);
+	mod = modularity(mnet_b,groups4,.5);
 	log(std::to_string(mod) + " ",false);
 	log("done .5!");
-	mod = modularity(mnet,groups4,1);
+	mod = modularity(mnet_b,groups4,1);
 	log(std::to_string(mod) + " ",false);
 	log("done 1!");
-
+	 */
 	log("TEST SUCCESSFULLY COMPLETED (modularity)");
-	*/
 }
-
-

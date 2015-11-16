@@ -13,7 +13,7 @@
 #include "utils.h"
 #include "io.h"
 //#include "community.h"
-//#include "evolution.h"
+#include "evolution.h"
 //#include "transformation.h"
 
 #endif /* MULTIPLENETWORK_MULTIPLENETWORK_H_ */

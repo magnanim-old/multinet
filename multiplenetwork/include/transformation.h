@@ -1,7 +1,7 @@
 /*
  * transformation.h
  *
- * Functions to transform a set of networks into a single one.
+ * Functions to transform a set of layers into a single one.
  */
 
 #ifndef MULTIPLENETWORK_TRANSFORMATION_H_
@@ -9,21 +9,21 @@
 
 #include "datastructures.h"
 
+namespace mlnet {
+
 /**
  * The "weighted" flattening approach adds an edge between v1 and v2 in the flattened network if
  * the edge is present in any on the input networks.
  * The weight on the edge indicates the number of networks where the edge is present.
  */
-Network flatten_weighted(const MultiplexNetwork& mnet, const std::set<network_id>& networks, bool force_directed, bool force_all_actors);
+void flatten_weighted(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
 
-Network flatten_weighted(const MultiplexNetwork& mnet, const std::set<std::string>& networks, bool force_directed, bool force_all_actors);
+void flatten_or(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
 
-Network flatten_or(const MultiplexNetwork& mnet, const std::set<network_id>& networks, bool force_directed, bool force_all_actors);
+void flatten_multi(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
 
-Network flatten_or(const MultiplexNetwork& mnet, const std::set<std::string>& networks, bool force_directed, bool force_all_actors);
+void project(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
 
-Network flatten_multi(const MultiplexNetwork& mnet, const std::set<network_id>& networks, bool force_directed, bool force_all_actors);
-
-Network flatten_multi(const MultiplexNetwork& mnet, const std::set<std::string>& networks, bool force_directed, bool force_all_actors);
+}
 
 #endif /* MULTIPLENETWORK_TRANSFORMATION_H_ */

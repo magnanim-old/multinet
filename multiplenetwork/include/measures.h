@@ -62,15 +62,12 @@ double xrelevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, c
 /** Network comparison ************************************************/
 /**********************************************************************/
 
-double network_jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers);
-double network_jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::set<std::string>& active_networks);
-double network_jaccard_similarity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double network_jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::string& network_name1, const std::string& network_name2);
+double jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers);
+double jaccard_similarity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
-double network_coverage(const MLNetworkSharedPtr& mnet, const std::set<layer_id>& n1, const std::set<layer_id>& n2);
-double network_coverage(const MLNetworkSharedPtr& mnet, const std::set<std::string>& n1, const std::set<std::string>& n2);
-double network_coverage(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double network_coverage(const MLNetworkSharedPtr& mnet, const std::string& network_name1, const std::string& network_name2);
+double coverage(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+
+double assortativity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode);
 
 // FROM HERE, PORTING NOT COMPLETED YET
 
@@ -78,11 +75,8 @@ double network_coverage(const MLNetworkSharedPtr& mnet, const std::string& netwo
 /** Distances *********************************************************/
 /**********************************************************************/
 
-//void pareto_distance(MultipleNetwork& mnet, global_identity identity, std::map<global_identity,Distance>& distances);
-
+std::unordered_map<ActorSharedPtr,std::set<distance> > pareto_distance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& from);
 /*
-std::map<actor_id,std::set<Distance> > pareto_distance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor,);
-
 std::map<actor_id,std::set<Path> > pareto_distance_all_paths(const MLNetworkSharedPtr& mnet, actor_id vertex);
 */
 
@@ -105,7 +99,7 @@ int check_dominance(const Path& p1, const Path& p2);
 /** Clustering ********************************************************/
 /**********************************************************************/
 
-double modularity(const MLNetworkSharedPtr& mnet, std::map<layer_id,std::map<actor_id,long> >& communities, double c);
+double modularity(MLNetworkSharedPtr mnet, const hash<NodeSharedPtr,long>& groups, double c);
 
 //std::vector<long> distribution(long (*f)(const MLNetworkSharedPtr, global_identity, const std::set<layer_id>&));
 

@@ -24,15 +24,15 @@ private:
 };
 
 /* Unit test functions */
-//void testNetwork();
 void testMLNetwork();
 void testIO();
 void testLocalMeasures();
+void testDistanceMeasures();
 void testRandom();
 void testRandomWalks();
-/*void testDistanceMeasures();
-void testModularity();
 void testEvolution();
+void testModularity();
+/*
 void testTransformations();*/
 
 

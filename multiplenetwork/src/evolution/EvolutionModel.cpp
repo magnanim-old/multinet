@@ -9,5 +9,8 @@
 #include <set>
 #include <iostream>
 
+namespace mlnet {
 
 EvolutionModel::~EvolutionModel() {}
+
+}

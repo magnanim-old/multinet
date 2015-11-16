@@ -15,12 +15,6 @@
 
 using namespace std;
 
-/*
- void pareto_distance(MultipleNetwork* mnet,
- igraph_integer_t vertex,
- vector<set<MultiDistance> > *distances) {}
-*/
-
 std::map<entity_id,std::set<Distance> > pareto_distance(const MLNetwork& mnet, entity_id identity)  {
 	std::map<entity_id,std::set<Distance> > distances;
 	std::set<entity_id> identities = mnet.getGlobalIdentities();

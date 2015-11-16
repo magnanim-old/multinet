@@ -10,17 +10,18 @@
 #include <iostream>
 #include "evolution.h"
 
-void evolve(MultiplexNetwork &mnet,
+namespace mlnet {
+
+void evolve(MLNetworkSharedPtr mnet,
 		long num_of_steps,
-		std::vector<int> num_new_vertexes_per_step,
+		long num_initial_actors,
+		//std::vector<int> num_new_vertexes_per_step,
+		std::vector<double> pr_no_event,
 		std::vector<double> pr_internal_event,
-		std::vector<evolution_strategy> strategy,
-		std::vector<double> pr_external_event,
-		std::vector<std::vector<double> > dependency) {
+		matrix<double> dependency,
+		std::vector<EvolutionModel*> evolution_model) {
 
-	Random rand;
-
-	// init of support data structures
+	/* init of support data structures
 	std::vector<std::set<entity_id> > free_identities(mnet.getNumNetworks());
 	std::set<entity_id> ids = mnet.getGlobalIdentities();
 
@@ -29,11 +30,25 @@ void evolve(MultiplexNetwork &mnet,
 		std::set<entity_id> to_copy(ids.begin(),ids.end());
 		free_identities[n] = to_copy;
 	}
+	*/
+
+	// Creating num_initial_actors actors
+	//std::cout << "INIT ACTORS" << std::endl;
+	for (int i=0; i<num_initial_actors; i++)
+		mnet->add_actor("A"+std::to_string(i));
+
+	// Initialization
+	for (int n=0; n<mnet->get_layers().size(); n++) {
+		//std::cout << "INIT LAYER " << n << std::endl;
+		evolution_model[n]->init_step(mnet,mnet->get_layers().get_at_index(n));
+	}
 
 	for (long i=0; i<num_of_steps; i++) {
-		for (int n=0; n<mnet.getNumNetworks(); n++) {
+		//std::cout << "step " << i << std::endl;
+		for (int n=0; n<mnet->get_layers().size(); n++) {
 
-			// Add new vertexes
+			LayerSharedPtr target_layer = mnet->get_layers().get_at_index(n);
+			/* Add new vertexes ???
 			//std::cout << "Add vertexes to " << n << ": ";
 			for (int new_v=0; new_v<num_new_vertexes_per_step[n]; new_v++) {
 				if (free_identities[n].empty())
@@ -45,10 +60,18 @@ void evolve(MultiplexNetwork &mnet,
 				//std::cout << ".";
 			}
 			//std::cout << std::endl;
+			*/
 
-			std::set<vertex_id> vertexes = mnet.getNetwork(n).getVertexes();
-			for (vertex_id vertex: vertexes) {
-				if (rand.test(pr_internal_event[n])) {
+			if (test(pr_no_event[n])) {
+				//std::cout << "no event" << std::endl;
+				//std::cout << " No event " << target_layer->to_string() << std::endl;
+				// DO NOTHING;
+			}
+
+			//std::set<vertex_id> vertexes = mnet.getNetwork(n).getVertexes();
+			//for (vertex_id vertex: vertexes) {
+			else if (test(pr_internal_event[n])) {
+					/*
 					//std::cout << "Iternal event for vertex " << vertex << std::endl;
 					switch (strategy[n]) {
 						case EVOLUTION_DEGREE:
@@ -60,44 +83,39 @@ void evolve(MultiplexNetwork &mnet,
 								mnet.getNetwork(n).addEdge(vertex,target);
 							break;
 					}
-				}
-				if (rand.test(pr_external_event[n])) {
-					//std::cout << "External event for vertex " << vertex << std::endl;
-								// choose a network from which to import an edge: first find the candidates:
-								std::set<network_id> candidates;
-								for (int i=0; i<dependency[n].size(); i++) {
-									if (rand.test(dependency[n][i]))
-										candidates.insert(i);
-								}
-								// then pick uniformly at random one of the candidates
-								network_id import = rand.getElement(candidates);
-								//std::cout << "external event from " << import << std::endl;
-								// finally we choose an edge uniformly at random from this network and we insert it into the target
-								std::set<edge_id> edges = mnet.getNetwork(import).getEdges();
-								std::set<edge_id> edges_between_common_ids;
-								for (edge_id e: edges) {
-									entity_id gid1 = mnet.getGlobalIdentity(e.v1,import);
-									entity_id gid2 = mnet.getGlobalIdentity(e.v2,import);
-									if (!mnet.containsVertex(gid1,n) || !mnet.containsVertex(gid2,n))
-										continue;
-									vertex_id lid1 = mnet.getVertexId(gid1,n);
-									vertex_id lid2 = mnet.getVertexId(gid2,n);
-									if (!mnet.getNetwork(n).containsEdge(lid1,lid2)) {
-										edge_id eid(lid1,lid2,false);
-										edges_between_common_ids.insert(eid);
-									}
-								}
-								if (edges_between_common_ids.empty()) continue;
-								edge_id edge_to_be_imported = rand.getElement(edges_between_common_ids);
-								// check if these identities are already present in the target network (if not, insert them)
-								mnet.getNetwork(n).addEdge(edge_to_be_imported.v1, edge_to_be_imported.v2);
+					*/
+				//std::cout << " Internal event " << target_layer->to_string() << std::endl;
+				evolution_model[n]->evolution_step(mnet,target_layer);
+			}
+			else {
+				// choose a layer from which to import an edge: first find the candidates:
+				//std::set<network_id> candidates;
+					int layer_index = test(dependency[n]);
+					LayerSharedPtr layer = mnet->get_layers().get_at_index(layer_index);
+
+					//std::cout << " External event " << target_layer->to_string() << " <- " << layer->to_string() << std::endl;
+
+					// Choose an actor from that layer and replicate it to the target layer (if it does not already exist)
+					NodeSharedPtr imported_node = mnet->get_nodes(layer).get_at_random();
+					NodeSharedPtr new_node = mnet->get_node(imported_node->actor,target_layer);
+					if (!new_node)
+						new_node = mnet->add_node(imported_node->actor,target_layer);
+
+					// finally we insert the actor's neighbors into the target layer, if the neighbors are also present there
+					for (NodeSharedPtr neighbor: mnet->neighbors(imported_node,OUT)) {
+						NodeSharedPtr local_neighbor = mnet->get_node(neighbor->actor,target_layer);
+						if (local_neighbor) {
+							if (!mnet->get_edge(new_node,local_neighbor)) {
+								mnet->add_edge(new_node,local_neighbor);
 							}
 						}
-			}
-
+					}
+				}
+		}
 	}
 }
 
+/*
 void evolve_edge_import(MultiplexNetwork &mnet,
 		long num_of_steps,
 		std::vector<double> pr_no_event,
@@ -196,7 +214,7 @@ void evolve_edge_copy(MultiplexNetwork &mnet,
 					for (int i=0; i<dependency.size(); i++) {
 						if (rand.test(dependency[i][n])) {
 							//std::cout << dependency[i][n] << " copy to " << i << std::endl;
-							/* copy vertexes
+							/  * copy vertexes
 							for (global_vertex_id gvid: new_vertexes) {
 								global_identity gid = mnet.getGlobalIdentity(gvid.vid,gvid.network);
 							if (!mnet.containsVertex(gid,i)) {
@@ -207,7 +225,7 @@ void evolve_edge_copy(MultiplexNetwork &mnet,
 									vertex = mnet.getNetwork(i).addVertex();
 								mnet.mapIdentity(gid, vertex, i);
 							}
-							}*/
+							}
 							// copy edges
 							for (global_edge_id geid: new_edges) {
 								entity_id gid1 = mnet.getGlobalIdentity(geid.v1,geid.network);
@@ -239,6 +257,10 @@ void evolve_edge_copy(MultiplexNetwork &mnet,
 				}
 			}
 		}
+}
+
+*/
+
 }
 
 

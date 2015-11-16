@@ -16,6 +16,9 @@
 using namespace mlnet;
 
 void testIO() {
+
+	//#define TEST_IO
+
 	log("TESTING IO (MLNetwork)");
 	log("Reading network io1 from file...",false);
 	MLNetworkSharedPtr mnet1 = read_multilayer("test/io1.mpx","mlnet 1",',');

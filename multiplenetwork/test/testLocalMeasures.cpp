@@ -6,8 +6,8 @@
  * Version: 0.0.1
  */
 
-#import "test.h"
-#import "multiplenetwork.h"
+#include "test.h"
+#include "multiplenetwork.h"
 #include <iostream>
 #include <string>
 
@@ -15,7 +15,10 @@ using namespace mlnet;
 
 void testLocalMeasures() {
 
-	// We need to read the network from a file: testIO() must have been passed
+	//#ifndef TEST_IO
+	//throw FailedUnitTestException("Local measure testing requires IO testing");
+	//#endif
+
 	log("TESTING measures (single actor)");
 	log("Reading the multilayer network...",false);
 	MLNetworkSharedPtr mnet = read_multilayer("test/io2.mpx","mlnet 2",',');
@@ -51,26 +54,26 @@ void testLocalMeasures() {
 	if (xneighbors(mnet,u1,nets,INOUT).size() != 4) throw FailedUnitTestException("Wrong exclusive neighborhood, both layers: " + to_string(xneighbors(mnet,u1,nets,INOUT).size()));
 	log("done!");
 
-	log("Testing network relevance...",false);
+	log("Testing layer relevance...",false);
 	if (relevance(mnet,u1,l1,INOUT) != 3.0/4.0) throw FailedUnitTestException("Wrong relevance, layer l1: " + to_string(relevance(mnet,u1,l1,INOUT)));
 	if (relevance(mnet,u1,nets,INOUT) != 1) throw FailedUnitTestException("Wrong relevance, both layers: " + to_string(relevance(mnet,u1,nets,INOUT)));
 	log("done!");
-	log("Testing exclusive network relevance...",false);
+	log("Testing exclusive layer relevance...",false);
 	if (xrelevance(mnet,u1,l1,INOUT) != 2.0/4.0) throw FailedUnitTestException("Wrong exclusive relevance, layer l1: " + to_string(xrelevance(mnet,u1,l1,INOUT)));
 	if (xrelevance(mnet,u1,nets,INOUT) != 1) throw FailedUnitTestException("Wrong exclusive relevance, both layers: " + to_string(xrelevance(mnet,u1,nets,INOUT)));
 	log("done!");
 
-	//log("Testing jaccard similarity...",false);
-	//MultiplexNetwork und_net = read_multiplex("test/io1.mpx");
+	log("Testing jaccard similarity...",false);
+	MLNetworkSharedPtr mnet1 = read_multilayer("test/io1.mpx","mlnet 1",',');
 	//std::cout << network_jaccard_similarity(und_net,nets) << std::endl;
-	//if (network_jaccard_similarity(mnet,nets) != 1.0/10.0) throw FailedUnitTestException("Wrong network similarity");
+	if (jaccard_similarity(mnet,nets) != 1.0/10.0) throw FailedUnitTestException("Wrong layer similarity");
 	/*MultiplexNetwork aucs = read_multiplex("data/aucs.mpx");
 	std::set<std::string> aucsnets;
 	aucsnets.insert("lunch");
 	aucsnets.insert("facebook");
 	std::cout << network_jaccard_similarity(aucs,aucsnets) << std::endl;
 	*/
-	//log("done!");
+	log("done!");
 
 	log("TEST SUCCESSFULLY COMPLETED (single actor)");
 

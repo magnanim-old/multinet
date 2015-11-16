@@ -8,78 +8,67 @@
 
 #include "community.h"
 #include "measures.h"
-#include <map>
+#include <unordered_map>
 #include <iostream>
 
-double modularity(MultipleNetwork& mnet,
-		 std::map<network_id,std::map<vertex_id,long> >& groups, double c) {
-	double res = 0;
-	double mu2 = 0;
-	std::set<network_id> networks;
-	mnet.getNetworks(networks);
-	std::set<network_id>::iterator network_iterator;
-	for (network_iterator=networks.begin(); network_iterator!=networks.end(); network_iterator++) {
-		network_id net = *network_iterator;
-		double m_net = 2*mnet.getNetwork(net)->getNumEdges();
-		mu2 += m_net;
-		// FIX TO THE ORIGINAL EQUATION WHEN THERE ARE NO EDGES
-		if (m_net == 0)
-			continue;
-		std::set<vertex_id> vertexes;
-		mnet.getNetwork(net)->getVertexes(vertexes);
-		for (std::set<vertex_id>::iterator v_i = vertexes.begin();
-				v_i != vertexes.end(); v_i++) {
-			for (std::set<vertex_id>::iterator v_j = vertexes.begin();
-					v_j != vertexes.end(); v_j++) {
-				// if (*v_i==*v_j) continue; SEEMS REASONABLE, BUT NOT IN DEFINITION...
-				vertex_id global_v_i = mnet.getGlobalVertexId(*v_i, net);
-				vertex_id global_v_j = mnet.getGlobalVertexId(*v_j, net);
-				//std::cout << global_v_i << " " << global_v_j << std::endl;
+namespace mlnet {
 
-				if (groups[net][global_v_i] == groups[net][global_v_j]) {
+double modularity(MLNetworkSharedPtr mnet, const hash<NodeSharedPtr,long>& membership, double c) {
+	// partition the nodes by group
+	hash<long, std::set<NodeSharedPtr> > groups;
+	for (auto pair: membership) {
+		groups[pair.second].insert(pair.first);
+	}
+	// start computing the modularity
+	double res = 0;
+	double mu = 0;
+	hash<LayerSharedPtr,long> m_s;
+	for (LayerSharedPtr s: mnet->get_layers()) {
+		double m = mnet->get_edges(s,s).size();
+		if (!mnet->is_directed(s,s))
+			m *= 2;
+		mu += m;
+		// FIX TO THE ORIGINAL EQUATION WHEN THERE ARE NO EDGES
+		if (m == 0)
+			m = 1; // no effect on the formula
+		m_s[s] = m;
+		mu += m;
+	}
+
+		for (auto pair: groups) {
+			for (NodeSharedPtr i: pair.second) {
+				for (NodeSharedPtr j: pair.second) {
+				if (i==j) continue; // not in the original definition - we do this assuming to deal with simple graphs
+				//std::cout << i->to_string() << " " << groups.count(i) << std::endl;
+				//std::cout << j->to_string() << " " << groups.count(j) << std::endl;
+
+				if (i->layer==j->layer) {
 					//std::cout << "Same group!" << std::endl;
 					//if (mnet.getNetwork(net)->containsEdge(*v_i,*v_j))
 					//	std::cout << "Edge" << std::endl;
-					long k_i = degree(mnet, global_v_i, net);
-					long k_j = degree(mnet, global_v_j, net);
-					int a_ij =
-							mnet.getNetwork(net)->containsEdge(
-									*v_i,
-									*v_j) ? 1.0 : 0.0;
-					res += a_ij - k_i * k_j / (2 * m_net);
+					long k_i = mnet->neighbors(i,OUT).size();
+					long k_j = mnet->neighbors(j,IN).size();
+					int a_ij = mnet->get_edge(i,j)? 1.0 : 0.0;
+					res += a_ij - k_i * k_j / (2 * m_s.at(i->layer));
 					//std::cout << global_v_i << " " << global_v_j << " " << (a_ij - k_i * k_j / (2 * m_net)) << std::endl;
 					//std::cout << "->" << res << std::endl;
 				}
+				if (i->actor==j->actor) {
+					res += c;
+				}
 			}
 		}
-		std::cout << "->" << m_net << std::endl;
+		//std::cout << "->" << m_net << std::endl;
 	}
+	//std::cout << "same" << std::endl;
 
-	double mod = res;
-
-	std::set<network_id>::iterator network_iterator1, network_iterator2;
-	std::set<vertex_id>::iterator vertex_iterator;
-	std::set<vertex_id> vertexes;
-	mnet.getVertexes(vertexes);
-	for (network_iterator1=networks.begin(); network_iterator1!=networks.end(); ++network_iterator1) {
-		network_id net1 = *network_iterator1;
-		for (network_iterator2=networks.begin(); network_iterator2!=networks.end(); ++network_iterator2) {
-			network_id net2 = *network_iterator2;
-			if (net1==net2) continue;
-			for (vertex_iterator=vertexes.begin(); vertex_iterator!=vertexes.end(); ++vertex_iterator) {
-				 vertex_id v = *vertex_iterator;
-				 if (mnet.containsVertex(v,net1) &&
-					mnet.containsVertex(v,net2)) {
-					 mu2+=c;
-					if (groups[net1][v] == groups[net2][v]) {
-					 	 res += c; // or omega
-			 	}
-				 }
-			}
-		}
+	for (ActorSharedPtr actor: mnet->get_actors()) {
+		int num_nodes = mnet->get_nodes(actor).size();
+		mu+=c*num_nodes*(num_nodes-1);
 	}
+	//std::cout << "->" << mod << " " << (res-mod) << "-" << mu2 << std::endl;
 
-	std::cout << "->" << mod << " " << (res-mod) << "-" << mu2 << std::endl;
+	return 1 / mu * res;
+}
 
-	return 1 / (mu2) * res;
 }
