@@ -1,15 +1,27 @@
-multiplenetwork
+mlnetwork
 ===============
 
-Analysis and mining of multiple(x) networks
+Analysis and mining of multilayer networks
 
-The include directory contains all the classes/functions definitions and detailed comments. To use this as an external library, it is sufficient to include multiplenetwork.h (which just imports all other headers).
+Brief description of the code structure of the mlnetwork library
 
-- datastructure.h contains the definitions of vertexes, edges, networks and multiple networks, in addition to paths and distances.
-- measures.h contains the definition of the main analysis measures: degree, neighborhood, network relevance, distance, betweenness, modularity, ... (all in their multiple-network extension).
-- io.h contains functions to read and write multiple networks from/to file (so far only a simple read function has been implemented).
-- transformation.h
-- evolution.h
-- community.h
+./include/mlnetwork.h is the main header file, and lists all the
+different modules in the library. This file can be useful to
+get a quick overview of the main modules in the library.
 
-The test directory contains unit-testing functions - every time a new polished function/class is added to the library a corresponding test function is added here. This is useful to understand how the library works. For example, looking at the code of testNetwork() we can see how a network is created and manipulated, etc. run_all (which is currently set as the default action in the Makefile) runs all the validated test functions. This should be tried every time the code is significantly changed.
+Each module is made of:
+- a header file (e.g., measures.h);
+- a directory with all the source files (e.g., ./src/measures/)
+- a file where the module's functions are tested (e.g., ./test/test_measures.cpp)
+
+The test files are also useful to see examples of how the classes/methods in the
+library can be used.
+
+The ./test directory contains its own header file, as it is not necessarily
+distributed together with the library, and the file test_all.cpp runs all the
+tests so that after any updates it can be checked that no functionality has
+been affected.
+
+In the basic Makefile (Mac version) there are two targets, one to run the tests
+(unit_test) and one to package the library in a library file to be used with
+other programs. 
