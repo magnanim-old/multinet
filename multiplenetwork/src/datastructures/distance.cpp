@@ -24,7 +24,7 @@ long distance::length(const LayerSharedPtr& from, const LayerSharedPtr& to) cons
 	return num_edges.count(from->id,to->id);
 }
 
-domination distance::compare(const distance& other, comparison_type comp) const {
+comparison_result distance::compare(const distance& other, comparison_type comp) const {
 	switch (comp) {
 	case FULL_COMPARISON:
 		return compare_full(other);
@@ -38,7 +38,7 @@ domination distance::compare(const distance& other, comparison_type comp) const 
 	throw WrongParameterException("Wrong comparison type");
 }
 
-domination distance::compare_full(const distance& other) const {
+comparison_result distance::compare_full(const distance& other) const {
 	bool canBeDominated = true;
 	bool canDominate = true;
 	if (mnet != other.mnet) {
@@ -67,7 +67,7 @@ domination distance::compare_full(const distance& other) const {
 		return P_EQUAL;
 }
 
-domination distance::compare_switch(const distance& other) const {
+comparison_result distance::compare_switch(const distance& other) const {
 	bool canBeDominated = true;
 	bool canDominate = true;
 	if (mnet != other.mnet) {
@@ -107,7 +107,7 @@ domination distance::compare_switch(const distance& other) const {
 		return P_EQUAL;
 }
 
-domination distance::compare_multiplex(const distance& other) const {
+comparison_result distance::compare_multiplex(const distance& other) const {
 	bool canBeDominated = true;
 	bool canDominate = true;
 	if (mnet != other.mnet) {
@@ -137,7 +137,7 @@ domination distance::compare_multiplex(const distance& other) const {
 		return P_EQUAL;
 }
 
-domination distance::compare_simple(const distance& other) const {
+comparison_result distance::compare_simple(const distance& other) const {
 	bool canBeDominated = true;
 	bool canDominate = true;
 	if (mnet != other.mnet) {

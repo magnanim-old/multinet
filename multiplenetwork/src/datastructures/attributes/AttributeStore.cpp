@@ -27,11 +27,11 @@ void AttributeStore::add(const std::string& attribute_name, attribute_type type)
 	switch (type) {
 	case STRING_TYPE:
 		if (string_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
-		string_attribute[attribute_name] = std::map<object_id,std::string>();
+		string_attribute[attribute_name] = hash<object_id,std::string>();
 		break;
 	case NUMERIC_TYPE:
 		if (numeric_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
-		numeric_attribute[attribute_name] = std::map<object_id,double>();
+		numeric_attribute[attribute_name] = hash<object_id,double>();
 		break;
 	}
 	AttributeSharedPtr new_attribute(new Attribute(attribute_name, type));
@@ -63,7 +63,7 @@ const std::string& AttributeStore::getString(const object_id& oid, const std::st
 	return string_attribute.at(attribute_name).at(oid);
 }
 
-void AttributeStore::remove(const object_id& oid) {
+void AttributeStore::reset(const object_id& oid) {
 	for (AttributeSharedPtr attr: attribute_vector) {
 		switch (attr->type()) {
 		case NUMERIC_TYPE:

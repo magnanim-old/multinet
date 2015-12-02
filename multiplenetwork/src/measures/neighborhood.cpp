@@ -13,8 +13,8 @@ using namespace std;
 
 namespace mlnet {
 
-SortedSet<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
-	SortedSet<actor_id,ActorSharedPtr> neighbors_on_selected_layers;
+sorted_set<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
+	sorted_set<actor_id,ActorSharedPtr> neighbors_on_selected_layers;
 	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
 		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
 			if (layers.count(neighbor->layer)>0) {
@@ -25,8 +25,8 @@ SortedSet<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, con
 	return neighbors_on_selected_layers;
 }
 
-SortedSet<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
-		SortedSet<actor_id,ActorSharedPtr> neighbors_on_selected_layer;
+sorted_set<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
+		sorted_set<actor_id,ActorSharedPtr> neighbors_on_selected_layer;
 		for (NodeSharedPtr node: mnet->get_nodes(actor)) {
 			for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
 				if (neighbor->layer==layer)
@@ -38,8 +38,8 @@ SortedSet<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, con
 
 ///////////////////////////////////
 
-	SortedSet<actor_id,ActorSharedPtr> xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
-		SortedSet<actor_id,ActorSharedPtr> neighbors_on_selected_layers;
+	sorted_set<actor_id,ActorSharedPtr> xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
+		sorted_set<actor_id,ActorSharedPtr> neighbors_on_selected_layers;
 		std::set<ActorSharedPtr> neighbors_on_other_layers;
 		for (NodeSharedPtr node: mnet->get_nodes(actor)) {
 			for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
@@ -53,8 +53,8 @@ SortedSet<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, con
 		return neighbors_on_selected_layers;
 	}
 
-	SortedSet<actor_id,ActorSharedPtr> xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
-		SortedSet<actor_id,ActorSharedPtr> neighbors_on_selected_layer;
+	sorted_set<actor_id,ActorSharedPtr> xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
+		sorted_set<actor_id,ActorSharedPtr> neighbors_on_selected_layer;
 		std::set<ActorSharedPtr> neighbors_on_other_layers;
 		for (NodeSharedPtr node: mnet->get_nodes(actor)) {
 			for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {

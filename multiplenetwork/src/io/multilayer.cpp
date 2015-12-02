@@ -49,6 +49,7 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 		if (v.size()==1 && v[0]=="") {
 			continue;
 		}
+
 		// SECTION
 		if (v[0].find("#TYPE")!=string::npos) {
 			current_sect = TYPE;
@@ -171,9 +172,9 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			if (v.size()<1)
 				throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": Actor name must be specified");
 			string actor_name = v[0];
-			ActorSharedPtr actor = mnet->get_actor(actor_name);
-			if (actor==NULL) {
-				actor = mnet->add_actor(actor_name);
+			ActorSharedPtr actor = mnet->add_actor(actor_name);
+			if (actor==NULL) { // actor already present
+				actor = mnet->get_actor(actor_name);
 			}
 			// Read attributes
 			if (1+actor_attr_names.size()>v.size())
@@ -210,6 +211,7 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			if (layer==NULL) {
 				layer = mnet->add_layer(layer_name,default_edge_directionality);
 			}
+
 			NodeSharedPtr node = mnet->get_node(actor,layer);
 			if (node==NULL) {
 				node = mnet->add_node(actor,layer);
@@ -258,6 +260,7 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			}
 
 			// TODO add warnings - and write MULTILAYER
+
 			ActorSharedPtr actor1 = mnet->get_actor(from_node);
 			if (actor1==NULL) {
 				actor1 = mnet->add_actor(from_node);
@@ -266,26 +269,33 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			if (actor2==NULL) {
 				actor2 = mnet->add_actor(to_node);
 			}
+
 			LayerSharedPtr layer1 = mnet->get_layer(layer_name1);
 			if (layer1==NULL) {
 				layer1 = mnet->add_layer(layer_name1,default_edge_directionality);
 			}
+
 			LayerSharedPtr layer2 = mnet->get_layer(layer_name2);
 			if (layer2==NULL) {
 				layer2 = mnet->add_layer(layer_name2,default_edge_directionality);
 			}
+
 			NodeSharedPtr node1 = mnet->get_node(actor1,layer1);
 			if (node1==NULL) {
 				node1 = mnet->add_node(actor1,layer1);
 			}
+
 			NodeSharedPtr node2 = mnet->get_node(actor2,layer2);
 			if (node2==NULL) {
 				node2 = mnet->add_node(actor2,layer2);
 			}
+
 			EdgeSharedPtr edge = mnet->get_edge(node1,node2);
 			if (edge==NULL) {
 				edge = mnet->add_edge(node1,node2);
 			}
+
+
 			// Read edge attributes
 			// indexes of current attribute in the local vectors and in the csv file.
 			int attr_i=0;

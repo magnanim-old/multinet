@@ -65,6 +65,11 @@ public:
      */
     long count(T val) const;
 
+    /**
+     * @return the value with the highest count (in case of tie, any maximal value can be returned)
+     */
+    T max() const;
+
     std::unordered_map<T,long>& map();
 };
 
@@ -94,6 +99,21 @@ long Counter<T>::count(T val) const {
 		return 0;
 	}
 	else return values.at(val);
+}
+
+template <class T>
+T Counter<T>::max() const {
+	long max = 0;
+	T max_value;
+	for (auto pair: values) {
+		if (pair.second>max) {
+			max_value = pair.first;
+			max = pair.second;
+		}
+	}
+	if (max==0)
+		return NULL;
+	else return max_value;
 }
 
 template <class T>

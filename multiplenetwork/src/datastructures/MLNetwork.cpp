@@ -16,7 +16,7 @@ MLNetworkSharedPtr MLNetwork::create(const std::string& name) {
 
 ActorSharedPtr MLNetwork::add_actor(const std::string& name)  {
 	ActorSharedPtr check = get_actor(name);
-	if (check) throw DuplicateElementException("actor " + check->to_string());
+	if (check) return NULL;
 	actor_id aid = ++max_actor_id;
 	ActorSharedPtr actor_ptr(new actor(aid,name));
 	actors.insert(aid,actor_ptr);
@@ -34,13 +34,13 @@ ActorSharedPtr MLNetwork::get_actor(const std::string& name) const {
 	  else return NULL;
 }
 
-const SortedSet<actor_id,ActorSharedPtr>& MLNetwork::get_actors() const {
+const sorted_set<actor_id,ActorSharedPtr>& MLNetwork::get_actors() const {
 	return actors;
 }
 
 LayerSharedPtr MLNetwork::add_layer(const std::string& name, bool directed) {
 	LayerSharedPtr check = get_layer(name);
-	if (check) throw DuplicateElementException("layer " + check->to_string());
+	if (check) return NULL;
 	layer_id id = ++max_layer_id;
 	LayerSharedPtr layer_ptr(new layer(id,name));
 	layers.insert(id,layer_ptr);
@@ -52,12 +52,12 @@ LayerSharedPtr MLNetwork::add_layer(const std::string& name, bool directed) {
 	return layer_ptr;
 }
 
-void MLNetwork::set_directed(LayerSharedPtr layer1, LayerSharedPtr layer2, bool directed) {
+void MLNetwork::set_directed(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, bool directed) {
 	edge_directionality[layer1->id][layer2->id] = directed;
 	edge_directionality[layer2->id][layer1->id] = directed;
 }
 
-bool MLNetwork::is_directed(LayerSharedPtr layer1, LayerSharedPtr layer2) const {
+bool MLNetwork::is_directed(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const {
 	if (edge_directionality.count(layer1->id)>0) {
 		if (edge_directionality.at(layer1->id).count(layer2->id)>0) {
 			return edge_directionality.at(layer1->id).at(layer2->id);
@@ -72,18 +72,21 @@ LayerSharedPtr MLNetwork::get_layer(const layer_id& id) const {
 }
 
 LayerSharedPtr MLNetwork::get_layer(const std::string& name) const {
-	  if (cidx_layer_by_name.count(name)>0)
-	  	  return cidx_layer_by_name.at(name);
-	  else return NULL;
+	if (cidx_layer_by_name.count(name)>0) {
+		return cidx_layer_by_name.at(name);
+	}
+	else {
+		return NULL;
+	}
 }
 
-const SortedSet<layer_id,LayerSharedPtr>& MLNetwork::get_layers() const {
+const sorted_set<layer_id,LayerSharedPtr>& MLNetwork::get_layers() const {
 	return layers;
 }
 
 NodeSharedPtr MLNetwork::add_node(const ActorSharedPtr& actor, const LayerSharedPtr& layer) {
 	NodeSharedPtr check = get_node(actor,layer);
-	if (check) throw DuplicateElementException("node " + check->to_string());
+	if (check) return NULL;
 	node_id id = ++max_node_id;
 	NodeSharedPtr node_ptr(new node(id,actor,layer));
 	nodes.insert(id,node_ptr);
@@ -98,30 +101,31 @@ NodeSharedPtr MLNetwork::get_node(const node_id& id) const {
 }
 
 NodeSharedPtr MLNetwork::get_node(const ActorSharedPtr& actor, const LayerSharedPtr& layer) const  {
-	  if (cidx_node_by_actor_and_layer.count(actor->id)>0 && cidx_node_by_actor_and_layer.at(actor->id).count(layer->id)>0)
-	 	  return cidx_node_by_actor_and_layer.at(actor->id).at(layer->id);
-	  else return NULL;
+	if (cidx_node_by_actor_and_layer.count(actor->id)>0 && cidx_node_by_actor_and_layer.at(actor->id).count(layer->id)>0) {
+		return cidx_node_by_actor_and_layer.at(actor->id).at(layer->id);
+	}
+	else return NULL;
 }
 
-const SortedSet<node_id,NodeSharedPtr>& MLNetwork::get_nodes() const  {
+const sorted_set<node_id,NodeSharedPtr>& MLNetwork::get_nodes() const  {
 	return nodes;
 }
 
-const SortedSet<node_id,NodeSharedPtr>& MLNetwork::get_nodes(const LayerSharedPtr& layer) const {
+const sorted_set<node_id,NodeSharedPtr>& MLNetwork::get_nodes(const LayerSharedPtr& layer) const {
 	if (sidx_nodes_by_layer.count(layer->id)==0)
-		return *(new SortedSet<node_id,NodeSharedPtr>());
+		return *(new sorted_set<node_id,NodeSharedPtr>());
 	return sidx_nodes_by_layer.at(layer->id);
 }
 
-const SortedSet<node_id,NodeSharedPtr>& MLNetwork::get_nodes(const ActorSharedPtr& actor) const {
+const sorted_set<node_id,NodeSharedPtr>& MLNetwork::get_nodes(const ActorSharedPtr& actor) const {
 	if (sidx_nodes_by_actor.count(actor->id)==0)
-			return *(new SortedSet<node_id,NodeSharedPtr>());
+			return *(new sorted_set<node_id,NodeSharedPtr>());
 		return sidx_nodes_by_actor.at(actor->id);
 }
 
 EdgeSharedPtr MLNetwork::add_edge(const NodeSharedPtr& node1, const NodeSharedPtr& node2) {
 	EdgeSharedPtr check = get_edge(node1,node2);
-	if (check) throw DuplicateElementException("edge " + check->to_string());
+	if (check) return NULL;
 	edge_id eid = ++max_edge_id;
 	bool edge_directed = is_directed(node1->layer,node2->layer);
 	EdgeSharedPtr new_edge_v1_v2(new edge(eid,node1,node2,edge_directed));
@@ -151,13 +155,13 @@ EdgeSharedPtr MLNetwork::get_edge(const NodeSharedPtr& node1, const NodeSharedPt
 	else return NULL;
 }
 
-const SortedSet<edge_id,EdgeSharedPtr>& MLNetwork::get_edges() const {
+const sorted_set<edge_id,EdgeSharedPtr>& MLNetwork::get_edges() const {
 	return edges;
 }
 
-const SortedSet<edge_id,EdgeSharedPtr>& MLNetwork::get_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const {
+const sorted_set<edge_id,EdgeSharedPtr>& MLNetwork::get_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const {
 	if (sidx_edges_by_layer_pair.count(layer1->id)==0 || sidx_edges_by_layer_pair.at(layer1->id).count(layer2->id)==0)
-		return *(new SortedSet<edge_id,EdgeSharedPtr>());
+		return *(new sorted_set<edge_id,EdgeSharedPtr>());
 	return sidx_edges_by_layer_pair.at(layer1->id).at(layer2->id);
 }
 
@@ -168,7 +172,7 @@ bool MLNetwork::erase(const NodeSharedPtr& node) {
 	cidx_node_by_actor_and_layer[node->actor->id].erase(node->layer->id);
 
 	// removing adjacent edges
-	SortedSet<node_id,NodeSharedPtr> in = neighbors(node,IN);
+	sorted_set<node_id,NodeSharedPtr> in = neighbors(node,IN);
 	std::vector<EdgeSharedPtr> to_erase_in;
 	to_erase_in.reserve(in.size());
 	for (NodeSharedPtr node_in : in) {
@@ -177,7 +181,7 @@ bool MLNetwork::erase(const NodeSharedPtr& node) {
 	for (EdgeSharedPtr edge : to_erase_in) {
 		erase(edge);
 	}
-	SortedSet<node_id,NodeSharedPtr> out = neighbors(node,OUT);
+	sorted_set<node_id,NodeSharedPtr> out = neighbors(node,OUT);
 	std::vector<EdgeSharedPtr> to_erase_out;
 	to_erase_out.reserve(out.size());
 	for (NodeSharedPtr node_out : out) {
@@ -187,7 +191,7 @@ bool MLNetwork::erase(const NodeSharedPtr& node) {
 		erase(edge);
 	}
 	// remove attribute values
-	node_features(node->layer)->remove(node->id);
+	node_features(node->layer)->reset(node->id);
 	return res;
 }
 
@@ -212,7 +216,7 @@ bool MLNetwork::erase(const EdgeSharedPtr& edge) {
 		sidx_neighbors_all[edge->v1->id].erase(edge->v2->id);
 		sidx_neighbors_all[edge->v2->id].erase(edge->v1->id);
 	}
-	edge_features(edge->v1->layer,edge->v2->layer)->remove(edge->id);
+	edge_features(edge->v1->layer,edge->v2->layer)->reset(edge->id);
 	return res;
 }
 
@@ -227,7 +231,7 @@ bool MLNetwork::erase(const ActorSharedPtr& actor) {
 		}
 	}
 	sidx_nodes_by_actor.erase(actor->id);
-	actor_features()->remove(actor->id);
+	actor_features()->reset(actor->id);
 	return res;
 }
 
@@ -243,11 +247,11 @@ bool MLNetwork::erase(const LayerSharedPtr& layer) {
 			erase(node);
 		}
 	} // This automatically deletes all edges among nodes on that layer
-	layer_features()->remove(layer->id);
+	layer_features()->reset(layer->id);
 	return res;
 }
 
-const SortedSet<node_id,NodeSharedPtr>& MLNetwork::neighbors(const NodeSharedPtr& node, edge_mode mode) const {
+const sorted_set<node_id,NodeSharedPtr>& MLNetwork::neighbors(const NodeSharedPtr& node, edge_mode mode) const {
 	if (mode==IN) {
 		if (sidx_neighbors_in.count(node->id)==0) {
 			return empty;

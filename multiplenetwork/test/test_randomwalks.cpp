@@ -17,7 +17,7 @@
 
 using namespace mlnet;
 
-void testRandomWalks() {
+void test_randomwalks() {
 	log("TESTING Random Walks");
 
 	log("Reading network toy from file...",false);

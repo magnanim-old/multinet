@@ -9,9 +9,9 @@
 #ifndef MULTIPLENETWORK_TEST_H_
 #define MULTIPLENETWORK_TEST_H_
 
-//#include "multiplenetwork.h"
 #include <exception>
 #include <string>
+#include <iostream>
 
 /* Exceptions */
 class FailedUnitTestException: public std::exception {
@@ -24,16 +24,22 @@ private:
 };
 
 /* Unit test functions */
-void testMLNetwork();
-void testIO();
-void testLocalMeasures();
+void test_datastructures();
+void test_io();
+void test_measures();
 void testDistanceMeasures();
 void testRandom();
-void testRandomWalks();
-void testEvolution();
+void test_randomwalks();
+void test_evolution();
 void testModularity();
 /*
-void testTransformations();*/
+void testTransformations();
+void testCommunity();
+*/
+
+void test_begin(const std::string& name);
+
+void test_end(const std::string& name);
 
 
 #endif /* MULTIPLENETWORK_TEST_H_ */

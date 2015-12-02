@@ -10,11 +10,11 @@ OBJS = 	src/datastructures/*.cpp \
 		src/exceptions/*.cpp \
 		src/utils/*.cpp \
 		
-TEST = test/run_all.cpp test/testModularity.cpp test/testMLNetwork.cpp test/testIO.cpp test/testDistanceMeasures.cpp test/testLocalMeasures.cpp test/testRandom.cpp test/testRandomWalks.cpp test/FailedUnitTestException.cpp test/testEvolution.cpp
+TEST = test/*.cpp
 		
 LIBS = -L/usr/local/lib
 
-unit_test: test/run_all.cpp $(OBJS) $(TEST)
+unit_test: test/test_all.cpp $(OBJS) $(TEST)
 	$(CXX) $(CXXFLAGS) -o runtest $(OBJS) $(TEST) $(LIBS)
 
 #lib: $(OBJS)

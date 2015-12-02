@@ -15,11 +15,11 @@
 
 using namespace mlnet;
 
-void testIO() {
+void test_io() {
 
 	//#define TEST_IO
 
-	log("TESTING IO (MLNetwork)");
+	test_begin("IO");
 	log("Reading network io1 from file...",false);
 	MLNetworkSharedPtr mnet1 = read_multilayer("test/io1.mpx","mlnet 1",',');
 	log("done! ",false);
@@ -56,26 +56,12 @@ void testIO() {
 		layers.insert(layer);
 	}
 	write_multilayer(mnet3,layers,"_tmp_file1.gml",',');
-	write_graphml(mnet3,layers,"_tmp_file2.gml",true);
-	write_graphml(mnet3,layers,"_tmp_file3.gml",false);
 	std::remove("_tmp_file1.gml");
+	write_graphml(mnet3,layers,"_tmp_file2.gml",true);
 	std::remove("_tmp_file2.gml");
+	write_graphml(mnet3,layers,"_tmp_file3.gml",false);
 	std::remove("_tmp_file3.gml");
-
-	/*
-	Density based?
-	for (NodeSharedPtr node1: mnet3->get_nodes()) {
-		for (NodeSharedPtr node2: mnet3->get_nodes()) {
-			int common_neigh = 0;
-			for (NodeSharedPtr neigh: mnet3->neighbors(node1,INOUT)) {
-				if (mnet3->neighbors(node2,INOUT).contains(neigh->id))
-					common_neigh++;
-			}
-			log(node1->actor->name + " " + node2->actor->name + " " + to_string((double)common_neigh/std::min(mnet3->neighbors(node1,INOUT).size(),mnet3->neighbors(node2,INOUT).size())));
-		}
-	}
-	 */
-	log("TEST SUCCESSFULLY COMPLETED (IO)");
+	test_end("IO");
 }
 
 

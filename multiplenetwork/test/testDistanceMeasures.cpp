@@ -7,7 +7,7 @@
  */
 
 #import "test.h"
-#import "multiplenetwork.h"
+#import "mlnetwork.h"
 #include <iostream>
 #include <string>
 

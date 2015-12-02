@@ -7,13 +7,13 @@
  */
 
 #include "test.h"
-#include "multiplenetwork.h"
+#include "mlnetwork.h"
 #include <iostream>
 #include <string>
 
 using namespace mlnet;
 
-void testLocalMeasures() {
+void test_measures() {
 
 	//#ifndef TEST_IO
 	//throw FailedUnitTestException("Local measure testing requires IO testing");
@@ -27,6 +27,7 @@ void testLocalMeasures() {
 	ActorSharedPtr u1 = mnet->get_actor("U1");
 	ActorSharedPtr u3 = mnet->get_actor("U3");
 	std::unordered_set<LayerSharedPtr> nets = {l1,l2};
+
 	log("done!");
 
 	//print(mnet);

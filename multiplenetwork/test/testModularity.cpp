@@ -7,7 +7,7 @@
  */
 
 #include "test.h"
-#include "multiplenetwork.h"
+#include "mlnetwork.h"
 #include <iostream>
 #include <string>
 
@@ -84,37 +84,6 @@ void testModularity() {
 	mod = modularity(mnet_a,groups1,1);
 	log(std::to_string(mod) + " ",false);
 	log("done 1!");
-	/*
-	log("GR2!");
-	mod = modularity(mnet_b,groups2,0);
-	log(std::to_string(mod) + " ",false);
-	log("done 0!");
-	mod = modularity(mnet_b,groups2,.5);
-	log(std::to_string(mod) + " ",false);
-	log("done .5!");
-	mod = modularity(mnet_b,groups2,1);
-	log(std::to_string(mod) + " ",false);
-	log("done 1!");
-	log("GR3!");
-	mod = modularity(mnet_b,groups3,0);
-	log(std::to_string(mod) + " ",false);
-	log("done 0!");
-	mod = modularity(mnet_b,groups3,.5);
-	log(std::to_string(mod) + " ",false);
-	log("done .5!");
-	mod = modularity(mnet_b,groups3,1);
-	log(std::to_string(mod) + " ",false);
-	log("done 1!");
-	log("GR4!");
-	mod = modularity(mnet_b,groups4,0);
-	log(std::to_string(mod) + " ",false);
-	log("done 0!");
-	mod = modularity(mnet_b,groups4,.5);
-	log(std::to_string(mod) + " ",false);
-	log("done .5!");
-	mod = modularity(mnet_b,groups4,1);
-	log(std::to_string(mod) + " ",false);
-	log("done 1!");
-	 */
+
 	log("TEST SUCCESSFULLY COMPLETED (modularity)");
 }

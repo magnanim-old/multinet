@@ -1,6 +1,6 @@
 
 #include "test.h"
-#include "multiplenetwork.h"
+#include "mlnetwork.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <set>
@@ -10,7 +10,7 @@
 
 using namespace mlnet;
 
-void testEvolution() {
+void test_evolution() {
 	{
 	log("[Evolution Test R1] N1: larger independent, N2: smaller independent and with basic random graph evolution model");
 	// create multiplex network

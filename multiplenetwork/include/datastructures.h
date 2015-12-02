@@ -4,33 +4,19 @@
  * Author: Matteo Magnani <matteo.magnani@it.uu.se>
  * Version: 1.0
  *
- * This file defines the basic data structures of the library. It includes:
- * 
- * 1. MLNetwork (where ML stands for multilayer), the main class defined in this file.
- * 2. Basic components of a MLNetwork (layer, node, edge, actor).
- *    An actor represents a global identity, and multiple nodes
- *    (organized into multiple layers) can correspond to the same actor.
- *    An example is an individual (actor) with multiple accounts (nodes)
- *    on different online social networks (layers).
- * 3. An ObjectSet class, to store a set of pointers to basic network components.
- *    This class is optimized so that:
- *    (a) Functions potentially returning many pointers to entities
- *    (e.g., "return all neighbors of a node") do not
- *    directly return all the pointers, but only an object that allows
- *    to iterate over them.
- *    (b) It allows efficient (log n) selection both by key and by position, which
- *    is useful e.g. to randomly select objects in the ML network.
- * 4. An AttributeStore class, to associate attributes to different objects
- *    (actors, nodes...) in the MLNetwork, together with a class Attribute to represent
+ * This file defines the basic data structure of the library: the MLNetwork class (where
+ * "ML" stands for "multilayer"). Other related types are also defined, in particular:
+ * 1. The basic components of a multilayer network (layer, node, edge, actor, and their
+ *    abstract super-types, basic_component and named_component).
+ *    These components are encapsulated inside a MLNetwork and programmers using this library do
+ *    not need to deal with them: they are created, retrieved and updated by the MLNetwork,
+ *    whose methods return (smart) pointers to them to avoid duplicates.
+ * 2. An AttributeStore class, to associate attributes to different components
+ *    (actors, nodes...) in a multilayer network, together with a class Attribute to represent
  *    metadata.
- * 5. Smart pointers to all these objects.
- *    Only one instance of each entity (e.g., node) is kept in memory,
- *    and can be accessed through multiple indexes (e.g., by ID, by name)
- *    storing pointers to the entities. Functions accessing the MLNetwork's
- *    components return pointers as well, so that the objects are never
- *    duplicated after their creation.
- *
- * All the definitions are in the "mlnet" namespace
+ * 2. Classes to represent paths and distances crossing multiple layers.
+ * 3. Short names for smart pointers to all these objects:
+ *    ActorSharedPtr, NodeSharedPtr, MLNetworkSharedPtr, etc.
  */
 
 #ifndef MLNET_DATASTRUCTURES_H_
@@ -42,65 +28,79 @@
 #include <set>
 #include <vector>
 #include <memory>
-#include "sortedsets.h"
+
+#include "sortedset.h"
 #include "counter.h"
 #include "exceptions.h"
-#include <cmath>
 
 namespace mlnet {
 
-template <class T>
-using matrix = std::vector<std::vector<T> >;
-
-template <class T1, class T2>
-using hash = std::unordered_map<T1,T2>;
+/* Identifiers */
+typedef long object_id; // for generic components
+typedef object_id actor_id;
+typedef object_id layer_id;
+typedef object_id node_id;
+typedef object_id edge_id;
+/* Main classes (full definitions follow later in this file) */
+class MLNetwork;
+class actor;
+class layer;
+class node;
+class edge;
+class AttributeStore;
+class Attribute;
+/* Shorthands for smart pointers */
+typedef std::shared_ptr<MLNetwork> MLNetworkSharedPtr;
+typedef std::shared_ptr<const MLNetwork> constMLNetworkSharedPtr;
+typedef std::shared_ptr<edge> EdgeSharedPtr;
+typedef std::shared_ptr<actor> ActorSharedPtr;
+typedef std::shared_ptr<layer> LayerSharedPtr;
+typedef std::shared_ptr<node> NodeSharedPtr;
+typedef std::shared_ptr<Attribute> AttributeSharedPtr;
+typedef std::shared_ptr<AttributeStore> AttributeStoreSharedPtr;
+/* Shorthands for lists of components */
+typedef sorted_set<actor_id, ActorSharedPtr> actor_list;
+typedef sorted_set<layer_id, LayerSharedPtr> layer_list;
+typedef sorted_set<node_id, NodeSharedPtr> node_list;
+typedef sorted_set<edge_id, EdgeSharedPtr> edge_list;
+/* Other shorthands, for tidiness */
+template <class T> using matrix = std::vector<std::vector<T> >;
+template <class T1, class T2> using hash = std::unordered_map<T1,T2>;
 
 /**********************************************************************/
 /** Constants and Function Parameters *********************************/
 /**********************************************************************/
 
-const bool DEFAULT_EDGE_DIRECTIONALITY = false; // undirected edges by default
+/** Directionality of edges, when not specified */
+const bool DEFAULT_EDGE_DIRECTIONALITY = false; // edges are undirected by default
 
 /** Selection mode, for directed edges (e.g., to compute the IN-degree or OUT-degree of a node) */
 enum edge_mode {INOUT=0, IN=1, OUT=2};
 
-/** Supported attribute types */
+/** Supported attribute types in the current implementation of AttributeStore */
 enum attribute_type {STRING_TYPE = 0, NUMERIC_TYPE = 1};
 
-/** Type of comparison between multidimensional distances, considering more or less information */
+/**
+ * The length of a path traversing multiple layers can be represented
+ * using a matrix m, where cell m_{i,j} indicates the number
+ * of edges traversed from layer i to layer j.
+ * These constants specify how much of this information should be used
+ * while comparing two path lengths:
+ * FULL_COMPARISON: all the elements in the matrix are considered.
+ * SWITCH_COMPARISON: the diagonal elements are considered (indicating inter-layer steps),
+ *   plus an additional element summing the values on all non-diagonal cells (indicating a layer crossing).
+ * MULTIPLEX_COMPARISON: only the diagonal is considered (that is, only inter-layer steps).
+ * SIMPLE_COMPARISON: the sum of all elements in the matrix (that is, the number of steps
+ *   irrespective of the traversed layers) is considered.
+ **/
 enum comparison_type {FULL_COMPARISON = 0, SWITCH_COMPARISON = 1, MULTIPLEX_COMPARISON = 2, SIMPLE_COMPARISON = 3};
 
-/** Outcome of the comparison between two numbers, or vectors, or matrices... */
-enum domination {P_DOMINATED=0, P_EQUAL=1, P_INCOMPARABLE=2, P_DOMINATES=3};
+/** Outcome of the comparison between two numbers, or two vectors, or two matrices. (the concept of Pareto dominance is used). */
+enum comparison_result {P_DOMINATED=0, P_EQUAL=1, P_INCOMPARABLE=2, P_DOMINATES=3};
 
 /**********************************************************************/
 /** MLNetwork components **********************************************/
 /**********************************************************************/
-
-// MLNetwork (full definition later)
-
-class MLNetwork;
-/** A smart pointer to objects of type MLNetwork */
-typedef std::shared_ptr<MLNetwork> MLNetworkSharedPtr;
-/** A smart pointer to constant objects of type MLNetwork */
-typedef std::shared_ptr<const MLNetwork> constMLNetworkSharedPtr;
-
-// Identifiers of a MLNetwork basic components
-
-/** A generic identifier for all objects in a MLNetwork (nodes, edges, ...) */
-typedef long object_id;
-/** The unique identifier of each node inside a MLNetwork */
-typedef object_id node_id;
-/** The unique identifier of each edge inside a MLNetwork */
-typedef object_id edge_id;
-/** The unique identifier of each layer in a MLNetwork. Every node belongs to exactly one layer */
-typedef object_id  layer_id;
-/** Nodes in different layers may correspond to the same "actor",
- * e.g., a person (actor) can have multiple accounts (nodes) on
- * different social media (layers) */
-typedef object_id actor_id;
-
-// MLNetwork component objects
 
 /**
  * A generic basic component in a MLNetwork.
@@ -109,7 +109,7 @@ class basic_component {
 protected:
 	/** Constructor */
 	basic_component(const object_id& id);
-	/** Output function, presenting a complete description of the node */
+	/** Output function, presenting a complete description of the component */
 	std::string to_string() const;
 public:
 	/** Unique identifier of the component */
@@ -125,13 +125,13 @@ public:
 };
 
 /**
- * A basic component of a MLNetwork, which can be identified by name.
+ * A basic component of a MLNetwork, which can also be identified by name.
  */
 class named_component : public basic_component {
 protected:
 	/** Constructor */
 	named_component(const object_id& id, const std::string& name);
-	/** Output function, presenting a complete description of the actor */
+	/** Output function, presenting a complete description of the component */
 	std::string to_string() const;
 public:
 	/** Unique name of the component */
@@ -149,9 +149,6 @@ public:
 	std::string to_string() const;
 };
 
-/** A smart pointer to objects of type actor */
-typedef std::shared_ptr<actor> ActorSharedPtr;
-
 /**
  * A layer in a MLNetwork.
  */
@@ -163,8 +160,6 @@ public:
 	std::string to_string() const;
 };
 
-/** A smart pointer to objects of type layer */
-typedef std::shared_ptr<layer> LayerSharedPtr;
 
 /**
  * A node inside a MLNetwork.
@@ -181,8 +176,6 @@ public:
 	std::string to_string() const;
 };
 
-/** A smart pointer to objects of type node */
-typedef std::shared_ptr<node> NodeSharedPtr;
 
 /**
  * An edge between two nodes in a MLNetwork.
@@ -201,8 +194,6 @@ public:
 	std::string to_string() const;
 };
 
-/** A smart pointer to objects of type edge */
-typedef std::shared_ptr<edge> EdgeSharedPtr;
 
 /**********************************************************************/
 /** Attribute handling ************************************************/
@@ -242,9 +233,6 @@ private:
 	std::string aname;
 	attribute_type atype;
 };
-
-/** A smart pointer to objects of type Attribute */
-typedef std::shared_ptr<Attribute> AttributeSharedPtr;
 
 /**
  * A class associating multiple attributes and attribute values to a set of objects.
@@ -335,7 +323,7 @@ public:
 	 * If the same object is queried after this method has been called, default values will be returned.
 	 * @param id The id of the object to be removed from the store.
 	 **/
-	void remove(const object_id& id);
+	void reset(const object_id& id);
 
 public:
 	/** default value for numeric attributes */
@@ -345,14 +333,11 @@ public:
 private:
 	/* meta-data: names and types of attributes */
 	std::vector<AttributeSharedPtr> attribute_vector;
-	std::map<std::string,int> attribute_ids;
-	/* These maps are structured as: map[AttributeName][object_id][AttributeValue] */
-	std::map<std::string, std::map<object_id, std::string> > string_attribute;
-	std::map<std::string, std::map<object_id, double> > numeric_attribute;
+	hash<std::string,int> attribute_ids;
+	/* These hash maps are structured as: map[AttributeName][object_id][AttributeValue] */
+	hash<std::string, hash<object_id, std::string> > string_attribute;
+	hash<std::string, hash<object_id, double> > numeric_attribute;
 };
-
-/** A smart pointer to objects of type AttributeStore */
-typedef std::shared_ptr<AttributeStore> AttributeStoreSharedPtr;
 
 /**********************************************************************/
 /** MLNetwork *********************************************************/
@@ -362,10 +347,6 @@ typedef std::shared_ptr<AttributeStore> AttributeStoreSharedPtr;
  * Main data structure of the package, defining a multilayer network.
  */
 class MLNetwork {
-	friend class actor_list;
-	friend class layer_list;
-	friend class node_list;
-	friend class edge_list;
 
 	/**************************************************************************************
 	 * Constructors/destructors
@@ -373,6 +354,8 @@ class MLNetwork {
 private:
 	/**
 	 * Creates an empty MLNetwork.
+	 * This is only used internally: to create a new network use MLNetwork::create() instead (or
+	 * any IO function available in another module of the library).
 	 * @param name name of the new MLNetwork
 	 */
 	MLNetwork(const std::string& name);
@@ -383,23 +366,21 @@ public:
 	const std::string name;
 
 	/**
-	 * Creates an empty MLNetwork and returns a pointer to it. This is the only way to create a network,
-	 * so that it cannot be duplicated.
+	 * Creates an empty MLNetwork and returns a pointer to it.
 	 * @param name name of the new multilayer network
 	 * @return a pointer to the new multilayer network
 	 */
 	static MLNetworkSharedPtr create(const std::string& name);
 
 	/**************************************************************************************
-	 * Basic structural operations used to modify a MLNetwork
+	 * Basic structural operations used to modify/access MLNetwork components
 	 **************************************************************************************/
 
 	/**
 	 * @brief Adds a new actor to the MLNetwork.
 	 * A new identifier is automatically associated to the new actor.
 	 * @param name name of the actor
-	 * @return a pointer to the new actor
-	 * @throws DuplicateElementException if the actor is already present in the network
+	 * @return a pointer to the new actor, or a NULL pointer if an actor with the same name exists.
 	 **/
 	ActorSharedPtr add_actor(const std::string& name);
 
@@ -423,15 +404,16 @@ public:
 	 * @brief Returns all the actors in the MLNetwork.
 	 * @return a pointer to an actor iterator
 	 **/
-	const SortedSet<actor_id, ActorSharedPtr>& get_actors() const;
+	const actor_list& get_actors() const;
 
 	/**
 	 * @brief Adds a new layer to the MLNetwork.
-	 * A new identifier is automatically associated to the new layer
+	 * A new identifier is automatically associated to the new layer. If the layer is
+	 * already present in the network, a NULL pointer is returned indicating that
+	 * the operation failed.
 	 * @param name name of the layer
 	 * @param directed TRUE or FALSE
-	 * @return a pointer to the new layer
-	 * @throws DuplicateElementException if the layer is already present in the network
+	 * @return a pointer to the new layer, or a NULL pointer if a layer with the same name exists.
 	 **/
 	LayerSharedPtr add_layer(const std::string& name, bool directed);
 
@@ -455,7 +437,7 @@ public:
 	 * @brief Returns all the layers in the MLNetwork.
 	 * @return a layer iterator
 	 **/
-	const SortedSet<layer_id, LayerSharedPtr>& get_layers() const;
+	const layer_list& get_layers() const;
 
 	/**
 	 * @brief Sets the default edge directionality depending on the layers of the connected nodes.
@@ -466,20 +448,20 @@ public:
 	 * @param directed TRUE or FALSE
 	 * @return a pointer to the new layer
 	 **/
-	void set_directed(LayerSharedPtr layer1, LayerSharedPtr layer2, bool directed);
+	void set_directed(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, bool directed);
 
 	/**
 	 * @brief Gets the default edge directionality depending on the layers of the connected nodes.
 	 * @return a Boolean value indicating if edges among these two layers are directed or not.
 	 **/
-	bool is_directed(LayerSharedPtr layer1, LayerSharedPtr layer2) const;
+	bool is_directed(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
 
 	/**
 	 * @brief Adds a new node to the MLNetwork.
-	 * A new identifier and a default name are automatically associated to the new node
+	 * A new identifier is automatically associated to the new node
 	 * @param layer pointer to the layer where this node is located
 	 * @param actor pointer to the actor corresponding to this node
-	 * @return a pointer to the new node
+	 * @return a pointer to the new node, or a NULL pointer if the actor is already present in the layer.
 	 * @throws ElementNotFoundException if the input layer or actor are not present in the network
 	 **/
 	NodeSharedPtr add_node(const ActorSharedPtr& actor, const LayerSharedPtr& layer);
@@ -505,21 +487,21 @@ public:
 	 * @brief Returns all the nodes in the MLNetwork.
 	 * @return a node iterator
 	 **/
-	const SortedSet<node_id, NodeSharedPtr>& get_nodes() const;
+	const node_list& get_nodes() const;
 
 	/**
 	 * @brief Returns all the nodes in a layer.
 	 * @param layer pointer to the layer where this node is located
 	 * @return a node iterator
 	 **/
-	const SortedSet<node_id, NodeSharedPtr>& get_nodes(const LayerSharedPtr& layer) const;
+	const node_list& get_nodes(const LayerSharedPtr& layer) const;
 
 	/**
 	 * @brief Returns the nodes associated to the input actor.
 	 * @param actor pointer to the actor
 	 * @return an iterator containing pointers to nodes
 	 **/
-	const SortedSet<node_id, NodeSharedPtr>& get_nodes(const ActorSharedPtr& actor) const;
+	const node_list& get_nodes(const ActorSharedPtr& actor) const;
 
 	/**
 	 * @brief Adds a new edge to the MLNetwork.
@@ -527,7 +509,7 @@ public:
 	 * edge is defined by the layers of the two nodes.
 	 * @param node1 a pointer to the "from" node if directed, or to one end of the edge if undirected
 	 * @param node2 a pointer to the "to" node if directed, or one end of the edge if undirected
-	 * @return a pointer to the new edge
+	 * @return a pointer to the new edge, or a NULL pointer if the edge already exists.
 	 * @throws ElementNotFoundException if the input nodes are not present in the network
 	 **/
 	EdgeSharedPtr add_edge(const NodeSharedPtr& node1, const NodeSharedPtr& node2);
@@ -545,7 +527,7 @@ public:
 	 * @brief Returns all the edges in the MLNetwork.
 	 * @return an edge iterator
 	 **/
-	const SortedSet<edge_id, EdgeSharedPtr>& get_edges() const;
+	const edge_list& get_edges() const;
 
 	/**
 	 * @brief Returns all the edges from a layer A to a layer B.
@@ -554,7 +536,7 @@ public:
 	 * @param layer2 pointer to the layer where the second ends of the edges are located
 	 * @return an edge iterator
 	 **/
-	const SortedSet<edge_id, EdgeSharedPtr>& get_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
+	const edge_list& get_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
 
 	/**
 	 * @brief Deletes an existing node.
@@ -595,7 +577,7 @@ public:
 	 * @return an iterator containing pointers to nodes
 	 * @throws WrongParameterException if mode is not one of IN, OUT or INOUT
 	 **/
-	const SortedSet<node_id, NodeSharedPtr>& neighbors(const NodeSharedPtr& node, edge_mode mode) const;
+	const node_list& neighbors(const NodeSharedPtr& node, edge_mode mode) const;
 
 	/******************************
 	 * Attribute handling
@@ -663,7 +645,7 @@ public:
 	 **/
 	const AttributeStoreSharedPtr edge_features(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
 
-	/** Returns a string representation of this MLNetwork */
+	/** Returns a compact string representation of this MLNetwork */
 	std::string to_string() const;
 
 private:
@@ -674,39 +656,37 @@ private:
 	layer_id max_layer_id;
 
 	/* Edge directionality */
-	std::map<layer_id, std::map<layer_id, bool> > edge_directionality;
+	hash<layer_id, hash<layer_id, bool> > edge_directionality;
 
 	// Components:
-	SortedSet<layer_id,LayerSharedPtr> layers;
-	SortedSet<actor_id,ActorSharedPtr> actors;
-	SortedSet<node_id,NodeSharedPtr> nodes;
-	SortedSet<edge_id,EdgeSharedPtr> edges;
+	layer_list layers;
+	actor_list actors;
+	node_list nodes;
+	edge_list edges;
 
 	// Indexes to components (Component IDX):
-	std::unordered_map<std::string, LayerSharedPtr> cidx_layer_by_name;
-	std::unordered_map<std::string, ActorSharedPtr> cidx_actor_by_name;
-	std::unordered_map<actor_id, std::unordered_map<layer_id, NodeSharedPtr > > cidx_node_by_actor_and_layer;
-	std::unordered_map<node_id, std::unordered_map<node_id, EdgeSharedPtr> > cidx_edge_by_nodes;
+	hash<std::string, LayerSharedPtr> cidx_layer_by_name;
+	hash<std::string, ActorSharedPtr> cidx_actor_by_name;
+	hash<actor_id, hash<layer_id, NodeSharedPtr > > cidx_node_by_actor_and_layer;
+	hash<node_id, hash<node_id, EdgeSharedPtr> > cidx_edge_by_nodes;
 
 	// Indexes to sets of components (Set IDX):
-	std::unordered_map<layer_id, SortedSet<node_id,NodeSharedPtr> > sidx_nodes_by_layer;
-	std::unordered_map<actor_id, SortedSet<node_id,NodeSharedPtr> > sidx_nodes_by_actor;
-	std::unordered_map<layer_id, std::map<layer_id, SortedSet<edge_id,EdgeSharedPtr> > > sidx_edges_by_layer_pair;
+	hash<layer_id, node_list> sidx_nodes_by_layer;
+	hash<actor_id, node_list> sidx_nodes_by_actor;
+	hash<layer_id, hash<layer_id, edge_list> > sidx_edges_by_layer_pair;
 
-	std::unordered_map<node_id, SortedSet<node_id,NodeSharedPtr> > sidx_neighbors_out;
-	std::unordered_map<node_id, SortedSet<node_id,NodeSharedPtr> > sidx_neighbors_in;
-	std::unordered_map<node_id, SortedSet<node_id,NodeSharedPtr> > sidx_neighbors_all;
+	hash<node_id, node_list> sidx_neighbors_out;
+	hash<node_id, node_list> sidx_neighbors_in;
+	hash<node_id, node_list> sidx_neighbors_all;
 
 	/* objects storing the feature vectors of the different components */
 	AttributeStoreSharedPtr actor_attributes;
 	AttributeStoreSharedPtr layer_attributes;
-	std::unordered_map<layer_id, AttributeStoreSharedPtr> node_attributes;
-	std::unordered_map<layer_id, std::map<layer_id, AttributeStoreSharedPtr> > edge_attributes;
+	hash<layer_id, AttributeStoreSharedPtr> node_attributes;
+	hash<layer_id, hash<layer_id, AttributeStoreSharedPtr> > edge_attributes;
 
-	/* An empty set of nodes, conveniently returned by const methods
-	 * instead of creating a new empty SortedSet object.
-	 */
-	SortedSet<node_id,NodeSharedPtr> empty;
+	/* An empty set of nodes, conveniently returned when necessary instead of creating a new empty node_list. */
+	node_list empty;
 };
 
 
@@ -775,7 +755,7 @@ public:
 	 * - SIMPLE_COMPARISON: the total number of steps is considered. The two distances will always be comparable (<, >, == or !=).
 	 * @return One of the relationship types: P_DOMINATED, P_EQUAL, P_INCOMPARABLE, or P_DOMINATES
 	 */
-	domination compare(const distance& other, comparison_type comp) const;
+	comparison_result compare(const distance& other, comparison_type comp) const;
 
 	/**
 	 * Comparison by id. For a comparison considering steps
@@ -814,13 +794,13 @@ public:
 
 private:
 
-	domination compare_full(const distance& other) const;
+	comparison_result compare_full(const distance& other) const;
 
-	domination compare_switch(const distance& other) const;
+	comparison_result compare_switch(const distance& other) const;
 
-	domination compare_multiplex(const distance& other) const;
+	comparison_result compare_multiplex(const distance& other) const;
 
-	domination compare_simple(const distance& other) const;
+	comparison_result compare_simple(const distance& other) const;
 };
 
 } // namespace mlnet
