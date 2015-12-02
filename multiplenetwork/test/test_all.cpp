@@ -28,15 +28,14 @@ int main(int argn, char* argv[]) {
 	try {
 	test_datastructures();
 	test_io();
-	/*
 	test_measures();
-	testDistanceMeasures();
-	testRandom();
+	/*
+	test_utils();
 	test_randomwalks();
-	testEvolution();
-	testModularity();
-	testTransformations();
-	testCommunity();
+	test_evolution();
+	test_modularity();
+	test_transformations();
+	test_community();
 	*/
 	}
 	catch (std::exception& e) {

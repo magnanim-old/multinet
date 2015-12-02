@@ -178,7 +178,7 @@ bool distance::operator!=(const distance& other) const {
 }
 
 std::string distance::to_string() const {
-	std::string res = "Steps:";
+	std::string res;
 	for (LayerSharedPtr layer: mnet->get_layers()) {
 		long l = length(layer,layer);
 		res += " " + layer->name + ":" + std::to_string(l);

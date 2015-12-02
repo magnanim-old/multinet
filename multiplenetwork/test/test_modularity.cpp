@@ -13,7 +13,7 @@
 
 using namespace mlnet;
 
-void testModularity() {
+void test_modularity() {
 
 	// We need to read the network from a file: testIO() must have been passed
 	log("TESTING measures");

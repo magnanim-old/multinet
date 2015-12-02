@@ -98,9 +98,9 @@ namespace mlnet {
  */
 MLNetworkSharedPtr read_multilayer(const std::string& infile, const std::string& network_name, char separator);
 
-void write_multilayer(const MLNetworkSharedPtr mlnet, const std::unordered_set<LayerSharedPtr>& layers, const std::string& outfile, char separator);
+void write_multilayer(const MLNetworkSharedPtr mlnet, const std::string& outfile, char separator);
 
-void write_graphml(const MLNetworkSharedPtr mnet, const std::unordered_set<LayerSharedPtr>& layers, const std::string& path, bool multigraph);
+void write_graphml(const MLNetworkSharedPtr mnet, const std::string& path, bool multigraph);
 
 }
 

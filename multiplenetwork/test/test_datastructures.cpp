@@ -54,8 +54,8 @@ void test_datastructures() {
 	test_begin("MLNetwork - structure");
 	std::cout << "Creating an empty ML network...";
 	MLNetworkSharedPtr mnet = MLNetwork::create("friends");
-	std::cout << mnet->to_string() << " done!" << std::endl;
-	std::cout << "Adding three actors...";
+	std::cout << " done!" << mnet->to_string() << std::endl;
+	std::cout << "Adding three actors: ";
 	ActorSharedPtr a1 = mnet->add_actor("a1");
 	ActorSharedPtr a2 = mnet->add_actor("a2");
 	ActorSharedPtr a3 = mnet->add_actor("Matteo");
@@ -125,7 +125,7 @@ void test_datastructures() {
 	if (num_edges!=6 || num_edges!=mnet->get_edges().size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	std::cout << "done!" << std::endl;
 
-	std::cout << "Getting in-neighbors: ";
+	std::cout << "Getting N" << n3v2->id << "'s in-neighbors: ";
 	int num_neighbors=0;
 	for (NodeSharedPtr node : mnet->neighbors(n3v2,IN)) {
 		num_neighbors++;
@@ -133,7 +133,7 @@ void test_datastructures() {
 	}
 	if (num_neighbors!=1) throw FailedUnitTestException("Could not retrieve neighbors");
 	std::cout << "done!" << std::endl;
-	std::cout << "Getting out-neighbors: ";
+	std::cout << "Getting N" << n3v2->id << "'s out-neighbors: ";
 	num_neighbors=0;
 	for (NodeSharedPtr node : mnet->neighbors(n3v2,OUT)) {
 		num_neighbors++;
@@ -141,7 +141,7 @@ void test_datastructures() {
 	}
 	if (num_neighbors!=1) throw FailedUnitTestException("Could not retrieve neighbors");
 	std::cout << "done!" << std::endl;
-	std::cout << "Getting in/out-neighbors: ";
+	std::cout << "Getting N" << n3v2->id << "'s in/out-neighbors: ";
 	num_neighbors=0;
 	for (NodeSharedPtr node : mnet->neighbors(n3v2,INOUT)) {
 		num_neighbors++;
@@ -149,7 +149,7 @@ void test_datastructures() {
 	}
 	if (num_neighbors!=2) throw FailedUnitTestException("Could not retrieve neighbors");
 	std::cout << "done!" << std::endl;
-	std::cout << "Getting out-neighbors with undirected edges: ";
+	std::cout << "Getting N" << n2v1->id << "'s out-neighbors (undirected edges): ";
 	num_neighbors=0;
 	for (NodeSharedPtr node : mnet->neighbors(n2v1,OUT)) {
 		num_neighbors++;
@@ -157,7 +157,7 @@ void test_datastructures() {
 	}
 	if (num_neighbors!=2) throw FailedUnitTestException("Could not retrieve neighbors");
 	std::cout << "done!" << std::endl;
-	std::cout << "Getting in/out-neighbors with undirected edges: ";
+	std::cout << "Getting N" << n2v1->id << "'s in/out-neighbors (undirected edges): ";
 	num_neighbors=0;
 	for (NodeSharedPtr node : mnet->neighbors(n2v1,INOUT)) {
 		num_neighbors++;
@@ -166,7 +166,7 @@ void test_datastructures() {
 	if (num_neighbors!=2) throw FailedUnitTestException("Could not retrieve neighbors");
 	std::cout << "done!" << std::endl;
 
-	std::cout << "Erasing components: ";
+	std::cout << "Erasing components...";
 	mnet->erase(n3v2);
 	if (8 != mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	mnet->erase(e3);
@@ -175,10 +175,9 @@ void test_datastructures() {
 	if (2 != mnet->get_actors().size()) throw FailedUnitTestException("Could not retrieve all actor");
 	if (5 != mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	mnet->erase(l1);
-	std::cout << mnet->to_string();
 	if (2 != mnet->get_layers().size()) throw FailedUnitTestException("Could not retrieve all layers");
 	if (3 != mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
-	std::cout << "done!" << std::endl;
+	std::cout << "done! " << mnet->to_string() << std::endl;
 	test_end("MLNetwork - structure");
 
 
@@ -204,7 +203,6 @@ void test_datastructures() {
 	for (AttributeSharedPtr attr: mnet->edge_features(l2,l1)->attributes()) {
 		std::cout << "- Attribute \"" << attr->name() << "\", type: " << attr->type_as_string() << std::endl;
 	}
-	std::cout << "done!" << std::endl;
 	test_end("MLNetwork - attribute management");
 }
 

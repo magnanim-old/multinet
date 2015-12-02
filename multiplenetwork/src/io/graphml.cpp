@@ -19,7 +19,7 @@ using namespace std;
 
 namespace mlnet {
 
-void write_graphml(const MLNetworkSharedPtr mnet, const std::unordered_set<LayerSharedPtr>& layers, const std::string& path, bool multigraph) {
+void write_graphml(const MLNetworkSharedPtr mnet, const std::string& path, bool multigraph) {
 	std::ofstream outfile;
 	outfile.open(path.data());
 
@@ -38,7 +38,7 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::unordered_set<Layer
 	}*/
 
 	// Node attributes
-	for (LayerSharedPtr layer: layers) {
+	for (LayerSharedPtr layer: mnet->get_layers()) {
 		outfile << "    <key id=\"l" << layer->id << "\" for=\"node\" attr.name=\"" << layer->name << "\" attr.type=\"string\"/>" << std::endl;
 		for (AttributeSharedPtr attr: mnet->node_features(layer)->attributes()) {
 			if (attr->type()==NUMERIC_TYPE)
@@ -49,8 +49,8 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::unordered_set<Layer
 	}
 	outfile << "    <key id=\"e_type\" for=\"edge\" attr.name=\"e_type\" attr.type=\"string\"/>" << std::endl;
 
-	for (LayerSharedPtr layer1: layers) {
-		for (LayerSharedPtr layer2: layers) {
+	for (LayerSharedPtr layer1: mnet->get_layers()) {
+		for (LayerSharedPtr layer2: mnet->get_layers()) {
 			for (AttributeSharedPtr attr: mnet->edge_features(layer1,layer2)->attributes()) {
 				if (attr->type()==NUMERIC_TYPE)
 					outfile << "    <key id=\"e" << layer1->name << "-" << layer2->name << ": " << attr->name() << "\" for=\"edge\" attr.name=\"" << layer1->name << "-" << layer2->name << ": "  << attr->name() << "\" attr.type=\"double\"/>" << std::endl;
@@ -69,8 +69,6 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::unordered_set<Layer
 		for (ActorSharedPtr actor: mnet->get_actors()) {
 			bool printed = false;
 			for (NodeSharedPtr node: mnet->get_nodes(actor)) {
-				if (layers.count(node->layer)==0)
-					continue;
 				if (!printed) {
 					outfile << "    <node id=\"" << actor->id << "\" name=\"" << actor->name << "\">" << std::endl;
 					printed = true;
@@ -91,8 +89,6 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::unordered_set<Layer
 	else {
 		// (one for each node)
 		for (NodeSharedPtr node: mnet->get_nodes()) {
-			if (layers.count(node->layer)==0)
-				continue;
 			outfile << "    <node id=\"" << node->id << "\" name=\"" << node->actor->name << ":" << node->layer->name << "\">" << std::endl;
 			AttributeStoreSharedPtr attrs = mnet->node_features(node->layer);
 			for (AttributeSharedPtr attr: attrs->attributes()) {
@@ -111,8 +107,6 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::unordered_set<Layer
 	if (multigraph) {
 		// (connect actor ids)
 		for (EdgeSharedPtr edge: mnet->get_edges()) {
-			if (layers.count(edge->v1->layer)==0 || layers.count(edge->v2->layer)==0)
-				continue;
 			outfile << "    <edge id=\"e" << edge->id << "\" source=\"" << edge->v1->actor->id << "\" target=\"" << edge->v2->actor->id << "\">" << std::endl;
 			if (edge->v1->layer==edge->v2->layer) {
 				outfile << "        <data key=\"e_type\">" << edge->v1->layer->name << "</data>" << std::endl;
@@ -132,8 +126,6 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::unordered_set<Layer
 	else {
 		// (connect node ids)
 		for (EdgeSharedPtr edge: mnet->get_edges()) {
-			if (layers.count(edge->v1->layer)==0 || layers.count(edge->v2->layer)==0)
-				continue;
 			outfile << "    <edge id=\"e" << edge->id << "\" source=\"" << edge->v1->id << "\" target=\"" << edge->v2->id << "\">" << std::endl;
 			outfile << "        <data key=\"e_type\">" << edge->v1->layer->name << "-" << edge->v1->layer->name << "</data>" << std::endl;
 			AttributeStoreSharedPtr attrs = mnet->edge_features(edge->v1->layer,edge->v2->layer);

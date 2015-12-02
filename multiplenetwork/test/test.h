@@ -27,11 +27,11 @@ private:
 void test_datastructures();
 void test_io();
 void test_measures();
-void testDistanceMeasures();
-void testRandom();
+
+void test_random();
 void test_randomwalks();
 void test_evolution();
-void testModularity();
+void test_modularity();
 /*
 void testTransformations();
 void testCommunity();

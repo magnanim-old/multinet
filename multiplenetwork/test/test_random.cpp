@@ -19,17 +19,7 @@
 using namespace std;
 using namespace mlnet;
 
-void testRandom() {
-
-	// WORK IN PROGRESS
-
-	//set<unsigned long>::iterator it;
-	//map<unsigned long, int>::iterator itm;
-	//Random r;
-	//map<unsigned long, int> count;
-	//set<unsigned long> res;
-	//unsigned long randomLong;
-	//double randomDouble;
+void test_random() {
 
 	cout << "Testing random integer in [0,3[, 1000 iterations.." << endl;
 	std::array<int,10> occurrences;

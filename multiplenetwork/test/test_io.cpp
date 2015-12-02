@@ -17,25 +17,33 @@ using namespace mlnet;
 
 void test_io() {
 
-	//#define TEST_IO
-
 	test_begin("IO");
-	log("Reading network io1 from file...",false);
+
+	std::cout << "Reading network io1 from file...";
 	MLNetworkSharedPtr mnet1 = read_multilayer("test/io1.mpx","mlnet 1",',');
-	log("done! ",false);
-	log(mnet1->to_string());
+	if (mnet1->get_actors().size()!=5 ||
+		mnet1->get_layers().size()!=2 ||
+		mnet1->get_nodes().size()!=7 ||
+		mnet1->get_edges().size()!=7) throw FailedUnitTestException("Could not retrieve all network components");
+	std::cout << "done! " << mnet1->to_string() << std::endl;
 
-	log("Reading network io2 from file...",false);
+	std::cout << "Reading network io2 from file...";
 	MLNetworkSharedPtr mnet2 = read_multilayer("test/io2.mpx","mlnet 2",',');
-	log("done! ",false);
-	log(mnet2->to_string());
+	if (mnet2->get_actors().size()!=6 ||
+		mnet2->get_layers().size()!=2 ||
+		mnet2->get_nodes().size()!=8 ||
+		mnet2->get_edges().size()!=7) throw FailedUnitTestException("Could not retrieve all network components");
+	std::cout << "done! " << mnet2->to_string() << std::endl;
 
-	log("Reading network io3 from file...",false);
+	std::cout << "Reading network io3 from file...";
 	MLNetworkSharedPtr mnet3 = read_multilayer("test/io3.mpx","mlnet 3",',');
-	log("done! ",false);
-	log(mnet3->to_string());
+	if (mnet3->get_actors().size()!=6 ||
+		mnet3->get_layers().size()!=2 ||
+		mnet3->get_nodes().size()!=8 ||
+		mnet3->get_edges().size()!=7) throw FailedUnitTestException("Could not retrieve all network components");
+	std::cout << "done! " << mnet3->to_string() << std::endl;
 
-	log("Testing attribute values...",false);
+	std::cout << "Checking if attribute values have been retrieved...";
 	LayerSharedPtr layer = mnet3->get_layer("l1");
 	ActorSharedPtr actor0 = mnet3->get_actor("U0");
 	ActorSharedPtr actor1 = mnet3->get_actor("U1");
@@ -49,18 +57,24 @@ void test_io() {
 	EdgeSharedPtr edge = mnet3->get_edge(node1,node2);
 	if (mnet3->edge_features(layer,layer)->getNumeric(edge->id,"Weight")!=3) throw FailedUnitTestException("Edge weight not correctly read from file");
 	if (mnet3->edge_features(layer,layer)->getNumeric(edge->id,"Stars")!=4) throw FailedUnitTestException("Edge numeric attribute not correctly read from file");
-	log("done!");
+	std::cout << "done!" << std::endl;
 
-	std::unordered_set<LayerSharedPtr> layers;
-	for (LayerSharedPtr layer: mnet3->get_layers()) {
-		layers.insert(layer);
-	}
-	write_multilayer(mnet3,layers,"_tmp_file1.gml",',');
+	std::cout << "Writing to file and reloading a multilayer network (native format)...";
+	write_multilayer(mnet3,"_tmp_file1.gml",',');
+	MLNetworkSharedPtr mnet4 = read_multilayer("_tmp_file1.gml","tmp",',');
+	if (mnet4->get_actors().size()!=6 ||
+		mnet4->get_layers().size()!=2 ||
+		mnet4->get_nodes().size()!=8 ||
+		mnet4->get_edges().size()!=7) throw FailedUnitTestException("Could not retrieve all network components");
 	std::remove("_tmp_file1.gml");
-	write_graphml(mnet3,layers,"_tmp_file2.gml",true);
+	std::cout << "done!" << std::endl;
+	std::cout << "Writing a graphml file...";
+	write_graphml(mnet3,"_tmp_file2.gml",true);
 	std::remove("_tmp_file2.gml");
-	write_graphml(mnet3,layers,"_tmp_file3.gml",false);
+	write_graphml(mnet3,"_tmp_file3.gml",false);
 	std::remove("_tmp_file3.gml");
+	std::cout << "done!" << std::endl;
+
 	test_end("IO");
 }
 
