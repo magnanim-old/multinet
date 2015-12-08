@@ -325,6 +325,18 @@ const AttributeStoreSharedPtr MLNetwork::edge_features(const LayerSharedPtr& lay
 	return edge_attributes.at(layer1->id).at(layer2->id);
 }
 
+void MLNetwork::set_weight(NodeSharedPtr node1, NodeSharedPtr node2, double weight) {
+	EdgeSharedPtr edge = get_edge(node1,node2);
+	if (!edge) throw ElementNotFoundException("edge between " + node1->to_string() + " and " + node2->to_string());
+	edge_features(node1->layer,node2->layer)->setNumeric(edge->id,DEFAULT_WEIGHT_ATTR_NAME,weight);
+}
+
+double MLNetwork::get_weight(NodeSharedPtr node1, NodeSharedPtr node2) {
+	EdgeSharedPtr edge = get_edge(node1,node2);
+	if (!edge) throw ElementNotFoundException("edge between " + node1->to_string() + " and " + node2->to_string());
+	return edge_features(node1->layer,node2->layer)->getNumeric(edge->id,DEFAULT_WEIGHT_ATTR_NAME);
+}
+
 std::string MLNetwork::to_string() const {
 	return "Multilayer Network (\"" + name + "\": " + std::to_string(get_layers().size()) + " layers, " +
 			std::to_string(get_actors().size()) + " actors, " +

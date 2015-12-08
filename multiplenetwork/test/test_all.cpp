@@ -29,12 +29,12 @@ int main(int argn, char* argv[]) {
 	test_datastructures();
 	test_io();
 	test_measures();
+	test_transformations();
 	/*
 	test_utils();
 	test_randomwalks();
 	test_evolution();
 	test_modularity();
-	test_transformations();
 	test_community();
 	*/
 	}

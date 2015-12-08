@@ -74,6 +74,9 @@ template <class T1, class T2> using hash = std::unordered_map<T1,T2>;
 /** Directionality of edges, when not specified */
 const bool DEFAULT_EDGE_DIRECTIONALITY = false; // edges are undirected by default
 
+/** Default name for weight attribute */
+const std::string DEFAULT_WEIGHT_ATTR_NAME = "|";
+
 /** Selection mode, for directed edges (e.g., to compute the IN-degree or OUT-degree of a node) */
 enum edge_mode {INOUT=0, IN=1, OUT=2};
 
@@ -644,6 +647,26 @@ public:
 	 * @return a constant AttributeStore storing edge features
 	 **/
 	const AttributeStoreSharedPtr edge_features(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
+
+	/**
+	 * @brief Commodity function to set the weight of an edge.
+	 * The weight attribute (DEFAULT_WEIGHT_ATTR_NAME) must exist.
+	 * @param node1 a pointer to the "from" node if directed, or to one end of the edge if undirected
+	 * @param node2 a pointer to the "to" node if directed, or one end of the edge if undirected
+	 * @param weight the weight to be set
+	 * @throw ElementNotFoundException if the edge does not exist
+	 **/
+	void set_weight(NodeSharedPtr node1, NodeSharedPtr node2, double weight);
+
+	/**
+	 * @brief Commodity function to get the weight of an edge.
+	 * The weight attribute (DEFAULT_WEIGHT_ATTR_NAME) must exist.
+	 * @param node1 a pointer to the "from" node if directed, or to one end of the edge if undirected
+	 * @param node2 a pointer to the "to" node if directed, or one end of the edge if undirected
+	 * @throw ElementNotFoundException if the edge does not exist
+	 * @return the weight on the edge
+	 **/
+	double get_weight(NodeSharedPtr node1, NodeSharedPtr node2);
 
 	/** Returns a compact string representation of this MLNetwork */
 	std::string to_string() const;

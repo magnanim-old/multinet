@@ -5,6 +5,7 @@ OBJS = 	src/datastructures/*.cpp \
 		src/datastructures/attributes/*.cpp \
 		src/io/*.cpp \
 		src/measures/*.cpp \
+		src/transformation/*.cpp \
 		src/community/*.cpp \
 		src/evolution/*.cpp \
 		src/exceptions/*.cpp \

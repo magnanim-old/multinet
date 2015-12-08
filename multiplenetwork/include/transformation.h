@@ -8,21 +8,25 @@
 #define MULTIPLENETWORK_TRANSFORMATION_H_
 
 #include "datastructures.h"
+#include <unordered_set>
 
 namespace mlnet {
 
 /**
  * The "weighted" flattening approach adds an edge between v1 and v2 in the flattened network if
- * the edge is present in any on the input networks.
- * The weight on the edge indicates the number of networks where the edge is present.
+ * the edge is present in any on the input layers.
+ * The weight on the edge indicates the number of layers where the edge is present.
  */
-void flatten_weighted(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
+LayerSharedPtr flatten_weighted(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors);
 
-void flatten_or(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
+LayerSharedPtr flatten_or(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors);
 
-void flatten_multi(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
+//LayerSharedPtr flatten_multi(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
 
-void project(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
+LayerSharedPtr project(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
+
+// utility function used in multiple types of flattening
+LayerSharedPtr create_layer(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors);
 
 }
 
