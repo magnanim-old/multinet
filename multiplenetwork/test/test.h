@@ -33,9 +33,8 @@ void test_random();
 void test_randomwalks();
 void test_evolution();
 void test_modularity();
-/*
-void testCommunity();
-*/
+void test_community();
+void test_dynamics();
 
 void test_begin(const std::string& name);
 

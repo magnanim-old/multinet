@@ -19,7 +19,7 @@ using namespace std;
 
 namespace mlnet {
 
-void write_graphml(const MLNetworkSharedPtr mnet, const std::string& path, bool multigraph) {
+void write_graphml(const MLNetworkSharedPtr mnet, const std::unordered_set<LayerSharedPtr>& layers, const std::string& path, bool multigraph) {
 	std::ofstream outfile;
 	outfile.open(path.data());
 
@@ -29,16 +29,19 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::string& path, bool 
 	outfile << "    xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns" << std::endl;
 	outfile << "     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">" << std::endl;
 
-	/*bool directed = false;
-	for (LayerSharedPtr layer: layers) {
-		if (mnet->getNetwork(layer).isDirected()) {
-			directed = true;
-			continue;
+	bool directed = false;
+	for (LayerSharedPtr layer1: layers) {
+		for (LayerSharedPtr layer2: layers) {
+			if (mnet->is_directed(layer1,layer2)) {
+				directed = true;
+				goto end_loop;
+			}
 		}
-	}*/
+	}
+	end_loop:
 
 	// Node attributes
-	for (LayerSharedPtr layer: mnet->get_layers()) {
+	for (LayerSharedPtr layer: layers) {
 		outfile << "    <key id=\"l" << layer->id << "\" for=\"node\" attr.name=\"" << layer->name << "\" attr.type=\"string\"/>" << std::endl;
 		for (AttributeSharedPtr attr: mnet->node_features(layer)->attributes()) {
 			if (attr->type()==NUMERIC_TYPE)
@@ -49,8 +52,8 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::string& path, bool 
 	}
 	outfile << "    <key id=\"e_type\" for=\"edge\" attr.name=\"e_type\" attr.type=\"string\"/>" << std::endl;
 
-	for (LayerSharedPtr layer1: mnet->get_layers()) {
-		for (LayerSharedPtr layer2: mnet->get_layers()) {
+	for (LayerSharedPtr layer1: layers) {
+		for (LayerSharedPtr layer2: layers) {
 			for (AttributeSharedPtr attr: mnet->edge_features(layer1,layer2)->attributes()) {
 				if (attr->type()==NUMERIC_TYPE)
 					outfile << "    <key id=\"e" << layer1->name << "-" << layer2->name << ": " << attr->name() << "\" for=\"edge\" attr.name=\"" << layer1->name << "-" << layer2->name << ": "  << attr->name() << "\" attr.type=\"double\"/>" << std::endl;
@@ -60,8 +63,7 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::string& path, bool 
 		}
 	}
 
-	outfile << "  <graph id=\"" << mnet->name << "\">" << std::endl;
-	// REMOVED:  edgedefault=\"" << (directed?"directed":"undirected") << "\"
+	outfile << "  <graph id=\"" << mnet->name << "\" edgedefault=\"" << (directed?"directed":"undirected") << "\">" << std::endl;
 
 	// Nodes
 	if (multigraph) {
@@ -73,6 +75,8 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::string& path, bool 
 					outfile << "    <node id=\"" << actor->id << "\" name=\"" << actor->name << "\">" << std::endl;
 					printed = true;
 				}
+				if (layers.count(node->layer)==0)
+					continue;
 				outfile << "        <data key=\"l" << node->layer->id << "\">T</data>" << std::endl;
 				AttributeStoreSharedPtr attrs = mnet->node_features(node->layer);
 				for (AttributeSharedPtr attr: attrs->attributes()) {
@@ -88,16 +92,18 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::string& path, bool 
 	}
 	else {
 		// (one for each node)
-		for (NodeSharedPtr node: mnet->get_nodes()) {
-			outfile << "    <node id=\"" << node->id << "\" name=\"" << node->actor->name << ":" << node->layer->name << "\">" << std::endl;
-			AttributeStoreSharedPtr attrs = mnet->node_features(node->layer);
-			for (AttributeSharedPtr attr: attrs->attributes()) {
-				if (attr->type()==NUMERIC_TYPE)
-					outfile << "        <data key=\"v" << node->layer->name << ": " << attr->name() << "\">" << attrs->getNumeric(node->id,attr->name()) << "</data>" << std::endl;
-				else if (attr->type()==STRING_TYPE)
-					outfile << "        <data key=\"v" << node->layer->name << ": " << attr->name() << "\">" << attrs->getString(node->id,attr->name()) << "</data>" << std::endl;
+		for (LayerSharedPtr layer: layers) {
+			for (NodeSharedPtr node: mnet->get_nodes(layer)) {
+				outfile << "    <node id=\"" << node->id << "\" name=\"" << node->actor->name << ":" << node->layer->name << "\">" << std::endl;
+				AttributeStoreSharedPtr attrs = mnet->node_features(node->layer);
+				for (AttributeSharedPtr attr: attrs->attributes()) {
+					if (attr->type()==NUMERIC_TYPE)
+						outfile << "        <data key=\"v" << node->layer->name << ": " << attr->name() << "\">" << attrs->getNumeric(node->id,attr->name()) << "</data>" << std::endl;
+					else if (attr->type()==STRING_TYPE)
+						outfile << "        <data key=\"v" << node->layer->name << ": " << attr->name() << "\">" << attrs->getString(node->id,attr->name()) << "</data>" << std::endl;
+				}
+				outfile << "    </node>" << std::endl;
 			}
-			outfile << "    </node>" << std::endl;
 		}
 	}
 
@@ -106,36 +112,44 @@ void write_graphml(const MLNetworkSharedPtr mnet, const std::string& path, bool 
 	// Edges
 	if (multigraph) {
 		// (connect actor ids)
-		for (EdgeSharedPtr edge: mnet->get_edges()) {
-			outfile << "    <edge id=\"e" << edge->id << "\" source=\"" << edge->v1->actor->id << "\" target=\"" << edge->v2->actor->id << "\">" << std::endl;
-			if (edge->v1->layer==edge->v2->layer) {
-				outfile << "        <data key=\"e_type\">" << edge->v1->layer->name << "</data>" << std::endl;
+		for (LayerSharedPtr layer1: layers) {
+			for (LayerSharedPtr layer2: layers) {
+				for (EdgeSharedPtr edge: mnet->get_edges(layer1,layer2)) {
+					outfile << "    <edge id=\"e" << edge->id << "\" source=\"" << edge->v1->actor->id << "\" target=\"" << edge->v2->actor->id << "\">" << std::endl;
+					if (edge->v1->layer==edge->v2->layer) {
+						outfile << "        <data key=\"e_type\">" << edge->v1->layer->name << "</data>" << std::endl;
+					}
+					else
+						outfile << "        <data key=\"e_type\">" << edge->v1->layer->name << "-" << edge->v2->layer->name << "</data>" << std::endl;
+					AttributeStoreSharedPtr attrs = mnet->edge_features(edge->v1->layer,edge->v2->layer);
+					for (AttributeSharedPtr attr: attrs->attributes()) {
+						if (attr->type()==NUMERIC_TYPE)
+							outfile << "        <data key=\"e" << edge->v1->layer->name << "-" << edge->v2->layer->name << "_" << "\">" << attrs->getNumeric(edge->id,attr->name()) << "</data>" << std::endl;
+						else if (attr->type()==STRING_TYPE)
+							outfile << "        <data key=\"e" << edge->v1->layer->name << "-" << edge->v2->layer->name << "_" << "\">" << attrs->getString(edge->id,attr->name()) << "</data>" << std::endl;
+					}
+					outfile << "    </edge>" << std::endl;
+				}
 			}
-			else
-				outfile << "        <data key=\"e_type\">" << edge->v1->layer->name << "-" << edge->v2->layer->name << "</data>" << std::endl;
-			AttributeStoreSharedPtr attrs = mnet->edge_features(edge->v1->layer,edge->v2->layer);
-			for (AttributeSharedPtr attr: attrs->attributes()) {
-				if (attr->type()==NUMERIC_TYPE)
-					outfile << "        <data key=\"e" << edge->v1->layer->name << "-" << edge->v2->layer->name << "_" << "\">" << attrs->getNumeric(edge->id,attr->name()) << "</data>" << std::endl;
-				else if (attr->type()==STRING_TYPE)
-					outfile << "        <data key=\"e" << edge->v1->layer->name << "-" << edge->v2->layer->name << "_" << "\">" << attrs->getString(edge->id,attr->name()) << "</data>" << std::endl;
-			}
-			outfile << "    </edge>" << std::endl;
 		}
 	}
 	else {
 		// (connect node ids)
-		for (EdgeSharedPtr edge: mnet->get_edges()) {
-			outfile << "    <edge id=\"e" << edge->id << "\" source=\"" << edge->v1->id << "\" target=\"" << edge->v2->id << "\">" << std::endl;
-			outfile << "        <data key=\"e_type\">" << edge->v1->layer->name << "-" << edge->v1->layer->name << "</data>" << std::endl;
-			AttributeStoreSharedPtr attrs = mnet->edge_features(edge->v1->layer,edge->v2->layer);
-			for (AttributeSharedPtr attr: attrs->attributes()) {
-				if (attr->type()==NUMERIC_TYPE)
-					outfile << "        <data key=\"e" << edge->v1->layer->name << "-" << edge->v2->layer->name << "_" << "\">" << attrs->getNumeric(edge->id,attr->name()) << "</data>" << std::endl;
-				else if (attr->type()==STRING_TYPE)
-					outfile << "        <data key=\"e" << edge->v1->layer->name << "-" << edge->v2->layer->name << "_" << "\">" << attrs->getString(edge->id,attr->name()) << "</data>" << std::endl;
+		for (LayerSharedPtr layer1: layers) {
+			for (LayerSharedPtr layer2: layers) {
+				for (EdgeSharedPtr edge: mnet->get_edges(layer1,layer2)) {
+					outfile << "    <edge id=\"e" << edge->id << "\" source=\"" << edge->v1->id << "\" target=\"" << edge->v2->id << "\">" << std::endl;
+					outfile << "        <data key=\"e_type\">" << edge->v1->layer->name << "-" << edge->v1->layer->name << "</data>" << std::endl;
+					AttributeStoreSharedPtr attrs = mnet->edge_features(edge->v1->layer,edge->v2->layer);
+					for (AttributeSharedPtr attr: attrs->attributes()) {
+						if (attr->type()==NUMERIC_TYPE)
+							outfile << "        <data key=\"e" << edge->v1->layer->name << "-" << edge->v2->layer->name << "_" << "\">" << attrs->getNumeric(edge->id,attr->name()) << "</data>" << std::endl;
+						else if (attr->type()==STRING_TYPE)
+							outfile << "        <data key=\"e" << edge->v1->layer->name << "-" << edge->v2->layer->name << "_" << "\">" << attrs->getString(edge->id,attr->name()) << "</data>" << std::endl;
+					}
+					outfile << "    </edge>" << std::endl;
+				}
 			}
-			outfile << "    </edge>" << std::endl;
 		}
 	}
 	outfile << "  </graph>" << std::endl;

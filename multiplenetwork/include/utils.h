@@ -12,6 +12,7 @@
 
 #include "datastructures.h"
 #include "exceptions.h"
+#include <unordered_set>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -90,9 +91,25 @@ double to_double(const std::string &double_as_string);
 double mean(const std::vector<double>& vec);
 double stdev(const std::vector<double>& vec);
 
-//std::set<network_id> network_names_to_ids(const MultiplexNetwork& mnet, const std::vector<std::string>& names);
 
-//std::set<entity_id> identity_names_to_ids(const MultiplexNetwork& mnet, const std::vector<std::string>& names);
+template <class T>
+std::unordered_set<T> intersect(std::unordered_set<T> set1, std::unordered_set<T> set2) {
+	std::unordered_set<T> result;
+	for (T l: set1) {
+		if (set2.count(l)==1) {
+			result.insert(l);
+		}
+	}
+	return result;
+}
+
+template <class T>
+std::unordered_set<T> set_union(std::unordered_set<T> set1, std::unordered_set<T> set2) {
+	std::unordered_set<T> result;
+	result.insert(set1.begin(), set1.end());
+	result.insert(set2.begin(), set2.end());
+	return result;
+}
 
 }
 

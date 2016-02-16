@@ -195,6 +195,81 @@ std::unordered_map<T1, std::unordered_map<T2,long> >& PairCounter<T1,T2>::map() 
 	return values;
 }
 
+
+/**
+ * A Counter for a pair of values
+ */
+template <class T1, class T2, class T3>
+class TriangleCounter {
+private:
+	/** A map where the count is kept */
+    std::unordered_map<T1, std::unordered_map<T2, std::unordered_map<T3,long> > > values;
+
+public:
+    /**
+     * Constructor.
+     */
+    TriangleCounter();
+
+    /**
+     * Destructor.
+     */
+    ~TriangleCounter();
+
+    /**
+     * This function is used to increase the count of the pair T1,T2.
+     * @param val value whose count should be incremented
+     */
+    void inc(T1 val1, T2 val2, T3 val3);
+
+    /**
+     * This function is used to set a given value for the count of the pair T1,T2.
+     * @param val value whose count should be incremented
+     */
+    void set(T1 val1, T2 val2, T3 val3, long num);
+
+    /**
+     * @param val value whose count should be returned
+     * @return count of the pair T1,T2
+     */
+    long count(T1 val1, T2 val2, T3 val3) const;
+
+    std::unordered_map<T1, std::unordered_map<T2, std::unordered_map<T3,long> > >& map();
+};
+
+template <class T1, class T2, class T3>
+TriangleCounter<T1, T2, T3>::TriangleCounter() {}
+
+template <class T1, class T2, class T3>
+TriangleCounter<T1, T2, T3>::~TriangleCounter() {
+}
+
+template <class T1, class T2, class T3>
+void TriangleCounter<T1, T2, T3>::inc(T1 val1, T2 val2, T3 val3) {
+	if (values.count(val1)==0 || values.at(val1).count(val2)==0 || values.at(val1).at(val2).count(val3)==0) {
+		values[val1][val2][val3] = 0;
+	}
+	values[val1][val2][val3]++;
+}
+
+template <class T1, class T2, class T3>
+void TriangleCounter<T1, T2, T3>::set(T1 val1, T2 val2, T3 val3, long num) {
+	values[val1][val2][val3] = num;
+}
+
+template <class T1, class T2, class T3>
+long TriangleCounter<T1,T2,T3>::count(T1 val1, T2 val2, T3 val3) const {
+	if (values.count(val1)==0 || values.at(val1).count(val2)==0 || values.at(val1).at(val2).count(val3)==0) {
+		return 0;
+	}
+	else return values.at(val1).at(val2);
+}
+
+template <class T1, class T2, class T3>
+std::unordered_map<T1, std::unordered_map<T2, std::unordered_map<T3,long> > >& TriangleCounter<T1,T2,T3>::map() {
+	return values;
+}
+
 } // namespace mlnet
 
 #endif /* MLNET_COUNTER_H_ */

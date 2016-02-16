@@ -61,8 +61,12 @@ void test_measures() {
 	std::cout << "done!" << std::endl;
 
 	std::cout << "Testing jaccard similarity...";
-	MLNetworkSharedPtr mnet1 = read_multilayer("test/io1.mpx","mlnet 1",',');
-	if (jaccard_similarity(mnet,layers) != 1.0/10.0) throw FailedUnitTestException("Wrong layer similarity");
+	MLNetworkSharedPtr mnet5 = read_multilayer("test/io5.mpx","mlnet 5",',');
+	if (jaccard_similarity(mnet5,layers) != 4.0/7.0) throw FailedUnitTestException("Wrong layer similarity");
+	std::cout << "done!" << std::endl;
+
+	std::cout << "Testing triangle jaccard similarity...";
+	if (jaccard_triangle_similarity(mnet5,layers) != 1.0/2.0) throw FailedUnitTestException("Wrong jaccard triangle layer similarity: " + to_string(jaccard_triangle_similarity(mnet5,layers)));
 	std::cout << "done!" << std::endl;
 
 	std::cout << "Computing multilayer distance between all pairs of vertexes...";

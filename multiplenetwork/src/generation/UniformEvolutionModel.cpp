@@ -1,7 +1,7 @@
 #include <set>
 #include <cstdlib>
 #include <iostream>
-#include "evolution.h"
+#include "generation.h"
 
 using namespace std;
 

@@ -66,6 +66,55 @@ double jaccard_similarity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& 
 	return jaccard_similarity(mnet,layers);
 }
 
+// TODO DOC: only undirected
+double jaccard_triangle_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers) {
+	TriangleCounter<actor_id,actor_id,actor_id> c;
+	int num_layers = layers.size();
+	long num_triangles = 0;
+	long num_matches = 0;
+	// count all the triangles
+	for (LayerSharedPtr layer: layers) {
+		std::unordered_set<NodeSharedPtr> processed1;
+		for (NodeSharedPtr n1: mnet->get_nodes(layer)) {
+			processed1.insert(n1);
+			std::unordered_set<NodeSharedPtr> processed2;
+			for (NodeSharedPtr n2: mnet->neighbors(n1,INOUT)) {
+				if (processed1.count(n2)>0) continue;
+				processed2.insert(n2);
+				for (NodeSharedPtr n3: mnet->neighbors(n2,INOUT)) {
+					if (processed1.count(n3)>0) continue;
+					if (processed2.count(n3)>0) continue;
+					if (mnet->get_edge(n3,n1)) {
+						std::vector<actor_id> triangle(3);
+						triangle[0] = n1->actor->id;
+						triangle[1] = n2->actor->id;
+						triangle[2] = n3->actor->id;
+						std::sort(triangle.begin(),triangle.end());
+						c.inc(triangle[0],triangle[1],triangle[2]);
+					}
+				}
+			}
+		}
+	}
+	for (auto& e1: c.map()) {
+		for (auto& e2: e1.second) {
+			for (auto& e3: e2.second) {
+				num_triangles++;
+				if (e3.second==num_layers)
+					num_matches++;
+			}
+		}
+	}
+	return double(num_matches)/num_triangles;
+}
+
+double jaccard_triangle_similarity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) {
+	std::unordered_set<LayerSharedPtr> layers;
+	layers.insert(layer1);
+	layers.insert(layer2);
+	return jaccard_triangle_similarity(mnet,layers);
+}
+
 double coverage(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) {
 	//std::cout << edges.size() << " " << flat.getNumEdges() << std::endl;
 	long num_edges = mnet->get_edges(layer2,layer2).size();

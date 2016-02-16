@@ -29,12 +29,14 @@
 // Main analytical measures (degree, neighborhood, relevance, ...):
 #include "measures.h"
 // Generation of multilayer networks:
-#include "evolution.h"
+#include "generation.h"
 // Functions for community detection:
 #include "community.h"
 // Random walks on multilayer networks:
 #include "randomwalks.h"
 // Network pre-processing (flattening, projection...):
 #include "transformation.h"
+// Dynamical processes (viral models, threshold models...):
+#include "dynamics.h"
 
 #endif /* MLNET_MLNETWORK_H_ */

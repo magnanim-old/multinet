@@ -5,7 +5,7 @@
  *      Author: matteo.magnani
  */
 
-#include "evolution.h"
+#include "generation.h"
 #include <set>
 #include <iostream>
 

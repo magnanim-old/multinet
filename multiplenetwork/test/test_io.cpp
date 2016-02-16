@@ -69,9 +69,12 @@ void test_io() {
 	std::remove("_tmp_file1.gml");
 	std::cout << "done!" << std::endl;
 	std::cout << "Writing a graphml file...";
-	write_graphml(mnet3,"_tmp_file2.gml",true);
+	std::unordered_set<LayerSharedPtr> layers;
+	for (LayerSharedPtr layer: mnet3->get_layers())
+		layers.insert(layer);
+	write_graphml(mnet3,layers,"_tmp_file2.gml",true);
 	std::remove("_tmp_file2.gml");
-	write_graphml(mnet3,"_tmp_file3.gml",false);
+	write_graphml(mnet3,layers,"_tmp_file3.gml",false);
 	std::remove("_tmp_file3.gml");
 	std::cout << "done!" << std::endl;
 

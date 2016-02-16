@@ -7,7 +7,8 @@ OBJS = 	src/datastructures/*.cpp \
 		src/measures/*.cpp \
 		src/transformation/*.cpp \
 		src/community/*.cpp \
-		src/evolution/*.cpp \
+		src/dynamics/*.cpp \
+		src/generation/*.cpp \
 		src/exceptions/*.cpp \
 		src/utils/*.cpp \
 		
@@ -26,7 +27,7 @@ unit_test: test/test_all.cpp $(OBJS) $(TEST)
 
 lib: $(OBJS)
 	$(CXX) -c -fPIC  $(CXXFLAGS) $(OBJS)  
-	$(CXX) $(LIBS) -stdlib=libc++ -shared -o libmultiplenetwork.so *.o 
+	$(CXX) $(LIBS) -stdlib=libc++ -shared -o libmlnetwork.so *.o 
 	rm *.o
 	 
 all:	unit_test 

@@ -30,12 +30,13 @@ int main(int argn, char* argv[]) {
 	test_io();
 	test_measures();
 	test_transformations();
+	test_community();
+	test_dynamics();
 	/*
 	test_utils();
 	test_randomwalks();
 	test_evolution();
 	test_modularity();
-	test_community();
 	*/
 	}
 	catch (std::exception& e) {

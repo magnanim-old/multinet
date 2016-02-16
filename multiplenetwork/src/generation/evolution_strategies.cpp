@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <vector>
 #include <iostream>
-#include "evolution.h"
+#include "generation.h"
 
 /*
 vertex_id choice_degree(Random rand, MultiplexNetwork& mnet, network_id net) {

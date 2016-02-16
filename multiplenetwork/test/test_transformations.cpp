@@ -45,9 +45,24 @@ void test_transformations() {
 	if (mnet->get_edges(new_layer,new_layer).size() != 10) throw FailedUnitTestException("Wrong number of edges");
 	std::cout << "done!" << std::endl;
 
-
 	test_end("flattening");
 
+	test_begin("projection");
+
+	std::cout << "Reading the multilayer network...";
+	MLNetworkSharedPtr mnet_p = read_multilayer("test/io4.mln","interdependent",',');
+	LayerSharedPtr A = mnet_p->get_layer("A");
+	LayerSharedPtr P = mnet_p->get_layer("P");
+	std::cout << "done!" << mnet_p->to_string() << std::endl;
+
+	std::cout << "Testing clique projection...";
+	LayerSharedPtr projected_layer = project_clique(mnet_p,"flat_weighted",A,P);
+	if (mnet_p->is_directed(projected_layer,projected_layer)) throw FailedUnitTestException("Layer should be undirected");
+	if (mnet_p->get_nodes(projected_layer).size() != 5) throw FailedUnitTestException("Wrong number of nodes");
+	if (mnet_p->get_edges(projected_layer,projected_layer).size() != 5) throw FailedUnitTestException("Wrong number of edges");
+	std::cout << "done!" << std::endl;
+
+	test_end("projection");
 }
 
 

@@ -13,7 +13,7 @@
 
 #include <set>
 #include <vector>
-#include "evolution.h"
+#include "generation.h"
 #include "datastructures.h"
 #include "utils.h"
 
@@ -86,7 +86,7 @@ void evolve(MLNetworkSharedPtr mnet,
 		long num_initial_actors,
 		std::vector<double> pr_no_event,
 		std::vector<double> pr_internal_event,
-		std::vector<std::vector<double> > dependency,
+		matrix<double> dependency,
 		std::vector<EvolutionModel*> evolution_model);
 
 

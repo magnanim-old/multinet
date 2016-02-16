@@ -23,7 +23,7 @@ LayerSharedPtr flatten_or(MLNetworkSharedPtr mnet, const std::string& new_layer_
 
 //LayerSharedPtr flatten_multi(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
 
-LayerSharedPtr project(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed);
+LayerSharedPtr project_clique(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
 // utility function used in multiple types of flattening
 LayerSharedPtr create_layer(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors);

@@ -59,11 +59,14 @@ double xrelevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, c
 double xrelevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode);
 
 /**********************************************************************/
-/** Network comparison ************************************************/
+/** Layer comparison ************************************************/
 /**********************************************************************/
 
 double jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers);
 double jaccard_similarity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
+
+double jaccard_triangle_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers);
+double jaccard_triangle_similarity(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
 double coverage(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 

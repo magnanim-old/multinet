@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <vector>
 #include <iostream>
-#include "evolution.h"
+#include "generation.h"
 
 namespace mlnet {
 
