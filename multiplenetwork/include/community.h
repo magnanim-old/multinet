@@ -28,6 +28,7 @@ class community {
 public:
 	community(long id, std::unordered_set<CliqueSharedPtr> cliques, std::unordered_set<LayerSharedPtr> layers);
 	community();
+	int size() const;
 	bool operator==(const community& comp) const;
 	bool operator!=(const community& comp) const;
 	bool operator<(const community& comp) const;
@@ -51,13 +52,21 @@ void find_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr A, hash<ActorSharedPt
 
 std::set<CliqueSharedPtr> find_max_cliques(MLNetworkSharedPtr mnet, int k, int m);
 
-void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr A, hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > B, hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > N, std::set<CliqueSharedPtr>& C, int k, int m);
+void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr& A, hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> >& B, hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> >& C, std::set<CliqueSharedPtr>& result, int k, int m);
 
-std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> > build_adjacency_graph(const std::set<CliqueSharedPtr>& C, int k);
+std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> > build_adjacency_graph(const std::set<CliqueSharedPtr>& C, int m);
+
+std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> > build_max_adjacency_graph(const std::set<CliqueSharedPtr>& C, int k, int m);
 
 void find_communities(const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr A, const std::unordered_set<CliqueSharedPtr>& B, std::set<CliqueSharedPtr> U, std::set<CommunitySharedPtr>& C, int m);
 
 std::set<CommunitySharedPtr> find_communities(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, int m);
+
+std::set<CommunitySharedPtr> find_max_communities(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, int m);
+
+void find_max_communities2(const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr A, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > B, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > D, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > U, std::set<CommunitySharedPtr>& C, int m);
+
+void find_max_communities(const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr& A, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& B, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& C, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& D, std::set<CommunitySharedPtr>& result, int m);
 
 }
 #endif /* MULTIPLENETWORK_COMMUNITY_H_ */
