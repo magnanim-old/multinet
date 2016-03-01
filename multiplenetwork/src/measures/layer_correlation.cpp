@@ -9,6 +9,7 @@
 #include "datastructures.h"
 #include "counter.h"
 #include <unordered_set>
+#include <algorithm>
 
 
 namespace mlnet {
