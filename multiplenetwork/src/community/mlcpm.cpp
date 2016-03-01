@@ -38,6 +38,15 @@ community::community() :
 community::community(long id, std::unordered_set<CliqueSharedPtr> cliques, std::unordered_set<LayerSharedPtr> layers) :
 	id(id), cliques(cliques), layers(layers) {}
 
+std::set<ActorSharedPtr> community::actors() {
+	std::set<ActorSharedPtr> actors;
+	for (CliqueSharedPtr clique: cliques) {
+		for (ActorSharedPtr actor: clique->actors)
+			actors.insert(actor);
+	}
+	return actors;
+}
+
 std::string community::to_string() {
 	std::string res = "C" + std::to_string(id) + ": ";
 	std::set<ActorSharedPtr> actors;
@@ -63,6 +72,18 @@ int community::size() const {
 	}
 	return actors.size();
 }
+
+std::set<CommunitySharedPtr> ml_cpm(MLNetworkSharedPtr mnet, int k, int m1, int m2) {
+	std::set<CliqueSharedPtr> C = find_max_cliques(mnet,k,m1);
+	if (C.size()==0)
+		return std::set<CommunitySharedPtr>();
+
+	std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> > adjacency = build_max_adjacency_graph(C,k,m2);
+
+	return find_max_communities(mnet,adjacency,m2);
+}
+
+
 
 hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > get_mlneighbors(MLNetworkSharedPtr mnet, ActorSharedPtr actor) {
 	hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > result;

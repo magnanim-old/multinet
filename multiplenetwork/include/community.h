@@ -28,6 +28,7 @@ class community {
 public:
 	community(long id, std::unordered_set<CliqueSharedPtr> cliques, std::unordered_set<LayerSharedPtr> layers);
 	community();
+	std::set<ActorSharedPtr> actors();
 	int size() const;
 	bool operator==(const community& comp) const;
 	bool operator!=(const community& comp) const;
@@ -41,6 +42,8 @@ public:
 };
 
 typedef std::shared_ptr<community> CommunitySharedPtr;
+
+std::set<CommunitySharedPtr> ml_cpm(MLNetworkSharedPtr mnet, int k, int m1, int m2);
 
 hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > get_mlneighbors(MLNetworkSharedPtr mnet, ActorSharedPtr actor);
 

@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <algorithm>
 #include <string>
 #include "ctype.h"
 #include "io.h"
