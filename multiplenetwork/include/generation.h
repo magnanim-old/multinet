@@ -2,7 +2,7 @@
  * This module defines a generic network co-evolution process.
  *
  * The function "evolve" takes a multilayer network as input and at every step
- * updates each of its layer taking one of the following actions:
+ * updates each of its layers taking one of the following actions:
  * 1) no action (the layer remains unchanged - used to set different evolution speeds)
  * 2) internal evolution (the layer evolves according to some internal dynamics, defined by an EvolutionModel)
  * 3) external evolution (the layer imports nodes and edges from another layer)

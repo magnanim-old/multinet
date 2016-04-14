@@ -1,9 +1,5 @@
 /*
- * run_all.cpp
- *
- * Created on: Feb 7, 2014
- * Author: matteomagnani
- * Version: 0.0.1
+ * This program runs all the unit tests defined for this library.
  */
 
 #include "test.h"
@@ -25,14 +21,15 @@ void test_end(const std::string& name) {
 
 int main(int argn, char* argv[]) {
 
+	test_begin("All unit tests");
 	try {
 	test_datastructures();
 	test_io();
+	/*
 	test_measures();
 	test_transformations();
 	test_community();
 	test_dynamics();
-	/*
 	test_utils();
 	test_randomwalks();
 	test_evolution();
@@ -43,6 +40,7 @@ int main(int argn, char* argv[]) {
 		std::cout << "[Error] UNIT TEST NOT PASSED: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
+	test_end("All unit tests");
 
 	return EXIT_SUCCESS;
 }

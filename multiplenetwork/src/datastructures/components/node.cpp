@@ -2,7 +2,7 @@
 
 namespace mlnet {
 
-node::node(const node_id& id, const ActorSharedPtr& actor, const LayerSharedPtr& layer) :
+node::node(node_id id, const ActorSharedPtr& actor, const LayerSharedPtr& layer) :
 	basic_component(id),
 	actor(actor),
 	layer(layer) {}

@@ -1,8 +1,3 @@
-/*
- *  Created on: Jun 12, 2013
- *      Author: magnanim
- */
-
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,25 +16,28 @@ namespace mlnet {
 
 MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_name, char separator) {
 	MLNetworkSharedPtr mnet = MLNetwork::create(network_name);
-	enum NetType {MULTIPLEX, MULTILAYER};
+	enum NetType {MULTIPLEX_NETWORK, MULTILAYER_NETWORK};
 	enum Section {TYPE, LAYERS, ACTOR_ATTRS, EDGE_ATTRS, NODE_ATTRS, ACTORS, EDGES, NODES, DEFAULT};
 	enum EdgeDir {DIRECTED=true, UNDIRECTED=false};
 	/********************************************/
 	bool default_edge_directionality = UNDIRECTED;
-	bool network_type = MULTIPLEX;
+	bool network_type = MULTIPLEX_NETWORK;
 	/****************************/
 	// C(++), I hate you...
 	int (*touppercase)(int) = toupper;
 	/****************************/
-	map<string,map<string,vector<int> > > layers_edge_attr_type;
-	map<string,map<string,vector<string> > > layers_edge_attr_names;
-	map<string,vector<int> > layers_node_attr_type;
-	map<string,vector<string> > layers_node_attr_names;
-	map<string,map<string,bool> > edge_directionality;
 	vector<int> actor_attr_type;
 	vector<string> actor_attr_names;
+	vector<int> layer_attr_type;
+	vector<string> layer_attr_names;
+	hashtable<string,hashtable<string,vector<int> > > edge_attr_type;
+	hashtable<string,hashtable<string,vector<string> > > edge_attr_names;
+	hashtable<string,vector<int> > node_attr_type;
+	hashtable<string,vector<string> > node_attr_names;
+	hashtable<string,hashtable<string,bool> > edge_directionality;
 
-	Section current_sect = DEFAULT; // Default section, in case only an edge list is provided
+	// Default section, in case only an edge list is provided
+	Section current_sect = DEFAULT;
 
 	CSVReader csv;
 	csv.trimFields(true);
@@ -51,14 +49,14 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			continue;
 		}
 
-		// SECTION
+		// SECTION IDENTIFICATION
 		if (v[0].find("#TYPE")!=string::npos) {
 			current_sect = TYPE;
 			std::transform(v[0].begin(), v[0].end(), v[0].begin(), touppercase);
 			if (v[0]=="#TYPE MULTIPLEX")
-				network_type=MULTIPLEX;
+				network_type=MULTIPLEX_NETWORK;
 			else if (v[0]=="#TYPE MULTILAYER")
-				network_type=MULTILAYER; // TODO
+				network_type=MULTILAYER_NETWORK;
 			else throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": only \"multiplex\" and \"multilayer\" types are supported");
 			continue;
 		}
@@ -90,16 +88,6 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			current_sect = ACTORS;
 			continue;
 		}
-		if (current_sect == LAYERS) {
-			if (v.size()!=2)
-				throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": DIRECTED/UNDIRECTED must be specified for each layer");
-			string layer_name = v[0];
-			std::transform(v[1].begin(), v[1].end(), v[1].begin(), touppercase);
-			bool directed = (v[1]=="DIRECTED");
-			if (!directed && v[1]!="UNDIRECTED")
-				throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": either DIRECTED or UNDIRECTED must be specified for each layer");
-			mnet->add_layer(layer_name,directed);
-		}
 		if (current_sect == ACTOR_ATTRS) {
 			if (v.size()!=2)
 				throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": for actor attributes, attribute name and type expected");
@@ -127,12 +115,12 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			if (v[2]=="NUMERIC") attr_type = NUMERIC_TYPE;
 			else if (v[2]=="STRING") attr_type = STRING_TYPE;
 			else throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": unsupported attribute type - " + v[1]);
-			layers_node_attr_type[layer_name].push_back(attr_type);
-			layers_node_attr_names[layer_name].push_back(attr_name);
+			node_attr_type[layer_name].push_back(attr_type);
+			node_attr_names[layer_name].push_back(attr_name);
 			mnet->node_features(mnet->get_layer(layer_name))->add(attr_name,attr_type);
 		}
 		if (current_sect == EDGE_ATTRS) {
-			if (network_type==MULTIPLEX) {
+			if (network_type==MULTIPLEX_NETWORK) {
 				if (v.size()!=3)
 					throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": for edge attributes, layer name, attribute name and type expected");
 				string layer_name = v[0];
@@ -145,11 +133,11 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 				if (v[2]=="NUMERIC") attr_type = NUMERIC_TYPE;
 				else if (v[2]=="STRING") attr_type = STRING_TYPE;
 				else throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": unsupported attribute type - " + v[1]);
-				layers_edge_attr_type[layer_name][layer_name].push_back(attr_type);
-				layers_edge_attr_names[layer_name][layer_name].push_back(attr_name);
+				edge_attr_type[layer_name][layer_name].push_back(attr_type);
+				edge_attr_names[layer_name][layer_name].push_back(attr_name);
 				mnet->edge_features(layer,layer)->add(attr_name,attr_type);
 			}
-			else if (network_type==MULTILAYER) {
+			else if (network_type==MULTILAYER_NETWORK) {
 				if (v.size()!=4)
 					throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": for edge attributes, layer names, attribute name and type expected");
 				string layer_name1 = v[0];
@@ -164,9 +152,40 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 				if (v[3]=="NUMERIC") attr_type = NUMERIC_TYPE;
 				else if (v[3]=="STRING") attr_type = STRING_TYPE;
 				else throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": unsupported attribute type - " + v[2]);
-				layers_edge_attr_type[layer_name1][layer_name2].push_back(attr_type);
-				layers_edge_attr_names[layer_name1][layer_name2].push_back(attr_name);
+				edge_attr_type[layer_name1][layer_name2].push_back(attr_type);
+				edge_attr_names[layer_name1][layer_name2].push_back(attr_name);
 				mnet->edge_features(layer1,layer2)->add(attr_name,attr_type);
+			}
+		}
+		if (current_sect == LAYERS) {
+			string layer_name1, layer_name2;
+			string directionality;
+			if (network_type==MULTIPLEX_NETWORK) {
+				if (v.size()<2) {
+					throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": expected layer name followed by DIRECTED/UNDIRECTED");
+				}
+				layer_name1 = layer_name2 = v[0];
+				directionality = v[1];
+			}
+			else if (network_type==MULTILAYER_NETWORK) {
+				if (v.size()<3) {
+					throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": expected two layer names followed by DIRECTED/UNDIRECTED");
+				}
+				layer_name1 = v[0];
+				layer_name2 = v[1];
+				directionality = v[2];
+			}
+			std::transform(directionality.begin(), directionality.end(), directionality.begin(), touppercase);
+			bool directed = (directionality=="DIRECTED");
+			if (!directed && directionality!="UNDIRECTED")
+				throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": either DIRECTED or UNDIRECTED must be specified");
+			if (layer_name1==layer_name2) {
+				LayerSharedPtr layer = mnet->add_layer(layer_name1,directed);
+				}
+			else {
+				LayerSharedPtr layer1 = mnet->get_layer(layer_name1);
+				LayerSharedPtr layer2 = mnet->get_layer(layer_name2);
+				mnet->set_directed(layer1,layer2,directed);
 			}
 		}
 		if (current_sect == ACTORS) {
@@ -177,24 +196,7 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			if (actor==NULL) { // actor already present
 				actor = mnet->get_actor(actor_name);
 			}
-			// Read attributes
-			if (1+actor_attr_names.size()>v.size())
-				throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": not enough attribute values for actor " + actor_name);
-
-			// indexes of current attribute in the local vectors and in the csv file.
-			int attr_i=0;
-			int csv_i=1;
-			for (string attr_name: actor_attr_names) {
-				switch (actor_attr_type[attr_i]) {
-					case NUMERIC_TYPE:
-						mnet->actor_features()->setNumeric(actor->id,attr_name,to_double(v[csv_i]));
-						break;
-					case STRING_TYPE:
-						mnet->actor_features()->setString(actor->id,attr_name,v[csv_i]);
-					break;
-				}
-				attr_i++; csv_i++;
-			}
+			read_attributes(mnet->actor_features(), actor->id, actor_attr_type, actor_attr_names, v, 1, csv.rowNum());
 		}
 		if (current_sect == NODES) {
 			if (v.size()<2)
@@ -203,7 +205,6 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			string node_name = v[0];
 			string layer_name = v[1];
 
-			// TODO Only for multiplex
 			ActorSharedPtr actor = mnet->get_actor(node_name);
 			if (actor==NULL) {
 				actor = mnet->add_actor(node_name);
@@ -217,25 +218,7 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			if (node==NULL) {
 				node = mnet->add_node(actor,layer);
 			}
-
-			// Read node attributes
-			if (2+layers_node_attr_names[layer_name].size()>v.size())
-				throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": not enough attribute values for node " + node_name);
-
-			// indexes of current attribute in the local vectors and in the csv file.
-			int attr_i=0;
-			int csv_i=2;
-			for (string attr_name: layers_node_attr_names[layer_name]) {
-			switch (layers_node_attr_type[layer_name][attr_i]) {
-				case NUMERIC_TYPE:
-					mnet->node_features(layer)->setNumeric(node->id,attr_name,to_double(v[csv_i]));
-					break;
-				case STRING_TYPE:
-					mnet->node_features(layer)->setString(node->id,attr_name,v[csv_i]);
-				break;
-				}
-				attr_i++; csv_i++;
-			}
+			read_attributes(mnet->node_features(layer), node->id, node_attr_type[layer_name], node_attr_names[layer_name], v, 2, csv.rowNum());
 		}
 		if (current_sect == EDGES || current_sect == DEFAULT) {
 			if (v.size()<3) {
@@ -248,19 +231,17 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 			string layer_name1;
 			string layer_name2;
 
-			if (network_type==MULTIPLEX) {
+			if (network_type==MULTIPLEX_NETWORK) {
 				from_node = v[0];
 				to_node = v[1];
 				layer_name2 = layer_name1 = v[2];
 			}
-			else if (network_type==MULTILAYER) {
+			else if (network_type==MULTILAYER_NETWORK) {
 				from_node = v[0];
 				layer_name1 = v[1];
 				to_node = v[2];
 				layer_name2 = v[3];
 			}
-
-			// TODO add warnings - and write MULTILAYER
 
 			ActorSharedPtr actor1 = mnet->get_actor(from_node);
 			if (actor1==NULL) {
@@ -296,47 +277,37 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 				edge = mnet->add_edge(node1,node2);
 			}
 
-
-			// Read edge attributes
-			// indexes of current attribute in the local vectors and in the csv file.
-			int attr_i=0;
-			int csv_i=0;
-			if (network_type==MULTIPLEX) csv_i=3;
-			else if (network_type==MULTILAYER) csv_i=4;
-			if (csv_i+layers_edge_attr_names[layer_name1][layer_name2].size()>v.size())
-				throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": not enough attribute values for edge " + edge->to_string());
-
-			for (string attr_name: layers_edge_attr_names[layer_name1][layer_name2]) {
-				switch (layers_edge_attr_type[layer_name1][layer_name2][attr_i]) {
-				case NUMERIC_TYPE:
-					mnet->edge_features(layer1,layer2)->setNumeric(edge->id,attr_name,to_double(v[csv_i]));
-					break;
-				case STRING_TYPE:
-					mnet->edge_features(layer1,layer2)->setString(edge->id,attr_name,v[csv_i]);
-				break;
-				}
-				attr_i++; csv_i++;
-			}
+			if (network_type==MULTIPLEX_NETWORK)
+				read_attributes(mnet->edge_features(layer1,layer2), edge->id, edge_attr_type[layer_name1][layer_name2], edge_attr_names[layer_name1][layer_name2], v, 3, csv.rowNum());
+			else if (network_type==MULTILAYER_NETWORK)
+				read_attributes(mnet->edge_features(layer1,layer2), edge->id, edge_attr_type[layer_name1][layer_name2], edge_attr_names[layer_name1][layer_name2], v, 4, csv.rowNum());
 		}
 	}
 	return mnet;
 }
 
-void write_multilayer(const MLNetworkSharedPtr mnet, const string& path, char sep) {
+void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char sep) {
 	std::ofstream outfile;
 	outfile.open(path.data());
 
-	outfile << "#TYPE multiplex" << std::endl;
+	outfile << "#TYPE multilayer" << std::endl;
 	outfile << std::endl;
 
 	outfile << "#LAYERS" << std::endl;
 	for (LayerSharedPtr layer: mnet->get_layers()) {
-		outfile << layer->name << sep << (mnet->is_directed(layer,layer)?"DIRECTED":"UNDIRECTED") << std::endl;
+		outfile << layer->name << sep << layer->name << sep << (mnet->is_directed(layer,layer)?"DIRECTED":"UNDIRECTED") << std::endl;
+	}
+	for (LayerSharedPtr layer1: mnet->get_layers()) {
+		for (LayerSharedPtr layer2: mnet->get_layers()) {
+			if (layer1==layer2)
+				continue;
+			outfile << layer1->name << sep << layer2->name << sep << (mnet->is_directed(layer1,layer2)?"DIRECTED":"UNDIRECTED") << std::endl;
+		}
 	}
 
 	outfile << "#ACTOR ATTRIBUTES" << std::endl;
 	for (AttributeSharedPtr attr: mnet->actor_features()->attributes()) {
-		outfile << attr->name()<< sep << attr->type_as_string() << std::endl;
+		outfile << attr->name() << sep << attr->type_as_string() << std::endl;
 	}
 
 	outfile << "#NODE ATTRIBUTES" << std::endl;
@@ -348,13 +319,11 @@ void write_multilayer(const MLNetworkSharedPtr mnet, const string& path, char se
 
 	outfile << "#EDGE ATTRIBUTES" << std::endl;
 	for (LayerSharedPtr layer1: mnet->get_layers()) {
-		//for (LayerSharedPtr layer2: mnet->get_layers()) {
-			//for (AttributeSharedPtr attr: mnet->edge_features(layer1,layer2)->attributes()) {
-			for (AttributeSharedPtr attr: mnet->edge_features(layer1,layer1)->attributes()) {
-				//outfile << layer1->name << sep << layer2->name << sep << attr->name()<< sep << attr->type_as_string() << std::endl;
-				outfile << layer1->name << sep << attr->name()<< sep << attr->type_as_string() << std::endl;
+		for (LayerSharedPtr layer2: mnet->get_layers()) {
+			for (AttributeSharedPtr attr: mnet->edge_features(layer1,layer2)->attributes()) {
+				outfile << layer1->name << sep << layer2->name << sep << attr->name()<< sep << attr->type_as_string() << std::endl;
 			}
-		//}
+		}
 	}
 
 	outfile << "#ACTORS" << std::endl;
@@ -397,7 +366,7 @@ void write_multilayer(const MLNetworkSharedPtr mnet, const string& path, char se
 	for (LayerSharedPtr layer1: mnet->get_layers()) {
 		for (LayerSharedPtr layer2: mnet->get_layers()) {
 			for (EdgeSharedPtr edge: mnet->get_edges(layer1,layer2)) {
-				outfile << edge->v1->actor->name << sep << edge->v2->actor->name << sep << edge->v2->layer->name;
+				outfile << edge->v1->actor->name << sep << edge->v1->layer->name << sep << edge->v2->actor->name << sep << edge->v2->layer->name;
 				AttributeStoreSharedPtr edge_attrs = mnet->edge_features(layer1,layer2);
 				for (AttributeSharedPtr attr: edge_attrs->attributes()) {
 					switch (attr->type()) {
@@ -415,5 +384,27 @@ void write_multilayer(const MLNetworkSharedPtr mnet, const string& path, char se
 	}
 	outfile.close();
 }
+
+
+	void read_attributes(const AttributeStoreSharedPtr& store, object_id id, const vector<int>& attr_types, const vector<string>& attr_names, const vector<string>& line, int idx, int csv_line_number) {
+		// Read node attributes
+		if (idx+attr_names.size()>line.size())
+			throw WrongFormatException("Line " + to_string(csv_line_number) + ": not enough attribute values");
+
+		// indexes of current attribute in the local vectors and in the csv file.
+		int attr_i=0;
+		int csv_i=idx;
+		for (string attr_name: attr_names) {
+		switch (attr_types[attr_i]) {
+			case NUMERIC_TYPE:
+				store->setNumeric(id,attr_name,to_double(line[csv_i]));
+				break;
+			case STRING_TYPE:
+				store->setString(id,attr_name,line[csv_i]);
+			break;
+			}
+			attr_i++; csv_i++;
+		}
+	}
 
 }

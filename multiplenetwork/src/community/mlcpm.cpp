@@ -85,8 +85,10 @@ std::set<CommunitySharedPtr> ml_cpm(MLNetworkSharedPtr mnet, int k, int m1, int 
 
 
 
-hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > get_mlneighbors(MLNetworkSharedPtr mnet, ActorSharedPtr actor) {
-	hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > result;
+
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > get_mlneighbors(MLNetworkSharedPtr mnet, ActorSharedPtr actor) {
+
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > result;
 	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
 		for (NodeSharedPtr neigh: mnet->neighbors(node,INOUT)) {
 			result[neigh->actor].insert(neigh->layer);
@@ -115,7 +117,8 @@ std::set<CliqueSharedPtr> find_cliques(MLNetworkSharedPtr mnet, int k, int m) {
 	}
 	CliqueSharedPtr A(new clique());
 	A->layers = all_layers;
-	hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > B;
+
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > B;
 	for (ActorSharedPtr actor : mnet->get_actors()) {
 		B[actor] = all_layers;
 	}
@@ -123,7 +126,8 @@ std::set<CliqueSharedPtr> find_cliques(MLNetworkSharedPtr mnet, int k, int m) {
 	return C;
 }
 
-void find_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr A, hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > B, std::set<CliqueSharedPtr>& C, int k, int m) {
+void find_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr A,
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > B, std::set<CliqueSharedPtr>& C, int k, int m) {
 	if (A->actors.size()==k) {
 		A->id = C.size();
 		C.insert(A);
@@ -133,7 +137,8 @@ void find_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr A, hash<ActorSharedPt
 		std::unordered_set<ActorSharedPtr> P(A->actors.begin(),A->actors.end());
 		P.insert(n->first);
 		std::unordered_set<LayerSharedPtr> S_P = intersect(A->layers,n->second);
-		hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > Q;
+
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > Q;
 		auto n2 = n;
 		for (++n2; n2!=B.end(); ++n2) {
 			std::unordered_set<LayerSharedPtr> common = intersect(n2->second,intersect(S_P,neighboring_layers(mnet,n->first,n2->first)));
@@ -155,17 +160,21 @@ std::set<CliqueSharedPtr> find_max_cliques(MLNetworkSharedPtr mnet, int k, int m
 	CliqueSharedPtr A(new clique());
 	A->layers = all_layers;
 	// B: all actors
-	hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > B;
+
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > B;
 	for (ActorSharedPtr actor : mnet->get_actors()) {
 		B[actor] = all_layers;
 	}
 	// C: empty set of actors
-	hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > C;
+
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > C;
 	find_max_cliques(mnet,A,B,C,result,k,m);
 	return result;
 }
 
-void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr& A, hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> >& B, hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> >& C, std::set<CliqueSharedPtr>& result, int k, int m) {
+void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr& A,
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> >& B,
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> >& C, std::set<CliqueSharedPtr>& result, int k, int m) {
 	/*
 	for (int i=0; i<A->actors.size(); i++) std::cout << " - ";
 	std::cout << "FMC(" << A->to_string() << ", { ";
@@ -187,7 +196,7 @@ void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr& A, hash<ActorSha
 	std::cout << "})"<< std::endl;
 	 */
 
-	//hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > original_N(N.begin(),N.end());
+	//hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > original_N(N.begin(),N.end());
 
 	if (A->actors.size()+B.size()<k)
 		return;
@@ -222,7 +231,8 @@ void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr& A, hash<ActorSha
 		std::unordered_set<LayerSharedPtr> S_P = intersect(A->layers,b->second);
 		CliqueSharedPtr A_ext(new clique(0,P,S_P));
 
-		hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > B_ext;
+
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > B_ext;
 		auto q = b;
 		for (++q; q!=B.end(); ++q) {
 			std::unordered_set<LayerSharedPtr> common = intersect(q->second,neighboring_layers(mnet,b->first,q->first));
@@ -231,7 +241,8 @@ void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr& A, hash<ActorSha
 			}
 		}
 
-		hash<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > C_ext;
+
+hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > C_ext;
 		for (auto c = C.begin(); c!=C.end(); ++c) {
 			std::unordered_set<LayerSharedPtr> common = intersect(c->second,neighboring_layers(mnet,b->first,c->first));
 			if (common.size()>=m) {
@@ -395,9 +406,12 @@ std::set<CommunitySharedPtr> find_max_communities(MLNetworkSharedPtr mnet, const
 	}
 	A->layers = all_layers;
 	// C: cliques that have already been used (none so far)
-	hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > B;
-	hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > C;
-	hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > D;
+
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > B;
+
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > C;
+
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > D;
 	for (auto clique_pair : adjacency) {
 		// std::cout << "processing "<< clique_pair.first->to_string() << std::endl;
 		// B: cliques that can be used to extend the current community
@@ -409,7 +423,10 @@ std::set<CommunitySharedPtr> find_max_communities(MLNetworkSharedPtr mnet, const
 	return result;
 }
 
-void find_max_communities2(const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr A, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > B, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > D, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > U, std::set<CommunitySharedPtr>& C, int m) {
+void find_max_communities2(const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr A,
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > B,
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > D,
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > U, std::set<CommunitySharedPtr>& C, int m) {
 	/*std::cout << prefix << "FMComm(A: {";
 	for (auto b: A->cliques) {
 			std::cout << b->id;
@@ -442,7 +459,8 @@ void find_max_communities2(const std::map<CliqueSharedPtr,std::set<CliqueSharedP
 		std::unordered_set<LayerSharedPtr> S_P = intersect(A->layers,b.second);
 		CommunitySharedPtr A_ext(new community(0,P,S_P));
 
-		hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > Q;
+
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > Q;
 		if (adjacency.count(b.first)>0)
 		for (auto q: adjacency.at(b.first)) {
 			//std::cout << "   checking adj.: " << q->to_string() << std::endl;
@@ -467,7 +485,8 @@ void find_max_communities2(const std::map<CliqueSharedPtr,std::set<CliqueSharedP
 			}
 		}
 
-		hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > D_ext;
+
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > D_ext;
 		if (adjacency.count(b.first)>0)
 		for (auto q: adjacency.at(b.first)) {
 			if (P.count(q)>0) continue;
@@ -495,7 +514,8 @@ void find_max_communities2(const std::map<CliqueSharedPtr,std::set<CliqueSharedP
 			C.insert(A_ext);
 		}
 		//if (!Q.empty())
-		hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > U_ext(U.begin(), U.end());
+
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > U_ext(U.begin(), U.end());
 		find_max_communities2(adjacency,A_ext,Q,D_ext,U_ext,C,m);
 		U[b.first] = b.second;
 		//A_ext->cliques.erase(b->first);
@@ -509,7 +529,10 @@ void find_max_communities2(const std::map<CliqueSharedPtr,std::set<CliqueSharedP
 }
 
 
-void find_max_communities(const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr& A, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& B, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& C, hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& D, std::set<CommunitySharedPtr>& result, int m) {
+void find_max_communities(const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr& A,
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& B,
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& C,
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& D, std::set<CommunitySharedPtr>& result, int m) {
 	/*for (int i=0; i<A->cliques.size(); i++) std::cout << " - ";
 	std::cout << "FMComm(A: {";
 	for (auto b: A->cliques) {
@@ -561,7 +584,8 @@ void find_max_communities(const std::map<CliqueSharedPtr,std::set<CliqueSharedPt
 			std::unordered_set<LayerSharedPtr> S_P = intersect(A->layers,b->second);
 			CommunitySharedPtr A_ext(new community(0,P,S_P));
 
-			hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > C_ext;
+
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > C_ext;
 			for (auto c = C.begin(); c!=C.end(); ++c) {
 				std::unordered_set<LayerSharedPtr> common = intersect(c->second,S_P);
 				if (common.size()>=m) {
@@ -569,7 +593,8 @@ void find_max_communities(const std::map<CliqueSharedPtr,std::set<CliqueSharedPt
 				}
 			}
 
-			hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > B_ext;
+
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > B_ext;
 			for (auto q=B.begin(); q!=B.end(); ++q) {
 				if (q->first==b->first)
 					continue;
@@ -597,7 +622,8 @@ void find_max_communities(const std::map<CliqueSharedPtr,std::set<CliqueSharedPt
 				}
 			}
 
-			hash<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > D_ext;
+
+hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > D_ext;
 			for (auto d = D.begin(); d!=D.end(); ++d) {
 				std::unordered_set<LayerSharedPtr> common = intersect(d->second,S_P);
 				//if (common.size()>=m) {
@@ -612,14 +638,17 @@ void find_max_communities(const std::map<CliqueSharedPtr,std::set<CliqueSharedPt
 }
 
 /*
-hash<NodeSharedPtr,long> label_propagation(const MLNetworkSharedPtr& mnet, double c) {
-	hash<NodeSharedPtr,long> membership;
+
+hashtable<NodeSharedPtr,long> label_propagation(const MLNetworkSharedPtr& mnet, double c) {
+
+hashtable<NodeSharedPtr,long> membership;
 	// initial assignment
 	long i=0;
 	for (NodeSharedPtr node: mnet->get_nodes()) {
 		membership[node] = i++;
 	}
-	hash<LayerSharedPtr,long> m_s;
+
+hashtable<LayerSharedPtr,long> m_s;
 	for (LayerSharedPtr s: mnet->get_layers()) {
 		double m = mnet->get_edges(s,s).size();
 		if (!mnet->is_directed(s,s))
@@ -632,12 +661,15 @@ hash<NodeSharedPtr,long> label_propagation(const MLNetworkSharedPtr& mnet, doubl
 	return membership;
 }
 
-long update_labels(const MLNetworkSharedPtr& mnet, hash<NodeSharedPtr,long>& membership, hash<LayerSharedPtr,long> m_s, double c, long max_neighbors) {
+long update_labels(const MLNetworkSharedPtr& mnet,
+hashtable<NodeSharedPtr,long>& membership,
+hashtable<LayerSharedPtr,long> m_s, double c, long max_neighbors) {
 	long num_updates = 0;
 	for  (NodeSharedPtr node: mnet->get_nodes()) {
 		if (mnet->neighbors(node,INOUT).size()==0)
 			continue;
-		hash<long, double> labels;
+
+hashtable<long, double> labels;
 		long k_node = mnet->neighbors(node,INOUT).size();
 		for (NodeSharedPtr n: mnet->neighbors(node,INOUT)) {
 			/ *

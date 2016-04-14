@@ -12,7 +12,7 @@ using namespace mlnet;
 
 void test_evolution() {
 	{
-	log("[Evolution Test R1] N1: larger independent, N2: smaller independent and with basic random graph evolution model");
+	test_begin("[Evolution Test R1] N1: larger independent, N2: smaller independent and with basic random graph evolution model");
 	// create multiplex network
 	MLNetworkSharedPtr mnet = MLNetwork::create("synt1");
 	LayerSharedPtr layer1 = mnet->add_layer("L1",true);
@@ -27,13 +27,13 @@ void test_evolution() {
 	UniformEvolutionModel ra(70);
 	std::vector<EvolutionModel*> evolution_model = {&ba, &ra};
 	evolve(mnet,num_of_steps,num_of_actors,pr_no_event,pr_internal_event,dependency,evolution_model);
-	log(mnet->to_string());
-	log("Edge Jaccard similarity: " + to_string(jaccard_similarity(mnet,layer1,layer2)));
-	log("Assortativity: " + to_string(assortativity(mnet,layer1,layer2,OUT)));
+	//log(mnet->to_string());
+	//log("Edge Jaccard similarity: " + to_string(jaccard_similarity(mnet,layer1,layer2)));
+	//log("Assortativity: " + to_string(assortativity(mnet,layer1,layer2,OUT)));
 	}
 
 	{
-	log("[Evolution Test R2] N1: larger independent, N2: smaller dependent on N1, both with basic random graph evolution model");
+	test_begin("[Evolution Test R2] N1: larger independent, N2: smaller dependent on N1, both with basic random graph evolution model");
 	MLNetworkSharedPtr mnet = MLNetwork::create("synt1");
 	LayerSharedPtr layer1 = mnet->add_layer("L1",true);
 	LayerSharedPtr layer2 = mnet->add_layer("L2",true);
@@ -46,9 +46,9 @@ void test_evolution() {
 	UniformEvolutionModel ra(30);
 	std::vector<EvolutionModel*> evolution_model = {&ra, &ra};
 	evolve(mnet,num_of_steps,num_of_actors,pr_no_event,pr_internal_event,dependency,evolution_model);
-	log(mnet->to_string());
-	log("Edge Jaccard similarity: " + to_string(jaccard_similarity(mnet,layer1,layer2)));
-	log("Assortativity: " + to_string(assortativity(mnet,layer1,layer2,OUT)));
+	//log(mnet->to_string());
+	//log("Edge Jaccard similarity: " + to_string(jaccard_similarity(mnet,layer1,layer2)));
+	//log("Assortativity: " + to_string(assortativity(mnet,layer1,layer2,OUT)));
 	}
 	/*
 	{
@@ -158,7 +158,7 @@ void test_evolution() {
 	}
 	*/
 	{
-	log("[Evolution Test 5] LARGER NETWORKS, COMMON ACTORS - N1: larger independent, N2: smaller dependent more on N1 than on N3, N3: smaller almost independent");
+	test_begin("[Evolution Test 5] LARGER NETWORKS, COMMON ACTORS - N1: larger independent, N2: smaller dependent more on N1 than on N3, N3: smaller almost independent");
 	// create multiplex network
 	MLNetworkSharedPtr mnet = MLNetwork::create("synt1");
 		LayerSharedPtr layer1 = mnet->add_layer("L1",true);
@@ -173,13 +173,13 @@ void test_evolution() {
 		BAEvolutionModel ba(3,2);
 		std::vector<EvolutionModel*> evolution_model = {&ba, &ba, &ba};
 		evolve(mnet,num_of_steps,num_of_actors,pr_no_event,pr_internal_event,dependency,evolution_model);
-		log(mnet->to_string());
-		log("Edge Jaccard similarity 1-2: " + to_string(jaccard_similarity(mnet,layer1,layer2)));
-		log("Edge Jaccard similarity 1-3: " + to_string(jaccard_similarity(mnet,layer1,layer3)));
-		log("Edge Jaccard similarity 2-3: " + to_string(jaccard_similarity(mnet,layer2,layer3)));
-		log("Assortativity 1-2: " + to_string(assortativity(mnet,layer1,layer2,OUT)));
-		log("Assortativity 1-3: " + to_string(assortativity(mnet,layer1,layer3,OUT)));
-		log("Assortativity 2-3: " + to_string(assortativity(mnet,layer2,layer3,OUT)));
+		//log(mnet->to_string());
+		//log("Edge Jaccard similarity 1-2: " + to_string(jaccard_similarity(mnet,layer1,layer2)));
+		//log("Edge Jaccard similarity 1-3: " + to_string(jaccard_similarity(mnet,layer1,layer3)));
+		//log("Edge Jaccard similarity 2-3: " + to_string(jaccard_similarity(mnet,layer2,layer3)));
+		//log("Assortativity 1-2: " + to_string(assortativity(mnet,layer1,layer2,OUT)));
+		//log("Assortativity 1-3: " + to_string(assortativity(mnet,layer1,layer3,OUT)));
+		//log("Assortativity 2-3: " + to_string(assortativity(mnet,layer2,layer3,OUT)));
 	}
 }
 

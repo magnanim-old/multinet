@@ -24,17 +24,20 @@ namespace mlnet {
  vector<set<Multidistance> > *distances) {}
 */
 
-std::unordered_map<ActorSharedPtr,std::set<distance> > pareto_distance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& from)  {
-	std::unordered_map<actor_id,std::set<std::pair<distance,long> > > distances;
-	/* timestamps, used for efficiency reasons to avoid processing edges when no changes have occurred since the last iteration  */
+hashtable<ActorSharedPtr,std::set<path_length> > pareto_distance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& from)  {
+	class timestamp_comparator {
+	    public: int operator()(const std::pair<path_length,long>& lhs, const std::pair<path_length,long>& rhs) {return lhs.second < rhs.second;}
+	};
+	std::unordered_map<actor_id,std::set<std::pair<path_length,long>,timestamp_comparator> > distances;
+	// timestamps, used for efficiency reasons to avoid processing edges when no changes have occurred since the last iteration
 	long ts = 0;
 	PairCounter<node_id, node_id> last_updated;
-	/* initialize distance array - for every target vertex there is still no found path leading to it...*/
+	// initialize distance array - for every target vertex there is still no found path leading to it...
 	for (ActorSharedPtr actor: mnet->get_actors()) {
-		distances[actor->id] = set<std::pair<distance,long>>();
+		distances[actor->id] = std::set<std::pair<path_length,long>,timestamp_comparator>();
 	} // ...except for the source node, reachable from itself via an empty path
-	distance empty(mnet);
-	distances[from->id].insert(std::pair<distance,long>(empty,ts));
+	path_length empty(mnet);
+	distances[from->id].insert(std::pair<path_length,long>(empty,ts));
 
 	bool changes; // keep updating the paths until when no changes occur during one full scan of the edges
 	do {
@@ -69,36 +72,36 @@ std::unordered_map<ActorSharedPtr,std::set<distance> > pareto_distance(const MLN
 				// otherwise, extend the distance to reach e.v2
 				// TOADD: check it's not a cycle, for efficiency reasons (?)
 				// Extend
-				distance extended_distance = dist.first;
+				path_length extended_distance = dist.first;
 				extended_distance.ts = ts;
-				extended_distance.step(node_from, node_to);
+				extended_distance.step(node_from->layer, node_to->layer);
 				//cout << "producing candidate: " << extended_distance << endl;
 
 				// compare the new distance with the other temporary distances to e.v2
 				bool should_be_inserted = true;
-				set<std::pair<distance,long>> dominated; // here we store the distances that will be removed if dominated by the new one
+				set<std::pair<path_length,long>,timestamp_comparator> dominated; // here we store the distances that will be removed if dominated by the new one
 				for (auto previous: distances[actor2]) {
 				// check dominance, i.e., if this is a shorter distance
 				//cout << "comparison " << extended_distance << " vs. " << previous << ": ";
 
-				int dominance = extended_distance.compare(previous.first,FULL_COMPARISON);
+				int dominance = extended_distance.compare(previous.first,FULL);
 				switch (dominance) {
-					case P_DOMINATED: // stop here
+					case LESS_THAN: // stop here
 						should_be_inserted = false;
 						//cout << "dominated" << endl;
 						break;
-					case P_EQUAL:
+					case EQUAL:
 						// this means that the number of steps in each layer is the same.
 						// Only one of them will be kept
 						should_be_inserted = false;
 						//cout << "equal" << endl;
 						// go on with the others
 						break;
-					case P_INCOMPARABLE: // incomparable
+					case INCOMPARABLE: // incomparable
 						//cout << "inc." << endl;
 						// go on with the others
 						break;
-					case P_DOMINATES: // dominates -> insert it in the list of paths to be removed
+					case GREATER_THAN: // dominates -> insert it in the list of paths to be removed
 						dominated.insert(previous);
 						//cout << " dominated - remove " << endl;
 						//debug("   - REMOV " + currentPath);
@@ -108,7 +111,7 @@ std::unordered_map<ActorSharedPtr,std::set<distance> > pareto_distance(const MLN
 
 				if (should_be_inserted) {
 					//cout << " INSERT NEW for " << mnet->get_actor(actor2)->name << endl;
-					distances[actor2].insert(std::pair<distance,long>(extended_distance,ts));
+					distances[actor2].insert(std::pair<path_length,long>(extended_distance,ts));
 					//cout << "insert " << mnet.getGlobalName(actor2) << " - " << extended_distance << endl;
 					//cout << "add " << paths[toGlobalId].size() << "\n";
 					//cout << "New path " << fromGlobalId << " => "
@@ -118,7 +121,7 @@ std::unordered_map<ActorSharedPtr,std::set<distance> > pareto_distance(const MLN
 
 				// remove dominated paths
 				// ?? why not just remove?
-				set<std::pair<distance,long> > diff;
+				std::set<std::pair<path_length,long>,timestamp_comparator> diff;
 				set_difference(distances[actor2].begin(),
 				distances[actor2].end(), dominated.begin(),
 				dominated.end(), inserter(diff, diff.end()));
@@ -127,7 +130,7 @@ std::unordered_map<ActorSharedPtr,std::set<distance> > pareto_distance(const MLN
 			}
 		}
 	} while (changes);
-	std::unordered_map<ActorSharedPtr,std::set<distance> > result;
+	std::unordered_map<ActorSharedPtr,std::set<path_length> > result;
 	for (auto p: distances) {
 		for (auto dist: p.second) {
 			result[mnet->get_actor(p.first)].insert(dist.first);

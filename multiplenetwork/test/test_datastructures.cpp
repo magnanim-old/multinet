@@ -13,11 +13,15 @@
 using namespace mlnet;
 
 void test_datastructures() {
+
+	test_begin("DATA STRUCTURES");
+
 	/*
 	 * This initial test is for components that are normally
-	 * automatically created by the MLNetwork class. For an
-	 * example of how to create and manipulate a MLNetwork
-	 * see the next test.
+	 * automatically created by the MLNetwork class. A programmer
+	 * using/extending this library is not supposed to directly call
+	 * these methods. For an example of how to create and manipulate a
+	 * multilayer network (MLNetwork) see the next test.
 	 */
 	test_begin("basic MLNetwork components (node, edge, layer, actor)");
 	std::cout << "Creating two actors...";
@@ -52,9 +56,9 @@ void test_datastructures() {
 	 * created using this library.
 	 */
 	test_begin("MLNetwork - structure");
-	std::cout << "Creating an empty ML network...";
+	std::cout << "Creating an empty ML network called 'frieds'...";
 	MLNetworkSharedPtr mnet = MLNetwork::create("friends");
-	std::cout << " done!" << mnet->to_string() << std::endl;
+	std::cout << " done! " << mnet->to_string() << std::endl;
 	std::cout << "Adding three actors: ";
 	ActorSharedPtr a1 = mnet->add_actor("a1");
 	ActorSharedPtr a2 = mnet->add_actor("a2");
@@ -180,9 +184,6 @@ void test_datastructures() {
 	std::cout << "done! " << mnet->to_string() << std::endl;
 	test_end("MLNetwork - structure");
 
-
-
-
 	test_begin("MLNetwork - attribute management");
 	mnet->node_features(l1)->add("weight",NUMERIC_TYPE);
 	mnet->node_features(l1)->add("type",STRING_TYPE);
@@ -204,6 +205,8 @@ void test_datastructures() {
 		std::cout << "- Attribute \"" << attr->name() << "\", type: " << attr->type_as_string() << std::endl;
 	}
 	test_end("MLNetwork - attribute management");
+
+	test_end("DATA STRUCTURES");
 }
 
 

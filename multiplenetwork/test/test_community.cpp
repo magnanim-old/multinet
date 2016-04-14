@@ -106,5 +106,5 @@ void test_community() {
 	log(std::to_string(mod) + " ",false);
 	log("done 1!");
 	 */
-	log("TEST SUCCESSFULLY COMPLETED (community)");
+	test_end("ML-CPM");
 }

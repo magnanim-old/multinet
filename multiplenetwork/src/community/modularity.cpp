@@ -13,16 +13,16 @@
 
 namespace mlnet {
 
-double modularity(MLNetworkSharedPtr mnet, const hash<NodeSharedPtr,long>& membership, double c) {
+double modularity(const MLNetworkSharedPtr& mnet, const hashtable<NodeSharedPtr,long>& membership, double c) {
 	// partition the nodes by group
-	hash<long, std::set<NodeSharedPtr> > groups;
+	hashtable<long, std::set<NodeSharedPtr> > groups;
 	for (auto pair: membership) {
 		groups[pair.second].insert(pair.first);
 	}
 	// start computing the modularity
 	double res = 0;
 	double mu = 0;
-	hash<LayerSharedPtr,long> m_s;
+	hashtable<LayerSharedPtr,long> m_s;
 	for (LayerSharedPtr s: mnet->get_layers()) {
 		double m = mnet->get_edges(s,s).size();
 		if (!mnet->is_directed(s,s))

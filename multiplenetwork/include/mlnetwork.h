@@ -15,13 +15,10 @@
 #ifndef MLNET_MLNETWORK_H_
 #define MLNET_MLNETWORK_H_
 
-// Exceptions and various utility functions/classes (like CSV reading, support data structures...):
+// Exceptions:
 #include "exceptions.h"
+// Various utility functions/classes (like CSV reading, support data structures...):
 #include "utils.h"
-#include "random.h"
-#include "sortedset.h"
-#include "counter.h"
-
 // Main data structures, in particular the MLNetwork class to represent multilayer networks:
 #include "datastructures.h"
 // Reading and writing network data:

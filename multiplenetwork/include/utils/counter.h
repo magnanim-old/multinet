@@ -1,23 +1,19 @@
 /**
  * counter.h
- *
- * Author: Matteo Magnani <matteo.magnani@it.uu.se>
- * Version: 1.0
  * 
- * A commodity class to count the number of occurrences of a value or a pair of values.
+ * Classes to count the number of occurrences of some objects/values.
  */
 
 #ifndef MLNET_COUNTER_H_
 #define MLNET_COUNTER_H_
 
+#include "exceptions.h"
 #include <string>
 #include <map>
 #include <unordered_map>
 #include <set>
 #include <vector>
 #include <memory>
-#include "random.h"
-#include "exceptions.h"
 #include <cmath>
 
 namespace mlnet {
@@ -73,6 +69,88 @@ public:
     std::unordered_map<T,long>& map();
 };
 
+/**
+ * A Counter for a pair of values
+ */
+template <class T1, class T2>
+class PairCounter {
+private:
+	/** A map where the count is kept */
+    std::unordered_map<T1, std::unordered_map<T2,long> > values;
+
+public:
+    /**
+     * Constructor.
+     */
+    PairCounter();
+
+    /**
+     * Destructor.
+     */
+    ~PairCounter();
+
+    /**
+     * This function is used to increase the count of the pair T1,T2.
+     * @param val value whose count should be incremented
+     */
+    void inc(T1 val1, T2 val2);
+
+    /**
+     * This function is used to set a given value for the count of the pair T1,T2.
+     * @param val value whose count should be incremented
+     */
+    void set(T1 val1, T2 val2, long num);
+
+    /**
+     * @param val value whose count should be returned
+     * @return count of the pair T1,T2
+     */
+    long count(T1 val1, T2 val2) const;
+
+    std::unordered_map<T1, std::unordered_map<T2,long> >& map();
+};
+
+/**
+ * A Counter for a triple of values
+ */
+template <class T1, class T2, class T3>
+class TriangleCounter {
+private:
+	/** A map where the count is kept */
+    std::unordered_map<T1, std::unordered_map<T2, std::unordered_map<T3,long> > > values;
+
+public:
+    /**
+     * Constructor.
+     */
+    TriangleCounter();
+
+    /**
+     * Destructor.
+     */
+    ~TriangleCounter();
+
+    /**
+     * This function is used to increase the count of the pair T1,T2.
+     * @param val value whose count should be incremented
+     */
+    void inc(T1 val1, T2 val2, T3 val3);
+
+    /**
+     * This function is used to set a given value for the count of the pair T1,T2.
+     * @param val value whose count should be incremented
+     */
+    void set(T1 val1, T2 val2, T3 val3, long num);
+
+    /**
+     * @param val value whose count should be returned
+     * @return count of the pair T1,T2
+     */
+    long count(T1 val1, T2 val2, T3 val3) const;
+
+    std::unordered_map<T1, std::unordered_map<T2, std::unordered_map<T3,long> > >& map();
+};
+
 template <class T>
 Counter<T>::Counter() {}
 
@@ -121,47 +199,6 @@ std::unordered_map<T, long>& Counter<T>::map() {
 	return values;
 }
 
-/**
- * A Counter for a pair of values
- */
-template <class T1, class T2>
-class PairCounter {
-private:
-	/** A map where the count is kept */
-    std::unordered_map<T1, std::unordered_map<T2,long> > values;
-
-public:
-    /**
-     * Constructor.
-     */
-    PairCounter();
-
-    /**
-     * Destructor.
-     */
-    ~PairCounter();
-
-    /**
-     * This function is used to increase the count of the pair T1,T2.
-     * @param val value whose count should be incremented
-     */
-    void inc(T1 val1, T2 val2);
-
-    /**
-     * This function is used to set a given value for the count of the pair T1,T2.
-     * @param val value whose count should be incremented
-     */
-    void set(T1 val1, T2 val2, long num);
-
-    /**
-     * @param val value whose count should be returned
-     * @return count of the pair T1,T2
-     */
-    long count(T1 val1, T2 val2) const;
-
-    std::unordered_map<T1, std::unordered_map<T2,long> >& map();
-};
-
 template <class T1, class T2>
 PairCounter<T1, T2>::PairCounter() {}
 
@@ -194,48 +231,6 @@ template <class T1, class T2>
 std::unordered_map<T1, std::unordered_map<T2,long> >& PairCounter<T1,T2>::map() {
 	return values;
 }
-
-
-/**
- * A Counter for a pair of values
- */
-template <class T1, class T2, class T3>
-class TriangleCounter {
-private:
-	/** A map where the count is kept */
-    std::unordered_map<T1, std::unordered_map<T2, std::unordered_map<T3,long> > > values;
-
-public:
-    /**
-     * Constructor.
-     */
-    TriangleCounter();
-
-    /**
-     * Destructor.
-     */
-    ~TriangleCounter();
-
-    /**
-     * This function is used to increase the count of the pair T1,T2.
-     * @param val value whose count should be incremented
-     */
-    void inc(T1 val1, T2 val2, T3 val3);
-
-    /**
-     * This function is used to set a given value for the count of the pair T1,T2.
-     * @param val value whose count should be incremented
-     */
-    void set(T1 val1, T2 val2, T3 val3, long num);
-
-    /**
-     * @param val value whose count should be returned
-     * @return count of the pair T1,T2
-     */
-    long count(T1 val1, T2 val2, T3 val3) const;
-
-    std::unordered_map<T1, std::unordered_map<T2, std::unordered_map<T3,long> > >& map();
-};
 
 template <class T1, class T2, class T3>
 TriangleCounter<T1, T2, T3>::TriangleCounter() {}

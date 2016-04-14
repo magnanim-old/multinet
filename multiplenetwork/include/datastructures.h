@@ -4,36 +4,42 @@
  * Author: Matteo Magnani <matteo.magnani@it.uu.se>
  * Version: 1.0
  *
- * This file defines the basic data structure of the library: the MLNetwork class (where
- * "ML" stands for "multilayer"). Other related types are also defined, in particular:
+ * This file defines the basic data structure of the library: the MLNetwork class - where
+ * "ML" stands for "multilayer" and not for "Matteo & Luca", as in the original paper
+ * "The ML-model for multi-layer social networks" :). Other related data types are also defined:
  * 1. The basic components of a multilayer network (layer, node, edge, actor, and their
  *    abstract super-types, basic_component and named_component).
  *    These components are encapsulated inside a MLNetwork and programmers using this library do
- *    not need to deal with them: they are created, retrieved and updated by the MLNetwork,
- *    whose methods return (smart) pointers to them to avoid duplicates.
+ *    not need to deal with them: they are created, retrieved and updated by MLNetwork objects.
  * 2. An AttributeStore class, to associate attributes to different components
- *    (actors, nodes...) in a multilayer network, together with a class Attribute to represent
- *    metadata.
+ *    (actors, nodes...) in a multilayer network, together with a class Attribute. This class
+ *    encapsulates attribute management outside MLNetworks, so that it can be substituted with
+ *    other storage systems if needed, like a relational database.
  * 2. Classes to represent paths and distances crossing multiple layers.
- * 3. Short names for smart pointers to all these objects:
- *    ActorSharedPtr, NodeSharedPtr, MLNetworkSharedPtr, etc.
+ * 3. Short names and constants used throughout the package:
+ *    ActorSharedPtr, NodeSharedPtr, ..., ml_matrix, ml_hashtable, ..., edge_mode, attribute_type, ...
  */
 
 #ifndef MLNET_DATASTRUCTURES_H_
 #define MLNET_DATASTRUCTURES_H_
 
+#include "utils.h"
+#include "exceptions.h"
 #include <string>
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 #include <set>
 #include <vector>
 #include <memory>
 
-#include "sortedset.h"
-#include "counter.h"
-#include "exceptions.h"
-
 namespace mlnet {
+
+
+/**********************************************************************/
+/** Main classes defined in this file *********************************/
+/** (full definitions follow) *****************************************/
+/**********************************************************************/
 
 /* Identifiers */
 typedef long object_id; // for generic components
@@ -41,15 +47,22 @@ typedef object_id actor_id;
 typedef object_id layer_id;
 typedef object_id node_id;
 typedef object_id edge_id;
-/* Main classes (full definitions follow later in this file) */
-class MLNetwork;
+
+/* Classes */
 class actor;
 class layer;
 class node;
 class edge;
+class MLNetwork;
 class AttributeStore;
 class Attribute;
-/* Shorthands for smart pointers */
+class path;
+
+/**********************************************************************/
+/** Shorthands ********************************************************/
+/**********************************************************************/
+
+/* smart pointers */
 typedef std::shared_ptr<MLNetwork> MLNetworkSharedPtr;
 typedef std::shared_ptr<const MLNetwork> constMLNetworkSharedPtr;
 typedef std::shared_ptr<edge> EdgeSharedPtr;
@@ -58,14 +71,19 @@ typedef std::shared_ptr<layer> LayerSharedPtr;
 typedef std::shared_ptr<node> NodeSharedPtr;
 typedef std::shared_ptr<Attribute> AttributeSharedPtr;
 typedef std::shared_ptr<AttributeStore> AttributeStoreSharedPtr;
-/* Shorthands for lists of components */
+
+/* Lists of components */
 typedef sorted_set<actor_id, ActorSharedPtr> actor_list;
 typedef sorted_set<layer_id, LayerSharedPtr> layer_list;
 typedef sorted_set<node_id, NodeSharedPtr> node_list;
 typedef sorted_set<edge_id, EdgeSharedPtr> edge_list;
+
 /* Other shorthands, for tidiness */
+typedef std::string string;
+template <class T> using u_set = std::unordered_set<T>;
+template <class T> using vector = std::vector<T>;
 template <class T> using matrix = std::vector<std::vector<T> >;
-template <class T1, class T2> using hash = std::unordered_map<T1,T2>;
+template <class T1, class T2> using hashtable = std::unordered_map<T1,T2>;
 
 /**********************************************************************/
 /** Constants and Function Parameters *********************************/
@@ -75,7 +93,7 @@ template <class T1, class T2> using hash = std::unordered_map<T1,T2>;
 const bool DEFAULT_EDGE_DIRECTIONALITY = false; // edges are undirected by default
 
 /** Default name for weight attribute */
-const std::string DEFAULT_WEIGHT_ATTR_NAME = "|";
+const string DEFAULT_WEIGHT_ATTR_NAME = "ML_WEIGHT";
 
 /** Selection mode, for directed edges (e.g., to compute the IN-degree or OUT-degree of a node) */
 enum edge_mode {INOUT=0, IN=1, OUT=2};
@@ -89,17 +107,18 @@ enum attribute_type {STRING_TYPE = 0, NUMERIC_TYPE = 1};
  * of edges traversed from layer i to layer j.
  * These constants specify how much of this information should be used
  * while comparing two path lengths:
- * FULL_COMPARISON: all the elements in the matrix are considered.
- * SWITCH_COMPARISON: the diagonal elements are considered (indicating inter-layer steps),
+ * - FULL: all the elements in the matrix are considered.
+ * - SWITCH_COSTS: the diagonal elements are considered (indicating inter-layer steps),
  *   plus an additional element summing the values on all non-diagonal cells (indicating a layer crossing).
- * MULTIPLEX_COMPARISON: only the diagonal is considered (that is, only inter-layer steps).
- * SIMPLE_COMPARISON: the sum of all elements in the matrix (that is, the number of steps
+ * - MULTIPLEX: only the diagonal is considered (that is, only inter-layer steps).
+ * - SIMPLE: the sum of all elements in the matrix (that is, the number of steps
  *   irrespective of the traversed layers) is considered.
  **/
-enum comparison_type {FULL_COMPARISON = 0, SWITCH_COMPARISON = 1, MULTIPLEX_COMPARISON = 2, SIMPLE_COMPARISON = 3};
+enum comparison_type {FULL = 0, SWITCH_COSTS = 1, MULTIPLEX = 2, SIMPLE = 3};
 
 /** Outcome of the comparison between two numbers, or two vectors, or two matrices. (the concept of Pareto dominance is used). */
-enum comparison_result {P_DOMINATED=0, P_EQUAL=1, P_INCOMPARABLE=2, P_DOMINATES=3};
+enum comparison_result {LESS_THAN=0, EQUAL=1, INCOMPARABLE=2, GREATER_THAN=3};
+
 
 /**********************************************************************/
 /** MLNetwork components **********************************************/
@@ -111,9 +130,9 @@ enum comparison_result {P_DOMINATED=0, P_EQUAL=1, P_INCOMPARABLE=2, P_DOMINATES=
 class basic_component {
 protected:
 	/** Constructor */
-	basic_component(const object_id& id);
+	basic_component(object_id id);
 	/** Output function, presenting a complete description of the component */
-	std::string to_string() const;
+	string to_string() const;
 public:
 	/** Unique identifier of the component */
 	const object_id id;
@@ -133,12 +152,12 @@ public:
 class named_component : public basic_component {
 protected:
 	/** Constructor */
-	named_component(const object_id& id, const std::string& name);
+	named_component(object_id id, const string& name);
 	/** Output function, presenting a complete description of the component */
-	std::string to_string() const;
+	string to_string() const;
 public:
 	/** Unique name of the component */
-	const std::string name;
+	const string name;
 };
 
 /**
@@ -147,9 +166,9 @@ public:
 class actor : public named_component {
 public:
 	/** Constructor */
-	actor(const actor_id& id, const std::string& name);
+	actor(actor_id id, const string& name);
 	/** Output function, presenting a complete description of the actor */
-	std::string to_string() const;
+	string to_string() const;
 };
 
 /**
@@ -158,9 +177,9 @@ public:
 class layer : public named_component {
 public:
 	/** Constructor */
-	layer(const layer_id& id, const std::string& name);
+	layer(layer_id id, const string& name);
 	/** Output function, presenting a complete description of the layer */
-	std::string to_string() const;
+	string to_string() const;
 };
 
 
@@ -170,13 +189,13 @@ public:
 class node : public basic_component {
 public:
 	/** The actor corresponding to this node */
-	ActorSharedPtr actor;
+	const ActorSharedPtr actor;
 	/** The layer where this node is located */
-	LayerSharedPtr layer;
+	const LayerSharedPtr layer;
 	/** Constructor */
-	node(const node_id& id, const ActorSharedPtr& actor, const LayerSharedPtr& layer);
+	node(node_id id, const ActorSharedPtr& actor, const LayerSharedPtr& layer);
 	/** Output function, presenting a complete description of the node */
-	std::string to_string() const;
+	string to_string() const;
 };
 
 
@@ -186,15 +205,15 @@ public:
 class edge : public basic_component  {
 public:
 	/** The node at the first end of this edge */
-	NodeSharedPtr v1;
+	const NodeSharedPtr v1;
 	/** The node at the second end of this edge */
-	NodeSharedPtr v2;
+	const NodeSharedPtr v2;
 	/** Edge directionality */
-	bool directed;
+	const bool directed;
 	/** Constructor */
-	edge(const edge_id& id, const NodeSharedPtr& v1, const NodeSharedPtr& v2, bool directed);
+	edge(edge_id id, const NodeSharedPtr& v1, const NodeSharedPtr& v2, bool directed);
 	/** Output function, presenting a complete description of the edge */
-	std::string to_string() const;
+	string to_string() const;
 };
 
 
@@ -212,29 +231,29 @@ public:
 	 * @param name name of the attribute
 	 * @param type type of the attribute (see attribute_type enumeration: STRING_TYPE, NUMERIC_TYPE)
 	 */
-	Attribute(const std::string& name, attribute_type type);
+	Attribute(const string& name, attribute_type type);
 
 	/**
 	 * @brief Returns the name of the attribute
 	 * @return the name of the attribute.
 	 **/
-	const std::string& name() const;
+	const string& name() const;
 
 	/**
 	 * @brief Returns the type of the attribute.
 	 * @return the type of the attribute.
 	 **/
-	int type() const;
+	attribute_type type() const;
 
 	/**
 	 * @brief Returns a string representation of the type of the attribute.
 	 * @return a string representation of the type of the attribute.
 	 **/
-	std::string type_as_string() const;
+	string type_as_string() const;
 
 private:
-	std::string aname;
-	attribute_type atype;
+	const string aname;
+	const attribute_type atype;
 };
 
 /**
@@ -249,40 +268,52 @@ private:
 class AttributeStore {
 public:
 	/**
+	* Creates an empty AttributeStore and returns a pointer to it. Attribute stores
+	* are only created using this method throughout the library, so that the type of
+	* attribute store can be easily changed. For now, only a main memory attribute store
+	* is available.
+	* @return a pointer to the new attribute store
+	*/
+	static AttributeStoreSharedPtr create();
+
+	/** virtual destructor */
+	virtual ~AttributeStore();
+
+	/**
 	 * @brief Returns the number of attributes in this store, of all types.
 	 * @return the number of attributes in this store
 	 **/
-	int numAttributes() const;
+	virtual int numAttributes() const = 0;
 
 	/**
 	 * @brief Returns the attributes in this store.
 	 * @return a vector containing all the attributes.
 	 **/
-	const std::vector<AttributeSharedPtr>& attributes() const;
+	virtual const vector<AttributeSharedPtr>& attributes() const = 0;
 
 	/**
 	 * @brief Returns the n^th attribute in this store.
 	 * @param idx the position of the attribute (from 0 to numAttributes()-1).
 	 * @return an object of type Attribute, or NULL if idx's attribute does not exist.
 	 **/
-	AttributeSharedPtr attribute(int idx) const;
+	virtual AttributeSharedPtr attribute(int idx) const = 0;
 
 	/**
 	 * @brief Returns an attribute by name.
 	 * @param name The name of the queried attribute.
 	 * @return an object of type AttributeSharedPtr, or NULL if an attribute with this name does not exist.
 	 **/
-	AttributeSharedPtr attribute(const std::string& name) const;
+	virtual AttributeSharedPtr attribute(const string& name) const = 0;
 
 	/**
 	 * @brief Enables the association of a value to each object in this store.
 	 * @param attribute_name The name of the attribute
 	 * @param type The type of the attribute
-	 * STRING_TYPE: c++ "std::string" type
-	 * NUMERIC_TYPE: c++ "double" type
+	 * - STRING_TYPE: c++ "string" type
+	 * - NUMERIC_TYPE: c++ "double" type
 	 * @throws DuplicateElementException if an attribute with this name already exists
 	 **/
-	void add(const std::string& attribute_name, attribute_type type);
+	virtual void add(const string& attribute_name, attribute_type type) = 0;
 
 	/**
 	 * @brief Sets the value of an attribute.
@@ -292,7 +323,7 @@ public:
 	 * @throws ElementNotFoundException if there is no attribute with this name
 	 * @throws OperationNotSupportedException if the attribute type is not STRING_TYPE
 	 **/
-	void setString(const object_id& id, const std::string& attribute_name, const std::string& value);
+	virtual void setString(object_id id, const string& attribute_name, const string& value) = 0;
 
 	/**
 	 * @brief Sets the value of an attribute.
@@ -302,7 +333,7 @@ public:
 	 * @throws ElementNotFoundException if there is no attribute with this name
 	 * @throws OperationNotSupportedException if the attribute type is not NUMERIC_TYPE
 	 **/
-	void setNumeric(const object_id& id, const std::string& attribute_name, double value);
+	virtual void setNumeric(object_id id, const string& attribute_name, double value) = 0;
 
 	/**
 	 * @brief Gets the value of an attribute.
@@ -311,7 +342,7 @@ public:
 	 * @return The value associated to the object, or null if the object id has not been registered in this store
 	 * @throws ElementNotFoundException if there is no attribute with this name
 	 **/
-	const std::string& getString(const object_id& id, const std::string& attribute_name) const;
+	virtual const string& getString(object_id id, const string& attribute_name) const = 0;
 
 	/**
 	 * @brief Gets the value of an attribute.
@@ -319,27 +350,46 @@ public:
 	 * @param attribute_name The name of the attribute
 	 * @throws ElementNotFoundException if there is no object with this id
 	 **/
-	const double& getNumeric(const object_id& id, const std::string& attribute_name) const;
+	virtual const double& getNumeric(object_id id, const string& attribute_name) const = 0;
 
 	/**
 	 * @brief Removes all the attribute values from an object.
 	 * If the same object is queried after this method has been called, default values will be returned.
 	 * @param id The id of the object to be removed from the store.
 	 **/
-	void reset(const object_id& id);
+	virtual void reset(object_id id) = 0;
 
-public:
+protected:
 	/** default value for numeric attributes */
 	double default_numeric = 0.0;
 	/** default value for string attributes */
-	std::string default_string = "";
+	string default_string = "";
+};
+
+class MainMemoryAttributeStore: public AttributeStore {
+public:
+	MainMemoryAttributeStore();
+
+	// All the following methods are documented in the super-class AttributeStore
+
+	int numAttributes() const;
+	const vector<AttributeSharedPtr>& attributes() const;
+	AttributeSharedPtr attribute(int idx) const;
+	AttributeSharedPtr attribute(const string& name) const;
+	void add(const string& attribute_name, attribute_type type);
+	void setString(object_id id, const string& attribute_name, const string& value);
+	void setNumeric(object_id id, const string& attribute_name, double value);
+	const string& getString(object_id id, const string& attribute_name) const;
+	const double& getNumeric(object_id id, const string& attribute_name) const;
+	void reset(object_id id);
+
 private:
 	/* meta-data: names and types of attributes */
-	std::vector<AttributeSharedPtr> attribute_vector;
-	hash<std::string,int> attribute_ids;
+	vector<AttributeSharedPtr> attribute_vector;
+	hashtable<string,int> attribute_ids;
 	/* These hash maps are structured as: map[AttributeName][object_id][AttributeValue] */
-	hash<std::string, hash<object_id, std::string> > string_attribute;
-	hash<std::string, hash<object_id, double> > numeric_attribute;
+	hashtable<string, hashtable<object_id, string> > string_attribute;
+	hashtable<string, hashtable<object_id, double> > numeric_attribute;
 };
 
 /**********************************************************************/
@@ -361,19 +411,19 @@ private:
 	 * any IO function available in another module of the library).
 	 * @param name name of the new MLNetwork
 	 */
-	MLNetwork(const std::string& name);
+	MLNetwork(const string& name);
 
 public:
 
 	/** Name of the multilayer network */
-	const std::string name;
+	const string name;
 
 	/**
 	 * Creates an empty MLNetwork and returns a pointer to it.
 	 * @param name name of the new multilayer network
 	 * @return a pointer to the new multilayer network
 	 */
-	static MLNetworkSharedPtr create(const std::string& name);
+	static MLNetworkSharedPtr create(const string& name);
 
 	/**************************************************************************************
 	 * Basic structural operations used to modify/access MLNetwork components
@@ -385,7 +435,7 @@ public:
 	 * @param name name of the actor
 	 * @return a pointer to the new actor, or a NULL pointer if an actor with the same name exists.
 	 **/
-	ActorSharedPtr add_actor(const std::string& name);
+	ActorSharedPtr add_actor(const string& name);
 
 	/**
 	 * @brief Returns an actor by ID.
@@ -393,7 +443,7 @@ public:
 	 * @param id identifier of the actor
 	 * @return a pointer to the requested actor, or null if the actor does not exist
 	 **/
-	ActorSharedPtr get_actor(const actor_id& id) const;
+	ActorSharedPtr get_actor(actor_id id) const;
 
 	/**
 	 * @brief Returns an actor by name.
@@ -401,7 +451,7 @@ public:
 	 * @param name name of the actor
 	 * @return a pointer to the requested actor, or null if the actor does not exist
 	 **/
-	ActorSharedPtr get_actor(const std::string& name) const;
+	ActorSharedPtr get_actor(const string& name) const;
 
 	/**
 	 * @brief Returns all the actors in the MLNetwork.
@@ -418,7 +468,7 @@ public:
 	 * @param directed TRUE or FALSE
 	 * @return a pointer to the new layer, or a NULL pointer if a layer with the same name exists.
 	 **/
-	LayerSharedPtr add_layer(const std::string& name, bool directed);
+	LayerSharedPtr add_layer(const string& name, bool directed);
 
 	/**
 	 * @brief Returns a layer by ID.
@@ -426,7 +476,7 @@ public:
 	 * @param id identifier of the layer
 	 * @return a pointer to the requested layer, or null if the layer does not exist
 	 **/
-	LayerSharedPtr get_layer(const layer_id& id) const;
+	LayerSharedPtr get_layer(layer_id id) const;
 
 	/**
 	 * @brief Returns a layer by name.
@@ -434,7 +484,7 @@ public:
 	 * @param name name of the layer
 	 * @return a pointer to the requested layer, or null if the layer does not exist
 	 **/
-	LayerSharedPtr get_layer(const std::string& name) const;
+	LayerSharedPtr get_layer(const string& name) const;
 
 	/**
 	 * @brief Returns all the layers in the MLNetwork.
@@ -475,7 +525,7 @@ public:
 	 * @param id identifier of the layer
 	 * @return a pointer to the requested node, or null if the node does not exist
 	 **/
-	NodeSharedPtr get_node(const node_id& id) const;
+	NodeSharedPtr get_node(node_id id) const;
 
 	/**
 	 * @brief Returns a node by specifying an actor and a layer.
@@ -656,7 +706,7 @@ public:
 	 * @param weight the weight to be set
 	 * @throw ElementNotFoundException if the edge does not exist
 	 **/
-	void set_weight(NodeSharedPtr node1, NodeSharedPtr node2, double weight);
+	void set_weight(const NodeSharedPtr& node1, const NodeSharedPtr& node2, double weight);
 
 	/**
 	 * @brief Commodity function to get the weight of an edge.
@@ -666,10 +716,10 @@ public:
 	 * @throw ElementNotFoundException if the edge does not exist
 	 * @return the weight on the edge
 	 **/
-	double get_weight(NodeSharedPtr node1, NodeSharedPtr node2);
+	double get_weight(const NodeSharedPtr& node1, const NodeSharedPtr& node2);
 
 	/** Returns a compact string representation of this MLNetwork */
-	std::string to_string() const;
+	string to_string() const;
 
 private:
 	// largest identifier assigned so far
@@ -679,7 +729,7 @@ private:
 	layer_id max_layer_id;
 
 	/* Edge directionality */
-	hash<layer_id, hash<layer_id, bool> > edge_directionality;
+	hashtable<layer_id, hashtable<layer_id, bool> > edge_directionality;
 
 	// Components:
 	layer_list layers;
@@ -688,25 +738,25 @@ private:
 	edge_list edges;
 
 	// Indexes to components (Component IDX):
-	hash<std::string, LayerSharedPtr> cidx_layer_by_name;
-	hash<std::string, ActorSharedPtr> cidx_actor_by_name;
-	hash<actor_id, hash<layer_id, NodeSharedPtr > > cidx_node_by_actor_and_layer;
-	hash<node_id, hash<node_id, EdgeSharedPtr> > cidx_edge_by_nodes;
+	hashtable<string, LayerSharedPtr> cidx_layer_by_name;
+	hashtable<string, ActorSharedPtr> cidx_actor_by_name;
+	hashtable<actor_id, hashtable<layer_id, NodeSharedPtr > > cidx_node_by_actor_and_layer;
+	hashtable<node_id, hashtable<node_id, EdgeSharedPtr> > cidx_edge_by_nodes;
 
 	// Indexes to sets of components (Set IDX):
-	hash<layer_id, node_list> sidx_nodes_by_layer;
-	hash<actor_id, node_list> sidx_nodes_by_actor;
-	hash<layer_id, hash<layer_id, edge_list> > sidx_edges_by_layer_pair;
+	hashtable<layer_id, node_list> sidx_nodes_by_layer;
+	hashtable<actor_id, node_list> sidx_nodes_by_actor;
+	hashtable<layer_id, hashtable<layer_id, edge_list> > sidx_edges_by_layer_pair;
 
-	hash<node_id, node_list> sidx_neighbors_out;
-	hash<node_id, node_list> sidx_neighbors_in;
-	hash<node_id, node_list> sidx_neighbors_all;
+	hashtable<node_id, node_list> sidx_neighbors_out;
+	hashtable<node_id, node_list> sidx_neighbors_in;
+	hashtable<node_id, node_list> sidx_neighbors_all;
 
 	/* objects storing the feature vectors of the different components */
 	AttributeStoreSharedPtr actor_attributes;
 	AttributeStoreSharedPtr layer_attributes;
-	hash<layer_id, AttributeStoreSharedPtr> node_attributes;
-	hash<layer_id, hash<layer_id, AttributeStoreSharedPtr> > edge_attributes;
+	hashtable<layer_id, AttributeStoreSharedPtr> node_attributes;
+	hashtable<layer_id, hashtable<layer_id, AttributeStoreSharedPtr> > edge_attributes;
 
 	/* An empty set of nodes, conveniently returned when necessary instead of creating a new empty node_list. */
 	node_list empty;
@@ -714,13 +764,15 @@ private:
 
 
 /**********************************************************************/
-/** Distance **********************************************************/
+/** Paths *************************************************************/
 /**********************************************************************/
 
 /**
- * This class represents a sequence of consecutive edges in a multilayer network.
+ * This class represents the length of a path in a multilayer network.
+ * It is represented using a matrix where element {i,j} indicates the number
+ * of edges traversed from layer i to layer j.
  */
-class distance {
+class path_length {
 private:
 	/** The multilayer network to which this distance refers. */
 	MLNetworkSharedPtr mnet;
@@ -733,17 +785,14 @@ public:
 	long ts;
 
 	/** Constructs an empty distance. */
-	distance(const MLNetworkSharedPtr& mnet);
+	path_length(const MLNetworkSharedPtr& mnet);
 
 	/**
 	 * Increases this distance by a new step from a node to another.
-	 * For efficiency reasons, and also to allow steps not following
-	 * the known connections, there is no check that this nodes are reachable
-	 * in the underlying network.
-	 * @param n1 the starting node of the new step.
-	 * @param n2 the arrival node of the new step.
+	 * @param layer1 the starting layer of the new step.
+	 * @param layer2 the arrival layer of the new step.
 	 */
-	void step(const NodeSharedPtr& n1, const NodeSharedPtr& n2);
+	void step(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
 
 	/**
 	 * @return The total number of steps (that is, traversed edges).
@@ -766,27 +815,19 @@ public:
 	/**
 	 * @brief Compares two distances according to the comp parameter:
 	 * @param other The distance to be compared to.
-	 * @param comp This parameter specifies the amount of information used while comparing the two distances:
-	 * - FULL_COMPARISON: all steps among each pair of layers
-	 *   (including the same layer) are considered as distinct entities,
-	 *   and a Pareto relationship is returned (that is, the two distances may be incomparable).
-	 * - SWITCH_COMPARISON: all steps inside the same layer and the steps between any two
-	 *   different layers are considered as distinct entities, and a Pareto relationship is returned
-	 *   (that is, the two distances may be incomparable).
-	 * - MULTIPLEX_COMPARISON: all steps inside the same layer are considered as distinct entities.
-	 *   Inter-layer steps are not counted, and a Pareto relationship is returned (that is, the two distances may be incomparable).
-	 * - SIMPLE_COMPARISON: the total number of steps is considered. The two distances will always be comparable (<, >, == or !=).
-	 * @return One of the relationship types: P_DOMINATED, P_EQUAL, P_INCOMPARABLE, or P_DOMINATES
+	 * @param comp This parameter specifies the amount of information used while comparing the two distances.
+	 * For the allowed values, see the definition of mlnet::comparison_type.
+	 * @return One relationship of type mlnet::comparison_result
 	 */
-	comparison_result compare(const distance& other, comparison_type comp) const;
+	comparison_result compare(const path_length& other, comparison_type comp) const;
 
 	/**
 	 * Comparison by id. For a comparison considering steps
 	 * on different layers as incomparable entities, use compare()
 	 * @param other The distance to be compared to.
-	 * @return true if this distance is shorter than the input one.
+	 * @return true if this distance's id is shorter than the input one.
 	 */
-	bool operator<(const distance& other) const;
+	bool operator<(const path_length& other) const;
 
 	/**
 	 * Comparison by id. For a comparison considering steps
@@ -794,7 +835,7 @@ public:
 	 * @param other The distance to be compared to.
 	 * @return true if this distance is longer than the input one.
 	 */
-	bool operator>(const distance& other) const;
+	bool operator>(const path_length& other) const;
 
 	/**
 	 * Comparison by id. For a comparison considering steps
@@ -802,7 +843,7 @@ public:
 	 * @param other The distance to be compared to.
 	 * @return true if this distance is the same as the input one.
 	 */
-	bool operator==(const distance& other) const;
+	bool operator==(const path_length& other) const;
 
 	/**
 	 * Compare the absolute length of the two distances. For a comparison considering steps
@@ -810,20 +851,20 @@ public:
 	 * @param other The distance to be compared to.
 	 * @return true if this distance is different from the input one.
 	 */
-	bool operator!=(const distance& other) const;
+	bool operator!=(const path_length& other) const;
 
 	/** Returns a string representation of this object */
-	std::string to_string() const;
+	string to_string() const;
 
 private:
 
-	comparison_result compare_full(const distance& other) const;
+	comparison_result compare_full(const path_length& other) const;
 
-	comparison_result compare_switch(const distance& other) const;
+	comparison_result compare_switch(const path_length& other) const;
 
-	comparison_result compare_multiplex(const distance& other) const;
+	comparison_result compare_multiplex(const path_length& other) const;
 
-	comparison_result compare_simple(const distance& other) const;
+	comparison_result compare_simple(const path_length& other) const;
 };
 
 } // namespace mlnet

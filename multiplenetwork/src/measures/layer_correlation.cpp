@@ -7,14 +7,14 @@
  */
 
 #include "datastructures.h"
-#include "counter.h"
+#include "utils.h"
 #include <unordered_set>
 #include <algorithm>
 
 
 namespace mlnet {
 
-double jaccard_similarity(const MLNetworkSharedPtr& mnet, const std::unordered_set<LayerSharedPtr>& layers) {
+double jaccard_similarity(const MLNetworkSharedPtr& mnet, const u_set<LayerSharedPtr>& layers) {
 	PairCounter<actor_id,actor_id> c;
 	int num_layers = layers.size();
 	long num_pairs = 0;

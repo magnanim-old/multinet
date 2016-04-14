@@ -1,8 +1,5 @@
 /**
  * sortedset.h
- *
- * Author: Matteo Magnani <matteo.magnani@it.uu.se>
- * Version: 1.0
  * 
  * A sorted set is a class used to store a set of objects that can be accessed:
  * 1. by id in (average) log time.
@@ -19,14 +16,14 @@
 #ifndef MLNET_SORTED_SET_H_
 #define MLNET_SORTED_SET_H_
 
+#include "random.h"
+#include "exceptions.h"
 #include <string>
 #include <map>
 #include <unordered_map>
 #include <set>
 #include <vector>
 #include <memory>
-#include "random.h"
-#include "exceptions.h"
 #include <cmath>
 
 namespace mlnet {
@@ -102,7 +99,7 @@ public:
 	 */
     sorted_set(long start_capacity);
 
-    /** Iterator over the obects in this collection */
+    /** Iterator over the objects in this collection */
 	class iterator {
 	    typedef std::forward_iterator_tag iterator_category;
 		public:
@@ -392,7 +389,6 @@ void sorted_set<KEY,VALUE>::print(int lev) {
     std::cout << "l" << lev << " e: " << num << " std: " << std/num << "\n";
 }
 
-// only for debugging
 template <class KEY, class VALUE>
 void sorted_set<KEY,VALUE>::print() {
 std::cout << "cap:" << capacity << " num:" << num_entries << " lev:" << level << " MaxLevel:" << MAX_LEVEL << "\n";

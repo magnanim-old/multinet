@@ -5,8 +5,8 @@ namespace mlnet {
 MLNetwork::MLNetwork(const std::string& name) :
 		name(name), max_node_id(0),
 		max_edge_id(0), max_actor_id(0), max_layer_id(0) {
-	layer_attributes = AttributeStoreSharedPtr(new AttributeStore());
-	actor_attributes = AttributeStoreSharedPtr(new AttributeStore());
+	layer_attributes = AttributeStore::create();
+	actor_attributes = AttributeStore::create();
 }
 
 MLNetworkSharedPtr MLNetwork::create(const std::string& name) {
@@ -24,7 +24,7 @@ ActorSharedPtr MLNetwork::add_actor(const std::string& name)  {
 	return actor_ptr;
 }
 
-ActorSharedPtr MLNetwork::get_actor(const actor_id& id) const {
+ActorSharedPtr MLNetwork::get_actor(actor_id id) const {
 	  return actors.get(id);
 }
 
@@ -67,7 +67,7 @@ bool MLNetwork::is_directed(const LayerSharedPtr& layer1, const LayerSharedPtr& 
 	return DEFAULT_EDGE_DIRECTIONALITY;
 }
 
-LayerSharedPtr MLNetwork::get_layer(const layer_id& id) const {
+LayerSharedPtr MLNetwork::get_layer(layer_id id) const {
 	  return layers.get(id);
 }
 
@@ -96,7 +96,7 @@ NodeSharedPtr MLNetwork::add_node(const ActorSharedPtr& actor, const LayerShared
 	return node_ptr;
 }
 
-NodeSharedPtr MLNetwork::get_node(const node_id& id) const {
+NodeSharedPtr MLNetwork::get_node(node_id id) const {
 	  return nodes.get(id);
 }
 
@@ -173,7 +173,7 @@ bool MLNetwork::erase(const NodeSharedPtr& node) {
 
 	// removing adjacent edges
 	sorted_set<node_id,NodeSharedPtr> in = neighbors(node,IN);
-	std::vector<EdgeSharedPtr> to_erase_in;
+	vector<EdgeSharedPtr> to_erase_in;
 	to_erase_in.reserve(in.size());
 	for (NodeSharedPtr node_in : in) {
 		to_erase_in.push_back(get_edge(node_in,node));
@@ -182,7 +182,7 @@ bool MLNetwork::erase(const NodeSharedPtr& node) {
 		erase(edge);
 	}
 	sorted_set<node_id,NodeSharedPtr> out = neighbors(node,OUT);
-	std::vector<EdgeSharedPtr> to_erase_out;
+	vector<EdgeSharedPtr> to_erase_out;
 	to_erase_out.reserve(out.size());
 	for (NodeSharedPtr node_out : out) {
 		to_erase_out.push_back(get_edge(node,node_out));
@@ -238,7 +238,7 @@ bool MLNetwork::erase(const ActorSharedPtr& actor) {
 bool MLNetwork::erase(const LayerSharedPtr& layer) {
 	bool res = layers.erase(layer->id);
 	if (sidx_nodes_by_layer.count(layer->id)>0) {
-		std::vector<NodeSharedPtr> to_erase;
+		vector<NodeSharedPtr> to_erase;
 		to_erase.reserve(sidx_nodes_by_layer.at(layer->id).size());
 		for (NodeSharedPtr node: sidx_nodes_by_layer.at(layer->id)) {
 			to_erase.push_back(node);
@@ -296,14 +296,14 @@ const AttributeStoreSharedPtr MLNetwork::layer_features() const {
 // layer-specific attribute stores are initialized if needed
 AttributeStoreSharedPtr MLNetwork::node_features(const LayerSharedPtr& layer) {
 	if (node_attributes.count(layer->id)==0) {
-		node_attributes[layer->id] = AttributeStoreSharedPtr(new AttributeStore());
+		node_attributes[layer->id] = AttributeStore::create();
 	}
 	return node_attributes[layer->id];
 }
 
 const AttributeStoreSharedPtr MLNetwork::node_features(const LayerSharedPtr& layer) const {
 	if (node_attributes.count(layer->id)==0) {
-		return AttributeStoreSharedPtr(new AttributeStore());
+		return AttributeStore::create();
 	}
 	return node_attributes.at(layer->id);
 }
@@ -311,7 +311,7 @@ const AttributeStoreSharedPtr MLNetwork::node_features(const LayerSharedPtr& lay
 // layer-specific attribute stores are initialized if needed
 AttributeStoreSharedPtr MLNetwork::edge_features(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) {
 	if (edge_attributes.count(layer1->id)==0 || edge_attributes.at(layer1->id).count(layer2->id)==0) {
-		edge_attributes[layer1->id][layer2->id] = AttributeStoreSharedPtr(new AttributeStore());
+		edge_attributes[layer1->id][layer2->id] = AttributeStore::create();
 		if (!is_directed(layer1,layer2))
 			edge_attributes[layer2->id][layer1->id] = edge_attributes[layer1->id][layer2->id];
 	}
@@ -320,18 +320,18 @@ AttributeStoreSharedPtr MLNetwork::edge_features(const LayerSharedPtr& layer1, c
 
 const AttributeStoreSharedPtr MLNetwork::edge_features(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const {
 	if (edge_attributes.count(layer1->id)==0 || edge_attributes.at(layer1->id).count(layer2->id)==0) {
-		return AttributeStoreSharedPtr(new AttributeStore());
+		return AttributeStore::create();
 	}
 	return edge_attributes.at(layer1->id).at(layer2->id);
 }
 
-void MLNetwork::set_weight(NodeSharedPtr node1, NodeSharedPtr node2, double weight) {
+void MLNetwork::set_weight(const NodeSharedPtr& node1, const NodeSharedPtr& node2, double weight) {
 	EdgeSharedPtr edge = get_edge(node1,node2);
 	if (!edge) throw ElementNotFoundException("edge between " + node1->to_string() + " and " + node2->to_string());
 	edge_features(node1->layer,node2->layer)->setNumeric(edge->id,DEFAULT_WEIGHT_ATTR_NAME,weight);
 }
 
-double MLNetwork::get_weight(NodeSharedPtr node1, NodeSharedPtr node2) {
+double MLNetwork::get_weight(const NodeSharedPtr& node1, const NodeSharedPtr& node2) {
 	EdgeSharedPtr edge = get_edge(node1,node2);
 	if (!edge) throw ElementNotFoundException("edge between " + node1->to_string() + " and " + node2->to_string());
 	return edge_features(node1->layer,node2->layer)->getNumeric(edge->id,DEFAULT_WEIGHT_ATTR_NAME);

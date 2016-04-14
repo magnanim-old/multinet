@@ -4,41 +4,40 @@ using namespace std;
 
 namespace mlnet {
 
-distance::distance(const MLNetworkSharedPtr& mnet) : mnet(mnet), total_length(0), ts(0) {}
+path_length::path_length(const MLNetworkSharedPtr& mnet) : mnet(mnet), total_length(0), ts(0) {}
 
-void distance::step(const NodeSharedPtr& n1, const NodeSharedPtr& n2) {
-	num_edges.inc(n1->layer->id,n2->layer->id);
+void path_length::step(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) {
+	num_edges.inc(layer1->id,layer2->id);
 	total_length++;
 }
 
-long distance::length() const {
+long path_length::length() const {
 	return total_length;
 }
 
-
-long distance::length(const LayerSharedPtr& layer) const {
+long path_length::length(const LayerSharedPtr& layer) const {
 	return num_edges.count(layer->id,layer->id);
 }
 
-long distance::length(const LayerSharedPtr& from, const LayerSharedPtr& to) const {
+long path_length::length(const LayerSharedPtr& from, const LayerSharedPtr& to) const {
 	return num_edges.count(from->id,to->id);
 }
 
-comparison_result distance::compare(const distance& other, comparison_type comp) const {
+comparison_result path_length::compare(const path_length& other, comparison_type comp) const {
 	switch (comp) {
-	case FULL_COMPARISON:
+	case FULL:
 		return compare_full(other);
-	case SWITCH_COMPARISON:
+	case SWITCH_COSTS:
 		return compare_switch(other);
-	case MULTIPLEX_COMPARISON:
+	case MULTIPLEX:
 		return compare_multiplex(other);
-	case SIMPLE_COMPARISON:
+	case SIMPLE:
 		return compare_simple(other);
 	}
 	throw WrongParameterException("Wrong comparison type");
 }
 
-comparison_result distance::compare_full(const distance& other) const {
+comparison_result path_length::compare_full(const path_length& other) const {
 	bool canBeDominated = true;
 	bool canDominate = true;
 	if (mnet != other.mnet) {
@@ -56,18 +55,18 @@ comparison_result distance::compare_full(const distance& other) const {
 		    	canBeDominated = false;
 		    }
 		    if (!canBeDominated && !canDominate)
-		    	return P_INCOMPARABLE;
+		    	return INCOMPARABLE;
 		}
 	}
 	if (canDominate && !canBeDominated)
-		return P_DOMINATES;
+		return GREATER_THAN;
 	if (canBeDominated && !canDominate)
-		return P_DOMINATED;
+		return LESS_THAN;
 	//if (canDominate && canBeDominated)
-		return P_EQUAL;
+		return EQUAL;
 }
 
-comparison_result distance::compare_switch(const distance& other) const {
+comparison_result path_length::compare_switch(const path_length& other) const {
 	bool canBeDominated = true;
 	bool canDominate = true;
 	if (mnet != other.mnet) {
@@ -87,7 +86,7 @@ comparison_result distance::compare_switch(const distance& other) const {
 			canBeDominated = false;
 		}
 		if (!canBeDominated && !canDominate)
-			return P_INCOMPARABLE;
+			return INCOMPARABLE;
 	}
 	long num_interlayer_steps1 = length()-num_intralayer_steps1;
 	long num_interlayer_steps2 = other.length()-num_intralayer_steps2;
@@ -98,16 +97,16 @@ comparison_result distance::compare_switch(const distance& other) const {
 		canBeDominated = false;
 	}
 	if (!canBeDominated && !canDominate)
-		return P_INCOMPARABLE;
+		return INCOMPARABLE;
 	if (canDominate && !canBeDominated)
-		return P_DOMINATES;
+		return GREATER_THAN;
 	if (canBeDominated && !canDominate)
-		return P_DOMINATED;
+		return LESS_THAN;
 	//if (canDominate && canBeDominated)
-		return P_EQUAL;
+		return EQUAL;
 }
 
-comparison_result distance::compare_multiplex(const distance& other) const {
+comparison_result path_length::compare_multiplex(const path_length& other) const {
 	bool canBeDominated = true;
 	bool canDominate = true;
 	if (mnet != other.mnet) {
@@ -127,17 +126,17 @@ comparison_result distance::compare_multiplex(const distance& other) const {
 			canBeDominated = false;
 		}
 		if (!canBeDominated && !canDominate)
-			return P_INCOMPARABLE;
+			return INCOMPARABLE;
 	}
 	if (canDominate && !canBeDominated)
-		return P_DOMINATES;
+		return GREATER_THAN;
 	if (canBeDominated && !canDominate)
-		return P_DOMINATED;
+		return LESS_THAN;
 	//if (canDominate && canBeDominated)
-		return P_EQUAL;
+		return EQUAL;
 }
 
-comparison_result distance::compare_simple(const distance& other) const {
+comparison_result path_length::compare_simple(const path_length& other) const {
 	bool canBeDominated = true;
 	bool canDominate = true;
 	if (mnet != other.mnet) {
@@ -152,32 +151,36 @@ comparison_result distance::compare_simple(const distance& other) const {
 		canBeDominated = false;
 	}
 	if (!canBeDominated && !canDominate)
-		return P_INCOMPARABLE;
+		return INCOMPARABLE;
 	if (canDominate && !canBeDominated)
-		return P_DOMINATES;
+		return GREATER_THAN;
 	if (canBeDominated && !canDominate)
-		return P_DOMINATED;
+		return LESS_THAN;
 	//if (canDominate && canBeDominated)
-		return P_EQUAL;
+		return EQUAL;
 }
 
-bool distance::operator<(const distance& other) const {
+bool path_length::operator<(const path_length& other) const {
+	//return total_length < other.total_length;
 	return ts < other.ts;
 }
 
-bool distance::operator>(const distance& other) const {
+bool path_length::operator>(const path_length& other) const {
+	//return total_length > other.total_length;
 	return ts > other.ts;
 }
 
-bool distance::operator==(const distance& other) const {
+bool path_length::operator==(const path_length& other) const {
+	//return total_length == other.total_length;
 	return ts == other.ts;
 }
 
-bool distance::operator!=(const distance& other) const {
+bool path_length::operator!=(const path_length& other) const {
+	//return total_length != other.total_length;
 	return ts != other.ts;
 }
 
-std::string distance::to_string() const {
+std::string path_length::to_string() const {
 	std::string res;
 	for (LayerSharedPtr layer: mnet->get_layers()) {
 		long l = length(layer,layer);

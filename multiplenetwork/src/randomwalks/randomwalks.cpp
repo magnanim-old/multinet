@@ -1,12 +1,4 @@
-/*
- * randomwalks.cpp
- *
- * Author: matteomagnani
- * Version: 0.0.1
- */
-
 #include "utils.h"
-#include "random.h"
 #include "randomwalks.h"
 #include <vector>
 
@@ -35,36 +27,34 @@ NodeSharedPtr Walker::next() {
  		no_action = false;
  	}
  	else { // random step
- 		std::vector<double> prob = transitions.at(layer_idx.at(current->layer->id));
- 		int layer_idx = test(prob);
+ 		int lidx = layer_idx.at(current->layer->id);
+ 		int layer_idx = test(transitions, lidx);
  		LayerSharedPtr new_layer = mlnet->get_layers().get_at_index(layer_idx);
  		if (current->layer==new_layer) {
- 			//log("Same layer");
+ 			// Moving inside the same layer
  			sorted_set<node_id,NodeSharedPtr> neigh = mlnet->neighbors(current,OUT);
  			if (neigh.size()==0) {
- 				//log("Blind end");
+ 				// No possibility to move: no action
  		 		no_action = true;
  		 		return current;
  			}
  			long rand = getRandomInt(neigh.size());
-			//log(std::to_string(rand) + " out of " + std::to_string(neigh.size()));
 			current = neigh.get_at_index(rand);
 			just_teleported = false;
 	 		no_action = false;
 			//log("--> " + next->to_string());
 		}
  		else {
- 			//log("Actor change");
+ 			// Changing node associated to the same actor
  			NodeSharedPtr next_node = mlnet->get_node(current->actor,new_layer);
  			if (!next_node) {
- 				//log("Singleton actor");
+ 				// No other nodes for this actor: no action
  		 		no_action = true;
  		 		return current;
  			}
  			current = next_node;
  			just_teleported = false;
  	 		no_action = false;
- 			//log("--> " + next->to_string());
  		}
 	}
 	return current;

@@ -1,5 +1,9 @@
-#ifndef MULTIPLENETWORK_EXCEPTIONS_H_
-#define MULTIPLENETWORK_EXCEPTIONS_H_
+/**
+ * exceptions.h
+ */
+
+#ifndef MLNET_EXCEPTIONS_H_
+#define MLNET_EXCEPTIONS_H_
 
 #include <exception>
 #include <string>
@@ -59,4 +63,4 @@ private:
 };
 
 
-#endif /* MULTIPLENETWORK_EXCEPTIONS_H_ */
+#endif /* MLNET_EXCEPTIONS_H_ */

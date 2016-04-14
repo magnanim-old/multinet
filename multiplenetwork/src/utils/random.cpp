@@ -1,10 +1,3 @@
-/*
- * Random.cpp
- *
- *  Created on: 14/ago/2013
- *      Author: stud10
- */
-
 #include "utils.h"
 #include "exceptions.h"
 #include <algorithm>
@@ -14,12 +7,10 @@
 //#include <random>
 //#include <chrono>
 
-using namespace std;
-
 namespace mlnet {
 //Random::Random() {
 	/*
-	// C++11 version:
+	// C++11 version: not supported by some systems yet
 	std::chrono::high_resolution_clock::time_point time = std::chrono::high_resolution_clock::now();
 	std::chrono::high_resolution_clock::duration dtn = time.time_since_epoch();
 	generator.seed(dtn.count());
@@ -61,30 +52,19 @@ double drand() {
 
 int random_level(int MAX_LEVEL, double P) {
     static bool first = true;
-
     if (first) {
         srand( (unsigned)time( NULL ) );
         first = false;
     }
-
     int lvl = (int)(std::log(drand())/std::log(1.0-P));
     return lvl < MAX_LEVEL ? lvl : MAX_LEVEL;
 }
 
-set<unsigned int> getKRandom(unsigned int max, unsigned int k) {
-	set<unsigned int> res;
+std::set<long> getKRandom(long max, long k) {
+	if (max<k) throw OperationNotSupportedException("Only " + to_string(max) + " values available, requested " + to_string(k));
+	std::set<long> res;
 	while (res.size()<k)
 		res.insert(getRandomInt(max));
-	/*
-	 // alternative version
-	resizeOptions(max);
-	set<unsigned long> res;
-	for (unsigned int i=0; i<k; i++) {
-		long idx = getRandomInt(options.size()-i);
-		res.insert(options[idx]);
-		swap(options[idx],options[options.size()-i-1]);
-	}
-	*/
 	return res;
 }
 
@@ -98,6 +78,7 @@ bool test(double probability) {
 }
 
 int test(const std::vector<double>& options) {
+	// For efficiency reasons, we do not check if the values sum to 1
 	double prob_failing_previous_tests=1;
 	for (int idx=0; idx<options.size()-1; idx++) {
 		double adjusted_prob = options.at(idx)/prob_failing_previous_tests;
@@ -105,17 +86,21 @@ int test(const std::vector<double>& options) {
 			return idx;
 		prob_failing_previous_tests *= (1-adjusted_prob);
 	}
+	// In practice, the last value of the input is assumed to be 1 minus the sum of the previous values
 	return options.size()-1;
 }
 
-/*
-void Random::resizeOptions(unsigned long max) {
-	if (max<options.size()) {
-		options.clear();
+int test(const std::vector<std::vector<double> >& options, int row_num) {
+	// For efficiency reasons, we do not check if the values sum to 1
+	double prob_failing_previous_tests=1;
+	for (int idx=0; idx<options.at(row_num).size()-1; idx++) {
+		double adjusted_prob = options.at(row_num).at(idx)/prob_failing_previous_tests;
+		if (test(adjusted_prob))
+			return idx;
+		prob_failing_previous_tests *= (1-adjusted_prob);
 	}
-	while (max>options.size()) {
-			options.push_back(options.size());
-	}
-}*/
+	// In practice, the last value of the input is assumed to be 1 minus the sum of the previous values
+	return options.at(row_num).size()-1;
+}
 
 }

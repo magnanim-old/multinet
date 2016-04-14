@@ -18,12 +18,12 @@
 using namespace mlnet;
 
 void test_randomwalks() {
-	log("TESTING Random Walks");
+	//log("TESTING Random Walks");
 
-	log("Reading network toy from file...",false);
+	//log("Reading network toy from file...",false);
 	MLNetworkSharedPtr mnet3 = read_multilayer("test/toy.mpx","toy",',');
-	log("done! ",false);
-	log(mnet3->to_string());
+	//log("done! ",false);
+	//log(mnet3->to_string());
 
 	std::vector<double> p1({.4,.2,.2,.2});
 	std::vector<double> p2({.2,.4,.2,.2});
@@ -33,7 +33,7 @@ void test_randomwalks() {
 	std::unordered_map<ActorSharedPtr, int > occ = occupation(mnet3,.2,transitions,10000);
 
 	for (const auto &p : occ) {
-		log(p.first->name + ": " + to_string(p.second));
+		//log(p.first->name + ": " + to_string(p.second));
 	}
 
 	//log("Testing ...",false);
@@ -48,7 +48,8 @@ void test_randomwalks() {
 
 
 
-	log("TEST SUCCESSFULLY COMPLETED (IO)");
+
+	//log("TEST SUCCESSFULLY COMPLETED (IO)");
 }
 
 

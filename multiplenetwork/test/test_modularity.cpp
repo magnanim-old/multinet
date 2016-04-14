@@ -16,8 +16,8 @@ using namespace mlnet;
 void test_modularity() {
 
 	// We need to read the network from a file: testIO() must have been passed
-	log("TESTING measures");
-	log("Reading the network...",false);
+	//log("TESTING measures");
+	//log("Reading the network...",false);
 	// Creating an empty multiple network and initializing it
 	MLNetworkSharedPtr mnet = read_multilayer("test/toy.mpx","toy",',');
 
@@ -26,10 +26,10 @@ void test_modularity() {
 
 	//mnet_read_edgelist(mnet, "test/toy.mnet");
 
-	log("done!");
+	//log("done!");
 
-	log("Computing modularity...");
-	hash<NodeSharedPtr,long> groups_toy, groups1, groups2, groups3, groups4;
+	//log("Computing modularity...");
+	hashtable<NodeSharedPtr,long> groups_toy, groups1, groups2, groups3, groups4;
 
 
 	/*double mod = modularity(mnet,groups_toy,1);
@@ -74,16 +74,16 @@ void test_modularity() {
 	groups1[mnet_a->get_node(v7,l3)] = 1;
 	groups1[mnet_a->get_node(v8,l3)] = 1;
 
-	log("GR1!");
+	//log("GR1!");
 	double mod = modularity(mnet_a,groups1,0);
-	log(std::to_string(mod) + " ",false);
-	log("done 0!");
+	//log(std::to_string(mod) + " ",false);
+	//log("done 0!");
 	mod = modularity(mnet_a,groups1,.5);
-	log(std::to_string(mod) + " ",false);
-	log("done .5!");
+	//log(std::to_string(mod) + " ",false);
+	//log("done .5!");
 	mod = modularity(mnet_a,groups1,1);
-	log(std::to_string(mod) + " ",false);
-	log("done 1!");
+	//log(std::to_string(mod) + " ",false);
+	//log("done 1!");
 
-	log("TEST SUCCESSFULLY COMPLETED (modularity)");
+	//log("TEST SUCCESSFULLY COMPLETED (modularity)");
 }

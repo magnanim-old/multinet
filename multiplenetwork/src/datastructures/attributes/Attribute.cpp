@@ -8,7 +8,7 @@ const std::string& Attribute::name() const {
 	return aname;
 }
 
-int Attribute::type() const {
+attribute_type Attribute::type() const {
 	return atype;
 }
 

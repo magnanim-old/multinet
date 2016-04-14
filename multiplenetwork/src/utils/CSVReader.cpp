@@ -1,20 +1,15 @@
 /*
  * CSVReader.cpp
  *
- *  Created on: Jun 27, 2013
- *      Author: magnanim
  */
 
+#include "utils.h"
+#include "exceptions.h"
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "utils.h"
-#include "exceptions.h"
-
-using namespace std;
-
 
 namespace mlnet {
 
@@ -26,11 +21,9 @@ CSVReader::CSVReader() {
 	field_separator = ',';
 }
 
-CSVReader::~CSVReader() {
-	// TODO Auto-generated destructor stub
-}
+CSVReader::~CSVReader() {}
 
-void CSVReader::open(string path) {
+void CSVReader::open(std::string path) {
 	infile.open(path.data());
 	if (infile.fail()) throw FileNotFoundException(path);
 	do {(getline(infile, next))?has_next=true:has_next=false;} while (next=="" && has_next);
@@ -49,13 +42,13 @@ void CSVReader::trimFields(bool value) {
 	return is_empty;
 }*/
 
-vector<string> CSVReader::getNext() {
+std::vector<std::string> CSVReader::getNext() {
 	row_number++;
-	istringstream line(next);
-	vector<string> record;
+	std::istringstream line(next);
+	std::vector<std::string> record;
 
 	while (line) {
-		string field;
+		std::string field;
 		if (!getline(line, field, field_separator)) break;
 		if (remove_trailing_spaces) {
 			field.erase(field.find_last_not_of(" \n\r\t")+1);

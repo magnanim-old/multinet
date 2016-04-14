@@ -71,7 +71,7 @@ void test_measures() {
 
 	std::cout << "Computing multilayer distance between all pairs of vertexes...";
 	// The result is stored in the variable paths, where for each target vertex (from source U0) we obtain a set of shortest paths
-	hash<ActorSharedPtr,std::set<distance> > dists = pareto_distance(mnet, mnet->get_actor("U0"));
+	hashtable<ActorSharedPtr,std::set<path_length> > dists = pareto_distance(mnet, mnet->get_actor("U0"));
 	std::cout << "done!" << std::endl;
 
 	for (auto p: dists) {
@@ -82,8 +82,8 @@ void test_measures() {
 
 	std::cout << "Testing sample values (U0->U3: 2 shortest paths expected)...";
 	if (dists[mnet->get_actor("U3")].size()!=2) throw FailedUnitTestException("Expected 2 distances, found " + to_string(dists[mnet->get_actor("U3")].size()));
-	distance p1 = *dists[mnet->get_actor("U3")].begin();
-	distance p2 = *++dists[mnet->get_actor("U3")].begin();
+	path_length p1 = *dists[mnet->get_actor("U3")].begin();
+	path_length p2 = *++dists[mnet->get_actor("U3")].begin();
 	if (p1.length()!=2) throw FailedUnitTestException("Wrong length: distance 1, " + to_string(p1.length()));
 	if (p2.length()!=2) throw FailedUnitTestException("Wrong length: distance 2, " + to_string(p2.length()));
 	if (p1.length(l1,l1)!=2) throw FailedUnitTestException("Wrong number of edges: distance 1 on layer l1");

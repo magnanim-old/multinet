@@ -2,7 +2,7 @@
 
 namespace mlnet {
 
-edge::edge(const edge_id& id, const NodeSharedPtr& v1, const NodeSharedPtr& v2, bool directed) :
+edge::edge(edge_id id, const NodeSharedPtr& v1, const NodeSharedPtr& v2, bool directed) :
 	basic_component(id),
 	v1(v1),
 	v2(v2),

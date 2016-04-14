@@ -1,11 +1,3 @@
-/*
- * logging.cpp
- *
- * Created on: Feb 8, 2014
- * Author: matteomagnani
- * Version: 0.0.1
- */
-
 #include "utils.h"
 #include <iostream>
 
