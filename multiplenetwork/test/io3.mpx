@@ -12,6 +12,9 @@ l1,Stars,NUMERIC
 l2,Weight,NUMERIC
 l2,Stars,NUMERIC
 
+#ACTORS
+U6
+
 #NODES
 U0,l1,Blue,34
 U5,l2,32

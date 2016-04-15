@@ -1,10 +1,3 @@
-/*
- * creation.cpp
- *
- *  Created on: Jun 12, 2013
- *      Author: magnanim
- */
-
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,7 +64,7 @@ void write_graphml(const MLNetworkSharedPtr& mnet, const string& path, const u_s
 
 	// Nodes
 	if (merge_actors) {
-		// one for each actor in the input layers
+		// one for each actor
 		for (ActorSharedPtr actor: mnet->get_actors()) {
 			// except if only layer-specific actors must be used
 			if (!include_all_actors) {
@@ -80,15 +73,20 @@ void write_graphml(const MLNetworkSharedPtr& mnet, const string& path, const u_s
 					if (mnet->get_node(actor,layer))
 						is_in_input_layers = true;
 				}
-				if (!is_in_input_layers)
+				if (!is_in_input_layers) {
 					continue;
-			}
-			bool node_element_printed = false;
-			for (NodeSharedPtr node: mnet->get_nodes(actor)) {
-				if (!node_element_printed) {
-					outfile << "    <node id=\"" << actor->id << "\" name=\"" << actor->name << "\">" << std::endl;
-					node_element_printed = true;
 				}
+			}
+			outfile << "    <node id=\"" << actor->id << "\">" << std::endl;
+			outfile << "        <data key=\"v_name\">" << actor->name << "</data>" << std::endl;
+
+			//bool node_element_printed = false;
+			for (NodeSharedPtr node: mnet->get_nodes(actor)) {
+				/*if (!node_element_printed) {
+					outfile << "    <node id=\"" << actor->id << "\">" << std::endl;
+					outfile << "        <data key=\"v_name\">" << actor->name << "</data>" << std::endl;
+					node_element_printed = true;
+				}*/
 				if (layers.count(node->layer)==0) {
 					// if a node is not on a layer, no attribute is used
 					// outfile << "        <data key=\"l" << node->layer->id << "\">F</data>" << std::endl;
@@ -104,15 +102,16 @@ void write_graphml(const MLNetworkSharedPtr& mnet, const string& path, const u_s
 					}
 				}
 			}
-			if (node_element_printed)
-				outfile << "    </node>" << std::endl;
+			//if (node_element_printed)
+			outfile << "    </node>" << std::endl;
 		}
 	}
 	else {
 		// no actor merging: one node for each node in the original multilayer network
 		for (LayerSharedPtr layer: layers) {
 			for (NodeSharedPtr node: mnet->get_nodes(layer)) {
-				outfile << "    <node id=\"" << node->id << "\" name=\"" << node->actor->name << ":" << node->layer->name << "\">" << std::endl;
+				outfile << "    <node id=\"" << node->id << "\">" << std::endl;
+				outfile << "        <data key=\"v_name\">" << node->actor->name << ":" << node->layer->name << "</data>" << std::endl;
 				AttributeStoreSharedPtr attrs = mnet->node_features(node->layer);
 				for (AttributeSharedPtr attr: attrs->attributes()) {
 					if (attr->type()==NUMERIC_TYPE)

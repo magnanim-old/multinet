@@ -126,8 +126,8 @@ void write_multilayer(const MLNetworkSharedPtr& mlnet, const std::string& outfil
  * @param merge_actors if true, one node in the output graph will represent all nodes associated to the same
  * actor in the original network. If false, for each node in the original network a node will appear in the output,
  * with an attribute indicating the corresponding actor. The first option builds a "traditional" multiplex network.
- * @param include_all_actors if true, all the actors in the multilayer network are included in the output. If false, only
- * actors that are present in the exported layers are included (see layers parameter).
+ * @param include_all_actors if parameter merge_actors is true, then we can decide which actors to include. If include_all_actors is true, all the actors in the multilayer network are included in the output. If false, only
+ * actors that are present in the exported layers are included (see layers parameter). If merge_actors is false, this attribute is not used.
  */
 void write_graphml(const MLNetworkSharedPtr& mnet, const string& outfile, const u_set<LayerSharedPtr>& layers, bool merge_actors, bool include_all_actors);
 
