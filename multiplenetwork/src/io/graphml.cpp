@@ -80,16 +80,9 @@ void write_graphml(const MLNetworkSharedPtr& mnet, const string& path, const u_s
 			outfile << "    <node id=\"" << actor->id << "\">" << std::endl;
 			outfile << "        <data key=\"v_name\">" << actor->name << "</data>" << std::endl;
 
-			//bool node_element_printed = false;
 			for (NodeSharedPtr node: mnet->get_nodes(actor)) {
-				/*if (!node_element_printed) {
-					outfile << "    <node id=\"" << actor->id << "\">" << std::endl;
-					outfile << "        <data key=\"v_name\">" << actor->name << "</data>" << std::endl;
-					node_element_printed = true;
-				}*/
 				if (layers.count(node->layer)==0) {
-					// if a node is not on a layer, no attribute is used
-					// outfile << "        <data key=\"l" << node->layer->id << "\">F</data>" << std::endl;
+					// no content
 				}
 				else {
 					outfile << "        <data key=\"" << node->layer->name << "\">T</data>" << std::endl;
@@ -102,12 +95,12 @@ void write_graphml(const MLNetworkSharedPtr& mnet, const string& path, const u_s
 					}
 				}
 			}
-			//if (node_element_printed)
 			outfile << "    </node>" << std::endl;
 		}
 	}
 	else {
-		// no actor merging: one node for each node in the original multilayer network
+		// No actor merging: one node for each node in the original multilayer network.
+		// Only actors present in at least one layer are included: the include_all_actors parameter is not used in this case.
 		for (LayerSharedPtr layer: layers) {
 			for (NodeSharedPtr node: mnet->get_nodes(layer)) {
 				outfile << "    <node id=\"" << node->id << "\">" << std::endl;

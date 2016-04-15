@@ -17,7 +17,7 @@
 #define MLNET_SORTED_SET_H_
 
 #include "random.h"
-#include "exceptions.h"
+#include "../exceptions.h"
 #include <string>
 #include <map>
 #include <unordered_map>

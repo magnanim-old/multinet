@@ -84,10 +84,10 @@ void test_io() {
 	 * e.g., with igraph in R: g <- read.graph("pr2.gml",format="graphml"), and checking
 	 * if all the information is preserved.
 	 */
-	write_graphml(mnet3,"pr1.gml",layers,true,true);
-	write_graphml(mnet3,"pr2.gml",layers,true,false);
-	write_graphml(mnet3,"pr3.gml",layers,false,true);
-	write_graphml(mnet3,"pr4.gml",layers,false,false);
+	//write_graphml(mnet3,"pr1.gml",layers,true,true);
+	//write_graphml(mnet3,"pr2.gml",layers,true,false);
+	//write_graphml(mnet3,"pr3.gml",layers,false,true);
+	//write_graphml(mnet3,"pr4.gml",layers,false,false);
 
 	test_end("IO");
 }

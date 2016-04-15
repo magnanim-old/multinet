@@ -7,7 +7,7 @@
 #ifndef MLNET_RANDOM_H_
 #define MLNET_RANDOM_H_
 
-#include "exceptions.h"
+#include "../exceptions.h"
 #include <string>
 #include <fstream>
 #include <sstream>

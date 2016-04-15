@@ -8,7 +8,7 @@
 #ifndef MLNET_MATH_H_
 #define MLNET_MATH_H_
 
-#include "exceptions.h"
+#include "../exceptions.h"
 #include <unordered_set>
 #include <string>
 #include <fstream>

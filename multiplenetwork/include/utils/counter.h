@@ -7,7 +7,7 @@
 #ifndef MLNET_COUNTER_H_
 #define MLNET_COUNTER_H_
 
-#include "exceptions.h"
+#include "../exceptions.h"
 #include <string>
 #include <map>
 #include <unordered_map>
