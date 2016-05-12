@@ -32,4 +32,10 @@ std::string named_component::to_string() const {
 	return "id(" + std::to_string(id) + "), name(" + name + ")";
 }
 
+std::ostream& operator<<(std::ostream& os, const named_component& dt) {
+	os << dt.name;
+	return os;
+}
+
+
 }

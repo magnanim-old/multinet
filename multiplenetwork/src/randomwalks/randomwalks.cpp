@@ -32,7 +32,7 @@ NodeSharedPtr Walker::next() {
  		LayerSharedPtr new_layer = mlnet->get_layers().get_at_index(layer_idx);
  		if (current->layer==new_layer) {
  			// Moving inside the same layer
- 			sorted_set<node_id,NodeSharedPtr> neigh = mlnet->neighbors(current,OUT);
+ 			sorted_random_map<node_id,NodeSharedPtr> neigh = mlnet->neighbors(current,OUT);
  			if (neigh.size()==0) {
  				// No possibility to move: no action
  		 		no_action = true;

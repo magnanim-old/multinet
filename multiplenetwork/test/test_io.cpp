@@ -70,7 +70,7 @@ void test_io() {
 	std::cout << "done!" << std::endl;
 
 	std::cout << "Writing a graphml file...";
-	u_set<LayerSharedPtr> layers;
+	simple_set<LayerSharedPtr> layers;
 	for (LayerSharedPtr layer: mnet3->get_layers())
 		layers.insert(layer);
 	write_graphml(mnet3,"_tmp_file2.gml",layers,true,true);

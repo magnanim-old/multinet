@@ -23,16 +23,16 @@ void test_community() {
 
 	MLNetworkSharedPtr mnet = read_multilayer("test/toy.mpx","cpm net",',');
 
-	std::set<CliqueSharedPtr> C = find_max_cliques(mnet,3,1);
+	simple_set<CliqueSharedPtr> C = find_max_cliques(mnet,3,1);
 
 	for (CliqueSharedPtr c: C) {
 		std::cout << c->to_string() << std::endl;
 	}
 
-	std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> > adjacency = build_adjacency_graph(C, 1);
+	std::map<CliqueSharedPtr,simple_set<CliqueSharedPtr> > adjacency = build_adjacency_graph(C, 1);
 
 
-	std::set<CommunitySharedPtr> communities = find_communities(mnet,adjacency,1);
+	simple_set<CommunitySharedPtr> communities = find_communities(mnet,adjacency,1);
 
 
 	for (CommunitySharedPtr c: communities) {

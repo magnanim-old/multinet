@@ -3,32 +3,25 @@
 
 namespace mlnet {
 
-clique::clique() {}
+actor_set::actor_set() {}
 
-clique::clique(const std::unordered_set<ActorSharedPtr>& actors, const std::unordered_set<LayerSharedPtr>& layers) :
-	actors(actors.begin(),actors.end()), layers(layers.begin(),layers.end()) {}
+actor_set::actor_set(const std::unordered_set<ActorSharedPtr>& actors) :
+	actors(actors.begin(),actors.end()) {}
 
-bool clique::operator==(const clique& comp) const {
-	if (actors.size() != comp.actors.size() || layers.size() != comp.layers.size()) return false;
+bool actor_set::operator==(const actor_set& comp) const {
+	if (actors.size() != comp.actors.size()) return false;
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
 	for (int i=0; i<actors.size(); i++) {
 		if ((*it1)!=(*it2))
 			return false;
 		++it1; ++it2;
-	}
-	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
-	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
-	for (int i=0; i<layers.size(); i++) {
-		if ((*itl1)!=(*itl2))
-			return false;
-		++itl1; ++itl2;
 	}
 	return true;
 }
 
-bool clique::operator!=(const clique& comp) const {
-	if (actors.size() != comp.actors.size() || layers.size() != comp.layers.size()) return true;
+bool actor_set::operator!=(const actor_set& comp) const {
+	if (actors.size() != comp.actors.size()) return true;
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
 	for (int i=0; i<actors.size(); i++) {
@@ -36,19 +29,11 @@ bool clique::operator!=(const clique& comp) const {
 			return true;
 		++it1; ++it2;
 	}
-	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
-	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
-	for (int i=0; i<layers.size(); i++) {
-		if ((*itl1)!=(*itl2))
-			return true;
-		++itl1; ++itl2;
-	}
 	return false;
 }
 
-bool clique::operator<(const clique& comp) const {
+bool actor_set::operator<(const actor_set& comp) const {
 	if (actors.size() != comp.actors.size()) return actors.size() < comp.actors.size();
-	if (layers.size() != comp.layers.size()) return layers.size() < comp.layers.size();
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
 	for (int i=0; i<actors.size(); i++) {
@@ -58,21 +43,11 @@ bool clique::operator<(const clique& comp) const {
 			return false;
 		++it1; ++it2;
 	}
-	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
-	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
-	for (int i=0; i<layers.size(); i++) {
-		if ((*itl1)<(*itl2))
-			return true;
-		if ((*itl1)>(*itl2))
-			return false;
-		++itl1; ++itl2;
-	}
 	return false;
 }
 
-bool clique::operator>(const clique& comp) const {
+bool actor_set::operator>(const actor_set& comp) const {
 	if (actors.size() != comp.actors.size()) return actors.size() > comp.actors.size();
-	if (layers.size() != comp.layers.size()) return layers.size() > comp.layers.size();
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
 	for (int i=0; i<actors.size(); i++) {
@@ -82,20 +57,22 @@ bool clique::operator>(const clique& comp) const {
 			return false;
 		++it1; ++it2;
 	}
-	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
-	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
-	for (int i=0; i<layers.size(); i++) {
-		if ((*itl1)>(*itl2))
-			return true;
-		if ((*itl1)<(*itl2))
-			return false;
-		++itl1; ++itl2;
-	}
 	return false;
 }
 
-string clique::to_string() {
-	return (mlnet::to_string(actors) + "L" + mlnet::to_string(layers));
+dyad::dyad(const ActorSharedPtr& actor1, const ActorSharedPtr& actor2) {
+	actors.insert(actor1);
+	actors.insert(actor2);
+}
+
+triad::triad(const ActorSharedPtr& actor1, const ActorSharedPtr& actor2, const ActorSharedPtr& actor3) {
+	actors.insert(actor1);
+	actors.insert(actor2);
+	actors.insert(actor3);
+}
+
+string actor_set::to_string() {
+	return mlnet::to_string(actors);
 }
 
 }

@@ -14,7 +14,7 @@ const std::string SEP = "|";
 
 namespace mlnet {
 
-LayerSharedPtr project_clique(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) {
+LayerSharedPtr project_unweighted(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) {
 	std::unordered_set<LayerSharedPtr> target;
 	target.insert(layer1);
 	LayerSharedPtr new_layer = create_layer(mnet,new_layer_name,target,false,false);

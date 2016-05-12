@@ -53,6 +53,7 @@ class actor;
 class layer;
 class node;
 class edge;
+class clique;
 class MLNetwork;
 class AttributeStore;
 class Attribute;
@@ -73,17 +74,13 @@ typedef std::shared_ptr<Attribute> AttributeSharedPtr;
 typedef std::shared_ptr<AttributeStore> AttributeStoreSharedPtr;
 
 /* Lists of components */
-typedef sorted_set<actor_id, ActorSharedPtr> actor_list;
-typedef sorted_set<layer_id, LayerSharedPtr> layer_list;
-typedef sorted_set<node_id, NodeSharedPtr> node_list;
-typedef sorted_set<edge_id, EdgeSharedPtr> edge_list;
+typedef sorted_random_map<actor_id, ActorSharedPtr> actor_list;
+typedef sorted_random_map<layer_id, LayerSharedPtr> layer_list;
+typedef sorted_random_map<node_id, NodeSharedPtr> node_list;
+typedef sorted_random_map<edge_id, EdgeSharedPtr> edge_list;
 
 /* Other shorthands, for tidiness */
 typedef std::string string;
-template <class T> using u_set = std::unordered_set<T>;
-template <class T> using vector = std::vector<T>;
-template <class T> using matrix = std::vector<std::vector<T> >;
-template <class T1, class T2> using hashtable = std::unordered_map<T1,T2>;
 
 /**********************************************************************/
 /** Constants and Function Parameters *********************************/
@@ -121,7 +118,7 @@ enum comparison_result {LESS_THAN=0, EQUAL=1, INCOMPARABLE=2, GREATER_THAN=3};
 
 
 /**********************************************************************/
-/** MLNetwork components **********************************************/
+/** MLNetwork components and basic motifs *****************************/
 /**********************************************************************/
 
 /**
@@ -155,6 +152,7 @@ protected:
 	named_component(object_id id, const string& name);
 	/** Output function, presenting a complete description of the component */
 	string to_string() const;
+	friend std::ostream& operator<<(std::ostream& os, const named_component& dt);
 public:
 	/** Unique name of the component */
 	const string name;
@@ -216,6 +214,65 @@ public:
 	string to_string() const;
 };
 
+class actor_set {
+public:
+	/** Constructors */
+	actor_set(const simple_set<ActorSharedPtr>& actors);
+	actor_set();
+	/** Comparison operator: equality, based on the presence of the same actors and the same layers. */
+	bool operator==(const actor_set& comp) const;
+	/** Comparison operator: difference, based on the presence of the same actors and the same layers. */
+	bool operator!=(const actor_set& comp) const;
+	/** Comparison operator: less then, based on the < operator of the actors and (if needed) the layers in the clique. */
+	bool operator<(const actor_set& comp) const;
+	/** Comparison operator: greater than, based on the > operator of the actors and (if needed) the layers in the clique. */
+	bool operator>(const actor_set& comp) const;
+	/** Output function, presenting a complete description of the clique */
+	std::string to_string();
+
+	sorted_set<ActorSharedPtr> actors;
+};
+
+class dyad : public actor_set {
+public:
+	/** Constructors */
+	dyad(const ActorSharedPtr& actor1, const ActorSharedPtr& actor2);
+};
+
+class triad : public actor_set {
+public:
+	/** Constructors */
+	triad(const ActorSharedPtr& actor1, const ActorSharedPtr& actor2, const ActorSharedPtr& actor3);
+};
+
+typedef std::shared_ptr<dyad> DyadSharedPtr;
+typedef std::shared_ptr<triad> TriadSharedPtr;
+typedef std::shared_ptr<actor_set> ActorSetSharedPtr;
+
+/**
+ * A multilayer clique.
+ */
+class clique {
+public:
+	/** Constructors */
+	clique(const simple_set<ActorSharedPtr>& actors, const simple_set<LayerSharedPtr>& layers);
+	clique();
+	/** Comparison operator: equality, based on the presence of the same actors and the same layers. */
+	bool operator==(const clique& comp) const;
+	/** Comparison operator: difference, based on the presence of the same actors and the same layers. */
+	bool operator!=(const clique& comp) const;
+	/** Comparison operator: less then, based on the < operator of the actors and (if needed) the layers in the clique. */
+	bool operator<(const clique& comp) const;
+	/** Comparison operator: greater than, based on the > operator of the actors and (if needed) the layers in the clique. */
+	bool operator>(const clique& comp) const;
+	/** Output function, presenting a complete description of the clique */
+	std::string to_string();
+
+	sorted_set<ActorSharedPtr> actors;
+	sorted_set<LayerSharedPtr> layers;
+};
+
+typedef std::shared_ptr<clique> CliqueSharedPtr;
 
 /**********************************************************************/
 /** Attribute handling ************************************************/
@@ -868,5 +925,22 @@ private:
 };
 
 } // namespace mlnet
+
+// Assumes a limited number of elements in the set TODO test collisions
+namespace std {
+template <>
+struct hash<mlnet::dyad> {
+	size_t operator()(const mlnet::dyad& a) const {
+		size_t h = ~0;
+		int shift = 5;
+		for (mlnet::ActorSharedPtr actor: a.actors) {
+			h += h ^ (actor->id << shift);
+			shift += 5;
+		}
+		return h;
+    }
+};
+}
+
 
 #endif /* MLNET_DATASTRUCTURES_H_ */

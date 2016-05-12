@@ -23,10 +23,11 @@ int main(int argn, char* argv[]) {
 
 	test_begin("All unit tests");
 	try {
+	test_utils();
 	test_datastructures();
 	test_io();
-	/*
 	test_measures();
+	/*
 	test_transformations();
 	test_community();
 	test_dynamics();

@@ -1,14 +1,101 @@
 #include "datastructures.h"
+#include "utils.h"
 
 namespace mlnet {
 
-node::node(node_id id, const ActorSharedPtr& actor, const LayerSharedPtr& layer) :
-	basic_component(id),
-	actor(actor),
-	layer(layer) {}
+clique::clique() {}
 
-std::string node::to_string() const {
-	return "Node: " + basic_component::to_string() + " as " + actor->to_string() + " on " + layer->to_string();
+clique::clique(const std::unordered_set<ActorSharedPtr>& actors, const std::unordered_set<LayerSharedPtr>& layers) :
+	actors(actors.begin(),actors.end()), layers(layers.begin(),layers.end()) {}
+
+bool clique::operator==(const clique& comp) const {
+	if (actors.size() != comp.actors.size() || layers.size() != comp.layers.size()) return false;
+	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
+	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
+	for (int i=0; i<actors.size(); i++) {
+		if ((*it1)!=(*it2))
+			return false;
+		++it1; ++it2;
+	}
+	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
+	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
+	for (int i=0; i<layers.size(); i++) {
+		if ((*itl1)!=(*itl2))
+			return false;
+		++itl1; ++itl2;
+	}
+	return true;
+}
+
+bool clique::operator!=(const clique& comp) const {
+	if (actors.size() != comp.actors.size() || layers.size() != comp.layers.size()) return true;
+	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
+	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
+	for (int i=0; i<actors.size(); i++) {
+		if ((*it1)!=(*it2))
+			return true;
+		++it1; ++it2;
+	}
+	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
+	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
+	for (int i=0; i<layers.size(); i++) {
+		if ((*itl1)!=(*itl2))
+			return true;
+		++itl1; ++itl2;
+	}
+	return false;
+}
+
+bool clique::operator<(const clique& comp) const {
+	if (actors.size() != comp.actors.size()) return actors.size() < comp.actors.size();
+	if (layers.size() != comp.layers.size()) return layers.size() < comp.layers.size();
+	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
+	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
+	for (int i=0; i<actors.size(); i++) {
+		if ((*it1)<(*it2))
+			return true;
+		if ((*it1)>(*it2))
+			return false;
+		++it1; ++it2;
+	}
+	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
+	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
+	for (int i=0; i<layers.size(); i++) {
+		if ((*itl1)<(*itl2))
+			return true;
+		if ((*itl1)>(*itl2))
+			return false;
+		++itl1; ++itl2;
+	}
+	return false;
+}
+
+bool clique::operator>(const clique& comp) const {
+	if (actors.size() != comp.actors.size()) return actors.size() > comp.actors.size();
+	if (layers.size() != comp.layers.size()) return layers.size() > comp.layers.size();
+	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
+	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
+	for (int i=0; i<actors.size(); i++) {
+		if ((*it1)>(*it2))
+			return true;
+		if ((*it1)<(*it2))
+			return false;
+		++it1; ++it2;
+	}
+	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
+	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
+	for (int i=0; i<layers.size(); i++) {
+		if ((*itl1)>(*itl2))
+			return true;
+		if ((*itl1)<(*itl2))
+			return false;
+		++itl1; ++itl2;
+	}
+	return false;
+}
+
+string clique::to_string() {
+	return (mlnet::to_string(actors) + "L" + mlnet::to_string(layers));
 }
 
 }

@@ -12,6 +12,7 @@
 #include <exception>
 #include <string>
 #include <iostream>
+#include "print.h"
 
 /**
  * Prints a text to the standard output indicating that the test is going to be performed.
@@ -26,6 +27,7 @@ void test_begin(const std::string& name);
 void test_end(const std::string& name);
 
 /* Unit test functions for different components of the library */
+void test_utils();
 void test_datastructures();
 void test_io();
 void test_measures();

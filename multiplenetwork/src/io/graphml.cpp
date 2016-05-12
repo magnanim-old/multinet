@@ -12,7 +12,7 @@ using namespace std;
 
 namespace mlnet {
 
-void write_graphml(const MLNetworkSharedPtr& mnet, const string& path, const u_set<LayerSharedPtr>& layers, bool merge_actors, bool include_all_actors) {
+void write_graphml(const MLNetworkSharedPtr& mnet, const string& path, const simple_set<LayerSharedPtr>& layers, bool merge_actors, bool include_all_actors) {
 
 	std::ofstream outfile;
 	outfile.open(path.data());

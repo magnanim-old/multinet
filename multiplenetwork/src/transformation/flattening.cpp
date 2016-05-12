@@ -14,7 +14,7 @@ const std::string SEP = "|";
 
 namespace mlnet {
 
-LayerSharedPtr flatten_weighted(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors) {
+LayerSharedPtr flatten_weighted(MLNetworkSharedPtr& mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors) {
 	LayerSharedPtr new_layer = create_layer(mnet,new_layer_name,layers,force_directed,force_actors);
 
 	bool directed = mnet->is_directed(new_layer,new_layer);
@@ -52,8 +52,7 @@ LayerSharedPtr flatten_weighted(MLNetworkSharedPtr mnet, const std::string& new_
 	return new_layer;
 }
 
-
-LayerSharedPtr flatten_or(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors) {
+LayerSharedPtr flatten_unweighted(MLNetworkSharedPtr& mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors) {
 	LayerSharedPtr new_layer = create_layer(mnet,new_layer_name,layers,force_directed,force_actors);
 
 	bool directed = mnet->is_directed(new_layer,new_layer);

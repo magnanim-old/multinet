@@ -7,26 +7,9 @@
 
 namespace mlnet {
 
-class clique {
-public:
-	clique(long id, std::unordered_set<ActorSharedPtr> actors, std::unordered_set<LayerSharedPtr> layers);
-	clique();
-	bool operator==(const clique& comp) const;
-	bool operator!=(const clique& comp) const;
-	bool operator<(const clique& comp) const;
-	bool operator>(const clique& comp) const;
-	std::string to_string();
-
-	long id;
-	std::unordered_set<ActorSharedPtr> actors;
-	std::unordered_set<LayerSharedPtr> layers;
-};
-
-typedef std::shared_ptr<clique> CliqueSharedPtr;
-
 class community {
 public:
-	community(long id, std::unordered_set<CliqueSharedPtr> cliques, std::unordered_set<LayerSharedPtr> layers);
+	community(long id, simple_set<CliqueSharedPtr> cliques, simple_set<LayerSharedPtr> layers);
 	community();
 	std::set<ActorSharedPtr> actors();
 	int size() const;
@@ -37,39 +20,41 @@ public:
 	std::string to_string();
 
 	long id;
-	std::unordered_set<CliqueSharedPtr> cliques;
-	std::unordered_set<LayerSharedPtr> layers;
+	std::set<CliqueSharedPtr> cliques;
+	std::set<LayerSharedPtr> layers;
 };
 
 typedef std::shared_ptr<community> CommunitySharedPtr;
 
-std::set<CommunitySharedPtr> ml_cpm(MLNetworkSharedPtr mnet, int k, int m1, int m2);
+simple_set<CommunitySharedPtr> ml_cpm(MLNetworkSharedPtr mnet, int k, int m1, int m2);
 
-hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > get_mlneighbors(MLNetworkSharedPtr mnet, ActorSharedPtr actor);
+hashtable<ActorSharedPtr,simple_set<LayerSharedPtr> > get_mlneighbors(MLNetworkSharedPtr mnet, ActorSharedPtr actor);
 
-std::unordered_set<LayerSharedPtr> neighboring_layers(MLNetworkSharedPtr mnet, ActorSharedPtr actor1, ActorSharedPtr actor2);
+simple_set<LayerSharedPtr> neighboring_layers(MLNetworkSharedPtr mnet, ActorSharedPtr actor1, ActorSharedPtr actor2);
 
-std::set<CliqueSharedPtr> find_cliques(MLNetworkSharedPtr mnet, int k, int m);
+simple_set<CliqueSharedPtr> find_cliques(MLNetworkSharedPtr mnet, int k, int m);
 
-void find_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr A, hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> > B, std::set<CliqueSharedPtr>& C, int k, int m);
+void find_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr A, hashtable<ActorSharedPtr,simple_set<LayerSharedPtr> > B, simple_set<CliqueSharedPtr>& C, int k, int m);
 
-std::set<CliqueSharedPtr> find_max_cliques(MLNetworkSharedPtr mnet, int k, int m);
+simple_set<CliqueSharedPtr> find_max_cliques(MLNetworkSharedPtr mnet, simple_set<LayerSharedPtr> layers, int k, int m);
 
-void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr& A, hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> >& B, hashtable<ActorSharedPtr,std::unordered_set<LayerSharedPtr> >& C, std::set<CliqueSharedPtr>& result, int k, int m);
+simple_set<CliqueSharedPtr> find_max_cliques(MLNetworkSharedPtr mnet, int k, int m);
 
-std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> > build_adjacency_graph(const std::set<CliqueSharedPtr>& C, int m);
+void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr& A, hashtable<ActorSharedPtr,simple_set<LayerSharedPtr> >& B, hashtable<ActorSharedPtr,simple_set<LayerSharedPtr> >& C, simple_set<CliqueSharedPtr>& result, int k, int m);
 
-std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> > build_max_adjacency_graph(const std::set<CliqueSharedPtr>& C, int k, int m);
+std::map<CliqueSharedPtr,simple_set<CliqueSharedPtr> > build_adjacency_graph(const simple_set<CliqueSharedPtr>& C, int m);
 
-void find_communities(const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr A, const std::unordered_set<CliqueSharedPtr>& B, std::set<CliqueSharedPtr> U, std::set<CommunitySharedPtr>& C, int m);
+std::map<CliqueSharedPtr,simple_set<CliqueSharedPtr> > build_max_adjacency_graph(const simple_set<CliqueSharedPtr>& C, int k, int m);
 
-std::set<CommunitySharedPtr> find_communities(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, int m);
+void find_communities(const std::map<CliqueSharedPtr,simple_set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr A, const simple_set<CliqueSharedPtr>& B, simple_set<CliqueSharedPtr> U, simple_set<CommunitySharedPtr>& C, int m);
 
-std::set<CommunitySharedPtr> find_max_communities(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, int m);
+simple_set<CommunitySharedPtr> find_communities(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,simple_set<CliqueSharedPtr> >& adjacency, int m);
 
-void find_max_communities2(const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr A, hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > B, hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > D, hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> > U, std::set<CommunitySharedPtr>& C, int m);
+simple_set<CommunitySharedPtr> find_max_communities(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,simple_set<CliqueSharedPtr> >& adjacency, int m);
 
-void find_max_communities(const std::map<CliqueSharedPtr,std::set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr& A, hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& B, hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& C, hashtable<CliqueSharedPtr,std::unordered_set<LayerSharedPtr> >& D, std::set<CommunitySharedPtr>& result, int m);
+void find_max_communities2(const std::map<CliqueSharedPtr,simple_set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr A, hashtable<CliqueSharedPtr,simple_set<LayerSharedPtr> > B, hashtable<CliqueSharedPtr,simple_set<LayerSharedPtr> > D, hashtable<CliqueSharedPtr,simple_set<LayerSharedPtr> > U, simple_set<CommunitySharedPtr>& C, int m);
+
+void find_max_communities(const std::map<CliqueSharedPtr,simple_set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr& A, hashtable<CliqueSharedPtr,simple_set<LayerSharedPtr> >& B, hashtable<CliqueSharedPtr,simple_set<LayerSharedPtr> >& C, hashtable<CliqueSharedPtr,simple_set<LayerSharedPtr> >& D, simple_set<CommunitySharedPtr>& result, int m);
 
 }
 #endif /* MULTIPLENETWORK_COMMUNITY_H_ */

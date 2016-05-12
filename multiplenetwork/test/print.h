@@ -26,10 +26,10 @@ template <typename T> void print(const mlnet::sorted_set<T>& set) {
 
 template <class STRUCTURE, class CONTEXT, class VALUE>
 void print(const mlnet::property_matrix<STRUCTURE, CONTEXT, VALUE>& P) {
-	for (auto c: P.columns()) {
-    	std::cout << c.first << ":";
+	for (auto s: P.columns()) {
+    	std::cout << s << ":";
     	for (CONTEXT cont: P.rows()) {
-    		std::cout << " (" << cont << ") " << P.get_observation(c.first, cont);
+    		std::cout << " (" << cont << ") " << P.get(s, cont);
     	}
         std::cout << std::endl;
 	}

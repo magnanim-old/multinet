@@ -60,15 +60,29 @@ void test_measures() {
 	if (xrelevance(mnet,u1,layers,INOUT) != 1) throw FailedUnitTestException("Wrong exclusive relevance, both layers: " + to_string(xrelevance(mnet,u1,layers,INOUT)));
 	std::cout << "done!" << std::endl;
 
-	std::cout << "Testing jaccard similarity...";
+	std::cout << "Testing actor jaccard similarity...";
 	MLNetworkSharedPtr mnet5 = read_multilayer("test/io5.mpx","mlnet 5",',');
-	if (jaccard_similarity(mnet5,layers) != 4.0/7.0) throw FailedUnitTestException("Wrong layer similarity");
+	if (jaccard_actor(mnet5,l1,l2) != 5.0/6.0) throw FailedUnitTestException("Wrong jaccard actor layer similarity");
+	std::cout << "done!" << std::endl;
+
+	std::cout << "Testing edge jaccard similarity...";
+	if (jaccard_edge(mnet5,l1,l2) != 4.0/8.0) throw FailedUnitTestException("Wrong jaccard edge layer similarity");
 	std::cout << "done!" << std::endl;
 
 	std::cout << "Testing triangle jaccard similarity...";
-	if (jaccard_triangle_similarity(mnet5,layers) != 1.0/2.0) throw FailedUnitTestException("Wrong jaccard triangle layer similarity: " + to_string(jaccard_triangle_similarity(mnet5,layers)));
+	if (jaccard_triangle(mnet5,l1,l2) != 1.0/2.0) throw FailedUnitTestException("Wrong jaccard triangle layer similarity: " + to_string(jaccard_triangle(mnet5,l1,l2)));
 	std::cout << "done!" << std::endl;
 
+	std::cout << "Assortativity: " << pearson_degree(mnet5,l1,l2,INOUT) << std::endl;
+	std::cout << "Rank correlation: " << rho_degree(mnet5,l1,l2,INOUT) << std::endl;
+
+	property_matrix<ActorSharedPtr,LayerSharedPtr,double> P(mnet->get_actors().size(),mnet->get_layers().size(),0);
+	for (NodeSharedPtr node: mnet5->get_nodes(l1)) {
+		P.set(node->actor,l1,mnet5->neighbors(node,INOUT).size());
+	}
+	for (NodeSharedPtr node: mnet5->get_nodes(l2)) {
+		P.set(node->actor,l2,mnet5->neighbors(node,INOUT).size());
+	}
 	std::cout << "Computing multilayer distance between all pairs of vertexes...";
 	// The result is stored in the variable paths, where for each target vertex (from source U0) we obtain a set of shortest paths
 	hashtable<ActorSharedPtr,std::set<path_length> > dists = pareto_distance(mnet, mnet->get_actor("U0"));

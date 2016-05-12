@@ -1,20 +1,8 @@
-/*
- * flattening.cpp
- *
- * Created on: Mar 28, 2014
- * Author: matteomagnani
- * Version: 0.0.1
- */
-
 #import "transformation.h"
-#import <set>
-#import <iostream>
-
-const std::string SEP = "|";
 
 namespace mlnet {
 
-LayerSharedPtr create_layer(MLNetworkSharedPtr mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors) {
+LayerSharedPtr create_layer(MLNetworkSharedPtr& mnet, const std::string& new_layer_name, const simple_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors) {
 	// verify if there are directed layers: if yes, the resulting flattened layer is also directed
 	bool directed = force_directed;
 	if (!force_directed) {
@@ -30,6 +18,7 @@ LayerSharedPtr create_layer(MLNetworkSharedPtr mnet, const std::string& new_laye
 	end_loop:
 
 	LayerSharedPtr new_layer =  mnet->add_layer(new_layer_name,directed);
+	if (!new_layer) throw DuplicateElementException("layer " + new_layer_name + " already exists");
 
 	if (force_actors) {
 		for (ActorSharedPtr actor: mnet->get_actors()) {

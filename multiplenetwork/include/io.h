@@ -129,7 +129,7 @@ void write_multilayer(const MLNetworkSharedPtr& mlnet, const std::string& outfil
  * @param include_all_actors if parameter merge_actors is true, then we can decide which actors to include. If include_all_actors is true, all the actors in the multilayer network are included in the output. If false, only
  * actors that are present in the exported layers are included (see layers parameter). If merge_actors is false, this attribute is not used.
  */
-void write_graphml(const MLNetworkSharedPtr& mnet, const string& outfile, const u_set<LayerSharedPtr>& layers, bool merge_actors, bool include_all_actors);
+void write_graphml(const MLNetworkSharedPtr& mnet, const string& outfile, const simple_set<LayerSharedPtr>& layers, bool merge_actors, bool include_all_actors);
 
 /**
  * Utility function to read attribute values.

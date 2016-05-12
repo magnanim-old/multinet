@@ -9,9 +9,10 @@
 
 #include "utils/counter.h" // classes to count objects/values.
 #include "utils/csv.h" // csv file reader.
+#include "utils/propertymatrix.h" // representation of a network based on structures and observational functions.
 #include "utils/math.h" // Basic mathematical functions and conversion from/to numbers/strings.
 #include "utils/random.h" // functions based on random number generation.
-#include "utils/sortedset.h" // a class used to store a set of objects that can be accessed by id and by index.
+#include "utils/sortedrandommap.h" // a class used to store a set of objects that can be accessed by id and by index.
 
 namespace mlnet {
 
