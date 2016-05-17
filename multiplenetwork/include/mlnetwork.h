@@ -29,6 +29,8 @@
 #include "generation.h"
 // Functions for community detection:
 #include "community.h"
+// Functions for computing coordinates (for drawing):
+#include "layout.h"
 // Random walks on multilayer networks:
 #include "randomwalks.h"
 // Network pre-processing (flattening, projection...):

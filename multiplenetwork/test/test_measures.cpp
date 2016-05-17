@@ -108,6 +108,36 @@ void test_measures() {
 
 	test_end("Actor measures");
 
+
+	// TMP Code
+
+	MLNetworkSharedPtr lnet = MLNetwork::create("friends");
+	ActorSharedPtr a1 = lnet->add_actor("a1");
+	ActorSharedPtr a2 = lnet->add_actor("a2");
+	ActorSharedPtr a3 = lnet->add_actor("a3");
+	ActorSharedPtr a4 = lnet->add_actor("a4");
+	ActorSharedPtr a5 = lnet->add_actor("a5");
+	ActorSharedPtr a6 = lnet->add_actor("a6");
+	ActorSharedPtr a7 = lnet->add_actor("a7");
+	LayerSharedPtr l = lnet->add_layer("l1",false);
+	NodeSharedPtr l1v1 = lnet->add_node(a1,l);
+	NodeSharedPtr l1v2 = lnet->add_node(a2,l);
+	NodeSharedPtr l1v3 = lnet->add_node(a3,l);
+	NodeSharedPtr l1v4 = lnet->add_node(a4,l);
+	NodeSharedPtr l1v5 = lnet->add_node(a5,l);
+	NodeSharedPtr l1v6 = lnet->add_node(a6,l);
+	NodeSharedPtr l1v7 = lnet->add_node(a7,l);
+	EdgeSharedPtr e1 = lnet->add_edge(l1v1,l1v2);
+	EdgeSharedPtr e2 = lnet->add_edge(l1v2,l1v3);
+	EdgeSharedPtr e3 = lnet->add_edge(l1v3,l1v1);
+	EdgeSharedPtr e4 = lnet->add_edge(l1v2,l1v4);
+	EdgeSharedPtr e5 = lnet->add_edge(l1v1,l1v5);
+	EdgeSharedPtr e6 = lnet->add_edge(l1v5,l1v6);
+	EdgeSharedPtr e7 = lnet->add_edge(l1v6,l1v7);
+	EdgeSharedPtr e8 = lnet->add_edge(l1v7,l1v5);
+
+	multiforce(lnet,10,10,20);
+
 }
 
 

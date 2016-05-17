@@ -1,0 +1,68 @@
+\hypertarget{classmlnet_1_1_path}{\section{mlnet\+:\+:Path Class Reference}
+\label{classmlnet_1_1_path}\index{mlnet\+::\+Path@{mlnet\+::\+Path}}
+}
+
+
+Constructs a.  
+
+
+
+
+{\ttfamily \#include $<$datastructures.\+h$>$}
+
+
+
+Collaboration diagram for mlnet\+:\+:Path\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=164pt]{classmlnet_1_1_path__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmlnet_1_1_path_aa9c641ba5a1fbee6f83a6e295047bb54}{{\bfseries Path} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, \hyperlink{namespacemlnet_acf8b1b6deb52e7dacfc676c689f9a10c}{Node\+Shared\+Ptr} origin)}\label{classmlnet_1_1_path_aa9c641ba5a1fbee6f83a6e295047bb54}
+
+\item 
+\hypertarget{classmlnet_1_1_path_aa283a2f26d1b08fd29687f2249229ed8}{\hyperlink{namespacemlnet_acf8b1b6deb52e7dacfc676c689f9a10c}{Node\+Shared\+Ptr} {\bfseries begin} ()}\label{classmlnet_1_1_path_aa283a2f26d1b08fd29687f2249229ed8}
+
+\item 
+\hypertarget{classmlnet_1_1_path_a877e86a54ce6ecdadc52711ea96bb85f}{\hyperlink{namespacemlnet_acf8b1b6deb52e7dacfc676c689f9a10c}{Node\+Shared\+Ptr} {\bfseries end} ()}\label{classmlnet_1_1_path_a877e86a54ce6ecdadc52711ea96bb85f}
+
+\item 
+\hypertarget{classmlnet_1_1_path_a43c02fff1cc86d839e4a4690cf658fa8}{void {\bfseries step} (\hyperlink{namespacemlnet_a33e88c3df9bea691a269d5e5d8bea57d}{Edge\+Shared\+Ptr} e)}\label{classmlnet_1_1_path_a43c02fff1cc86d839e4a4690cf658fa8}
+
+\item 
+\hypertarget{classmlnet_1_1_path_a8c833dbc418fa7e1762de4d17bf3f1d9}{\hyperlink{namespacemlnet_a33e88c3df9bea691a269d5e5d8bea57d}{Edge\+Shared\+Ptr} {\bfseries get\+\_\+step} (long pos) const }\label{classmlnet_1_1_path_a8c833dbc418fa7e1762de4d17bf3f1d9}
+
+\item 
+\hypertarget{classmlnet_1_1_path_a4fec50926ccf59d9c0ea2ad8a9573548}{long {\bfseries length} () const }\label{classmlnet_1_1_path_a4fec50926ccf59d9c0ea2ad8a9573548}
+
+\item 
+\hypertarget{classmlnet_1_1_path_affa5ff7e42e1ff204b7869f9b6024c68}{bool {\bfseries operator$<$} (const \hyperlink{classmlnet_1_1_path}{Path} \&other) const }\label{classmlnet_1_1_path_affa5ff7e42e1ff204b7869f9b6024c68}
+
+\item 
+\hypertarget{classmlnet_1_1_path_a9988075c10634646e840145eeaef926f}{\hyperlink{classmlnet_1_1_path}{Path} {\bfseries operator=} (const \hyperlink{classmlnet_1_1_path}{Path} \&other) const }\label{classmlnet_1_1_path_a9988075c10634646e840145eeaef926f}
+
+\item 
+\hypertarget{classmlnet_1_1_path_a40ab4743e4391bc08a7498ad246902bf}{bool {\bfseries operator==} (const \hyperlink{classmlnet_1_1_path}{Path} \&other) const }\label{classmlnet_1_1_path_a40ab4743e4391bc08a7498ad246902bf}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Constructs a. 
+
+Distance 
+\begin{DoxyExceptions}{Exceptions}
+{\em \hyperlink{class_element_not_found_exception}{Element\+Not\+Found\+Exception}} & if the input elements are not present in the network \\
+\hline
+{\em \hyperlink{class_operation_not_supported_exception}{Operation\+Not\+Supported\+Exception}} & if the two nodes lay on the same network\+Path \\
+\hline
+\end{DoxyExceptions}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/datastructures.\+h\end{DoxyCompactItemize}

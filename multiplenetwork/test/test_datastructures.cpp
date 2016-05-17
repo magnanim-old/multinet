@@ -56,7 +56,7 @@ void test_datastructures() {
 	 * created using this library.
 	 */
 	test_begin("MLNetwork - structure");
-	std::cout << "Creating an empty ML network called 'frieds'...";
+	std::cout << "Creating an empty ML network called 'friends'...";
 	MLNetworkSharedPtr mnet = MLNetwork::create("friends");
 	std::cout << " done! " << mnet->to_string() << std::endl;
 	std::cout << "Adding three actors: ";

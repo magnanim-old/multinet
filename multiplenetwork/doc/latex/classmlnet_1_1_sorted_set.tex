@@ -1,0 +1,136 @@
+\hypertarget{classmlnet_1_1_sorted_set}{\section{mlnet\+:\+:Sorted\+Set$<$ T $>$ Class Template Reference}
+\label{classmlnet_1_1_sorted_set}\index{mlnet\+::\+Sorted\+Set$<$ T $>$@{mlnet\+::\+Sorted\+Set$<$ T $>$}}
+}
+
+
+{\ttfamily \#include $<$datastructures.\+h$>$}
+
+
+
+Inheritance diagram for mlnet\+:\+:Sorted\+Set$<$ T $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmlnet_1_1_sorted_set__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for mlnet\+:\+:Sorted\+Set$<$ T $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classmlnet_1_1_sorted_set__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classmlnet_1_1_sorted_set_1_1iterator}{iterator}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set}$<$ T $>$\+::\hyperlink{classmlnet_1_1_sorted_set_1_1iterator}{iterator} \hyperlink{classmlnet_1_1_sorted_set_a15e228958332c123992f64df476324a3}{begin} () const 
+\item 
+\hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set}$<$ T $>$\+::\hyperlink{classmlnet_1_1_sorted_set_1_1iterator}{iterator} \hyperlink{classmlnet_1_1_sorted_set_ac88f8211ad1c259ee564320964085b58}{end} () const 
+\item 
+long \hyperlink{classmlnet_1_1_sorted_set_acd1e6023e51870488b53738d3609c784}{size} () const 
+\item 
+bool \hyperlink{classmlnet_1_1_sorted_set_a8d3dc2becc4da73e27ca44ef3dc0112c}{contains} (\hyperlink{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}{object\+\_\+id}) const 
+\item 
+T \hyperlink{classmlnet_1_1_sorted_set_a09a806a0625594688d7551a3cd2b6b6c}{get} (\hyperlink{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}{object\+\_\+id}) const 
+\item 
+T \hyperlink{classmlnet_1_1_sorted_set_a2268be8183ea413d6c85a41051f8bc2e}{get\+\_\+at\+\_\+index} (long) const 
+\item 
+void \hyperlink{classmlnet_1_1_sorted_set_a463ccc94cdfb56b0c45c418f91067fc8}{insert} (\hyperlink{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}{object\+\_\+id}, T)
+\item 
+void \hyperlink{classmlnet_1_1_sorted_set_a0ff289209df1bc8f890078a31eca3e44}{erase} (\hyperlink{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}{object\+\_\+id})
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class T$>$class mlnet\+::\+Sorted\+Set$<$ T $>$}
+
+Sorted Set A \hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set} is a class used to store a set of components that\+:
+\begin{DoxyEnumerate}
+\item can be accessed by id in log time.
+\item can be accessed by index (position) in the set in constant time.
+\item can be accessed using a const iterator, so that it is not necessary to duplicate them. As an example, it is not necessary to duplicate nodes when the neighbors of a node are accessed\+: a \hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set} on those nodes is returned instead.
+\end{DoxyEnumerate}
+
+A \hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set} is implemented as a skip list.
+
+A \hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set} is a class used to store a set of components that\+:
+\begin{DoxyEnumerate}
+\item can be accessed by id in log time.
+\item can be accessed by index (position) in the set in constant time.
+\item can be accessed using a const iterator, so that it is not necessary to duplicate them. As an example, it is not necessary to duplicate nodes when the neighbors of a node are accessed\+: a \hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set} on those nodes is returned instead.
+\end{DoxyEnumerate}
+
+A \hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set} is implemented as a skip list. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classmlnet_1_1_sorted_set_a15e228958332c123992f64df476324a3}{\index{mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}!begin@{begin}}
+\index{begin@{begin}!mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}}
+\subsubsection[{begin}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ {\bf Sorted\+Set}$<$ T $>$\+::{\bf iterator} Sorted\+Set\+::begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classmlnet_1_1_sorted_set_a15e228958332c123992f64df476324a3}
+Returns an iterator to the first object in the collection \hypertarget{classmlnet_1_1_sorted_set_a8d3dc2becc4da73e27ca44ef3dc0112c}{\index{mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}!contains@{contains}}
+\index{contains@{contains}!mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}}
+\subsubsection[{contains}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ bool Sorted\+Set\+::contains (
+\begin{DoxyParamCaption}
+\item[{{\bf object\+\_\+id}}]{search\+\_\+value}
+\end{DoxyParamCaption}
+) const}}\label{classmlnet_1_1_sorted_set_a8d3dc2becc4da73e27ca44ef3dc0112c}
+Returns true if an obect with the input id is present in the collection \hypertarget{classmlnet_1_1_sorted_set_ac88f8211ad1c259ee564320964085b58}{\index{mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}!end@{end}}
+\index{end@{end}!mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}}
+\subsubsection[{end}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ {\bf Sorted\+Set}$<$ T $>$\+::{\bf iterator} Sorted\+Set\+::end (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classmlnet_1_1_sorted_set_ac88f8211ad1c259ee564320964085b58}
+Returns an iterator after the last object in the collection \hypertarget{classmlnet_1_1_sorted_set_a0ff289209df1bc8f890078a31eca3e44}{\index{mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}!erase@{erase}}
+\index{erase@{erase}!mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}}
+\subsubsection[{erase}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ void Sorted\+Set\+::erase (
+\begin{DoxyParamCaption}
+\item[{{\bf object\+\_\+id}}]{value}
+\end{DoxyParamCaption}
+)}}\label{classmlnet_1_1_sorted_set_a0ff289209df1bc8f890078a31eca3e44}
+Removes the input object from the collection \hypertarget{classmlnet_1_1_sorted_set_a09a806a0625594688d7551a3cd2b6b6c}{\index{mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}!get@{get}}
+\index{get@{get}!mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}}
+\subsubsection[{get}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ T Sorted\+Set\+::get (
+\begin{DoxyParamCaption}
+\item[{{\bf object\+\_\+id}}]{search\+\_\+value}
+\end{DoxyParamCaption}
+) const}}\label{classmlnet_1_1_sorted_set_a09a806a0625594688d7551a3cd2b6b6c}
+Returns the obect with the input id if it is present in the collection, or N\+U\+L\+L \hypertarget{classmlnet_1_1_sorted_set_a2268be8183ea413d6c85a41051f8bc2e}{\index{mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}!get\+\_\+at\+\_\+index@{get\+\_\+at\+\_\+index}}
+\index{get\+\_\+at\+\_\+index@{get\+\_\+at\+\_\+index}!mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}}
+\subsubsection[{get\+\_\+at\+\_\+index}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ T Sorted\+Set\+::get\+\_\+at\+\_\+index (
+\begin{DoxyParamCaption}
+\item[{long}]{pos}
+\end{DoxyParamCaption}
+) const}}\label{classmlnet_1_1_sorted_set_a2268be8183ea413d6c85a41051f8bc2e}
+Returns the obect at the given position in the collection, or N\+U\+L\+L \hypertarget{classmlnet_1_1_sorted_set_a463ccc94cdfb56b0c45c418f91067fc8}{\index{mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}!insert@{insert}}
+\index{insert@{insert}!mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}}
+\subsubsection[{insert}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void Sorted\+Set\+::insert (
+\begin{DoxyParamCaption}
+\item[{{\bf object\+\_\+id}}]{value, }
+\item[{T}]{obj\+\_\+ptr}
+\end{DoxyParamCaption}
+)}}\label{classmlnet_1_1_sorted_set_a463ccc94cdfb56b0c45c418f91067fc8}
+Inserts a new object in the collection \hypertarget{classmlnet_1_1_sorted_set_acd1e6023e51870488b53738d3609c784}{\index{mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}!size@{size}}
+\index{size@{size}!mlnet\+::\+Sorted\+Set@{mlnet\+::\+Sorted\+Set}}
+\subsubsection[{size}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ long Sorted\+Set\+::size (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classmlnet_1_1_sorted_set_acd1e6023e51870488b53738d3609c784}
+Returns the number of objects in the collection 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/datastructures.\+h\item 
+include/sortedset.\+cpp\end{DoxyCompactItemize}

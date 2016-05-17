@@ -1,0 +1,435 @@
+\hypertarget{namespacemlnet}{\section{mlnet Namespace Reference}
+\label{namespacemlnet}\index{mlnet@{mlnet}}
+}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classmlnet_1_1actor}{actor}
+\item 
+class \hyperlink{classmlnet_1_1_attribute}{Attribute}
+\item 
+class \hyperlink{classmlnet_1_1_attribute_store}{Attribute\+Store}
+\item 
+class \hyperlink{classmlnet_1_1_b_a_evolution_model}{B\+A\+Evolution\+Model}
+\begin{DoxyCompactList}\small\item\em Grows a network by first creating a complete graph with m0 vertexes, then adding a new vertex at a time and connecting it to m other vertexes chosen with a probability proportional to their degree. \end{DoxyCompactList}\item 
+class \hyperlink{classmlnet_1_1basic__component}{basic\+\_\+component}
+\item 
+class \hyperlink{classmlnet_1_1distance}{distance}
+\item 
+class \hyperlink{classmlnet_1_1edge}{edge}
+\item 
+class \hyperlink{classmlnet_1_1_entry}{Entry}
+\item 
+class \hyperlink{classmlnet_1_1_evolution_model}{Evolution\+Model}
+\item 
+class \hyperlink{classmlnet_1_1layer}{layer}
+\item 
+class \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network}
+\item 
+class \hyperlink{classmlnet_1_1named__component}{named\+\_\+component}
+\item 
+class \hyperlink{classmlnet_1_1node}{node}
+\item 
+class \hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set}
+\item 
+class \hyperlink{classmlnet_1_1_uniform_evolution_model}{Uniform\+Evolution\+Model}
+\begin{DoxyCompactList}\small\item\em Grows a network by first creating all the vertexes and then at every step choosing two (uniform probability) to connect with an edge. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::shared\+\_\+ptr\\*
+$<$ \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} $>$ \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr}
+\item 
+typedef std\+::shared\+\_\+ptr$<$ const \\*
+\hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} $>$ \hyperlink{namespacemlnet_ae262c8b9dd013ed449c114a5dfba5743}{const\+M\+L\+Network\+Shared\+Ptr}
+\item 
+typedef long \hyperlink{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}{object\+\_\+id}
+\item 
+typedef \hyperlink{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}{object\+\_\+id} \hyperlink{namespacemlnet_a4c354f08ca868982bf3ddae882ff71c6}{node\+\_\+id}
+\item 
+typedef \hyperlink{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}{object\+\_\+id} \hyperlink{namespacemlnet_ad708e58e72680351e102e6b3d0489145}{edge\+\_\+id}
+\item 
+typedef \hyperlink{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}{object\+\_\+id} \hyperlink{namespacemlnet_a84ad9c6056f0eb7d129995351f9b13fb}{layer\+\_\+id}
+\item 
+typedef \hyperlink{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}{object\+\_\+id} \hyperlink{namespacemlnet_a1d557bff46b627f1d7f6ff613302bba5}{actor\+\_\+id}
+\item 
+typedef std\+::shared\+\_\+ptr$<$ \hyperlink{classmlnet_1_1actor}{actor} $>$ \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr}
+\item 
+typedef std\+::shared\+\_\+ptr$<$ \hyperlink{classmlnet_1_1layer}{layer} $>$ \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr}
+\item 
+typedef std\+::shared\+\_\+ptr$<$ \hyperlink{classmlnet_1_1node}{node} $>$ \hyperlink{namespacemlnet_acf8b1b6deb52e7dacfc676c689f9a10c}{Node\+Shared\+Ptr}
+\item 
+typedef std\+::shared\+\_\+ptr$<$ \hyperlink{classmlnet_1_1edge}{edge} $>$ \hyperlink{namespacemlnet_a33e88c3df9bea691a269d5e5d8bea57d}{Edge\+Shared\+Ptr}
+\item 
+typedef std\+::shared\+\_\+ptr\\*
+$<$ \hyperlink{classmlnet_1_1_attribute}{Attribute} $>$ \hyperlink{namespacemlnet_a760c8b8d6997e73350446bafff35e6d6}{Attribute\+Shared\+Ptr}
+\item 
+typedef std\+::shared\+\_\+ptr\\*
+$<$ \hyperlink{classmlnet_1_1_attribute_store}{Attribute\+Store} $>$ \hyperlink{namespacemlnet_a3d60b9ef6ef6489d000f6061e0a1bdf2}{Attribute\+Store\+Shared\+Ptr}
+\item 
+\hypertarget{namespacemlnet_ab2f8c10cae38d1bd0f2d438d7f35ab9e}{typedef int {\bfseries evolution\+\_\+strategy}}\label{namespacemlnet_ab2f8c10cae38d1bd0f2d438d7f35ab9e}
+
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} \{ {\bfseries I\+N\+O\+U\+T} =0, 
+{\bfseries I\+N} =1, 
+{\bfseries O\+U\+T} =2
+ \}
+\item 
+enum \hyperlink{namespacemlnet_a8bd10c6e8e4d27ef4d974b3f576a3a06}{attribute\+\_\+type} \{ {\bfseries S\+T\+R\+I\+N\+G\+\_\+\+T\+Y\+P\+E} = 0, 
+{\bfseries N\+U\+M\+E\+R\+I\+C\+\_\+\+T\+Y\+P\+E} = 1
+ \}
+\item 
+enum \hyperlink{namespacemlnet_ac59b03c9fd702da21a0c3c2a4bba57c9}{comparison\+\_\+type} \{ {\bfseries F\+U\+L\+L\+\_\+\+C\+O\+M\+P\+A\+R\+I\+S\+O\+N} = 0, 
+{\bfseries S\+W\+I\+T\+C\+H\+\_\+\+C\+O\+M\+P\+A\+R\+I\+S\+O\+N} = 1, 
+{\bfseries M\+U\+L\+T\+I\+P\+L\+E\+X\+\_\+\+C\+O\+M\+P\+A\+R\+I\+S\+O\+N} = 2, 
+{\bfseries S\+I\+M\+P\+L\+E\+\_\+\+C\+O\+M\+P\+A\+R\+I\+S\+O\+N} = 3
+ \}
+\item 
+enum \hyperlink{namespacemlnet_a49cbf481a06184d43958acdfc5d4fc60}{domination} \{ {\bfseries P\+\_\+\+D\+O\+M\+I\+N\+A\+T\+E\+D} =0, 
+{\bfseries P\+\_\+\+E\+Q\+U\+A\+L} =1, 
+{\bfseries P\+\_\+\+I\+N\+C\+O\+M\+P\+A\+R\+A\+B\+L\+E} =2, 
+{\bfseries P\+\_\+\+D\+O\+M\+I\+N\+A\+T\+E\+S} =3
+ \}
+\begin{DoxyCompactList}\small\item\em Constructs a. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{namespacemlnet_abb09784aac230fec8b1d2aa37278de7f}{void {\bfseries girwan\+\_\+newman} (\hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \&mnet, std\+::map$<$ \hyperlink{namespacemlnet_a84ad9c6056f0eb7d129995351f9b13fb}{layer\+\_\+id}, std\+::map$<$ \hyperlink{namespacemlnet_a4c354f08ca868982bf3ddae882ff71c6}{node\+\_\+id}, long $>$ $>$ \&communities)}\label{namespacemlnet_abb09784aac230fec8b1d2aa37278de7f}
+
+\item 
+entity\+\_\+id \hyperlink{namespacemlnet_adfaf99de2fa770d34c3ef57cc4420a3f}{choice\+\_\+uniform} (Random rand, \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \&mnet)
+\item 
+\hypertarget{namespacemlnet_aa63606c3c7ab8b69a0196c2cc4267eb2}{\hyperlink{namespacemlnet_a4c354f08ca868982bf3ddae882ff71c6}{node\+\_\+id} {\bfseries choice\+\_\+uniform} (Random rand, \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \&mnet, \hyperlink{namespacemlnet_a84ad9c6056f0eb7d129995351f9b13fb}{layer\+\_\+id} net)}\label{namespacemlnet_aa63606c3c7ab8b69a0196c2cc4267eb2}
+
+\item 
+\hypertarget{namespacemlnet_a295494c6027d62e98a6d1751ebf4f1e5}{\hyperlink{namespacemlnet_a4c354f08ca868982bf3ddae882ff71c6}{node\+\_\+id} {\bfseries choice\+\_\+common\+\_\+friends} (Random rand, \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \&mnet, \hyperlink{namespacemlnet_a84ad9c6056f0eb7d129995351f9b13fb}{layer\+\_\+id} net, \hyperlink{namespacemlnet_a4c354f08ca868982bf3ddae882ff71c6}{node\+\_\+id} vertex)}\label{namespacemlnet_a295494c6027d62e98a6d1751ebf4f1e5}
+
+\item 
+\hypertarget{namespacemlnet_a45b859e04c224ed33708cf5636826306}{\hyperlink{namespacemlnet_a4c354f08ca868982bf3ddae882ff71c6}{node\+\_\+id} {\bfseries choice\+\_\+degree} (Random rand, \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \&mnet, \hyperlink{namespacemlnet_a84ad9c6056f0eb7d129995351f9b13fb}{layer\+\_\+id} net)}\label{namespacemlnet_a45b859e04c224ed33708cf5636826306}
+
+\item 
+void \hyperlink{namespacemlnet_a2c2827feaeced0d47c7d4180e0204ca4}{evolve\+\_\+edge\+\_\+import} (\hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \&mnet, long num\+\_\+of\+\_\+steps, std\+::vector$<$ double $>$ pr\+\_\+no\+\_\+event, std\+::vector$<$ double $>$ pr\+\_\+internal\+\_\+event, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ dependency, std\+::vector$<$ \hyperlink{classmlnet_1_1_evolution_model}{Evolution\+Model} $\ast$ $>$ evolution\+\_\+model)
+\begin{DoxyCompactList}\small\item\em Grows the input multiplex network. \end{DoxyCompactList}\item 
+\hypertarget{namespacemlnet_adc031181ba00c2b421f33bbc25c1554a}{void {\bfseries evolve\+\_\+edge\+\_\+copy} (\hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \&mnet, long num\+\_\+of\+\_\+steps, std\+::vector$<$ double $>$ pr\+\_\+no\+\_\+event, std\+::vector$<$ double $>$ pr\+\_\+internal\+\_\+event, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ dependency, std\+::vector$<$ \hyperlink{classmlnet_1_1_evolution_model}{Evolution\+Model} $\ast$ $>$ evolution\+\_\+model)}\label{namespacemlnet_adc031181ba00c2b421f33bbc25c1554a}
+
+\item 
+\hypertarget{namespacemlnet_ae6e5b9458562f45633615a0cf41e982a}{void {\bfseries evolve} (\hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \&mnet, long num\+\_\+of\+\_\+steps, std\+::vector$<$ int $>$ num\+\_\+new\+\_\+vertexes\+\_\+per\+\_\+step, std\+::vector$<$ double $>$ pr\+\_\+internal\+\_\+event, std\+::vector$<$ evolution\+\_\+strategy $>$ strategy, std\+::vector$<$ double $>$ pr\+\_\+external\+\_\+event, std\+::vector$<$ std\+::vector$<$ double $>$ $>$ dependency)}\label{namespacemlnet_ae6e5b9458562f45633615a0cf41e982a}
+
+\item 
+\hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} \hyperlink{namespacemlnet_a282d13ae5c88b5a0f89798459bb2e500}{read\+\_\+multilayer} (const std\+::string \&infile, const std\+::string \&network\+\_\+name, char separator)
+\item 
+\hypertarget{namespacemlnet_ac7b268673765d5b2d7861a2fd799e051}{void {\bfseries write\+\_\+multilayer} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mlnet, const std\+::string \&outfile, char separator)}\label{namespacemlnet_ac7b268673765d5b2d7861a2fd799e051}
+
+\item 
+\hypertarget{namespacemlnet_ad9d70122d3cdde2bbd59caa41d5c9e9d}{void {\bfseries write\+\_\+graphml} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const std\+::set$<$ \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} $>$ \&layers, const std\+::string \&path)}\label{namespacemlnet_ad9d70122d3cdde2bbd59caa41d5c9e9d}
+
+\item 
+long \hyperlink{namespacemlnet_a50cfb15dd81a37b140f555047059915d}{degree} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const std\+::set$<$ \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} $>$ \&layers, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)
+\item 
+\hypertarget{namespacemlnet_ad21ac2760a442203e6bab2e5f84b244c}{long {\bfseries degree} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1layer}{layer}, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)}\label{namespacemlnet_ad21ac2760a442203e6bab2e5f84b244c}
+
+\item 
+\hypertarget{namespacemlnet_ac40e8ba818168953d656475c9030f7a9}{double {\bfseries degree\+\_\+mean} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const std\+::set$<$ \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} $>$ \&layers, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)}\label{namespacemlnet_ac40e8ba818168953d656475c9030f7a9}
+
+\item 
+\hypertarget{namespacemlnet_a51b9a01991bc0bcef7c09f0c67e2de91}{double {\bfseries degree\+\_\+deviation} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const std\+::set$<$ \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} $>$ \&layers, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)}\label{namespacemlnet_a51b9a01991bc0bcef7c09f0c67e2de91}
+
+\item 
+\hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set}$<$ \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} $>$ \hyperlink{namespacemlnet_a17c0af971ef94d327829ddf8255f635f}{neighbors} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const std\+::set$<$ \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} $>$ \&layers, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)
+\item 
+\hypertarget{namespacemlnet_a422e2ca4e1d47d1ca96fd53697883352}{\hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set}$<$ \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} $>$ {\bfseries neighbors} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1layer}{layer}, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)}\label{namespacemlnet_a422e2ca4e1d47d1ca96fd53697883352}
+
+\item 
+\hypertarget{namespacemlnet_aa5a15f09e636dd4b5a484ce84eeea30a}{\hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set}$<$ \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} $>$ {\bfseries xneighbors} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const std\+::set$<$ \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} $>$ \&layers, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)}\label{namespacemlnet_aa5a15f09e636dd4b5a484ce84eeea30a}
+
+\item 
+\hypertarget{namespacemlnet_a55b1a3041d94829d87f65e62df44255e}{\hyperlink{classmlnet_1_1_sorted_set}{Sorted\+Set}$<$ \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} $>$ {\bfseries xneighbors} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1layer}{layer}, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)}\label{namespacemlnet_a55b1a3041d94829d87f65e62df44255e}
+
+\item 
+double \hyperlink{namespacemlnet_a28c0d5d03edb3abfd351819a6280c3ba}{relevance} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const std\+::set$<$ \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} $>$ \&layers, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)
+\item 
+\hypertarget{namespacemlnet_aa5888d8d23fdd3b38193ce345fc079d9}{double {\bfseries relevance} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1layer}{layer}, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)}\label{namespacemlnet_aa5888d8d23fdd3b38193ce345fc079d9}
+
+\item 
+\hypertarget{namespacemlnet_a736008260840e6a991e74b13fcb6d245}{double {\bfseries xrelevance} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const std\+::set$<$ \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} $>$ \&layers, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)}\label{namespacemlnet_a736008260840e6a991e74b13fcb6d245}
+
+\item 
+\hypertarget{namespacemlnet_ab14639ef961ce6bcfcbfcfa2f7e688c4}{double {\bfseries xrelevance} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{Actor\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1actor}{actor}, const \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} \&\hyperlink{classmlnet_1_1layer}{layer}, \hyperlink{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{edge\+\_\+mode} mode)}\label{namespacemlnet_ab14639ef961ce6bcfcbfcfa2f7e688c4}
+
+\item 
+double \hyperlink{namespacemlnet_ac67126e07743387172dfdc8bca49534d}{network\+\_\+jaccard\+\_\+similarity} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const std\+::set$<$ \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} $>$ \&layers)
+\item 
+\hypertarget{namespacemlnet_ab1cc07d57abc29880ce1508d71ebf62e}{double {\bfseries network\+\_\+jaccard\+\_\+similarity} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const std\+::set$<$ std\+::string $>$ \&active\+\_\+networks)}\label{namespacemlnet_ab1cc07d57abc29880ce1508d71ebf62e}
+
+\item 
+\hypertarget{namespacemlnet_a01b6385edb10112a53804d04ec95cedf}{double {\bfseries network\+\_\+jaccard\+\_\+similarity} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} \&layer1, const \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} \&layer2)}\label{namespacemlnet_a01b6385edb10112a53804d04ec95cedf}
+
+\item 
+\hypertarget{namespacemlnet_a88f5708c994054200f814a94e2ce1bef}{double {\bfseries network\+\_\+jaccard\+\_\+similarity} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const std\+::string \&network\+\_\+name1, const std\+::string \&network\+\_\+name2)}\label{namespacemlnet_a88f5708c994054200f814a94e2ce1bef}
+
+\item 
+\hypertarget{namespacemlnet_ac4c4b88ac2629fddbcbe764709c51c15}{double {\bfseries network\+\_\+coverage} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const std\+::set$<$ \hyperlink{namespacemlnet_a84ad9c6056f0eb7d129995351f9b13fb}{layer\+\_\+id} $>$ \&n1, const std\+::set$<$ \hyperlink{namespacemlnet_a84ad9c6056f0eb7d129995351f9b13fb}{layer\+\_\+id} $>$ \&n2)}\label{namespacemlnet_ac4c4b88ac2629fddbcbe764709c51c15}
+
+\item 
+\hypertarget{namespacemlnet_a522620b695244aa276e959a54bf2c246}{double {\bfseries network\+\_\+coverage} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const std\+::set$<$ std\+::string $>$ \&n1, const std\+::set$<$ std\+::string $>$ \&n2)}\label{namespacemlnet_a522620b695244aa276e959a54bf2c246}
+
+\item 
+\hypertarget{namespacemlnet_aa57d968a779ee583c07d5ab74c3c5831}{double {\bfseries network\+\_\+coverage} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} \&layer1, const \hyperlink{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{Layer\+Shared\+Ptr} \&layer2)}\label{namespacemlnet_aa57d968a779ee583c07d5ab74c3c5831}
+
+\item 
+\hypertarget{namespacemlnet_a03f1a48667bf3a754aec66cb1849d26d}{double {\bfseries network\+\_\+coverage} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, const std\+::string \&network\+\_\+name1, const std\+::string \&network\+\_\+name2)}\label{namespacemlnet_a03f1a48667bf3a754aec66cb1849d26d}
+
+\item 
+double \hyperlink{namespacemlnet_aac120ae00185742397a27608597e09c7}{modularity} (const \hyperlink{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{M\+L\+Network\+Shared\+Ptr} mnet, std\+::map$<$ \hyperlink{namespacemlnet_a84ad9c6056f0eb7d129995351f9b13fb}{layer\+\_\+id}, std\+::map$<$ \hyperlink{namespacemlnet_a1d557bff46b627f1d7f6ff613302bba5}{actor\+\_\+id}, long $>$ $>$ \&communities, double c)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const bool \hyperlink{namespacemlnet_aac7f43aa0ec7157757c5a0e694e97706}{D\+E\+F\+A\+U\+L\+T\+\_\+\+E\+D\+G\+E\+\_\+\+D\+I\+R\+E\+C\+T\+I\+O\+N\+A\+L\+I\+T\+Y} = false
+\item 
+\hypertarget{namespacemlnet_a2ca45ff3813296ab392ec3c0ac1ede26}{const int {\bfseries E\+V\+O\+L\+U\+T\+I\+O\+N\+\_\+\+D\+E\+G\+R\+E\+E} =0}\label{namespacemlnet_a2ca45ff3813296ab392ec3c0ac1ede26}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{datastructures_8h_source}{datastructures.\+h}
+
+Author\+: Matteo Magnani \href{mailto:matteo.magnani@it.uu.se}{\tt matteo.\+magnani@it.\+uu.\+se} Version\+: 1.\+0
+
+This file defines the basic data structures of the library. It includes\+:
+
+
+\begin{DoxyEnumerate}
+\item \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} (where M\+L stands for multilayer), the main class defined in this file.
+\item Basic components of a \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} (layer, node, edge, actor). An actor represents a global identity, and multiple nodes (organized into multiple layers) can correspond to the same actor. An example is an individual (actor) with multiple accounts (nodes) on different online social networks (layers).
+\item An Object\+Set class, to store a set of pointers to basic network components. This class is optimized so that\+: (a) Functions potentially returning many pointers to entities (e.\+g., \char`\"{}return all neighbors of a node\char`\"{}) do not directly return all the pointers, but only an object that allows to iterate over them. (b) It allows efficient (log n) selection both by key and by position, which is useful e.\+g. to randomly select objects in the M\+L network.
+\item An \hyperlink{classmlnet_1_1_attribute_store}{Attribute\+Store} class, to associate attributes to different objects (actors, nodes...) in the \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network}, together with a class \hyperlink{classmlnet_1_1_attribute}{Attribute} to represent metadata.
+\item Smart pointers to all these objects. Only one instance of each entity (e.\+g., node) is kept in memory, and can be accessed through multiple indexes (e.\+g., by I\+D, by name) storing pointers to the entities. Functions accessing the \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network}'s components return pointers as well, so that the objects are never duplicated after their creation.
+\end{DoxyEnumerate}
+
+All the definitions are in the \char`\"{}mlnet\char`\"{} namespace
+
+This module defines a generic network co-\/evolution process.
+
+The function \char`\"{}evolve\char`\"{} takes a multiplex network as input and at every step updates each of its networks taking one of the following actions\+: 1) no action (the network remains unchanged -\/ used to set different evolution speeds) 2) internal evolution (the network evolves according to some internal dynamics) 3) external evolution (the network imports vertexes and edges from another) 
+
+\subsection{Typedef Documentation}
+\hypertarget{namespacemlnet_a1d557bff46b627f1d7f6ff613302bba5}{\index{mlnet@{mlnet}!actor\+\_\+id@{actor\+\_\+id}}
+\index{actor\+\_\+id@{actor\+\_\+id}!mlnet@{mlnet}}
+\subsubsection[{actor\+\_\+id}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf object\+\_\+id} {\bf mlnet\+::actor\+\_\+id}}}\label{namespacemlnet_a1d557bff46b627f1d7f6ff613302bba5}
+Nodes in different layers may correspond to the same \char`\"{}actor\char`\"{}, e.\+g., a person (actor) can have multiple accounts (nodes) on different social media (layers) \hypertarget{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}{\index{mlnet@{mlnet}!Actor\+Shared\+Ptr@{Actor\+Shared\+Ptr}}
+\index{Actor\+Shared\+Ptr@{Actor\+Shared\+Ptr}!mlnet@{mlnet}}
+\subsubsection[{Actor\+Shared\+Ptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::shared\+\_\+ptr$<${\bf actor}$>$ {\bf mlnet\+::\+Actor\+Shared\+Ptr}}}\label{namespacemlnet_a714fd98ffaeaadd5c38d61fa53dc4d24}
+A smart pointer to objects of type actor \hypertarget{namespacemlnet_a760c8b8d6997e73350446bafff35e6d6}{\index{mlnet@{mlnet}!Attribute\+Shared\+Ptr@{Attribute\+Shared\+Ptr}}
+\index{Attribute\+Shared\+Ptr@{Attribute\+Shared\+Ptr}!mlnet@{mlnet}}
+\subsubsection[{Attribute\+Shared\+Ptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::shared\+\_\+ptr$<${\bf Attribute}$>$ {\bf mlnet\+::\+Attribute\+Shared\+Ptr}}}\label{namespacemlnet_a760c8b8d6997e73350446bafff35e6d6}
+A smart pointer to objects of type \hyperlink{classmlnet_1_1_attribute}{Attribute} \hypertarget{namespacemlnet_a3d60b9ef6ef6489d000f6061e0a1bdf2}{\index{mlnet@{mlnet}!Attribute\+Store\+Shared\+Ptr@{Attribute\+Store\+Shared\+Ptr}}
+\index{Attribute\+Store\+Shared\+Ptr@{Attribute\+Store\+Shared\+Ptr}!mlnet@{mlnet}}
+\subsubsection[{Attribute\+Store\+Shared\+Ptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::shared\+\_\+ptr$<${\bf Attribute\+Store}$>$ {\bf mlnet\+::\+Attribute\+Store\+Shared\+Ptr}}}\label{namespacemlnet_a3d60b9ef6ef6489d000f6061e0a1bdf2}
+A smart pointer to objects of type \hyperlink{classmlnet_1_1_attribute_store}{Attribute\+Store} \hypertarget{namespacemlnet_ae262c8b9dd013ed449c114a5dfba5743}{\index{mlnet@{mlnet}!const\+M\+L\+Network\+Shared\+Ptr@{const\+M\+L\+Network\+Shared\+Ptr}}
+\index{const\+M\+L\+Network\+Shared\+Ptr@{const\+M\+L\+Network\+Shared\+Ptr}!mlnet@{mlnet}}
+\subsubsection[{const\+M\+L\+Network\+Shared\+Ptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::shared\+\_\+ptr$<$const {\bf M\+L\+Network}$>$ {\bf mlnet\+::const\+M\+L\+Network\+Shared\+Ptr}}}\label{namespacemlnet_ae262c8b9dd013ed449c114a5dfba5743}
+A smart pointer to constant objects of type \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \hypertarget{namespacemlnet_ad708e58e72680351e102e6b3d0489145}{\index{mlnet@{mlnet}!edge\+\_\+id@{edge\+\_\+id}}
+\index{edge\+\_\+id@{edge\+\_\+id}!mlnet@{mlnet}}
+\subsubsection[{edge\+\_\+id}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf object\+\_\+id} {\bf mlnet\+::edge\+\_\+id}}}\label{namespacemlnet_ad708e58e72680351e102e6b3d0489145}
+The unique identifier of each edge inside a \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \hypertarget{namespacemlnet_a33e88c3df9bea691a269d5e5d8bea57d}{\index{mlnet@{mlnet}!Edge\+Shared\+Ptr@{Edge\+Shared\+Ptr}}
+\index{Edge\+Shared\+Ptr@{Edge\+Shared\+Ptr}!mlnet@{mlnet}}
+\subsubsection[{Edge\+Shared\+Ptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::shared\+\_\+ptr$<${\bf edge}$>$ {\bf mlnet\+::\+Edge\+Shared\+Ptr}}}\label{namespacemlnet_a33e88c3df9bea691a269d5e5d8bea57d}
+A smart pointer to objects of type edge \hypertarget{namespacemlnet_a84ad9c6056f0eb7d129995351f9b13fb}{\index{mlnet@{mlnet}!layer\+\_\+id@{layer\+\_\+id}}
+\index{layer\+\_\+id@{layer\+\_\+id}!mlnet@{mlnet}}
+\subsubsection[{layer\+\_\+id}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf object\+\_\+id} {\bf mlnet\+::layer\+\_\+id}}}\label{namespacemlnet_a84ad9c6056f0eb7d129995351f9b13fb}
+The unique identifier of each layer in a \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network}. Every node belongs to exactly one layer \hypertarget{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}{\index{mlnet@{mlnet}!Layer\+Shared\+Ptr@{Layer\+Shared\+Ptr}}
+\index{Layer\+Shared\+Ptr@{Layer\+Shared\+Ptr}!mlnet@{mlnet}}
+\subsubsection[{Layer\+Shared\+Ptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::shared\+\_\+ptr$<${\bf layer}$>$ {\bf mlnet\+::\+Layer\+Shared\+Ptr}}}\label{namespacemlnet_a10c007fb811c55339dd5b9d32bb0505d}
+A smart pointer to objects of type layer \hypertarget{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}{\index{mlnet@{mlnet}!M\+L\+Network\+Shared\+Ptr@{M\+L\+Network\+Shared\+Ptr}}
+\index{M\+L\+Network\+Shared\+Ptr@{M\+L\+Network\+Shared\+Ptr}!mlnet@{mlnet}}
+\subsubsection[{M\+L\+Network\+Shared\+Ptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::shared\+\_\+ptr$<${\bf M\+L\+Network}$>$ {\bf mlnet\+::\+M\+L\+Network\+Shared\+Ptr}}}\label{namespacemlnet_aa6d3fa87865bcde4d1283abb1942cbbb}
+A smart pointer to objects of type \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \hypertarget{namespacemlnet_a4c354f08ca868982bf3ddae882ff71c6}{\index{mlnet@{mlnet}!node\+\_\+id@{node\+\_\+id}}
+\index{node\+\_\+id@{node\+\_\+id}!mlnet@{mlnet}}
+\subsubsection[{node\+\_\+id}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf object\+\_\+id} {\bf mlnet\+::node\+\_\+id}}}\label{namespacemlnet_a4c354f08ca868982bf3ddae882ff71c6}
+The unique identifier of each node inside a \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} \hypertarget{namespacemlnet_acf8b1b6deb52e7dacfc676c689f9a10c}{\index{mlnet@{mlnet}!Node\+Shared\+Ptr@{Node\+Shared\+Ptr}}
+\index{Node\+Shared\+Ptr@{Node\+Shared\+Ptr}!mlnet@{mlnet}}
+\subsubsection[{Node\+Shared\+Ptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::shared\+\_\+ptr$<${\bf node}$>$ {\bf mlnet\+::\+Node\+Shared\+Ptr}}}\label{namespacemlnet_acf8b1b6deb52e7dacfc676c689f9a10c}
+A smart pointer to objects of type node \hypertarget{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}{\index{mlnet@{mlnet}!object\+\_\+id@{object\+\_\+id}}
+\index{object\+\_\+id@{object\+\_\+id}!mlnet@{mlnet}}
+\subsubsection[{object\+\_\+id}]{\setlength{\rightskip}{0pt plus 5cm}typedef long {\bf mlnet\+::object\+\_\+id}}}\label{namespacemlnet_a318fc9bfdb74e1da4d44d0c50d4a453d}
+\hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} components A generic identifier for all objects in a \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} (nodes, edges, ...) 
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{namespacemlnet_a8bd10c6e8e4d27ef4d974b3f576a3a06}{\index{mlnet@{mlnet}!attribute\+\_\+type@{attribute\+\_\+type}}
+\index{attribute\+\_\+type@{attribute\+\_\+type}!mlnet@{mlnet}}
+\subsubsection[{attribute\+\_\+type}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf mlnet\+::attribute\+\_\+type}}}\label{namespacemlnet_a8bd10c6e8e4d27ef4d974b3f576a3a06}
+Supported attribute types \hypertarget{namespacemlnet_ac59b03c9fd702da21a0c3c2a4bba57c9}{\index{mlnet@{mlnet}!comparison\+\_\+type@{comparison\+\_\+type}}
+\index{comparison\+\_\+type@{comparison\+\_\+type}!mlnet@{mlnet}}
+\subsubsection[{comparison\+\_\+type}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf mlnet\+::comparison\+\_\+type}}}\label{namespacemlnet_ac59b03c9fd702da21a0c3c2a4bba57c9}
+Type of comparison between multidimensional distances, considering more or less information \hypertarget{namespacemlnet_a49cbf481a06184d43958acdfc5d4fc60}{\index{mlnet@{mlnet}!domination@{domination}}
+\index{domination@{domination}!mlnet@{mlnet}}
+\subsubsection[{domination}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf mlnet\+::domination}}}\label{namespacemlnet_a49cbf481a06184d43958acdfc5d4fc60}
+
+
+Constructs a. 
+
+Distance 
+\begin{DoxyExceptions}{Exceptions}
+{\em \hyperlink{class_element_not_found_exception}{Element\+Not\+Found\+Exception}} & if the input elements are not present in the network \\
+\hline
+{\em \hyperlink{class_operation_not_supported_exception}{Operation\+Not\+Supported\+Exception}} & if the two nodes lay on the same network\+Paths Outcome of the comparison between two numbers, or vectors, or matrices... \\
+\hline
+\end{DoxyExceptions}
+\hypertarget{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}{\index{mlnet@{mlnet}!edge\+\_\+mode@{edge\+\_\+mode}}
+\index{edge\+\_\+mode@{edge\+\_\+mode}!mlnet@{mlnet}}
+\subsubsection[{edge\+\_\+mode}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf mlnet\+::edge\+\_\+mode}}}\label{namespacemlnet_aa4ac93b948a2c3582aeead3f1c4ff022}
+Selection mode, for directed edges (e.\+g., to compute the I\+N-\/degree or O\+U\+T-\/degree of a node) 
+
+\subsection{Function Documentation}
+\hypertarget{namespacemlnet_adfaf99de2fa770d34c3ef57cc4420a3f}{\index{mlnet@{mlnet}!choice\+\_\+uniform@{choice\+\_\+uniform}}
+\index{choice\+\_\+uniform@{choice\+\_\+uniform}!mlnet@{mlnet}}
+\subsubsection[{choice\+\_\+uniform}]{\setlength{\rightskip}{0pt plus 5cm}entity\+\_\+id mlnet\+::choice\+\_\+uniform (
+\begin{DoxyParamCaption}
+\item[{Random}]{rand, }
+\item[{M\+L\+Network \&}]{mnet}
+\end{DoxyParamCaption}
+)}}\label{namespacemlnet_adfaf99de2fa770d34c3ef57cc4420a3f}
+edge closure strategy \hypertarget{namespacemlnet_a50cfb15dd81a37b140f555047059915d}{\index{mlnet@{mlnet}!degree@{degree}}
+\index{degree@{degree}!mlnet@{mlnet}}
+\subsubsection[{degree}]{\setlength{\rightskip}{0pt plus 5cm}long mlnet\+::degree (
+\begin{DoxyParamCaption}
+\item[{const M\+L\+Network\+Shared\+Ptr}]{mnet, }
+\item[{const Actor\+Shared\+Ptr \&}]{actor, }
+\item[{const std\+::set$<$ Layer\+Shared\+Ptr $>$ \&}]{layers, }
+\item[{edge\+\_\+mode}]{mode}
+\end{DoxyParamCaption}
+)}}\label{namespacemlnet_a50cfb15dd81a37b140f555047059915d}
+Degree \hypertarget{namespacemlnet_a2c2827feaeced0d47c7d4180e0204ca4}{\index{mlnet@{mlnet}!evolve\+\_\+edge\+\_\+import@{evolve\+\_\+edge\+\_\+import}}
+\index{evolve\+\_\+edge\+\_\+import@{evolve\+\_\+edge\+\_\+import}!mlnet@{mlnet}}
+\subsubsection[{evolve\+\_\+edge\+\_\+import}]{\setlength{\rightskip}{0pt plus 5cm}void mlnet\+::evolve\+\_\+edge\+\_\+import (
+\begin{DoxyParamCaption}
+\item[{M\+L\+Network \&}]{mnet, }
+\item[{long}]{num\+\_\+of\+\_\+steps, }
+\item[{std\+::vector$<$ double $>$}]{pr\+\_\+no\+\_\+event, }
+\item[{std\+::vector$<$ double $>$}]{pr\+\_\+internal\+\_\+event, }
+\item[{std\+::vector$<$ std\+::vector$<$ double $>$ $>$}]{dependency, }
+\item[{std\+::vector$<$ Evolution\+Model $\ast$ $>$}]{evolution\+\_\+model}
+\end{DoxyParamCaption}
+)}}\label{namespacemlnet_a2c2827feaeced0d47c7d4180e0204ca4}
+
+
+Grows the input multiplex network. 
+
+Evolution method 
+\begin{DoxyParams}{Parameters}
+{\em mnet} & \hyperlink{classmlnet_1_1_m_l_network}{M\+L\+Network} to grow \\
+\hline
+{\em num\+\_\+of\+\_\+steps} & number of evolution steps \\
+\hline
+{\em pr\+\_\+no\+\_\+event\mbox{[}$\,$\mbox{]}} & for each network, the probability that an evolution step does not change the network \\
+\hline
+{\em pr\+\_\+internal\+\_\+event\mbox{[}$\,$\mbox{]}} & for each network, the probability that if something happens this is an internal evolution according to the evolution\+\_\+model\mbox{[}\mbox{]} parameter \\
+\hline
+{\em dependency\mbox{[}$\,$\mbox{]}\mbox{[}$\,$\mbox{]}} & The (i,j) element of this matrix indicates the probability that, given an external evolution event, network i will consider network j as a potential candidate to import edges from \\
+\hline
+{\em evolution\+\_\+model\mbox{[}$\,$\mbox{]}} & for each network, a specification of how the network should evolve when an internal event happens \\
+\hline
+\end{DoxyParams}
+\hypertarget{namespacemlnet_aac120ae00185742397a27608597e09c7}{\index{mlnet@{mlnet}!modularity@{modularity}}
+\index{modularity@{modularity}!mlnet@{mlnet}}
+\subsubsection[{modularity}]{\setlength{\rightskip}{0pt plus 5cm}double mlnet\+::modularity (
+\begin{DoxyParamCaption}
+\item[{const M\+L\+Network\+Shared\+Ptr}]{mnet, }
+\item[{std\+::map$<$ layer\+\_\+id, std\+::map$<$ actor\+\_\+id, long $>$ $>$ \&}]{communities, }
+\item[{double}]{c}
+\end{DoxyParamCaption}
+)}}\label{namespacemlnet_aac120ae00185742397a27608597e09c7}
+Distances Betweenness Clustering \hypertarget{namespacemlnet_a17c0af971ef94d327829ddf8255f635f}{\index{mlnet@{mlnet}!neighbors@{neighbors}}
+\index{neighbors@{neighbors}!mlnet@{mlnet}}
+\subsubsection[{neighbors}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Sorted\+Set}$<${\bf Actor\+Shared\+Ptr}$>$ mlnet\+::neighbors (
+\begin{DoxyParamCaption}
+\item[{const M\+L\+Network\+Shared\+Ptr}]{mnet, }
+\item[{const Actor\+Shared\+Ptr \&}]{actor, }
+\item[{const std\+::set$<$ Layer\+Shared\+Ptr $>$ \&}]{layers, }
+\item[{edge\+\_\+mode}]{mode}
+\end{DoxyParamCaption}
+)}}\label{namespacemlnet_a17c0af971ef94d327829ddf8255f635f}
+Neighborhood \hypertarget{namespacemlnet_ac67126e07743387172dfdc8bca49534d}{\index{mlnet@{mlnet}!network\+\_\+jaccard\+\_\+similarity@{network\+\_\+jaccard\+\_\+similarity}}
+\index{network\+\_\+jaccard\+\_\+similarity@{network\+\_\+jaccard\+\_\+similarity}!mlnet@{mlnet}}
+\subsubsection[{network\+\_\+jaccard\+\_\+similarity}]{\setlength{\rightskip}{0pt plus 5cm}double mlnet\+::network\+\_\+jaccard\+\_\+similarity (
+\begin{DoxyParamCaption}
+\item[{const M\+L\+Network\+Shared\+Ptr}]{mnet, }
+\item[{const std\+::set$<$ Layer\+Shared\+Ptr $>$ \&}]{layers}
+\end{DoxyParamCaption}
+)}}\label{namespacemlnet_ac67126e07743387172dfdc8bca49534d}
+Network comparison \hypertarget{namespacemlnet_a282d13ae5c88b5a0f89798459bb2e500}{\index{mlnet@{mlnet}!read\+\_\+multilayer@{read\+\_\+multilayer}}
+\index{read\+\_\+multilayer@{read\+\_\+multilayer}!mlnet@{mlnet}}
+\subsubsection[{read\+\_\+multilayer}]{\setlength{\rightskip}{0pt plus 5cm}{\bf M\+L\+Network\+Shared\+Ptr} mlnet\+::read\+\_\+multilayer (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{infile, }
+\item[{const std\+::string \&}]{network\+\_\+name, }
+\item[{char}]{separator}
+\end{DoxyParamCaption}
+)}}\label{namespacemlnet_a282d13ae5c88b5a0f89798459bb2e500}
+Reads a multiplex network from a list of edges.
+
+\subsubsection*{This is the accepted format\+: }
+
+-- comment lines start with two dashes (--)
+
+\#\+T\+Y\+P\+E \mbox{[}multiplex$\vert$multilayer\mbox{]}
+
+\#\+L\+A\+Y\+E\+R\+S Layer\+Name,U\+N\+D\+I\+R\+E\+C\+T\+E\+D Layer\+Name,D\+I\+R\+E\+C\+T\+E\+D -- etc. -- If there are inter-\/layer edges, then their default directionality is indicated here\+: Layer\+Name1,Layer\+Name2,D\+I\+R\+E\+C\+T\+E\+D -- etc.
+
+\#\+A\+C\+T\+O\+R A\+T\+T\+R\+I\+B\+U\+T\+E\+S Attribute\+Name,S\+T\+R\+I\+N\+G Attribute\+Name,N\+U\+M\+E\+R\+I\+C -- etc.
+
+\#\+N\+O\+D\+E A\+T\+T\+R\+I\+B\+U\+T\+E\+S Layer\+Name,Attribute\+Name,S\+T\+R\+I\+N\+G Layer\+Name,Attribute\+Name,N\+U\+M\+E\+R\+I\+C -- etc.
+
+\#\+E\+D\+G\+E A\+T\+T\+R\+I\+B\+U\+T\+E\+S -- if type is multilayer, edge attributes are indicated as follows\+: Layer\+Name1,Layer\+Name2,Attribute\+Name,S\+T\+R\+I\+N\+G Layer\+Name1,Layer\+Name2,Attribute\+Name,N\+U\+M\+E\+R\+I\+C -- etc. -- if type is multiplex (default), edge attributes are indicated as follows\+: Layer\+Name,Attribute\+Name,S\+T\+R\+I\+N\+G Layer\+Name,Attribute\+Name,N\+U\+M\+E\+R\+I\+C -- etc.
+
+\#\+A\+C\+T\+O\+R\+S Actor\+Name,Attribute\+List... Actor\+Name,Attribute\+List... -- etc.
+
+\#\+N\+O\+D\+E\+S Node\+Name,Layer\+Name,Attribute\+List... Node\+Name,Layer\+Name,Attribute\+List... -- etc.
+
+\#\+E\+D\+G\+E\+S -- if type is multilayer, edges are indicated as follows\+: Node\+Name1,Layer\+Name1,Node\+Name2,Layer\+Name2,Attribute\+List... -- etc. -- if type is multiplex (default), edges are indicated as follows instead\+: Actor\+Name1,Actor\+Name2,Layer\+Name,Attribute\+List... \subsubsection*{-- etc. }
+
+If the \#\+L\+A\+Y\+E\+R\+S section is empty, undirected layers are created as mentioned in the \#\+E\+D\+G\+E\+S section.
+
+Allowed values for \#\+T\+Y\+P\+E are \char`\"{}\+Multiplex\char`\"{} and \char`\"{}\+Multilayer\char`\"{}, where multiplex is the default.
+
+If the \#\+A\+C\+T\+O\+R A\+T\+T\+R\+I\+B\+U\+T\+E\+S, \#\+N\+O\+D\+E A\+T\+T\+R\+I\+B\+U\+T\+E\+S or \#\+E\+D\+G\+E A\+T\+T\+R\+I\+B\+U\+T\+E\+S sections are empty, no attributes are created.
+
+The \#\+A\+C\+T\+O\+R\+S and \#\+N\+O\+D\+E\+S sections are useful only if attributes or disconnected nodes are present, otherwise they can be omitted
+
+If no section is specified, \#\+E\+D\+G\+E\+S is the default.
+
+\subsubsection*{Therefore, a minimalistic undirected network would look like this\+: }
+
+Matteo,Luca,Facebook Matteo,Mark,Facebook \subsubsection*{... }
+
+
+\begin{DoxyParams}{Parameters}
+{\em infile} & \\
+\hline
+{\em network\+\_\+name} & \\
+\hline
+{\em separator} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{namespacemlnet_a28c0d5d03edb3abfd351819a6280c3ba}{\index{mlnet@{mlnet}!relevance@{relevance}}
+\index{relevance@{relevance}!mlnet@{mlnet}}
+\subsubsection[{relevance}]{\setlength{\rightskip}{0pt plus 5cm}double mlnet\+::relevance (
+\begin{DoxyParamCaption}
+\item[{const M\+L\+Network\+Shared\+Ptr}]{mnet, }
+\item[{const Actor\+Shared\+Ptr \&}]{actor, }
+\item[{const std\+::set$<$ Layer\+Shared\+Ptr $>$ \&}]{layers, }
+\item[{edge\+\_\+mode}]{mode}
+\end{DoxyParamCaption}
+)}}\label{namespacemlnet_a28c0d5d03edb3abfd351819a6280c3ba}
+Layer relevance 
+
+\subsection{Variable Documentation}
+\hypertarget{namespacemlnet_aac7f43aa0ec7157757c5a0e694e97706}{\index{mlnet@{mlnet}!D\+E\+F\+A\+U\+L\+T\+\_\+\+E\+D\+G\+E\+\_\+\+D\+I\+R\+E\+C\+T\+I\+O\+N\+A\+L\+I\+T\+Y@{D\+E\+F\+A\+U\+L\+T\+\_\+\+E\+D\+G\+E\+\_\+\+D\+I\+R\+E\+C\+T\+I\+O\+N\+A\+L\+I\+T\+Y}}
+\index{D\+E\+F\+A\+U\+L\+T\+\_\+\+E\+D\+G\+E\+\_\+\+D\+I\+R\+E\+C\+T\+I\+O\+N\+A\+L\+I\+T\+Y@{D\+E\+F\+A\+U\+L\+T\+\_\+\+E\+D\+G\+E\+\_\+\+D\+I\+R\+E\+C\+T\+I\+O\+N\+A\+L\+I\+T\+Y}!mlnet@{mlnet}}
+\subsubsection[{D\+E\+F\+A\+U\+L\+T\+\_\+\+E\+D\+G\+E\+\_\+\+D\+I\+R\+E\+C\+T\+I\+O\+N\+A\+L\+I\+T\+Y}]{\setlength{\rightskip}{0pt plus 5cm}const bool mlnet\+::\+D\+E\+F\+A\+U\+L\+T\+\_\+\+E\+D\+G\+E\+\_\+\+D\+I\+R\+E\+C\+T\+I\+O\+N\+A\+L\+I\+T\+Y = false}}\label{namespacemlnet_aac7f43aa0ec7157757c5a0e694e97706}
+Constants and Function Parameters 

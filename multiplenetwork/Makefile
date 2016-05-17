@@ -8,6 +8,7 @@ OBJS = 	src/datastructures/*.cpp \
 		src/measures/*.cpp \
 		src/transformation/*.cpp \
 		src/community/*.cpp \
+		src/layout/*.cpp \
 		src/dynamics/*.cpp \
 		src/generation/*.cpp \
 		src/exceptions/*.cpp \

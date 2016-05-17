@@ -130,6 +130,8 @@ public:
     bool contains(KEY) const;
 	/** Returns the object with the input id if it is present in the collection, or NULL */
     VALUE get(KEY) const;
+	/** Returns the position of the input value in the collection, or -1 */
+    long get_index(KEY) const;
 	/** Returns the object at the given position in the collection, or NULL */
     VALUE get_at_index(long) const;
 	/** Returns a random object, uniform probability */
@@ -250,6 +252,23 @@ VALUE sorted_random_map<KEY,VALUE>::get(KEY search_value) const {
     if (x != NULL && x->id == search_value)
     	return x->obj_ptr;
     else return NULL;
+}
+
+template <class KEY, class VALUE>
+long sorted_random_map<KEY,VALUE>::get_index(KEY search_value) const {
+    const sortedmap_entry<KEY,VALUE> *x = header;
+    long so_far=0;
+    for (int i = level; i >= 0; i--) {
+        while (x->forward[i] != NULL && x->forward[i]->id < search_value) {
+        	so_far+= x->link_length[i];
+            x = x->forward[i];
+        }
+    }
+	so_far+= x->link_length[0];
+    x = x->forward[0];
+    if (x != NULL && x->id == search_value)
+    	return so_far;
+    else return -1;
 }
 
 template <class KEY, class VALUE>

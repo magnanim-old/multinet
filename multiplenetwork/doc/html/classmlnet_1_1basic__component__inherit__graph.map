@@ -1,0 +1,7 @@
+<map id="mlnet::basic_component" name="mlnet::basic_component">
+<area shape="rect" id="node2" href="$classmlnet_1_1edge.html" title="{mlnet::edge\n|+ v1\l+ v2\l+ directed\l|+ edge()\l+ to_string()\l}" alt="" coords="5,215,98,344"/>
+<area shape="rect" id="node3" href="$classmlnet_1_1named__component.html" title="{mlnet::named_component\n|+ name\l|# named_component()\l# to_string()\l}" alt="" coords="123,231,298,328"/>
+<area shape="rect" id="node6" href="$classmlnet_1_1node.html" title="{mlnet::node\n|+ actor\l+ layer\l|+ node()\l+ to_string()\l}" alt="" coords="323,223,415,336"/>
+<area shape="rect" id="node4" href="$classmlnet_1_1actor.html" title="{mlnet::actor\n||+ actor()\l+ to_string()\l}" alt="" coords="105,392,198,489"/>
+<area shape="rect" id="node5" href="$classmlnet_1_1layer.html" title="{mlnet::layer\n||+ layer()\l+ to_string()\l}" alt="" coords="223,392,315,489"/>
+</map>
