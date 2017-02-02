@@ -16,12 +16,13 @@
 #define MLNET_MLNETWORK_H_
 
 // Exceptions:
-#include "community.h"
 #include "exceptions.h"
 // Various utility functions/classes (like CSV reading, support data structures...):
 #include "utils.h"
 // Main data structures, in particular the MLNetwork class to represent multilayer networks:
 #include "datastructures.h"
+//
+#include "community.h"
 // Reading and writing network data:
 #include "io.h"
 // Main analytical measures (degree, neighborhood, relevance, ...):

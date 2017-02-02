@@ -7,9 +7,9 @@
  */
 
 #include "test.h"
-#include "mlnetwork.h"
 #include <unordered_set>
 #include <string>
+#include "../include/multinet.h"
 
 using namespace mlnet;
 

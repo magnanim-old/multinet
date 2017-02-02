@@ -1,4 +1,4 @@
-Brief description of the code structure of the mlnetwork library
+Brief description of the code structure of the multinet library
 
 Author: Matteo Magnani <matteo.magnani@it.uu.se>
 Version: 1.0

@@ -7,9 +7,9 @@
  */
 
 #include "test.h"
-#include "mlnetwork.h"
 #include <iostream>
 #include <string>
+#include "../include/multinet.h"
 
 using namespace mlnet;
 

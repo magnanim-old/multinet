@@ -1,12 +1,12 @@
 
 #include "test.h"
-#include "mlnetwork.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <set>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "../include/multinet.h"
 
 using namespace mlnet;
 

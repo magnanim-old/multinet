@@ -2,8 +2,8 @@
  * print.h
  */
 
-#include "mlnetwork.h"
 #include <iostream>
+#include "../include/multinet.h"
 
 #ifndef MLNET_PRINT_H_
 #define MLNET_PRINT_H_
