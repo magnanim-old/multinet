@@ -1,5 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classmlnet_1_1_evolution_model.html" title="mlnet::EvolutionModel" alt="" coords="5,32,158,60"/>
-<area shape="rect" id="node2" href="$classmlnet_1_1_b_a_evolution_model.html" title="Grows a network by first creating a complete graph with m0 vertexes, then adding a new vertex at a ti..." alt="" coords="220,5,390,33"/>
-<area shape="rect" id="node3" href="$classmlnet_1_1_uniform_evolution_model.html" title="Grows a network by first creating all the vertexes and then at every step choosing two (uniform proba..." alt="" coords="206,57,405,85"/>
-</map>

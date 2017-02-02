@@ -1,8 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classmlnet_1_1basic__component.html" title="mlnet::basic_component" alt="" coords="5,57,171,85"/>
-<area shape="rect" id="node2" href="$classmlnet_1_1edge.html" title="mlnet::edge" alt="" coords="261,5,352,33"/>
-<area shape="rect" id="node3" href="$classmlnet_1_1named__component.html" title="mlnet::named_component" alt="" coords="219,57,395,85"/>
-<area shape="rect" id="node6" href="$classmlnet_1_1node.html" title="mlnet::node" alt="" coords="261,109,352,137"/>
-<area shape="rect" id="node4" href="$classmlnet_1_1actor.html" title="mlnet::actor" alt="" coords="443,32,534,60"/>
-<area shape="rect" id="node5" href="$classmlnet_1_1layer.html" title="mlnet::layer" alt="" coords="443,84,533,112"/>
-</map>

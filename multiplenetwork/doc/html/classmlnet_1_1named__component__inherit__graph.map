@@ -1,5 +1,0 @@
-<map id="mlnet::named_component" name="mlnet::named_component">
-<area shape="rect" id="node3" href="$classmlnet_1_1actor.html" title="{mlnet::actor\n||+ actor()\l+ to_string()\l}" alt="" coords="5,360,98,457"/>
-<area shape="rect" id="node4" href="$classmlnet_1_1layer.html" title="{mlnet::layer\n||+ layer()\l+ to_string()\l}" alt="" coords="123,360,215,457"/>
-<area shape="rect" id="node2" href="$classmlnet_1_1basic__component.html" title="{mlnet::basic_component\n|+ id\l|+ operator==()\l+ operator!=()\l+ operator\&lt;()\l+ operator\&gt;()\l# basic_component()\l# to_string()\l}" alt="" coords="28,5,193,167"/>
-</map>
