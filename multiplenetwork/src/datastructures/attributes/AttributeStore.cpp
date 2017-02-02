@@ -1,5 +1,4 @@
 #include "datastructures.h"
-#include "exceptions.h"
 
 namespace mlnet {
 
@@ -35,11 +34,11 @@ void MainMemoryAttributeStore::add(const string& attribute_name, attribute_type 
 	switch (type) {
 	case STRING_TYPE:
 		if (string_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
-		string_attribute[attribute_name] = hashtable<object_id,string>();
+		string_attribute[attribute_name] = hash_map<object_id,string>();
 		break;
 	case NUMERIC_TYPE:
 		if (numeric_attribute.count(attribute_name)>0) throw DuplicateElementException("Attribute " + attribute_name);
-		numeric_attribute[attribute_name] = hashtable<object_id,double>();
+		numeric_attribute[attribute_name] = hash_map<object_id,double>();
 		break;
 	}
 	AttributeSharedPtr new_attribute(new Attribute(attribute_name, type));

@@ -7,7 +7,6 @@
 #define MLNET_RANDOMWALKS_H_
 
 #include "datastructures.h"
-#include "utils.h"
 #include <string>
 #include <fstream>
 #include <sstream>

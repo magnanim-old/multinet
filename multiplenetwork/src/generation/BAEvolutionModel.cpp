@@ -21,12 +21,12 @@ BAEvolutionModel::BAEvolutionModel(int m0, int m) {
 BAEvolutionModel::~BAEvolutionModel() {
 }
 
-void BAEvolutionModel::init_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer) {
-	if (mnet->get_actors().size()<m0)
+void BAEvolutionModel::init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer) {
+	if (mnet->get_actors()->size()<m0)
 		throw WrongParameterException("not enough actors available to initialize the layer (less than m0)");
 	std::set<ActorSharedPtr> actors;
 	while (actors.size()<m0)
-		actors.insert(mnet->get_actors().get_at_random());
+		actors.insert(mnet->get_actors()->get_at_random());
 	// we assume that the layer is empty - otherwise, some duplicate actors might accur
 	for (ActorSharedPtr actor: actors) {
 		mnet->add_node(actor, layer);
@@ -44,16 +44,16 @@ void BAEvolutionModel::init_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer) 
 	}
 }
 
-void BAEvolutionModel::evolution_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer)  {
+void BAEvolutionModel::evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer)  {
 	std::set<NodeSharedPtr> new_nodes;
 		std::set<EdgeSharedPtr> new_edges;
 		evolution_step(mnet, layer, new_nodes, new_edges);
 }
 
 
-void BAEvolutionModel::evolution_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges) {
+void BAEvolutionModel::evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges) {
 
-	ActorSharedPtr actor = mnet->get_actors().get_at_random();
+	ActorSharedPtr actor = mnet->get_actors()->get_at_random();
 
 	if (mnet->get_node(actor,layer))
 		return;
@@ -67,7 +67,7 @@ void BAEvolutionModel::evolution_step(MLNetworkSharedPtr mnet, LayerSharedPtr la
 	std::set<NodeSharedPtr> nodes;
 	// this operation may not be very efficient - think of an alternative implementation
 	while (nodes.size()<m) {
-		EdgeSharedPtr edge = mnet->get_edges().get_at_random();
+		EdgeSharedPtr edge = mnet->get_edges()->get_at_random();
 		nodes.insert(test(.5)?edge->v1:edge->v2);
 	}
 

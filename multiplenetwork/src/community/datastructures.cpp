@@ -5,7 +5,7 @@
 #include "utils.h"
 #include <iostream>
 
-#include "../../include/community.h"
+#include "community.h"
 
 namespace mlnet {
 

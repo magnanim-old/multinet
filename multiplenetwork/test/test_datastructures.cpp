@@ -39,10 +39,10 @@ void test_datastructures() {
 	NodeSharedPtr node4(new node(4,actor2,layer1));
 	std::cout << "done!" << std::endl;
 	std::cout << "Creating five edges...";
-	EdgeSharedPtr edge1(new edge(1,node1,node2,true)); // directed
-	EdgeSharedPtr edge2(new edge(2,node2,node1,true)); // directed
-	EdgeSharedPtr edge3(new edge(3,node1,node2,false)); // indirected
-	EdgeSharedPtr edge4(new edge(3,node2,node1,false)); // indirected
+	EdgeSharedPtr edge1(new edge(1,node1,node2,DIRECTED));
+	EdgeSharedPtr edge2(new edge(2,node2,node1,DIRECTED));
+	EdgeSharedPtr edge3(new edge(3,node1,node2,UNDIRECTED));
+	EdgeSharedPtr edge4(new edge(3,node2,node1,UNDIRECTED));
 	if (*edge1==*edge2) throw FailedUnitTestException("Wrong edge comparison");
 	if (*edge2==*edge3) throw FailedUnitTestException("Wrong edge comparison");
 	if (*edge3!=*edge4) throw FailedUnitTestException("Wrong edge comparison");
@@ -66,27 +66,27 @@ void test_datastructures() {
 	if (mnet->add_actor("Matteo")) throw FailedUnitTestException("Duplicate actor insertion not caught");
 	if (mnet->get_actor("Matteo") != a3) throw FailedUnitTestException("Could not retrieve actor");
 	int num_actors=0;
-	for (ActorSharedPtr actor : mnet->get_actors()) {
+	for (ActorSharedPtr actor : *mnet->get_actors()) {
 		num_actors++;
 		std::cout << "A" << actor->id << " ";
 	}
-	if (num_actors!=3 || num_actors!=mnet->get_actors().size()) throw FailedUnitTestException("Could not retrieve all actors");
+	if (num_actors!=3 || num_actors!=mnet->get_actors()->size()) throw FailedUnitTestException("Could not retrieve all actors");
 	std::cout << "done!" << std::endl;
 
 	std::cout << "Adding three layers: ";
-	LayerSharedPtr l1 = mnet->add_layer("l1",false);
-	LayerSharedPtr l2 = mnet->add_layer("l2",false);
-	LayerSharedPtr l3 = mnet->add_layer("Facebook",true);
+	LayerSharedPtr l1 = mnet->add_layer("l1",UNDIRECTED);
+	LayerSharedPtr l2 = mnet->add_layer("l2",UNDIRECTED);
+	LayerSharedPtr l3 = mnet->add_layer("Facebook",DIRECTED);
 	// should fail, that is, return NULL
-	if (mnet->add_layer("Facebook",false)) throw FailedUnitTestException("Duplicate actor insertion not caught");
+	if (mnet->add_layer("Facebook",UNDIRECTED)) throw FailedUnitTestException("Duplicate actor insertion not caught");
 	mnet->set_directed(l1,l2,true);
 	if (mnet->get_layer("Facebook") != l3) throw FailedUnitTestException("Could not retrieve layer");
 	int num_layers=0;
-	for (LayerSharedPtr layer : mnet->get_layers()) {
+	for (LayerSharedPtr layer : *mnet->get_layers()) {
 		num_layers++;
 		std::cout << "L" << layer->id << " ";
 	}
-	if (num_layers!=3 || num_layers!=mnet->get_layers().size()) throw FailedUnitTestException("Could not retrieve all layers");
+	if (num_layers!=3 || num_layers!=mnet->get_layers()->size()) throw FailedUnitTestException("Could not retrieve all layers");
 	std::cout << "done!" << std::endl;
 
 
@@ -105,11 +105,11 @@ void test_datastructures() {
 	NodeSharedPtr n3v2 = mnet->add_node(a3,l3);
 
 	int num_nodes=0;
-	for (NodeSharedPtr node : mnet->get_nodes()) {
+	for (NodeSharedPtr node : *mnet->get_nodes()) {
 		num_nodes++;
 		std::cout << "N" << node->id << " ";
 	}
-	if (num_nodes!=9 || num_nodes!=mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
+	if (num_nodes!=9 || num_nodes!=mnet->get_nodes()->size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	std::cout << "done!" << std::endl;
 
 	std::cout << "Adding five intra-layer edges and one inter-layer edge: ";
@@ -121,17 +121,20 @@ void test_datastructures() {
 
 	EdgeSharedPtr e6 = mnet->add_edge(n2v2,n3v1);
 
+	if (mnet->get_edge(n1v0,n1v1) != mnet->get_edge(n1v1,n1v0)) throw FailedUnitTestException("Failed comparison of edges (same undirected edge, inverted end points)");
+
+
 	int num_edges=0;
-	for (EdgeSharedPtr edge : mnet->get_edges()) {
+	for (EdgeSharedPtr edge : *mnet->get_edges()) {
 		num_edges++;
-		std::cout << "N" << edge->v1->id << (edge->directed?"->":"--") << "N" << edge->v2->id << " ";
+		std::cout << "N" << edge->v1->id << (edge->directionality?"->":"--") << "N" << edge->v2->id << " ";
 	}
-	if (num_edges!=6 || num_edges!=mnet->get_edges().size()) throw FailedUnitTestException("Could not retrieve all nodes");
+	if (num_edges!=6 || num_edges!=mnet->get_edges()->size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	std::cout << "done!" << std::endl;
 
 	std::cout << "Getting N" << n3v2->id << "'s in-neighbors: ";
 	int num_neighbors=0;
-	for (NodeSharedPtr node : mnet->neighbors(n3v2,IN)) {
+	for (NodeSharedPtr node : *mnet->neighbors(n3v2,IN)) {
 		num_neighbors++;
 		std::cout << "N" << node->id << " ";
 	}
@@ -139,7 +142,7 @@ void test_datastructures() {
 	std::cout << "done!" << std::endl;
 	std::cout << "Getting N" << n3v2->id << "'s out-neighbors: ";
 	num_neighbors=0;
-	for (NodeSharedPtr node : mnet->neighbors(n3v2,OUT)) {
+	for (NodeSharedPtr node : *mnet->neighbors(n3v2,OUT)) {
 		num_neighbors++;
 		std::cout << "N" << node->id << " ";
 	}
@@ -147,7 +150,7 @@ void test_datastructures() {
 	std::cout << "done!" << std::endl;
 	std::cout << "Getting N" << n3v2->id << "'s in/out-neighbors: ";
 	num_neighbors=0;
-	for (NodeSharedPtr node : mnet->neighbors(n3v2,INOUT)) {
+	for (NodeSharedPtr node : *mnet->neighbors(n3v2,INOUT)) {
 		num_neighbors++;
 		std::cout << "N" << node->id << " ";
 	}
@@ -155,7 +158,7 @@ void test_datastructures() {
 	std::cout << "done!" << std::endl;
 	std::cout << "Getting N" << n2v1->id << "'s out-neighbors (undirected edges): ";
 	num_neighbors=0;
-	for (NodeSharedPtr node : mnet->neighbors(n2v1,OUT)) {
+	for (NodeSharedPtr node : *mnet->neighbors(n2v1,OUT)) {
 		num_neighbors++;
 		std::cout << "N" << node->id << " ";
 	}
@@ -163,7 +166,7 @@ void test_datastructures() {
 	std::cout << "done!" << std::endl;
 	std::cout << "Getting N" << n2v1->id << "'s in/out-neighbors (undirected edges): ";
 	num_neighbors=0;
-	for (NodeSharedPtr node : mnet->neighbors(n2v1,INOUT)) {
+	for (NodeSharedPtr node : *mnet->neighbors(n2v1,INOUT)) {
 		num_neighbors++;
 		std::cout << "N" << node->id << " ";
 	}
@@ -172,15 +175,15 @@ void test_datastructures() {
 
 	std::cout << "Erasing components...";
 	mnet->erase(n3v2);
-	if (8 != mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
+	if (8 != mnet->get_nodes()->size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	mnet->erase(e3);
-	if (3 != mnet->get_edges().size()) throw FailedUnitTestException("Could not retrieve all edges");
+	if (3 != mnet->get_edges()->size()) throw FailedUnitTestException("Could not retrieve all edges");
 	mnet->erase(a1);
-	if (2 != mnet->get_actors().size()) throw FailedUnitTestException("Could not retrieve all actor");
-	if (5 != mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
+	if (2 != mnet->get_actors()->size()) throw FailedUnitTestException("Could not retrieve all actor");
+	if (5 != mnet->get_nodes()->size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	mnet->erase(l1);
-	if (2 != mnet->get_layers().size()) throw FailedUnitTestException("Could not retrieve all layers");
-	if (3 != mnet->get_nodes().size()) throw FailedUnitTestException("Could not retrieve all nodes");
+	if (2 != mnet->get_layers()->size()) throw FailedUnitTestException("Could not retrieve all layers");
+	if (3 != mnet->get_nodes()->size()) throw FailedUnitTestException("Could not retrieve all nodes");
 	std::cout << "done! " << mnet->to_string() << std::endl;
 	test_end("MLNetwork - structure");
 

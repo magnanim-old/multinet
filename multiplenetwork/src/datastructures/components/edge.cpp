@@ -2,17 +2,18 @@
 
 namespace mlnet {
 
-edge::edge(edge_id id, const NodeSharedPtr& v1, const NodeSharedPtr& v2, bool directed) :
+edge::edge(edge_id id, const NodeSharedPtr& v1, const NodeSharedPtr& v2, edge_directionality _directionality) :
 	basic_component(id),
 	v1(v1),
 	v2(v2),
-	directed(directed) {}
+	directionality(_directionality) {}
 
 std::string edge::to_string() const {
-	if (directed)
-		return "Edge: " + v1->to_string() + " -> " + v2->to_string();
-	else
-		return "Edge: " + v1->to_string() + " -- " + v2->to_string();
+	switch (directionality) {
+	case DIRECTED: return "Edge: " + v1->to_string() + " -> " + v2->to_string();
+	case UNDIRECTED: return "Edge: " + v1->to_string() + " -- " + v2->to_string();
+	}
+	return ""; // cannot get here
 }
 
 }

@@ -23,14 +23,14 @@ CSVReader::CSVReader() {
 
 CSVReader::~CSVReader() {}
 
-void CSVReader::open(std::string path) {
+void CSVReader::open(const std::string& path) {
 	infile.open(path.data());
 	if (infile.fail()) throw FileNotFoundException(path);
 	do {(getline(infile, next))?has_next=true:has_next=false;} while (next=="" && has_next);
 	row_number = 0;
 }
 
-bool CSVReader::hasNext() {
+bool CSVReader::hasNext() const {
 	return has_next;
 }
 
@@ -64,7 +64,7 @@ std::vector<std::string> CSVReader::getNext() {
 }
 
 
-int CSVReader::rowNum() {
+int CSVReader::rowNum() const {
 	return row_number;
 }
 

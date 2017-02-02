@@ -1,5 +1,5 @@
 /**
- * sortedrandommap.h
+ * sortedrandomset.h
  * 
  * A sorted random map is a class used to store a set of objects that can be accessed:
  * 1. by key in (average) log time.
@@ -14,13 +14,14 @@
  * than a map, but the map from the C++ standard library cannot be modified, so I could not
  * add the random element retrieval function. A skip list was much faster to implement from
  * scratch than a red-black tree.
+ *
+ * NOTE: The values stored in the set must be (smart) pointers
  */
 
-#ifndef MLNET_SORTED_MAP_H_
-#define MLNET_SORTED_MAP_H_
+#ifndef MLNET_SORTED_SET_H_
+#define MLNET_SORTED_SET_H_
 
 #include "random.h"
-#include "../exceptions.h"
 #include <string>
 #include <map>
 #include <unordered_map>
@@ -166,7 +167,7 @@ void sorted_random_set_entry<ELEMENT_TYPE>::increment(long skipped_entries) {
 
 template <class ELEMENT_TYPE>
 sorted_random_set<ELEMENT_TYPE>::sorted_random_set() {
-	header = new sorted_random_set_entry<ELEMENT_TYPE>(MAX_LEVEL, -1, NULL);
+	header = new sorted_random_set_entry<ELEMENT_TYPE>(MAX_LEVEL, NULL);
     level = 0;
 }
 
@@ -174,7 +175,7 @@ template <class ELEMENT_TYPE>
 sorted_random_set<ELEMENT_TYPE>::sorted_random_set(long start_capacity) {
 	capacity = start_capacity;
 	MAX_LEVEL = std::ceil(std::log2(capacity));
-	header = new sorted_random_set_entry<ELEMENT_TYPE>(MAX_LEVEL, -1, NULL);
+	header = new sorted_random_set_entry<ELEMENT_TYPE>(MAX_LEVEL, NULL);
     level = 0;
 }
 
@@ -294,8 +295,9 @@ bool sorted_random_set<ELEMENT_TYPE>::insert(ELEMENT_TYPE value) {
     }
     x = x->forward[0];
 
+
     if (x == NULL || x->obj_ptr != value) {
-     	num_entries++;
+        num_entries++;
     	if (num_entries>capacity) {
     		// resize the sorted list
     		capacity *= 2;
@@ -303,7 +305,7 @@ bool sorted_random_set<ELEMENT_TYPE>::insert(ELEMENT_TYPE value) {
     		header->increment(num_entries);
     	}
 
-        int lvl = random_level(MAX_LEVEL,P);
+    	int lvl = random_level(MAX_LEVEL,P);
 
         if (lvl > level) {
             update.resize(lvl+1);
@@ -314,7 +316,9 @@ bool sorted_random_set<ELEMENT_TYPE>::insert(ELEMENT_TYPE value) {
         	}
         	level = lvl;
         }
+
         x = new sorted_random_set_entry<ELEMENT_TYPE>(lvl, value);
+
         for (int i = 0; i <= lvl; i++) {
         	int offset = skipped_positions-skipped_positions_per_level[i];
 
@@ -328,10 +332,11 @@ bool sorted_random_set<ELEMENT_TYPE>::insert(ELEMENT_TYPE value) {
         	update[i]->forward[i] = x;
         	update[i]->link_length[i] = offset+1;
         }
+
         for (int i = lvl+1; i <= level; i++) {
         	update[i]->link_length[i]++;
         }
-        return true;
+    	return true;
     }
     else {
     	x->obj_ptr = value;
@@ -401,4 +406,4 @@ std::cout << "cap:" << capacity << " num:" << num_entries << " lev:" << level <<
 
 } // namespace mlnet
 
-#endif /* MLNET_SORTED_MAP_H_ */
+#endif /* MLNET_SORTED_SET_H_ */

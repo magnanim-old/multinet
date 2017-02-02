@@ -1,9 +1,8 @@
 /*
  * test.h
  *
- * Created on: Feb 7, 2014
- * Author: matteomagnani
- * Version: 0.0.1
+ * Unit testing functions.
+ *
  */
 
 #ifndef MLNET_TEST_H_
@@ -11,7 +10,7 @@
 
 #include <exception>
 #include <string>
-#include <iostream>
+#include <cmath>
 #include "print.h"
 
 /**
@@ -26,19 +25,6 @@ void test_begin(const std::string& name);
  */
 void test_end(const std::string& name);
 
-/* Unit test functions for different components of the library */
-void test_utils();
-void test_datastructures();
-void test_io();
-void test_measures();
-void test_transformations();
-void test_random();
-void test_randomwalks();
-void test_evolution();
-void test_modularity();
-void test_community();
-void test_dynamics();
-
 /* exception, thrown if a test fails */
 class FailedUnitTestException: public std::exception {
 public:
@@ -48,5 +34,23 @@ public:
 private:
 	std::string message;
 };
+
+void test_math();
+void test_random();
+void test_counter();
+void test_csv();
+void test_sortedrandommap();
+void test_sortedrandomset();
+void test_propertymatrix();
+
+void test_datastructures();
+void test_io();
+void test_measures();
+void test_transformation();
+void test_randomwalks();
+void test_evolution();
+void test_modularity();
+void test_community();
+void test_dynamics();
 
 #endif /* MLNET_TEST_H_ */

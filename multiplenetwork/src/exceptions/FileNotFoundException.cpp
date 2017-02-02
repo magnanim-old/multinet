@@ -1,11 +1,15 @@
 #include "exceptions.h"
 
-FileNotFoundException::FileNotFoundException(std::string path) {
-	FileNotFoundException::path = path;
+namespace mlnet {
+
+FileNotFoundException::FileNotFoundException(std::string value) {
+	FileNotFoundException::value = value;
 }
 
-FileNotFoundException::~FileNotFoundException() throw () {}
+FileNotFoundException::~FileNotFoundException() throw() {}
 
 const char* FileNotFoundException::what() const throw() {
-    return (std::string("File not found: ") + path).data();
+    return ("File not found: " + value).data();
+}
+
 }

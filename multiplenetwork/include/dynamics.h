@@ -1,27 +1,6 @@
-/*
- * measures.h
- *
- * Author: Matteo Magnani <matteo.magnani@it.uu.se>
- * Version: beta
- *
- * Social Network Analysis measures for multiplex networks.
- * TESTED:
- * Node based: degree, neighborhood, exclusive neighborhood, network relevance, exclusive network relevance
- * Network based: similarity
- *
- * TO BE CONSOLIDATED:
- * Distance based: Pareto distance, Pareto betweenness
- * Group based: modularity
- *
- * References to be added.
- */
-
 #ifndef MULTIPLENETWORK_DYNAMICS_H_
 #define MULTIPLENETWORK_DYNAMICS_H_
 
-#include <exception>
-#include <vector>
-#include <string>
 #include "datastructures.h"
 
 namespace mlnet {

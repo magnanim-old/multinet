@@ -6,28 +6,28 @@
  * Version: 0.0.1
  */
 
-#include "community.h"
 #include "measures.h"
 #include <unordered_map>
 #include <iostream>
 
+#include "community.h"
+
 namespace mlnet {
 
-double modularity(const MLNetworkSharedPtr& mnet, const hashtable<NodeSharedPtr,long>& membership, double c) {
+double modularity(const MLNetworkSharedPtr& mnet, const hash_map<NodeSharedPtr,long>& membership, double c) {
 	// partition the nodes by group
-	hashtable<long, std::set<NodeSharedPtr> > groups;
+	hash_map<long, std::set<NodeSharedPtr> > groups;
 	for (auto pair: membership) {
 		groups[pair.second].insert(pair.first);
 	}
 	// start computing the modularity
 	double res = 0;
 	double mu = 0;
-	hashtable<LayerSharedPtr,long> m_s;
-	for (LayerSharedPtr s: mnet->get_layers()) {
-		double m = mnet->get_edges(s,s).size();
+	hash_map<LayerSharedPtr,long> m_s;
+	for (LayerSharedPtr s: *mnet->get_layers()) {
+		double m = mnet->get_edges(s,s)->size();
 		if (!mnet->is_directed(s,s))
 			m *= 2;
-		mu += m;
 		// FIX TO THE ORIGINAL EQUATION WHEN THERE ARE NO EDGES
 		if (m == 0)
 			m = 1; // no effect on the formula
@@ -46,11 +46,11 @@ double modularity(const MLNetworkSharedPtr& mnet, const hashtable<NodeSharedPtr,
 					//std::cout << "Same group!" << std::endl;
 					//if (mnet.getNetwork(net)->containsEdge(*v_i,*v_j))
 					//	std::cout << "Edge" << std::endl;
-					long k_i = mnet->neighbors(i,OUT).size();
-					long k_j = mnet->neighbors(j,IN).size();
+					long k_i = mnet->neighbors(i,OUT)->size();
+					long k_j = mnet->neighbors(j,IN)->size();
 					int a_ij = mnet->get_edge(i,j)? 1.0 : 0.0;
-					res += a_ij - k_i * k_j / (2 * m_s.at(i->layer));
-					//std::cout << global_v_i << " " << global_v_j << " " << (a_ij - k_i * k_j / (2 * m_net)) << std::endl;
+					res += a_ij - (double)k_i * k_j / (m_s.at(i->layer));
+					//std::cout << i->actor->name << " " << j->actor->name << " " << i->layer->name << " "<< k_i << " " <<  k_j << " " <<  m_s.at(i->layer) << std::endl;
 					//std::cout << "->" << res << std::endl;
 				}
 				if (i->actor==j->actor) {
@@ -62,11 +62,12 @@ double modularity(const MLNetworkSharedPtr& mnet, const hashtable<NodeSharedPtr,
 	}
 	//std::cout << "same" << std::endl;
 
-	for (ActorSharedPtr actor: mnet->get_actors()) {
-		int num_nodes = mnet->get_nodes(actor).size();
-		mu+=c*num_nodes*(num_nodes-1);
+	//std::cout << mu << std::endl;
+	for (ActorSharedPtr actor: *mnet->get_actors()) {
+		int num_nodes = mnet->get_nodes(actor)->size();
+		mu+=num_nodes*(num_nodes-1)*c; // unclear if we should multiply by c
 	}
-	//std::cout << "->" << mod << " " << (res-mod) << "-" << mu2 << std::endl;
+	//std::cout << mu << std::endl;
 
 	return 1 / mu * res;
 }

@@ -32,9 +32,9 @@ void test_randomwalks() {
 	matrix<double> transitions({p1,p2,p3,p4});
 	std::unordered_map<ActorSharedPtr, int > occ = occupation(mnet3,.2,transitions,10000);
 
-	for (const auto &p : occ) {
+	//for (const auto &p : occ) {
 		//log(p.first->name + ": " + to_string(p.second));
-	}
+	//}
 
 	//log("Testing ...",false);
 	//NodeSharedPtr n0 = mnet3->get_node(mnet3->get_actor("U0"),mnet3->get_layer("l1"));

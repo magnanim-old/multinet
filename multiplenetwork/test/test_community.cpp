@@ -8,7 +8,6 @@
 
 #include "test.h"
 #include "mlnetwork.h"
-#include <iostream>
 #include <unordered_set>
 #include <string>
 
@@ -18,27 +17,30 @@ using namespace mlnet;
 
 void test_community() {
 
-
 	test_begin("ML-CPM");
 
-	MLNetworkSharedPtr mnet = read_multilayer("test/toy.mpx","cpm net",',');
+	MLNetworkSharedPtr mnet = read_multilayer("data/aucs.mpx","cpm net",',');
+	//mnet->erase(mnet->get_layer("work"));
+	//mnet->erase(mnet->get_layer("leisure"));
+	//mnet->erase(mnet->get_layer("facebook"));
+	//mnet->erase(mnet->get_layer("lunch"));
+	hash_set<CommunitySharedPtr> comm = ml_cpm(mnet,3,1,1,1);
 
-	simple_set<CliqueSharedPtr> C = find_max_cliques(mnet,3,1);
-
-	for (CliqueSharedPtr c: C) {
-		std::cout << c->to_string() << std::endl;
-	}
-
-	std::map<CliqueSharedPtr,simple_set<CliqueSharedPtr> > adjacency = build_adjacency_graph(C, 1);
-
-
-	simple_set<CommunitySharedPtr> communities = find_communities(mnet,adjacency,1);
-
-
-	for (CommunitySharedPtr c: communities) {
-		std::cout << c->to_string() << std::endl;
+	int i=0;
+	for (CommunitySharedPtr c: comm) {
+		std::cout << (i++) << " "  << c->to_string() << std::endl;
 	}
 	/*
+	hash_set<CliqueSharedPtr> C = find_max_cliques(mnet,3,1);
+
+	int i=0;
+	for (CliqueSharedPtr c: C) {
+		std::cout << (i++) << " " << c->to_string() << std::endl;
+	}
+
+	std::cout << std::endl;
+	C = find_max_cliques_it(mnet,3,1);
+
 	// We need to read the network from a file: testIO() must have been passed
 	log("TESTING community detection");
 	log("Reading the network...",false);

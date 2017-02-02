@@ -23,18 +23,29 @@ int main(int argn, char* argv[]) {
 
 	test_begin("All unit tests");
 	try {
-	test_utils();
+
+	test_begin("UTILITY FUNCTIONS AND CLASSES");
+	test_math();
+	test_random();
+	test_counter();
+	test_csv();
+	test_sortedrandommap();
+	test_sortedrandomset();
+	test_propertymatrix();
+	test_end("UTILITY FUNCTIONS AND CLASSES");
+
 	test_datastructures();
 	test_io();
 	test_measures();
-	/*
-	test_transformations();
 	test_community();
-	test_dynamics();
-	test_utils();
-	test_randomwalks();
 	test_evolution();
+	test_randomwalks();
 	test_modularity();
+	test_transformation();
+
+	/*
+
+	test_dynamics();
 	*/
 	}
 	catch (std::exception& e) {

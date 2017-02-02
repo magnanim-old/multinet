@@ -12,14 +12,14 @@
 
 namespace mlnet {
 
-void evolve(MLNetworkSharedPtr mnet,
+void evolve(MLNetworkSharedPtr& mnet,
 		long num_of_steps,
 		long num_initial_actors,
 		//std::vector<int> num_new_vertexes_per_step,
-		std::vector<double> pr_no_event,
-		std::vector<double> pr_internal_event,
-		matrix<double> dependency,
-		std::vector<EvolutionModel*> evolution_model) {
+		const std::vector<double>& pr_internal_event,
+		const std::vector<double>& pr_external_event,
+		const matrix<double>& dependency,
+		const std::vector<EvolutionModelSharedPtr>& evolution_model) {
 
 	/* init of support data structures
 	std::vector<std::set<entity_id> > free_identities(mnet.getNumNetworks());
@@ -32,22 +32,28 @@ void evolve(MLNetworkSharedPtr mnet,
 	}
 	*/
 
+	std::vector<double> pr_no_event;
+
+	for (int i=0; i<pr_internal_event.size(); i++) {
+		pr_no_event.push_back(1-pr_internal_event.at(i)-pr_external_event.at(i));
+	}
+
 	// Creating num_initial_actors actors
 	//std::cout << "INIT ACTORS" << std::endl;
 	for (int i=0; i<num_initial_actors; i++)
 		mnet->add_actor("A"+std::to_string(i));
 
 	// Initialization
-	for (int n=0; n<mnet->get_layers().size(); n++) {
+	for (int n=0; n<mnet->get_layers()->size(); n++) {
 		//std::cout << "INIT LAYER " << n << std::endl;
-		evolution_model[n]->init_step(mnet,mnet->get_layers().get_at_index(n));
+		evolution_model[n]->init_step(mnet,mnet->get_layers()->get_at_index(n));
 	}
 
 	for (long i=0; i<num_of_steps; i++) {
 		//std::cout << "step " << i << std::endl;
-		for (int n=0; n<mnet->get_layers().size(); n++) {
+		for (int n=0; n<mnet->get_layers()->size(); n++) {
 
-			LayerSharedPtr target_layer = mnet->get_layers().get_at_index(n);
+			LayerSharedPtr target_layer = mnet->get_layers()->get_at_index(n);
 			/* Add new vertexes ???
 			//std::cout << "Add vertexes to " << n << ": ";
 			for (int new_v=0; new_v<num_new_vertexes_per_step[n]; new_v++) {
@@ -62,7 +68,9 @@ void evolve(MLNetworkSharedPtr mnet,
 			//std::cout << std::endl;
 			*/
 
-			if (test(pr_no_event[n])) {
+			double dice = drand();
+
+			if (dice < pr_no_event[n]) {
 				//std::cout << "no event" << std::endl;
 				//std::cout << " No event " << target_layer->to_string() << std::endl;
 				// DO NOTHING;
@@ -70,7 +78,7 @@ void evolve(MLNetworkSharedPtr mnet,
 
 			//std::set<vertex_id> vertexes = mnet.getNetwork(n).getVertexes();
 			//for (vertex_id vertex: vertexes) {
-			else if (test(pr_internal_event[n])) {
+			else if (dice < pr_internal_event[n]+pr_no_event[n] || pr_external_event[n]==0) {
 					/*
 					//std::cout << "Iternal event for vertex " << vertex << std::endl;
 					switch (strategy[n]) {
@@ -91,18 +99,18 @@ void evolve(MLNetworkSharedPtr mnet,
 				// choose a layer from which to import an edge: first find the candidates:
 				//std::set<network_id> candidates;
 					int layer_index = test(dependency[n]);
-					LayerSharedPtr layer = mnet->get_layers().get_at_index(layer_index);
+					LayerSharedPtr layer = mnet->get_layers()->get_at_index(layer_index);
 
 					//std::cout << " External event " << target_layer->to_string() << " <- " << layer->to_string() << std::endl;
 
 					// Choose an actor from that layer and replicate it to the target layer (if it does not already exist)
-					NodeSharedPtr imported_node = mnet->get_nodes(layer).get_at_random();
+					NodeSharedPtr imported_node = mnet->get_nodes(layer)->get_at_random();
 					NodeSharedPtr new_node = mnet->get_node(imported_node->actor,target_layer);
 					if (!new_node)
 						new_node = mnet->add_node(imported_node->actor,target_layer);
 
 					// finally we insert the actor's neighbors into the target layer, if the neighbors are also present there
-					for (NodeSharedPtr neighbor: mnet->neighbors(imported_node,OUT)) {
+					for (NodeSharedPtr neighbor: *mnet->neighbors(imported_node,OUT)) {
 						NodeSharedPtr local_neighbor = mnet->get_node(neighbor->actor,target_layer);
 						if (local_neighbor) {
 							if (!mnet->get_edge(new_node,local_neighbor)) {

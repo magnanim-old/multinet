@@ -6,9 +6,7 @@
  * Version: 0.0.1
  */
 
-#import "transformation.h"
-#import <set>
-#import <iostream>
+#include "transformation.h"
 
 const std::string SEP = "|";
 
@@ -20,9 +18,9 @@ LayerSharedPtr flatten_weighted(MLNetworkSharedPtr& mnet, const std::string& new
 	bool directed = mnet->is_directed(new_layer,new_layer);
 	mnet->edge_features(new_layer,new_layer)->add(DEFAULT_WEIGHT_ATTR_NAME,NUMERIC_TYPE);
 
-	for (LayerSharedPtr layer1: layers) {
+	for (LayerSharedPtr layer1: layers ) {
 		for (LayerSharedPtr layer2: layers) {
-			for (EdgeSharedPtr edge: mnet->get_edges(layer1,layer2)) {
+			for (EdgeSharedPtr edge: *mnet->get_edges(layer1,layer2)) {
 				NodeSharedPtr node1 = mnet->get_node(edge->v1->actor,new_layer);
 				NodeSharedPtr node2 = mnet->get_node(edge->v2->actor,new_layer);
 				EdgeSharedPtr new_edge = mnet->get_edge(node1,node2);
@@ -35,7 +33,7 @@ LayerSharedPtr flatten_weighted(MLNetworkSharedPtr& mnet, const std::string& new
 					mnet->set_weight(node1,node2,weight+1);
 				}
 				// if the resulting layer is directed, undirected edges must be inserted as two directed ones
-				if (directed && !edge->directed) {
+				if (directed && !edge->directionality) {
 					new_edge = mnet->get_edge(node2,node1);
 					if (!new_edge) {
 						new_edge = mnet->add_edge(node2,node1);
@@ -59,7 +57,7 @@ LayerSharedPtr flatten_unweighted(MLNetworkSharedPtr& mnet, const std::string& n
 
 	for (LayerSharedPtr layer1: layers) {
 		for (LayerSharedPtr layer2: layers) {
-			for (EdgeSharedPtr edge: mnet->get_edges(layer1,layer2)) {
+			for (EdgeSharedPtr edge: *mnet->get_edges(layer1,layer2)) {
 				NodeSharedPtr node1 = mnet->get_node(edge->v1->actor,new_layer);
 				NodeSharedPtr node2 = mnet->get_node(edge->v2->actor,new_layer);
 				EdgeSharedPtr new_edge = mnet->get_edge(node1,node2);
@@ -67,7 +65,7 @@ LayerSharedPtr flatten_unweighted(MLNetworkSharedPtr& mnet, const std::string& n
 					new_edge = mnet->add_edge(node1,node2);
 				}
 				// if the resulting layer is directed, undirected edges must be inserted as two directed ones
-				if (directed && !edge->directed) {
+				if (directed && !edge->directionality) {
 					new_edge = mnet->get_edge(node2,node1);
 					if (!new_edge) {
 						new_edge = mnet->add_edge(node2,node1);

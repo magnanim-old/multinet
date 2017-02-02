@@ -23,7 +23,7 @@ std::string threshold_transition::fire(MLNetworkSharedPtr& mnet, const NodeShare
 	std::string new_status = (current_status==status1)?status2:status1;
 	long num_neighbors = 0;
 	long other_status = 0;
-	for (NodeSharedPtr n: mnet->neighbors(node,IN)) {
+	for (NodeSharedPtr n: *mnet->neighbors(node,IN)) {
 		num_neighbors++;
 		if (mnet->actor_features()->getString(n->actor->id,_S_current)==new_status) {
 			other_status++;

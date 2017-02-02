@@ -13,24 +13,24 @@ using namespace std;
 
 namespace mlnet {
 
-sorted_random_map<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
-	sorted_random_map<actor_id,ActorSharedPtr> neighbors_on_selected_layers;
-	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
-		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
+ActorListSharedPtr neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
+	ActorListSharedPtr neighbors_on_selected_layers = std::make_shared<actor_list>();
+	for (NodeSharedPtr node: *mnet->get_nodes(actor)) {
+		for (NodeSharedPtr neighbor: *mnet->neighbors(node, mode)) {
 			if (layers.count(neighbor->layer)>0) {
-				neighbors_on_selected_layers.insert(neighbor->actor->id,neighbor->actor);
+				neighbors_on_selected_layers->insert(neighbor->actor);
 			}
 		}
 	}
 	return neighbors_on_selected_layers;
 }
 
-sorted_random_map<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
-		sorted_random_map<actor_id,ActorSharedPtr> neighbors_on_selected_layer;
-		for (NodeSharedPtr node: mnet->get_nodes(actor)) {
-			for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
+ActorListSharedPtr neighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
+	ActorListSharedPtr neighbors_on_selected_layer = std::make_shared<actor_list>();
+		for (NodeSharedPtr node: *mnet->get_nodes(actor)) {
+			for (NodeSharedPtr neighbor: *mnet->neighbors(node, mode)) {
 				if (neighbor->layer==layer)
-					neighbors_on_selected_layer.insert(neighbor->actor->id,neighbor->actor);
+					neighbors_on_selected_layer->insert(neighbor->actor);
 			}
 		}
 		return neighbors_on_selected_layer;
@@ -38,35 +38,41 @@ sorted_random_map<actor_id,ActorSharedPtr> neighbors(const MLNetworkSharedPtr& m
 
 ///////////////////////////////////
 
-	sorted_random_map<actor_id,ActorSharedPtr> xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
-		sorted_random_map<actor_id,ActorSharedPtr> neighbors_on_selected_layers;
+ActorListSharedPtr xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
+	ActorListSharedPtr neighbors_on_selected_layers = std::make_shared<actor_list>();
 		std::set<ActorSharedPtr> neighbors_on_other_layers;
-		for (NodeSharedPtr node: mnet->get_nodes(actor)) {
-			for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
+		for (NodeSharedPtr node: *mnet->get_nodes(actor)) {
+			for (NodeSharedPtr neighbor: *mnet->neighbors(node, mode)) {
 				if (layers.count(neighbor->layer)>0)
-					neighbors_on_selected_layers.insert(neighbor->actor->id,neighbor->actor);
+					neighbors_on_selected_layers->insert(neighbor->actor);
 				else neighbors_on_other_layers.insert(neighbor->actor);
 			}
 		}
 		for (ActorSharedPtr entry: neighbors_on_other_layers)
-			neighbors_on_selected_layers.erase(entry->id);
+			neighbors_on_selected_layers->erase(entry);
 		return neighbors_on_selected_layers;
 	}
 
-	sorted_random_map<actor_id,ActorSharedPtr> xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
-		sorted_random_map<actor_id,ActorSharedPtr> neighbors_on_selected_layer;
+ActorListSharedPtr xneighbors(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
+	ActorListSharedPtr neighbors_on_selected_layer = std::make_shared<actor_list>();
 		std::set<ActorSharedPtr> neighbors_on_other_layers;
-		for (NodeSharedPtr node: mnet->get_nodes(actor)) {
-			for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
+		for (NodeSharedPtr node: *mnet->get_nodes(actor)) {
+			for (NodeSharedPtr neighbor: *mnet->neighbors(node, mode)) {
 				if (neighbor->layer==layer)
-					neighbors_on_selected_layer.insert(neighbor->actor->id,neighbor->actor);
+					neighbors_on_selected_layer->insert(neighbor->actor);
 				else neighbors_on_other_layers.insert(neighbor->actor);
 			}
 		}
 		for (ActorSharedPtr entry: neighbors_on_other_layers) {
-			neighbors_on_selected_layer.erase(entry->id);
+			neighbors_on_selected_layer->erase(entry);
 		}
 		return neighbors_on_selected_layer;
 	}
+
+double connective_redundancy(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const hash_set<LayerSharedPtr>& layers, edge_mode mode) {
+	double d = degree(mnet,actor,layers,mode);
+	if (d==0) return 0;
+	return 1 - neighbors(mnet,actor,layers,mode)->size()/d;
+}
 
 } // namespace

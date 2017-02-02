@@ -10,9 +10,6 @@
 #ifndef MLNET_IO_H_
 #define MLNET_IO_H_
 
-#include <exception>
-#include <string>
-#include <unordered_set>
 #include "datastructures.h"
 
 namespace mlnet {
@@ -82,6 +79,8 @@ namespace mlnet {
  *
  * ----------------------------------
  *
+ * If the type is Multiplex and there is no #NODES section, all actors are automatically added to all layers
+ *
  * If the #LAYERS section is empty, undirected layers are created as mentioned in the #EDGES section.
  *
  * If the #LAYER ATTRIBUTES, #ACTOR ATTRIBUTES, #NODE ATTRIBUTES or #EDGE ATTRIBUTES sections are empty, no attributes are created.
@@ -105,6 +104,15 @@ namespace mlnet {
 MLNetworkSharedPtr read_multilayer(const std::string& infile, const std::string& network_name, char separator);
 
 /**
+* Reads a simple FULLMATRIX DIAGONAL PRESENT dl file with multiple matrices. The dl format is more complex than this:
+* this function is not intended to read all possible dl files, but can be used as a starting point...
+* @param infile path of the file storing the multilayer network
+* @param network_name name assigned to the network
+*
+*/
+MLNetworkSharedPtr read_dl(const std::string& infile, const std::string& network_name, const vector<bool>& symmetric, const vector<bool>& valued);
+
+/**
  * This method writes a multilayer network to file, using the same format described for the read_multilayer method
  * @param mlnet network to be saved to file
  * @param outfile path of the file where to store the multilayer network
@@ -112,6 +120,40 @@ MLNetworkSharedPtr read_multilayer(const std::string& infile, const std::string&
  *
  */
 void write_multilayer(const MLNetworkSharedPtr& mlnet, const std::string& outfile, char separator);
+
+/**
+ * This method writes a multiplex network to file, using the same format described for the read_multilayer method.
+ * Interlayer edges are discarded if present - no check is performed.
+ * @param mlnet network to be saved to file
+ * @param outfile path of the file where to store the multilayer network
+ * @param separator character to be used to separate fields in the output file
+ *
+ */
+void write_multiplex(const MLNetworkSharedPtr& mlnet, const std::string& outfile, char separator);
+
+
+/**
+ * This method writes a multiplex network to file, using the same format described for the read_multilayer method.
+ * Interlayer edges are discarded if present - no check is performed.
+ * Actor, layer and node attributes are also discarded.
+ * @param mlnet network to be saved to file
+ * @param outfile path of the file where to store the multilayer network
+ * @param separator character to be used to separate fields in the output file
+ *
+ */
+void write_multiplex_edgelist(const MLNetworkSharedPtr& mlnet, const std::string& outfile, char separator);
+
+/**
+ * This method writes a multiplex network to file, using the same format described for the read_multilayer method.
+ * Interlayer edges are discarded if present - no check is performed.
+ * Actor, layer and node attributes are also discarded.
+ * In addition, actor names are replaced with random identifiers.
+ * @param mlnet network to be saved to file
+ * @param outfile path of the file where to store the multilayer network
+ * @param separator character to be used to separate fields in the output file
+ *
+ */
+void write_anonymized_multiplex_edgelist(const MLNetworkSharedPtr& mnet, const string& path, char sep);
 
 /**
  * This method writes a multilayer network to an XML file, using the graphML format. This is widely
@@ -129,7 +171,7 @@ void write_multilayer(const MLNetworkSharedPtr& mlnet, const std::string& outfil
  * @param include_all_actors if parameter merge_actors is true, then we can decide which actors to include. If include_all_actors is true, all the actors in the multilayer network are included in the output. If false, only
  * actors that are present in the exported layers are included (see layers parameter). If merge_actors is false, this attribute is not used.
  */
-void write_graphml(const MLNetworkSharedPtr& mnet, const string& outfile, const simple_set<LayerSharedPtr>& layers, bool merge_actors, bool include_all_actors);
+void write_graphml(const MLNetworkSharedPtr& mnet, const string& outfile, const hash_set<LayerSharedPtr>& layers, bool merge_actors, bool include_all_actors);
 
 /**
  * Utility function to read attribute values.

@@ -8,15 +8,10 @@
  * 3) external evolution (the layer imports nodes and edges from another layer)
  */
 
-#ifndef EVOLUTION_H_
-#define EVOLUTION_H_
+#ifndef GENERATION_H_
+#define GENERATION_H_
 
-#include <set>
-#include <vector>
-#include "generation.h"
 #include "datastructures.h"
-#include "utils.h"
-
 
 namespace mlnet {
 
@@ -38,10 +33,12 @@ NodeSharedPtr choice_degree(MLNetworkSharedPtr mnet, LayerSharedPtr layer);
 class EvolutionModel {
 public:
 	virtual ~EvolutionModel() = 0;
-	virtual void evolution_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer) = 0;
-	virtual void evolution_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges) = 0;
-	virtual void init_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer) = 0;
+	virtual void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer) = 0;
+	virtual void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges) = 0;
+	virtual void init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer) = 0;
 };
+
+typedef std::shared_ptr<EvolutionModel> EvolutionModelSharedPtr;
 
 /**
  * @brief Grows a network by first creating a complete graph with m0 nodes, then adding a new node at a time and connecting it to m other nodes chosen with a probability proportional to their degree.
@@ -51,9 +48,9 @@ class BAEvolutionModel : public EvolutionModel {
 public:
 	BAEvolutionModel(int m0, int m);
 	~BAEvolutionModel();
-	void init_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer);
-	void evolution_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer);
-	void evolution_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges);
+	void init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
+	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
+	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges);
 };
 
 /**
@@ -64,9 +61,9 @@ class UniformEvolutionModel : public EvolutionModel {
 public:
 	UniformEvolutionModel(int m0);
 	~UniformEvolutionModel();
-	void evolution_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer);
-	void evolution_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges);
-	void init_step(MLNetworkSharedPtr mnet, LayerSharedPtr layer);
+	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
+	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges);
+	void init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
 };
 
 /**********************************************************************/
@@ -81,13 +78,13 @@ public:
  * @param dependency[][] The (i,j) element of this matrix indicates the probability that, given an external evolution event, layer i will consider layer j as a potential candidate to import edges from
  * @param evolution_model[] for each layer, a specification of how the layer should evolve when an internal event happens
  **/
-void evolve(MLNetworkSharedPtr mnet,
+void evolve(MLNetworkSharedPtr& mnet,
 		long num_of_steps,
 		long num_initial_actors,
-		std::vector<double> pr_no_event,
-		std::vector<double> pr_internal_event,
-		matrix<double> dependency,
-		std::vector<EvolutionModel*> evolution_model);
+		const vector<double>& pr_no_event,
+		const vector<double>& pr_internal_event,
+		const matrix<double>& dependency,
+		const vector<EvolutionModelSharedPtr>& evolution_model);
 
 
 // Some variations yet do implement:
@@ -97,14 +94,14 @@ void evolve_edge_import(MLNetwork &mnet,
 		std::vector<double> pr_no_event,
 		std::vector<double> pr_internal_event,
 		matrix<double> dependency,
-		std::vector<EvolutionModel*> evolution_model);
+		std::vector<EvolutionModelSharedPtr> evolution_model);
 
 void evolve_edge_copy(MLNetwork &mnet,
 		long num_of_steps,
 		std::vector<double> pr_no_event,
 		std::vector<double> pr_internal_event,
 		std::vector<std::vector<double> > dependency,
-		std::vector<EvolutionModel*> evolution_model);
+		std::vector<EvolutionModelSharedPtr> evolution_model);
 } // namespace
 
-#endif /* EVOLUTION_H_ */
+#endif /* GENERATION_H_ */

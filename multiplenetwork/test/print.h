@@ -1,16 +1,16 @@
 /*
  * print.h
- *
  */
 
 #include "mlnetwork.h"
+#include <iostream>
 
-#ifndef MLNETWORK_PRINT_H_
-#define MLNETWORK_PRINT_H_
+#ifndef MLNET_PRINT_H_
+#define MLNET_PRINT_H_
 
 void print(const mlnet::MLNetworkSharedPtr mnet);
 
-template <typename T> void print(const mlnet::simple_set<T>& set) {
+template <typename T> void print(const mlnet::hash_set<T>& set) {
 	std::cout << "{ ";
     for (T element: set)
     	std::cout << element << " ";
@@ -35,4 +35,4 @@ void print(const mlnet::property_matrix<STRUCTURE, CONTEXT, VALUE>& P) {
 	}
 }
 
-#endif /* MLNETWORK_PRINT_H_ */
+#endif /* MLNET_PRINT_H_ */

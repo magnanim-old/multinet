@@ -19,6 +19,7 @@ std::string Attribute::type_as_string() const {
 	case STRING_TYPE:
 		return "string";
 	}
+	return "undefined";
 }
 
 }

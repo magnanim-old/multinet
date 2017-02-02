@@ -21,7 +21,7 @@ beta_transition::~beta_transition() {}
 std::string beta_transition::fire(MLNetworkSharedPtr& mnet, const NodeSharedPtr& node, long time) {
 	std::string current_status = mnet->actor_features()->getString(node->actor->id,_S_current);
 	if (current_status==status) {
-		for (NodeSharedPtr n: mnet->neighbors(node,IN)) {
+		for (NodeSharedPtr n: *mnet->neighbors(node,IN)) {
 			if (mnet->actor_features()->getString(n->actor->id,_S_current)==neighbor_status && test(beta)) {
 				return new_status;
 			}

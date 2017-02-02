@@ -27,12 +27,22 @@ double stdev(const std::vector<double>& vec) {
 
 double to_double(const std::string &double_as_string) {
     std::istringstream converted(double_as_string);
-    double double_as_double;
+    double result;
     // maybe use some manipulators
-    converted >> double_as_double;
+    converted >> result;
     if (!converted)
         throw std::runtime_error("Error converting to double");
-    return double_as_double;
+    return result;
+}
+
+int to_int(const std::string &int_as_string) {
+    std::istringstream converted(int_as_string);
+    int result;
+    // maybe use some manipulators
+    converted >> result;
+    if (!converted)
+        throw std::runtime_error("Error converting to integer");
+    return result;
 }
 
 

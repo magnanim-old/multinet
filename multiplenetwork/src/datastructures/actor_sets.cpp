@@ -1,5 +1,4 @@
 #include "datastructures.h"
-#include "utils.h"
 
 namespace mlnet {
 
@@ -72,7 +71,7 @@ triad::triad(const ActorSharedPtr& actor1, const ActorSharedPtr& actor2, const A
 }
 
 string actor_set::to_string() {
-	return mlnet::to_string(actors);
+	return mlnet::set_to_string(actors.begin(),actors.end());
 }
 
 }

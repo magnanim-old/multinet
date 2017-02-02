@@ -18,32 +18,26 @@ using namespace std;
 
 namespace mlnet {
 
-/*
- void pareto_distance(MultipleNetwork* mnet,
- igraph_integer_t vertex,
- vector<set<Multidistance> > *distances) {}
-*/
-
-hashtable<ActorSharedPtr,std::set<path_length> > pareto_distance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& from)  {
+hash_map<ActorSharedPtr,std::set<path_length> > pareto_distance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& from)  {
 	class timestamp_comparator {
 	    public: int operator()(const std::pair<path_length,long>& lhs, const std::pair<path_length,long>& rhs) {return lhs.second < rhs.second;}
 	};
-	std::unordered_map<actor_id,std::set<std::pair<path_length,long>,timestamp_comparator> > distances;
+	std::unordered_map<ActorSharedPtr,std::set<std::pair<path_length,long>,timestamp_comparator> > distances;
 	// timestamps, used for efficiency reasons to avoid processing edges when no changes have occurred since the last iteration
 	long ts = 0;
 	PairCounter<node_id, node_id> last_updated;
 	// initialize distance array - for every target vertex there is still no found path leading to it...
-	for (ActorSharedPtr actor: mnet->get_actors()) {
-		distances[actor->id] = std::set<std::pair<path_length,long>,timestamp_comparator>();
+	for (ActorSharedPtr actor: *mnet->get_actors()) {
+		distances[actor] = std::set<std::pair<path_length,long>,timestamp_comparator>();
 	} // ...except for the source node, reachable from itself via an empty path
 	path_length empty(mnet);
-	distances[from->id].insert(std::pair<path_length,long>(empty,ts));
+	distances[from].insert(std::pair<path_length,long>(empty,ts));
 
 	bool changes; // keep updating the paths until when no changes occur during one full scan of the edges
 	do {
 		changes = false;
-		for (NodeSharedPtr node_from: mnet->get_nodes()) {
-			for (NodeSharedPtr node_to: mnet->neighbors(node_from,OUT)) {
+		for (NodeSharedPtr node_from: *mnet->get_nodes()) {
+			for (NodeSharedPtr node_to: *mnet->neighbors(node_from,OUT)) {
 			ts++;
 			// last updated
 			long lastUpdate;
@@ -53,10 +47,10 @@ hashtable<ActorSharedPtr,std::set<path_length> > pareto_distance(const MLNetwork
 
 			//cout << ts << " " << node_from->actor->name << " on " << node_from->layer->name <<  " -> " << node_to->actor->name << " on " << node_to->layer->name << endl;
 
-			actor_id actor1 = node_from->actor->id;
-			actor_id actor2 = node_to->actor->id;
+			ActorSharedPtr actor1 = node_from->actor;
+			ActorSharedPtr actor2 = node_to->actor;
 
-			// if no tmp shortest paths exist to this , do nothing and continue
+			// if no tmp shortest paths exist to this, do nothing and continue
 			//if (distances[actor1].empty()) {
 			//	//cout << "No paths to " << mnet.getGlobalName(actor1) << endl;
 			//	continue;
@@ -110,7 +104,7 @@ hashtable<ActorSharedPtr,std::set<path_length> > pareto_distance(const MLNetwork
 				}
 
 				if (should_be_inserted) {
-					//cout << " INSERT NEW for " << mnet->get_actor(actor2)->name << endl;
+					//cout << " INSERT NEW for " << actor2->name << " - " << extended_distance << endl;
 					distances[actor2].insert(std::pair<path_length,long>(extended_distance,ts));
 					//cout << "insert " << mnet.getGlobalName(actor2) << " - " << extended_distance << endl;
 					//cout << "add " << paths[toGlobalId].size() << "\n";
@@ -133,7 +127,7 @@ hashtable<ActorSharedPtr,std::set<path_length> > pareto_distance(const MLNetwork
 	std::unordered_map<ActorSharedPtr,std::set<path_length> > result;
 	for (auto p: distances) {
 		for (auto dist: p.second) {
-			result[mnet->get_actor(p.first)].insert(dist.first);
+			result[p.first].insert(dist.first);
 			//cout << "new dist to " <<  mnet->get_actor(p.first)->name << ": " << dist.first.to_string() << " (" << result[mnet->get_actor(p.first)].size() << ")" << endl;
 		}
 	}

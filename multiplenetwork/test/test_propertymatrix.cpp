@@ -30,7 +30,6 @@ void test_propertymatrix() {
 	if (P.contexts().size()!=2) throw FailedUnitTestException("Wrong number of modified contexts");
 	std::cout << " done!" << std::endl;
 	std::cout << "Testing functions...";
-	binary_vector_comparison comp = compare(P,0,1);
 	if (russell_rao(P,0,1)!=1.0/4) throw FailedUnitTestException("Wrong function: russell_rao");
 	if (coverage(P,0,1)!=1.0/2) throw FailedUnitTestException("Wrong function: coverage");
 	if (jaccard(P,0,1)!=1.0/3) throw FailedUnitTestException("Wrong function: jaccard");
@@ -50,11 +49,9 @@ void test_propertymatrix() {
 	PI.set(3,1,3);
 	std::cout << " done!" << std::endl;
 	std::cout << "Testing functions...";
-	std::cout << pearson(PI,0,1) << std::endl;
-	if (pearson(PI,0,1)!=.8) throw FailedUnitTestException("Wrong function: pearson");
+	if (std::abs(pearson(PI,0,1)-.8)>0.001) throw FailedUnitTestException("Wrong function: pearson");
 	PI.rankify();
-	std::cout << pearson(PI,0,1) << std::endl;
-	if (pearson(PI,0,1)!=.8) throw FailedUnitTestException("Wrong function: rank correlation");
+	if (std::abs(pearson(PI,0,1)-.8)>0.001) throw FailedUnitTestException("Wrong function: rank correlation");
 	std::cout << " done!" << std::endl;
 
 	test_end("Property matrix");

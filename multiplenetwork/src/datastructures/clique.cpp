@@ -1,5 +1,4 @@
 #include "datastructures.h"
-#include "utils.h"
 
 namespace mlnet {
 
@@ -95,7 +94,16 @@ bool clique::operator>(const clique& comp) const {
 }
 
 string clique::to_string() {
-	return (mlnet::to_string(actors) + "L" + mlnet::to_string(layers));
+	std::ostringstream ss;
+    ss << "{ ";
+    for (ActorSharedPtr actor: actors)
+    	ss << actor->name << " ";
+    ss << "} + ";
+    ss << "[ ";
+    for (LayerSharedPtr layer: layers)
+    	ss << layer->name << " ";
+    ss << "]";
+    return ss.str();
 }
 
 }

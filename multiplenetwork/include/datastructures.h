@@ -4,20 +4,26 @@
  * Author: Matteo Magnani <matteo.magnani@it.uu.se>
  * Version: 1.0
  *
- * This file defines the basic data structure of the library: the MLNetwork class - where
- * "ML" stands for "multilayer" and not for "Matteo & Luca", as in the original paper
- * "The ML-model for multi-layer social networks" :). Other related data types are also defined:
+ * This file defines the basic data structure of the library: the MLNetwork class.
+ *
+ * Here "ML" stands for "multilayer" and not for "Matteo & Luca", as in our original paper
+ * "The ML-model for multi-layer social networks" [Magnani and Rossi, 2011] :). This class
+ * is a simplified version of the "multilayer network" model introduced by [Kivela et al., 2015],
+ * as described in our book "Multilayer Social Networks" [Dickison et al., 2016].
+ *
+ * Other related data types are also defined:
  * 1. The basic components of a multilayer network (layer, node, edge, actor, and their
  *    abstract super-types, basic_component and named_component).
- *    These components are encapsulated inside a MLNetwork and programmers using this library do
+ *    These components are encapsulated inside a MLNetwork and programmers extending this library do
  *    not need to deal with them: they are created, retrieved and updated by MLNetwork objects.
  * 2. An AttributeStore class, to associate attributes to different components
  *    (actors, nodes...) in a multilayer network, together with a class Attribute. This class
  *    encapsulates attribute management outside MLNetworks, so that it can be substituted with
- *    other storage systems if needed, like a relational database.
- * 2. Classes to represent paths and distances crossing multiple layers.
- * 3. Short names and constants used throughout the package:
- *    ActorSharedPtr, NodeSharedPtr, ..., ml_matrix, ml_hashtable, ..., edge_mode, attribute_type, ...
+ *    other storage systems if needed, like a relational database. In the current version of the library
+ *    we provide an in-memory implementation.
+ * 3. Classes to represent paths and distances crossing multiple layers.
+ * 4. Type definitions, aliases and constants used throughout the package:
+ *    ActorSharedPtr, NodeSharedPtr, ..., ml_matrix, ml_hash_map, ..., edge_mode, attribute_type, ...
  */
 
 #ifndef MLNET_DATASTRUCTURES_H_
@@ -28,13 +34,12 @@
 #include <string>
 #include <map>
 #include <unordered_map>
-#include <unordered_set>
 #include <set>
+#include <unordered_set>
 #include <vector>
 #include <memory>
 
 namespace mlnet {
-
 
 /**********************************************************************/
 /** Main classes defined in this file *********************************/
@@ -74,10 +79,15 @@ typedef std::shared_ptr<Attribute> AttributeSharedPtr;
 typedef std::shared_ptr<AttributeStore> AttributeStoreSharedPtr;
 
 /* Lists of components */
-typedef sorted_random_map<actor_id, ActorSharedPtr> actor_list;
-typedef sorted_random_map<layer_id, LayerSharedPtr> layer_list;
-typedef sorted_random_map<node_id, NodeSharedPtr> node_list;
-typedef sorted_random_map<edge_id, EdgeSharedPtr> edge_list;
+typedef sorted_random_set<ActorSharedPtr> actor_list;
+typedef sorted_random_set<LayerSharedPtr> layer_list;
+typedef sorted_random_set<NodeSharedPtr> node_list;
+typedef sorted_random_set<EdgeSharedPtr> edge_list;
+
+typedef std::shared_ptr<actor_list> ActorListSharedPtr;
+typedef std::shared_ptr<layer_list> LayerListSharedPtr;
+typedef std::shared_ptr<node_list> NodeListSharedPtr;
+typedef std::shared_ptr<edge_list> EdgeListSharedPtr;
 
 /* Other shorthands, for tidiness */
 typedef std::string string;
@@ -86,17 +96,20 @@ typedef std::string string;
 /** Constants and Function Parameters *********************************/
 /**********************************************************************/
 
-/** Directionality of edges, when not specified */
-const bool DEFAULT_EDGE_DIRECTIONALITY = false; // edges are undirected by default
-
-/** Default name for weight attribute */
-const string DEFAULT_WEIGHT_ATTR_NAME = "ML_WEIGHT";
+/** Directionality of edges */
+enum edge_directionality {UNDIRECTED=0, DIRECTED=1};
 
 /** Selection mode, for directed edges (e.g., to compute the IN-degree or OUT-degree of a node) */
 enum edge_mode {INOUT=0, IN=1, OUT=2};
 
 /** Supported attribute types in the current implementation of AttributeStore */
 enum attribute_type {STRING_TYPE = 0, NUMERIC_TYPE = 1};
+
+/** Default edge directionality (undirected). */
+const edge_directionality DEFAULT_EDGE_DIRECTIONALITY = UNDIRECTED;
+
+/** Default name for weight attribute */
+const string DEFAULT_WEIGHT_ATTR_NAME = "_WEIGHT";
 
 /**
  * The length of a path traversing multiple layers can be represented
@@ -127,20 +140,20 @@ enum comparison_result {LESS_THAN=0, EQUAL=1, INCOMPARABLE=2, GREATER_THAN=3};
 class basic_component {
 protected:
 	/** Constructor */
-	basic_component(object_id id);
+	basic_component(object_id);
 	/** Output function, presenting a complete description of the component */
 	string to_string() const;
 public:
 	/** Unique identifier of the component */
 	const object_id id;
 	/** Comparison operator: equality, based on the object identifiers. This assumes that objects of the same type are compared - no checks are made for efficiency reasons. */
-	bool operator==(const basic_component& comp) const;
+	bool operator==(const basic_component&) const;
 	/** Comparison operator: difference, based on the object identifiers. This assumes that objects of the same type are compared - no checks are made for efficiency reasons. */
-	bool operator!=(const basic_component& comp) const;
+	bool operator!=(const basic_component&) const;
 	/** Comparison operator: less than, based on the object identifiers. This assumes that objects of the same type are compared - no checks are made for efficiency reasons. */
-	bool operator<(const basic_component& comp) const;
+	bool operator<(const basic_component&) const;
 	/** Comparison operator: higher than, based on the object identifiers. This assumes that objects of the same type are compared - no checks are made for efficiency reasons. */
-	bool operator>(const basic_component& comp) const;
+	bool operator>(const basic_component&) const;
 };
 
 /**
@@ -149,10 +162,10 @@ public:
 class named_component : public basic_component {
 protected:
 	/** Constructor */
-	named_component(object_id id, const string& name);
+	named_component(object_id, const string& name);
 	/** Output function, presenting a complete description of the component */
 	string to_string() const;
-	friend std::ostream& operator<<(std::ostream& os, const named_component& dt);
+	friend std::ostream& operator<<(std::ostream&, const named_component&);
 public:
 	/** Unique name of the component */
 	const string name;
@@ -164,7 +177,7 @@ public:
 class actor : public named_component {
 public:
 	/** Constructor */
-	actor(actor_id id, const string& name);
+	actor(actor_id, const string& name);
 	/** Output function, presenting a complete description of the actor */
 	string to_string() const;
 };
@@ -175,14 +188,13 @@ public:
 class layer : public named_component {
 public:
 	/** Constructor */
-	layer(layer_id id, const string& name);
+	layer(layer_id, const string& name);
 	/** Output function, presenting a complete description of the layer */
 	string to_string() const;
 };
 
-
 /**
- * A node inside a MLNetwork.
+ * A node inside a MLNetwork. A node is an actor in a specific layer.
  */
 class node : public basic_component {
 public:
@@ -191,7 +203,7 @@ public:
 	/** The layer where this node is located */
 	const LayerSharedPtr layer;
 	/** Constructor */
-	node(node_id id, const ActorSharedPtr& actor, const LayerSharedPtr& layer);
+	node(node_id, const ActorSharedPtr&, const LayerSharedPtr&);
 	/** Output function, presenting a complete description of the node */
 	string to_string() const;
 };
@@ -207,9 +219,9 @@ public:
 	/** The node at the second end of this edge */
 	const NodeSharedPtr v2;
 	/** Edge directionality */
-	const bool directed;
+	const edge_directionality directionality;
 	/** Constructor */
-	edge(edge_id id, const NodeSharedPtr& v1, const NodeSharedPtr& v2, bool directed);
+	edge(edge_id, const NodeSharedPtr&, const NodeSharedPtr&, edge_directionality);
 	/** Output function, presenting a complete description of the edge */
 	string to_string() const;
 };
@@ -217,16 +229,16 @@ public:
 class actor_set {
 public:
 	/** Constructors */
-	actor_set(const simple_set<ActorSharedPtr>& actors);
+	actor_set(const hash_set<ActorSharedPtr>& actors);
 	actor_set();
 	/** Comparison operator: equality, based on the presence of the same actors and the same layers. */
-	bool operator==(const actor_set& comp) const;
+	bool operator==(const actor_set&) const;
 	/** Comparison operator: difference, based on the presence of the same actors and the same layers. */
-	bool operator!=(const actor_set& comp) const;
+	bool operator!=(const actor_set&) const;
 	/** Comparison operator: less then, based on the < operator of the actors and (if needed) the layers in the clique. */
-	bool operator<(const actor_set& comp) const;
+	bool operator<(const actor_set&) const;
 	/** Comparison operator: greater than, based on the > operator of the actors and (if needed) the layers in the clique. */
-	bool operator>(const actor_set& comp) const;
+	bool operator>(const actor_set&) const;
 	/** Output function, presenting a complete description of the clique */
 	std::string to_string();
 
@@ -255,19 +267,21 @@ typedef std::shared_ptr<actor_set> ActorSetSharedPtr;
 class clique {
 public:
 	/** Constructors */
-	clique(const simple_set<ActorSharedPtr>& actors, const simple_set<LayerSharedPtr>& layers);
+	clique(const hash_set<ActorSharedPtr>& actors, const hash_set<LayerSharedPtr>& layers);
 	clique();
 	/** Comparison operator: equality, based on the presence of the same actors and the same layers. */
-	bool operator==(const clique& comp) const;
+	bool operator==(const clique&) const;
 	/** Comparison operator: difference, based on the presence of the same actors and the same layers. */
-	bool operator!=(const clique& comp) const;
+	bool operator!=(const clique&) const;
 	/** Comparison operator: less then, based on the < operator of the actors and (if needed) the layers in the clique. */
-	bool operator<(const clique& comp) const;
+	bool operator<(const clique&) const;
 	/** Comparison operator: greater than, based on the > operator of the actors and (if needed) the layers in the clique. */
-	bool operator>(const clique& comp) const;
+	bool operator>(const clique&) const;
 	/** Output function, presenting a complete description of the clique */
 	std::string to_string();
 
+	//TMP
+	//int id;
 	sorted_set<ActorSharedPtr> actors;
 	sorted_set<LayerSharedPtr> layers;
 };
@@ -443,10 +457,10 @@ public:
 private:
 	/* meta-data: names and types of attributes */
 	vector<AttributeSharedPtr> attribute_vector;
-	hashtable<string,int> attribute_ids;
+	hash_map<string,int> attribute_ids;
 	/* These hash maps are structured as: map[AttributeName][object_id][AttributeValue] */
-	hashtable<string, hashtable<object_id, string> > string_attribute;
-	hashtable<string, hashtable<object_id, double> > numeric_attribute;
+	hash_map<string, hash_map<object_id, string> > string_attribute;
+	hash_map<string, hash_map<object_id, double> > numeric_attribute;
 };
 
 /**********************************************************************/
@@ -473,7 +487,7 @@ private:
 public:
 
 	/** Name of the multilayer network */
-	const string name;
+	string name;
 
 	/**
 	 * Creates an empty MLNetwork and returns a pointer to it.
@@ -495,14 +509,6 @@ public:
 	ActorSharedPtr add_actor(const string& name);
 
 	/**
-	 * @brief Returns an actor by ID.
-	 * This method can also be used to check if an actor is present in the MLNetwork.
-	 * @param id identifier of the actor
-	 * @return a pointer to the requested actor, or null if the actor does not exist
-	 **/
-	ActorSharedPtr get_actor(actor_id id) const;
-
-	/**
 	 * @brief Returns an actor by name.
 	 * This function can also be used to check if an actor is present in the MLNetwork.
 	 * @param name name of the actor
@@ -514,7 +520,7 @@ public:
 	 * @brief Returns all the actors in the MLNetwork.
 	 * @return a pointer to an actor iterator
 	 **/
-	const actor_list& get_actors() const;
+	const ActorListSharedPtr get_actors() const;
 
 	/**
 	 * @brief Adds a new layer to the MLNetwork.
@@ -525,15 +531,7 @@ public:
 	 * @param directed TRUE or FALSE
 	 * @return a pointer to the new layer, or a NULL pointer if a layer with the same name exists.
 	 **/
-	LayerSharedPtr add_layer(const string& name, bool directed);
-
-	/**
-	 * @brief Returns a layer by ID.
-	 * This function can also be used to check if a layer is present in the MLNetwork
-	 * @param id identifier of the layer
-	 * @return a pointer to the requested layer, or null if the layer does not exist
-	 **/
-	LayerSharedPtr get_layer(layer_id id) const;
+	LayerSharedPtr add_layer(const string& name, edge_directionality);
 
 	/**
 	 * @brief Returns a layer by name.
@@ -547,7 +545,7 @@ public:
 	 * @brief Returns all the layers in the MLNetwork.
 	 * @return a layer iterator
 	 **/
-	const layer_list& get_layers() const;
+	const LayerListSharedPtr get_layers() const;
 
 	/**
 	 * @brief Sets the default edge directionality depending on the layers of the connected nodes.
@@ -572,17 +570,8 @@ public:
 	 * @param layer pointer to the layer where this node is located
 	 * @param actor pointer to the actor corresponding to this node
 	 * @return a pointer to the new node, or a NULL pointer if the actor is already present in the layer.
-	 * @throws ElementNotFoundException if the input layer or actor are not present in the network
 	 **/
 	NodeSharedPtr add_node(const ActorSharedPtr& actor, const LayerSharedPtr& layer);
-
-	/**
-	 * @brief Returns a node by ID.
-	 * This function can also be used to check if a node is present in the MLNetwork
-	 * @param id identifier of the layer
-	 * @return a pointer to the requested node, or null if the node does not exist
-	 **/
-	NodeSharedPtr get_node(node_id id) const;
 
 	/**
 	 * @brief Returns a node by specifying an actor and a layer.
@@ -597,21 +586,21 @@ public:
 	 * @brief Returns all the nodes in the MLNetwork.
 	 * @return a node iterator
 	 **/
-	const node_list& get_nodes() const;
+	const NodeListSharedPtr get_nodes() const;
 
 	/**
 	 * @brief Returns all the nodes in a layer.
 	 * @param layer pointer to the layer where this node is located
 	 * @return a node iterator
 	 **/
-	const node_list& get_nodes(const LayerSharedPtr& layer) const;
+	const NodeListSharedPtr get_nodes(const LayerSharedPtr& layer) const;
 
 	/**
 	 * @brief Returns the nodes associated to the input actor.
 	 * @param actor pointer to the actor
 	 * @return an iterator containing pointers to nodes
 	 **/
-	const node_list& get_nodes(const ActorSharedPtr& actor) const;
+	const NodeListSharedPtr get_nodes(const ActorSharedPtr& actor) const;
 
 	/**
 	 * @brief Adds a new edge to the MLNetwork.
@@ -620,7 +609,6 @@ public:
 	 * @param node1 a pointer to the "from" node if directed, or to one end of the edge if undirected
 	 * @param node2 a pointer to the "to" node if directed, or one end of the edge if undirected
 	 * @return a pointer to the new edge, or a NULL pointer if the edge already exists.
-	 * @throws ElementNotFoundException if the input nodes are not present in the network
 	 **/
 	EdgeSharedPtr add_edge(const NodeSharedPtr& node1, const NodeSharedPtr& node2);
 
@@ -637,7 +625,7 @@ public:
 	 * @brief Returns all the edges in the MLNetwork.
 	 * @return an edge iterator
 	 **/
-	const edge_list& get_edges() const;
+	const EdgeListSharedPtr get_edges() const;
 
 	/**
 	 * @brief Returns all the edges from a layer A to a layer B.
@@ -646,7 +634,7 @@ public:
 	 * @param layer2 pointer to the layer where the second ends of the edges are located
 	 * @return an edge iterator
 	 **/
-	const edge_list& get_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
+	const EdgeListSharedPtr get_edges(const LayerSharedPtr& layer1, const LayerSharedPtr& layer2) const;
 
 	/**
 	 * @brief Deletes an existing node.
@@ -687,7 +675,7 @@ public:
 	 * @return an iterator containing pointers to nodes
 	 * @throws WrongParameterException if mode is not one of IN, OUT or INOUT
 	 **/
-	const node_list& neighbors(const NodeSharedPtr& node, edge_mode mode) const;
+	const NodeListSharedPtr neighbors(const NodeSharedPtr& node, edge_mode mode) const;
 
 	/******************************
 	 * Attribute handling
@@ -778,6 +766,9 @@ public:
 	/** Returns a compact string representation of this MLNetwork */
 	string to_string() const;
 
+	/** Returns a longer string representation of this MLNetwork, also indicating attributes if present and with a newline at the end */
+	string to_long_string() const;
+
 private:
 	// largest identifier assigned so far
 	node_id max_node_id;
@@ -786,37 +777,38 @@ private:
 	layer_id max_layer_id;
 
 	/* Edge directionality */
-	hashtable<layer_id, hashtable<layer_id, bool> > edge_directionality;
+	hash_map<layer_id, hash_map<layer_id, bool> > _edge_directionality;
 
 	// Components:
-	layer_list layers;
-	actor_list actors;
-	node_list nodes;
-	edge_list edges;
+	LayerListSharedPtr layers;
+	ActorListSharedPtr actors;
+	NodeListSharedPtr nodes;
+	EdgeListSharedPtr edges;
 
 	// Indexes to components (Component IDX):
-	hashtable<string, LayerSharedPtr> cidx_layer_by_name;
-	hashtable<string, ActorSharedPtr> cidx_actor_by_name;
-	hashtable<actor_id, hashtable<layer_id, NodeSharedPtr > > cidx_node_by_actor_and_layer;
-	hashtable<node_id, hashtable<node_id, EdgeSharedPtr> > cidx_edge_by_nodes;
+	hash_map<string, LayerSharedPtr> cidx_layer_by_name;
+	hash_map<string, ActorSharedPtr> cidx_actor_by_name;
+	hash_map<actor_id, hash_map<layer_id, NodeSharedPtr > > cidx_node_by_actor_and_layer;
+	hash_map<node_id, hash_map<node_id, EdgeSharedPtr> > cidx_edge_by_nodes;
 
 	// Indexes to sets of components (Set IDX):
-	hashtable<layer_id, node_list> sidx_nodes_by_layer;
-	hashtable<actor_id, node_list> sidx_nodes_by_actor;
-	hashtable<layer_id, hashtable<layer_id, edge_list> > sidx_edges_by_layer_pair;
+	hash_map<layer_id, NodeListSharedPtr> sidx_nodes_by_layer;
+	hash_map<actor_id, NodeListSharedPtr> sidx_nodes_by_actor;
+	hash_map<layer_id, hash_map<layer_id, EdgeListSharedPtr> > sidx_edges_by_layer_pair;
 
-	hashtable<node_id, node_list> sidx_neighbors_out;
-	hashtable<node_id, node_list> sidx_neighbors_in;
-	hashtable<node_id, node_list> sidx_neighbors_all;
+	hash_map<node_id, NodeListSharedPtr> sidx_neighbors_out;
+	hash_map<node_id, NodeListSharedPtr> sidx_neighbors_in;
+	hash_map<node_id, NodeListSharedPtr> sidx_neighbors_all;
 
 	/* objects storing the feature vectors of the different components */
 	AttributeStoreSharedPtr actor_attributes;
 	AttributeStoreSharedPtr layer_attributes;
-	hashtable<layer_id, AttributeStoreSharedPtr> node_attributes;
-	hashtable<layer_id, hashtable<layer_id, AttributeStoreSharedPtr> > edge_attributes;
+	hash_map<layer_id, AttributeStoreSharedPtr> node_attributes;
+	hash_map<layer_id, hash_map<layer_id, AttributeStoreSharedPtr> > edge_attributes;
 
-	/* An empty set of nodes, conveniently returned when necessary instead of creating a new empty node_list. */
-	node_list empty;
+	/* Empty sets, conveniently returned when necessary instead of creating a new empty list. */
+	NodeListSharedPtr empty_nodes;
+	EdgeListSharedPtr empty_edges;
 };
 
 
@@ -938,6 +930,28 @@ struct hash<mlnet::dyad> {
 			shift += 5;
 		}
 		return h;
+    }
+};
+
+template <>
+struct hash<mlnet::triad> {
+	size_t operator()(const mlnet::triad& a) const {
+		int sum = 0;
+		for (mlnet::ActorSharedPtr actor: a.actors) {
+			sum += actor->id;
+		}
+		return hash<int>()(sum);
+    }
+};
+
+template <>
+struct hash<mlnet::actor_set> {
+	size_t operator()(const mlnet::actor_set& a) const {
+		int sum = 0;
+		for (mlnet::ActorSharedPtr actor: a.actors) {
+			sum += actor->id;
+		}
+		return hash<int>()(sum);
     }
 };
 }

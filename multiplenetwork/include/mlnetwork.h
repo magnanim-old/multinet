@@ -16,6 +16,7 @@
 #define MLNET_MLNETWORK_H_
 
 // Exceptions:
+#include "community.h"
 #include "exceptions.h"
 // Various utility functions/classes (like CSV reading, support data structures...):
 #include "utils.h"
@@ -28,8 +29,6 @@
 // Generation of multilayer networks:
 #include "generation.h"
 // Functions for community detection:
-#include "community.h"
-// Functions for computing coordinates (for drawing):
 #include "layout.h"
 // Random walks on multilayer networks:
 #include "randomwalks.h"

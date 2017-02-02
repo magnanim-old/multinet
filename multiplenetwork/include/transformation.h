@@ -12,7 +12,6 @@
 #define MLNET_TRANSFORMATION_H_
 
 #include "datastructures.h"
-#include <unordered_set>
 
 namespace mlnet {
 
@@ -28,7 +27,7 @@ namespace mlnet {
  * @return A pointer to the newly created layer.
  * @throws DuplicateElementException If a layer with the same name already exists.
  */
-LayerSharedPtr flatten_weighted(MLNetworkSharedPtr& mnet, const std::string& new_layer_name, const simple_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors);
+LayerSharedPtr flatten_weighted(MLNetworkSharedPtr& mnet, const std::string& new_layer_name, const hash_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors);
 
 /**
  * The "disjunctive" flattening approach, also known as or-flattening and unweighted-fattening,
@@ -67,7 +66,14 @@ LayerSharedPtr project_unweighted(MLNetworkSharedPtr& mnet, const std::string& n
  * @return A pointer to the newly created layer.
  * @throws DuplicateElementException If a layer with the same name already exists.
  */
-LayerSharedPtr create_layer(MLNetworkSharedPtr& mnet, const std::string& new_layer_name, const simple_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors);
+LayerSharedPtr create_layer(MLNetworkSharedPtr& mnet, const std::string& new_layer_name, const hash_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors);
+
+
+/**
+ * Replace actor names with random values
+ * @param mnet A multilayer network.
+ */
+MLNetworkSharedPtr anonymize_actors(const MLNetworkSharedPtr& mnet, const string& name);
 
 }
 

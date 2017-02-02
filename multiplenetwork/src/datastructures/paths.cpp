@@ -44,8 +44,8 @@ comparison_result path_length::compare_full(const path_length& other) const {
 		throw OperationNotSupportedException("Cannot compare distances on different networks");
 	}
 
-	for (LayerSharedPtr layer1: mnet->get_layers()) {
-		for (LayerSharedPtr layer2: mnet->get_layers()) {
+	for (LayerSharedPtr layer1: *mnet->get_layers()) {
+		for (LayerSharedPtr layer2: *mnet->get_layers()) {
 			long l1 = length(layer1,layer2);
 			long l2 = other.length(layer1,layer2);
 		    if (l1 > l2) {
@@ -74,7 +74,7 @@ comparison_result path_length::compare_switch(const path_length& other) const {
 	}
 	long num_intralayer_steps1 = 0;
 	long num_intralayer_steps2 = 0;
-	for (LayerSharedPtr layer1: mnet->get_layers()) {
+	for (LayerSharedPtr layer1: *mnet->get_layers()) {
 		long l1 = length(layer1,layer1);
 		num_intralayer_steps1 += l1;
 		long l2 = other.length(layer1,layer1);
@@ -114,7 +114,7 @@ comparison_result path_length::compare_multiplex(const path_length& other) const
 	}
 	long num_intralayer_steps1 = 0;
 	long num_intralayer_steps2 = 0;
-	for (LayerSharedPtr layer1: mnet->get_layers()) {
+	for (LayerSharedPtr layer1: *mnet->get_layers()) {
 		long l1 = length(layer1,layer1);
 		num_intralayer_steps1 += l1;
 		long l2 = other.length(layer1,layer1);
@@ -182,12 +182,12 @@ bool path_length::operator!=(const path_length& other) const {
 
 std::string path_length::to_string() const {
 	std::string res;
-	for (LayerSharedPtr layer: mnet->get_layers()) {
+	for (LayerSharedPtr layer: *mnet->get_layers()) {
 		long l = length(layer,layer);
 		res += " " + layer->name + ":" + std::to_string(l);
 	}
-	for (LayerSharedPtr layer1: mnet->get_layers()) {
-		for (LayerSharedPtr layer2: mnet->get_layers()) {
+	for (LayerSharedPtr layer1: *mnet->get_layers()) {
+		for (LayerSharedPtr layer2: *mnet->get_layers()) {
 			if (layer1==layer2)
 				continue;
 			long l = length(layer1,layer2);

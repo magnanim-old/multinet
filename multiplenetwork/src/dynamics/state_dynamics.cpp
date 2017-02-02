@@ -25,7 +25,7 @@ matrix<long> run(MLNetworkSharedPtr& mnet, const std::vector<std::string>& statu
 
 	// Initialize actor statuses
 	Counter<std::string> c;
-	for (ActorSharedPtr actor: mnet->get_actors()) {
+	for (ActorSharedPtr actor: *mnet->get_actors()) {
 		std::string status = statuses.at(test(init_distribution));
 		c.inc(status);
 		mnet->actor_features()->setString(actor->id,_S_current,status);
@@ -39,14 +39,14 @@ matrix<long> run(MLNetworkSharedPtr& mnet, const std::vector<std::string>& statu
 
 	// If a seed has been specified, assign it to a random node
 	if (seed!="") {
-		mnet->actor_features()->setString(mnet->get_actors().get_at_random()->id,_S_current,seed);
-		mnet->actor_features()->setString(mnet->get_actors().get_at_random()->id,_S_next,seed);
+		mnet->actor_features()->setString(mnet->get_actors()->get_at_random()->id,_S_current,seed);
+		mnet->actor_features()->setString(mnet->get_actors()->get_at_random()->id,_S_next,seed);
 	}
 
 	// LOOP
 	for (long ts=1; ts<=num_iterations; ts++) {
 		Counter<std::string> c;
-		for (NodeSharedPtr node: mnet->get_nodes()) {
+		for (NodeSharedPtr node: *mnet->get_nodes()) {
 			if (mnet->actor_features()->getNumeric(node->actor->id,_S_time)==ts) continue;
 			for (transition* t: transitions) {
 				std::string new_status = t->fire(mnet,node,ts);
@@ -56,7 +56,7 @@ matrix<long> run(MLNetworkSharedPtr& mnet, const std::vector<std::string>& statu
 				}
 			}
 		}
-		for (ActorSharedPtr actor: mnet->get_actors()) {
+		for (ActorSharedPtr actor: *mnet->get_actors()) {
 			std::string next = mnet->actor_features()->getString(actor->id,_S_next);
 			mnet->actor_features()->setString(actor->id,_S_current,next);
 			c.inc(next);

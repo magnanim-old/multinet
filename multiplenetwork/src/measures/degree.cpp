@@ -15,8 +15,8 @@ namespace mlnet {
 
 long degree(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const std::unordered_set<LayerSharedPtr>& layers, edge_mode mode) {
 	int degree = 0;
-	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
-		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
+	for (NodeSharedPtr node: *mnet->get_nodes(actor)) {
+		for (NodeSharedPtr neighbor: *mnet->neighbors(node, mode)) {
 			if (layers.count(neighbor->layer)>0)
 				degree += 1;
 		}
@@ -26,8 +26,8 @@ long degree(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const s
 
 long degree(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, const LayerSharedPtr& layer, edge_mode mode) {
 	int degree = 0;
-	for (NodeSharedPtr node: mnet->get_nodes(actor)) {
-		for (NodeSharedPtr neighbor: mnet->neighbors(node, mode)) {
+	for (NodeSharedPtr node: *mnet->get_nodes(actor)) {
+		for (NodeSharedPtr neighbor: *mnet->neighbors(node, mode)) {
 			if (neighbor->layer==layer)
 				degree += 1;
 		}

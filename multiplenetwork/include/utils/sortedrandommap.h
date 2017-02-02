@@ -1,5 +1,5 @@
 /**
- * sortedmap.h
+ * sortedrandommap.h
  * 
  * A sorted random map is a class used to store a set of objects that can be accessed:
  * 1. by key in (average) log time.
@@ -10,14 +10,16 @@
  * sorted random map is typically returned so that no objects are duplicated and
  * no additional memory is used.
  *
- * Here a sorted random map is implemented as a skip list.
+ * Here a sorted random map is implemented as a skip list. This is (linearly) less efficient
+ * than a map, but the map from the C++ standard library cannot be modified, so I could not
+ * add the random element retrieval function. A skip list was much faster to implement from
+ * scratch than a red-black tree.
  */
 
 #ifndef MLNET_SORTED_MAP_H_
 #define MLNET_SORTED_MAP_H_
 
 #include "random.h"
-#include "../exceptions.h"
 #include <string>
 #include <map>
 #include <unordered_map>
@@ -58,7 +60,7 @@ public:
 
     /**
      * This function is used to increase the level of the header.
-     * @param number of skipped entries (to be set to the number of entries)
+     * @param skipped_entries number of skipped entries (to be set to the number of entries)
      */
     void increment(long skipped_entries);
 };
@@ -95,7 +97,7 @@ public:
     sorted_random_map();
 	/**
 	 * Creates a sorted set optimized to store a pre-defined number of entries
-	 * @param capacity the initial capacity for which the sorted set is optimized.
+	 * @param start_capacity the initial capacity for which the sorted set is optimized.
 	 */
     sorted_random_map(long start_capacity);
 
@@ -267,7 +269,7 @@ long sorted_random_map<KEY,VALUE>::get_index(KEY search_value) const {
 	so_far+= x->link_length[0];
     x = x->forward[0];
     if (x != NULL && x->id == search_value)
-    	return so_far;
+    	return so_far-1;
     else return -1;
 }
 

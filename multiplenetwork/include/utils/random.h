@@ -7,19 +7,21 @@
 #ifndef MLNET_RANDOM_H_
 #define MLNET_RANDOM_H_
 
-#include "../exceptions.h"
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <vector>
-#include <set>
+#include <time.h>
+#include <random>
+#include <chrono>
 
 namespace mlnet {
 
 /***********************************/
 /** Random                        **/
 /***********************************/
+
+/**
+ * @return a random device shared by all the library
+ */
+std::mt19937 & get_random_engine();
 
 /**
  * Returns a random integral number in the range [0,max[ using an
