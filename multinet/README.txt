@@ -3,7 +3,7 @@ Brief description of the code structure of the multinet library
 Author: Matteo Magnani <matteo.magnani@it.uu.se>
 Version: 1.0
 
-./include/mlnetwork.h is the main header file, and lists all the
+./include/multinet.h is the main header file, and lists all the
 different modules in the library. This file can be useful to
 get a quick overview of the main modules in the library.
 
