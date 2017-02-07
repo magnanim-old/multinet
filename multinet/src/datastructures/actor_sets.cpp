@@ -11,7 +11,7 @@ bool actor_set::operator==(const actor_set& comp) const {
 	if (actors.size() != comp.actors.size()) return false;
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
-	for (int i=0; i<actors.size(); i++) {
+	for (uint i = 0; i<actors.size(); i++) {
 		if ((*it1)!=(*it2))
 			return false;
 		++it1; ++it2;
@@ -23,7 +23,7 @@ bool actor_set::operator!=(const actor_set& comp) const {
 	if (actors.size() != comp.actors.size()) return true;
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
-	for (int i=0; i<actors.size(); i++) {
+	for (uint i = 0; i<actors.size(); i++) {
 		if ((*it1)!=(*it2))
 			return true;
 		++it1; ++it2;
@@ -35,7 +35,7 @@ bool actor_set::operator<(const actor_set& comp) const {
 	if (actors.size() != comp.actors.size()) return actors.size() < comp.actors.size();
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
-	for (int i=0; i<actors.size(); i++) {
+	for (uint i = 0; i<actors.size(); i++) {
 		if ((*it1)<(*it2))
 			return true;
 		if ((*it1)>(*it2))
@@ -49,7 +49,7 @@ bool actor_set::operator>(const actor_set& comp) const {
 	if (actors.size() != comp.actors.size()) return actors.size() > comp.actors.size();
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
-	for (int i=0; i<actors.size(); i++) {
+	for (uint i = 0; i<actors.size(); i++) {
 		if ((*it1)>(*it2))
 			return true;
 		if ((*it1)<(*it2))

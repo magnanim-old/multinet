@@ -91,6 +91,7 @@ typedef std::shared_ptr<edge_list> EdgeListSharedPtr;
 
 /* Other shorthands, for tidiness */
 typedef std::string string;
+typedef std::size_t size_t;
 
 /**********************************************************************/
 /** Constants and Function Parameters *********************************/
@@ -367,7 +368,7 @@ public:
 	 * @param idx the position of the attribute (from 0 to numAttributes()-1).
 	 * @return an object of type Attribute, or NULL if idx's attribute does not exist.
 	 **/
-	virtual AttributeSharedPtr attribute(int idx) const = 0;
+	virtual AttributeSharedPtr attribute(size_t idx) const = 0;
 
 	/**
 	 * @brief Returns an attribute by name.
@@ -445,7 +446,7 @@ public:
 
 	int numAttributes() const;
 	const vector<AttributeSharedPtr>& attributes() const;
-	AttributeSharedPtr attribute(int idx) const;
+	AttributeSharedPtr attribute(size_t idx) const;
 	AttributeSharedPtr attribute(const string& name) const;
 	void add(const string& attribute_name, attribute_type type);
 	void setString(object_id id, const string& attribute_name, const string& value);

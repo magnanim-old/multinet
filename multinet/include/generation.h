@@ -44,9 +44,9 @@ typedef std::shared_ptr<EvolutionModel> EvolutionModelSharedPtr;
  * @brief Grows a network by first creating a complete graph with m0 nodes, then adding a new node at a time and connecting it to m other nodes chosen with a probability proportional to their degree.
  **/
 class BAEvolutionModel : public EvolutionModel {
-	int m0, m;
+	size_t m0, m;
 public:
-	BAEvolutionModel(int m0, int m);
+	BAEvolutionModel(size_t m0, size_t m);
 	~BAEvolutionModel();
 	void init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
 	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
@@ -57,9 +57,9 @@ public:
  * @brief Grows a network by first creating all the nodes and then at every step choosing two nodes (uniform probability) to connect with an edge.
  **/
 class UniformEvolutionModel : public EvolutionModel {
-	int m0;
+	size_t m0;
 public:
-	UniformEvolutionModel(int m0);
+	UniformEvolutionModel(size_t m0);
 	~UniformEvolutionModel();
 	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
 	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges);

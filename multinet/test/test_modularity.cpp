@@ -51,9 +51,9 @@ void test_modularity() {
     groups[n5] = 1;
     groups[n6] = 0;
 
-	double mod = modularity(mnet,groups,1);
+	//double mod = modularity(mnet,groups,1);
 
-	std::cout << "Modularity: " << mod << std::endl;
+	//std::cout << "Modularity: " << mod << std::endl;
 
 	//log("TEST SUCCESSFULLY COMPLETED (modularity)");
 }

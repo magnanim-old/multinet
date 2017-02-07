@@ -6,14 +6,14 @@
  * Version: 0.0.1
  */
 
-#import <set>
-#import "test.h"
-#import "datastructures.h"
-#import "randomwalks.h"
-#import "exceptions.h"
-#import "measures.h"
-#import "utils.h"
-#import "io.h"
+#include <set>
+#include "test.h"
+#include "datastructures.h"
+#include "randomwalks.h"
+#include "exceptions.h"
+#include "measures.h"
+#include "utils.h"
+#include "io.h"
 
 using namespace mlnet;
 
@@ -21,7 +21,7 @@ void test_randomwalks() {
 	//log("TESTING Random Walks");
 
 	//log("Reading network toy from file...",false);
-	MLNetworkSharedPtr mnet3 = read_multilayer("test/toy.mpx","toy",',');
+	MLNetworkSharedPtr mnet3 = read_multilayer("./toy.mpx","toy",',');
 	//log("done! ",false);
 	//log(mnet3->to_string());
 
