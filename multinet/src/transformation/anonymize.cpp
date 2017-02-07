@@ -14,7 +14,7 @@ MLNetworkSharedPtr anonymize_actors(const MLNetworkSharedPtr& mnet, const string
 	MLNetworkSharedPtr anonym_net = MLNetwork::create(name);
 	// generate random ids
 	vector<string> names(mnet->get_actors()->size());
-	for (int i=0; i<names.size(); i++) {
+	for (uint i = 0; i<names.size(); i++) {
 		names[i] = "A" + to_string(i);
 	}
 	std::random_shuffle(names.begin(),names.end());

@@ -12,7 +12,7 @@ struct layer_set_comparator {
 		if (a.size() != b.size()) return a.size() < b.size();
 		sorted_set<LayerSharedPtr>::iterator it1 = a.begin();
 		sorted_set<LayerSharedPtr>::iterator it2 = b.begin();
-		for (int i=0; i<a.size(); i++) {
+		for (uint i=0; i<a.size(); i++) {
 			if ((*it1)<(*it2))
 				return true;
 			if ((*it1)>(*it2))
@@ -66,7 +66,7 @@ class cpm_community {
 
 	void find_max_communities_max_layers(const clique_adjacency_graph& adjacency, CommunitySharedPtr& A,
 			vector<CliqueSharedPtr> Candidates, hash_set<CliqueSharedPtr>& processedCliques, layer_sets& processedLayerCombinations, int m, hash_set<CommunitySharedPtr>& result);
-}
+};
 
 #endif /* MULTIPLENETWORK_COMMUNITY_H_ */
 

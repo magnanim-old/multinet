@@ -155,7 +155,7 @@ void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr& A,
 hash_map<ActorSharedPtr,hash_set<LayerSharedPtr> >& B,
 hash_map<ActorSharedPtr,hash_set<LayerSharedPtr> >& C,
 hash_set<ActorSharedPtr>& in_clique,
-hash_set<CliqueSharedPtr>& result, int k, int m) {
+hash_set<CliqueSharedPtr>& result, uint k, uint m) {
 
 	/*
 	std::cout << "CALL "<< std::endl;
@@ -174,12 +174,12 @@ hash_set<CliqueSharedPtr>& result, int k, int m) {
 */
 
 	if (A->actors.size()>=k) {
-		int max_layers_C = 0;
+		uint max_layers_C = 0;
 		for (auto c: C) {
 			if (c.second.size()>max_layers_C)
 				max_layers_C = c.second.size();
 		}
-		int max_layers_B = 0;
+		uint max_layers_B = 0;
 		for (auto b: B) {
 			if (b.second.size()>max_layers_B)
 				max_layers_B = b.second.size();
@@ -281,7 +281,7 @@ hash_set<CommunitySharedPtr> find_max_communities_max_layers(MLNetworkSharedPtr 
 }
 
 void find_max_communities_max_layers(const clique_adjacency_graph& adjacency, CommunitySharedPtr& A,
-		vector<CliqueSharedPtr> Candidates, hash_set<CliqueSharedPtr>& processedCliques, layer_sets& processedLayerCombinations, int m, hash_set<CommunitySharedPtr>& result) {
+		vector<CliqueSharedPtr> Candidates, hash_set<CliqueSharedPtr>& processedCliques, layer_sets& processedLayerCombinations, uint m, hash_set<CommunitySharedPtr>& result) {
 
 	/*
 	std::cout << "PROCESS: { ";
@@ -459,7 +459,7 @@ bool stopping_condition(const MLNetworkSharedPtr& mnet, long info) {
  * (2) extended with actors in B (3) not containing actors in C (4) on
  * at least k actors and m layers.
  */
-hash_set<CliqueSharedPtr> find_max_cliques_it(MLNetworkSharedPtr mnet, int k, int m) {
+hash_set<CliqueSharedPtr> find_max_cliques_it(MLNetworkSharedPtr mnet, uint k, uint m) {
 
 	hash_set<CliqueSharedPtr> result;
 	// A: empty clique
@@ -512,12 +512,12 @@ hash_set<CliqueSharedPtr> find_max_cliques_it(MLNetworkSharedPtr mnet, int k, in
 			}
 
 			// Compute the maximum number of layers for elements in B and C
-			int max_layers_C = 0;
+			uint max_layers_C = 0;
 			for (auto c: inst->C) {
 				if (c.second.size()>max_layers_C)
 					max_layers_C = c.second.size();
 			}
-			int max_layers_B = 0;
+			uint max_layers_B = 0;
 			for (auto b: inst->B) {
 				if (b.second.size()>max_layers_B)
 					max_layers_B = b.second.size();

@@ -6,12 +6,12 @@
  * Version: 0.0.1
  */
 
-#import <set>
-#import "test.h"
-#import "datastructures.h"
-#import "exceptions.h"
-#import "utils.h"
-#import "io.h"
+#include <set>
+#include "test.h"
+#include "datastructures.h"
+#include "exceptions.h"
+#include "utils.h"
+#include "io.h"
 
 using namespace mlnet;
 

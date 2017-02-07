@@ -66,7 +66,7 @@ int random_level(int MAX_LEVEL, double P) {
     return lvl < MAX_LEVEL ? lvl : MAX_LEVEL;
 }
 
-std::set<long> getKRandom(long max, long k) {
+std::set<long> getKRandom(long max, uint k) {
 	if (max<k) throw OperationNotSupportedException("Only " + to_string(max) + " values available, requested " + to_string(k));
 	std::set<long> res;
 	while (res.size()<k)
@@ -85,7 +85,7 @@ bool test(double probability) {
 int test(const std::vector<double>& options) {
 	// For efficiency reasons, we do not check if the values sum to 1
 	double prob_failing_previous_tests=1;
-	for (int idx=0; idx<options.size()-1; idx++) {
+	for (uint idx=0; idx<options.size()-1; idx++) {
 		double adjusted_prob = options.at(idx)/prob_failing_previous_tests;
 		if (test(adjusted_prob))
 			return idx;
@@ -98,7 +98,7 @@ int test(const std::vector<double>& options) {
 int test(const std::vector<std::vector<double> >& options, int row_num) {
 	// For efficiency reasons, we do not check if the values sum to 1
 	double prob_failing_previous_tests=1;
-	for (int idx=0; idx<options.at(row_num).size()-1; idx++) {
+	for (uint idx=0; idx<options.at(row_num).size()-1; idx++) {
 		double adjusted_prob = options.at(row_num).at(idx)/prob_failing_previous_tests;
 		if (test(adjusted_prob))
 			return idx;

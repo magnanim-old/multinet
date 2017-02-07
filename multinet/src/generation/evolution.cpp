@@ -34,24 +34,24 @@ void evolve(MLNetworkSharedPtr& mnet,
 
 	std::vector<double> pr_no_event;
 
-	for (int i=0; i<pr_internal_event.size(); i++) {
+	for (uint i=0; i<pr_internal_event.size(); i++) {
 		pr_no_event.push_back(1-pr_internal_event.at(i)-pr_external_event.at(i));
 	}
 
 	// Creating num_initial_actors actors
 	//std::cout << "INIT ACTORS" << std::endl;
-	for (int i=0; i<num_initial_actors; i++)
+	for (uint i=0; i<num_initial_actors; i++)
 		mnet->add_actor("A"+std::to_string(i));
 
 	// Initialization
-	for (int n=0; n<mnet->get_layers()->size(); n++) {
+	for (uint n=0; n<mnet->get_layers()->size(); n++) {
 		//std::cout << "INIT LAYER " << n << std::endl;
 		evolution_model[n]->init_step(mnet,mnet->get_layers()->get_at_index(n));
 	}
 
 	for (long i=0; i<num_of_steps; i++) {
 		//std::cout << "step " << i << std::endl;
-		for (int n=0; n<mnet->get_layers()->size(); n++) {
+		for (uint n=0; n<mnet->get_layers()->size(); n++) {
 
 			LayerSharedPtr target_layer = mnet->get_layers()->get_at_index(n);
 			/* Add new vertexes ???
@@ -98,7 +98,7 @@ void evolve(MLNetworkSharedPtr& mnet,
 			else {
 				// choose a layer from which to import an edge: first find the candidates:
 				//std::set<network_id> candidates;
-					int layer_index = test(dependency[n]);
+					uint layer_index = test(dependency[n]);
 					LayerSharedPtr layer = mnet->get_layers()->get_at_index(layer_index);
 
 					//std::cout << " External event " << target_layer->to_string() << " <- " << layer->to_string() << std::endl;
