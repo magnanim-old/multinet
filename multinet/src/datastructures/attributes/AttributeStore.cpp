@@ -18,7 +18,7 @@ const vector<AttributeSharedPtr>& MainMemoryAttributeStore::attributes() const {
 	return attribute_vector;
 }
 
-AttributeSharedPtr MainMemoryAttributeStore::attribute(int idx) const {
+AttributeSharedPtr MainMemoryAttributeStore::attribute(unsigned int idx) const {
 	if (attribute_vector.size()>idx)
 		return attribute_vector.at(idx);
 	else return AttributeSharedPtr();

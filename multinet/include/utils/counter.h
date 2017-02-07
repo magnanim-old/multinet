@@ -1,6 +1,6 @@
 /**
  * counter.h
- * 
+ *
  * Classes to count the number of occurrences of some objects/values.
  */
 
@@ -199,7 +199,7 @@ long Counter<T>::count(const T& val) const {
 template <class T>
 T Counter<T>::max() const {
 	long max = -1;
-	T max_value;
+	T max_value = 0;
 	for (auto pair: values) {
 		if (pair.second>max) {
 			max_value = pair.first;
