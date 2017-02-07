@@ -21,8 +21,8 @@ MLNetworkSharedPtr read_dl(const std::string& infile, const string& network_name
 	if (field.substr(0,field.find("="))!="N"){
 		throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": expected N, found " + field.substr(0,field.find("=")));;
 	}
-	int num_actors = to_int(field.substr(field.find("=")+1));
-	int num_layers;
+	uint num_actors = to_int(field.substr(field.find("=")+1));
+	uint num_layers;
 	if (v.size()==1) {
 		num_layers = 1;
 	}
@@ -37,7 +37,7 @@ MLNetworkSharedPtr read_dl(const std::string& infile, const string& network_name
 	csv.getNext(); // FORMAT
 	csv.getNext(); // ROW_LABELS:
 
-	for (int i=0; i<num_actors; i++) {
+	for (uint i=0; i<num_actors; i++) {
 		v = csv.getNext();
 		if (v.size()==1 && v.at(0)=="") {
 			continue;
@@ -47,12 +47,12 @@ MLNetworkSharedPtr read_dl(const std::string& infile, const string& network_name
 
 	csv.getNext(); // COLUMN_LABELS:
 
-	for (int i=0; i<num_actors; i++) csv.getNext();
+	for (uint i=0; i<num_actors; i++) csv.getNext();
 
 	csv.getNext(); // LEVEL LABELS:
 
 
-	for (int i=0; i<num_layers; i++) {
+	for (uint i=0; i<num_layers; i++) {
 		v = csv.getNext();
 		if (v.size()==1 && v.at(0)=="") {
 			continue;
@@ -63,18 +63,18 @@ MLNetworkSharedPtr read_dl(const std::string& infile, const string& network_name
 	}
 
 	// create the corresponding nodes
-	for (int l=0; l<num_layers; l++) {
-		for (int i=0; i<num_actors; i++) {
+	for (uint l=0; l<num_layers; l++) {
+		for (uint i=0; i<num_actors; i++) {
 			mnet->add_node(actors.at(i),layers.at(l));
 		}
 	}
 
 	csv.getNext(); // DATA:
 
-	for (int l=0; l<num_layers; l++) {
-		for (int a1=0; a1<num_actors; a1++) {
+	for (uint l=0; l<num_layers; l++) {
+		for (uint a1=0; a1<num_actors; a1++) {
 			v = csv.getNext();
-			for (int i=0; i<v.size(); i++) {
+			for (uint i=0; i<v.size(); i++) {
 				if (v.at(i)=="") {
 					v.erase(v.begin()+i);
 					i--;
@@ -83,7 +83,7 @@ MLNetworkSharedPtr read_dl(const std::string& infile, const string& network_name
 			if (v.size()!=num_actors) {
 				throw WrongFormatException("Line " + to_string(csv.rowNum()) + ": wrong number of columns in the data matrix");
 			}
-			for (int a2=0; a2<num_actors; a2++) {
+			for (uint a2=0; a2<num_actors; a2++) {
 				int val = to_int(v.at(a2));
 				if (val==0) continue;
 				else if (val>=1) {

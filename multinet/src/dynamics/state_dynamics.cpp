@@ -33,7 +33,7 @@ matrix<long> run(MLNetworkSharedPtr& mnet, const std::vector<std::string>& statu
 		mnet->actor_features()->setNumeric(actor->id,_S_time,0);
 		mnet->actor_features()->setNumeric(actor->id,_S_time,0);
 	}
-	for (int i=0; i<statuses.size(); i++) {
+	for (uint i=0; i<statuses.size(); i++) {
 		result[i][0] = c.count(statuses.at(i));
 	}
 
@@ -61,7 +61,7 @@ matrix<long> run(MLNetworkSharedPtr& mnet, const std::vector<std::string>& statu
 			mnet->actor_features()->setString(actor->id,_S_current,next);
 			c.inc(next);
 		}
-		for (int i=0; i<statuses.size(); i++) {
+		for (uint i=0; i<statuses.size(); i++) {
 			result[i][ts] = c.count(statuses.at(i));
 		}
 	}

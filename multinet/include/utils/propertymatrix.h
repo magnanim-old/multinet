@@ -3,7 +3,7 @@
  *
  * A property matrix is a view over a network that associates a value to each structure
  * (e.g., node, pair of nodes, ...) in each context (e.g., layer).
- * 
+ *
  * Several generic summarization functions can be computed on a property matrix, e.g., to
  * obtain the amount of overlapping or the statistical correlation between different types
  * of structures in different layers.
@@ -257,14 +257,14 @@ void property_matrix<STRUCTURE,CONTEXT,NUMBER>::rankify() {
 	structure_comparison_function<STRUCTURE,CONTEXT,NUMBER> f(this,&c);
 	std::sort(ranks.begin(), ranks.end(), f);
 
-	int i=0;
+	uint i=0;
 	while (i<ranks.size()) {
 		NUMBER val = get(ranks[i],c);
-		int last_tie = i;
+		uint last_tie = i;
 		while (i+1<ranks.size() && get(ranks[i+1],c)==val) {
 			i++;
 		}
-		for (int j=last_tie; j<=i; j++) {
+		for (uint j=last_tie; j<=i; j++) {
 			set(ranks[j],c,((double)last_tie+i)/2+1);
 		}
 		i++;
