@@ -24,7 +24,7 @@ void test_community() {
 	//mnet->erase(mnet->get_layer("leisure"));
 	//mnet->erase(mnet->get_layer("facebook"));
 	//mnet->erase(mnet->get_layer("lunch"));
-	hash_set<CommunitySharedPtr> comm = ml_cpm(mnet,3,1,1,1);
+	hash_set<CommunitySharedPtr> comm = ml_cpm(mnet,3.0,1,1,1);
 
 	int i=0;
 	for (CommunitySharedPtr c: comm) {

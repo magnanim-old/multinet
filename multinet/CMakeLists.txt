@@ -65,7 +65,6 @@ if (DOXYGEN_FOUND)
 		COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMENT "Generating API documentation with Doxygen"
-		EXCLUDE_FROM_ALL
 		VERBATIM)
 
 else()
@@ -78,3 +77,5 @@ install (TARGETS mlnetwork
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib)
+
+#add_subdirectory(test)
