@@ -1,4 +1,4 @@
-CXXFLAGS = -Iinclude -O2 -g -std=c++11 -Wall -Werror -fmessage-length=0
+CXXFLAGS = -Iinclude -O2 -g -Wall -fmessage-length=0 -std=gnu++11
 
 OBJS = 	src/datastructures/*.cpp \
 		src/datastructures/components/*.cpp \
@@ -23,7 +23,7 @@ unit_test: test/main.cpp $(OBJS) $(TEST)
 
 lib: $(OBJS)
 	$(CXX) -c -fPIC  $(CXXFLAGS) $(OBJS)
-	$(CXX) $(LIBS) -stdlib=libc++ -shared -o libmlnetwork.so *.o
+	$(CXX) $(LIBS) -shared -o libmlnetwork.so *.o
 	rm *.o
 
 all: unit_test

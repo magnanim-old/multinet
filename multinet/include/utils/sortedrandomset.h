@@ -1,6 +1,6 @@
 /**
  * sortedrandomset.h
- * 
+ *
  * A sorted random map is a class used to store a set of objects that can be accessed:
  * 1. by key in (average) log time.
  * 2. by index (position) in constant time.
@@ -81,9 +81,9 @@ private:
 
     sorted_random_set_entry<ELEMENT_TYPE> *header;
     /* Number of entries for which the sorted set is optimized. */
-    long capacity = 1;
+    size_t capacity = 1;
     /* Current number of entries. */
-    long num_entries = 0;
+    size_t num_entries = 0;
     /* Maximum level */
 	int MAX_LEVEL = 0;
     /* Current maximum level in use. */
@@ -98,7 +98,7 @@ public:
 	 * Creates a sorted set optimized to store a pre-defined number of entries
 	 * @param start_capacity the initial capacity for which the sorted set is optimized.
 	 */
-    sorted_random_set(long start_capacity);
+    sorted_random_set(size_t start_capacity);
 
     /** Iterator over the objects in this collection */
 	class iterator {
@@ -126,13 +126,13 @@ public:
 	/** Returns an iterator after the last object in the collection */
 	sorted_random_set<ELEMENT_TYPE>::iterator end() const;
 	/** Returns the number of objects in the collection */
-    long size() const;
+    size_t size() const;
 	/** Returns true if an object with the input id is present in the collection */
     bool contains(ELEMENT_TYPE) const;
 	/** Returns the position of the input value in the collection, or -1 */
-    long get_index(ELEMENT_TYPE) const;
+    size_t get_index(ELEMENT_TYPE) const;
 	/** Returns the object at the given position in the collection, or NULL */
-    ELEMENT_TYPE get_at_index(long) const;
+    ELEMENT_TYPE get_at_index(size_t) const;
 	/** Returns a random object, uniform probability */
     ELEMENT_TYPE get_at_random() const;
 	/**
@@ -172,7 +172,7 @@ sorted_random_set<ELEMENT_TYPE>::sorted_random_set() {
 }
 
 template <class ELEMENT_TYPE>
-sorted_random_set<ELEMENT_TYPE>::sorted_random_set(long start_capacity) {
+sorted_random_set<ELEMENT_TYPE>::sorted_random_set(size_t start_capacity) {
 	capacity = start_capacity;
 	MAX_LEVEL = std::ceil(std::log2(capacity));
 	header = new sorted_random_set_entry<ELEMENT_TYPE>(MAX_LEVEL, NULL);
@@ -222,7 +222,7 @@ bool sorted_random_set<ELEMENT_TYPE>::iterator::operator!=(const sorted_random_s
 }
 
 template <class ELEMENT_TYPE>
-long sorted_random_set<ELEMENT_TYPE>::size() const {
+size_t sorted_random_set<ELEMENT_TYPE>::size() const {
 	return num_entries;
 }
 
@@ -239,7 +239,7 @@ bool sorted_random_set<ELEMENT_TYPE>::contains(ELEMENT_TYPE search_value) const 
 }
 
 template <class ELEMENT_TYPE>
-long sorted_random_set<ELEMENT_TYPE>::get_index(ELEMENT_TYPE search_value) const {
+size_t sorted_random_set<ELEMENT_TYPE>::get_index(ELEMENT_TYPE search_value) const {
     const sorted_random_set_entry<ELEMENT_TYPE> *x = header;
     long so_far=0;
     for (int i = level; i >= 0; i--) {
@@ -256,11 +256,11 @@ long sorted_random_set<ELEMENT_TYPE>::get_index(ELEMENT_TYPE search_value) const
 }
 
 template <class ELEMENT_TYPE>
-ELEMENT_TYPE sorted_random_set<ELEMENT_TYPE>::get_at_index(long pos) const {
+ELEMENT_TYPE sorted_random_set<ELEMENT_TYPE>::get_at_index(size_t pos) const {
 	if (pos < 0 || pos >= num_entries)
 		throw ElementNotFoundException("Index out of bounds");
     const sorted_random_set_entry<ELEMENT_TYPE> *x = header;
-    long so_far=0;
+    size_t so_far=0;
     for (int i = level; i >= 0; i--) {
         while (x->forward[i] != NULL && x->link_length[i] + so_far <= pos + 1) {
         	so_far+= x->link_length[i];
