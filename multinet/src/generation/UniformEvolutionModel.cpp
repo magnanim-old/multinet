@@ -7,7 +7,7 @@ using namespace std;
 
 namespace mlnet {
 
-UniformEvolutionModel::UniformEvolutionModel(uint m0) {
+UniformEvolutionModel::UniformEvolutionModel(size_t m0) {
 	UniformEvolutionModel::m0 = m0;
 }
 

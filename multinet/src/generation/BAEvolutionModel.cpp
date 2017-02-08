@@ -13,7 +13,7 @@ using namespace std;
 
 namespace mlnet {
 
-BAEvolutionModel::BAEvolutionModel(uint m0, uint m) {
+BAEvolutionModel::BAEvolutionModel(size_t m0, size_t m) {
 	BAEvolutionModel::m0 = m0;
 	BAEvolutionModel::m = m;
 }
