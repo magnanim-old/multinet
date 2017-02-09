@@ -40,7 +40,7 @@ int main(int argn, char* argv[]) {
 	test_community();
 	test_evolution();
 	test_randomwalks();
-	test_modularity();
+  test_modularity();
 	test_transformation();
 
 	/*

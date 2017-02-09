@@ -19,17 +19,17 @@ void test_community() {
 
 	test_begin("ML-CPM");
 
-	MLNetworkSharedPtr mnet = read_multilayer("data/aucs.mpx","cpm net",',');
+	//MLNetworkSharedPtr mnet = read_multilayer("data/aucs.mpx","cpm net",',');
 	//mnet->erase(mnet->get_layer("work"));
 	//mnet->erase(mnet->get_layer("leisure"));
 	//mnet->erase(mnet->get_layer("facebook"));
 	//mnet->erase(mnet->get_layer("lunch"));
-	hash_set<CommunitySharedPtr> comm = ml_cpm(mnet,3.0,1,1,1);
+	//hash_set<CommunitySharedPtr> comm = ml_cpm(mnet,3,1,1,1);
 
-	int i=0;
-	for (CommunitySharedPtr c: comm) {
-		std::cout << (i++) << " "  << c->to_string() << std::endl;
-	}
+	//int i=0;
+	//for (CommunitySharedPtr c: comm) {
+	//	std::cout << (i++) << " "  << c->to_string() << std::endl;
+	//}
 	/*
 	hash_set<CliqueSharedPtr> C = find_max_cliques(mnet,3,1);
 
