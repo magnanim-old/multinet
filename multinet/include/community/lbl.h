@@ -14,6 +14,7 @@ class abacus {
 			Pre: MLNetworkSharedPtr is a multilayer network
 				sigma is the support threshold for association rule mining
 				SLCDAlgorithm is a single layer community detection algorithm
+				Args... args are arguments to the Single layer community detection algorithm
 			Post: h is a hash set containing actor communities
 					e.x: print hash_set[A]
 						>>> B,C,D

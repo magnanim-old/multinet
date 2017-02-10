@@ -5,8 +5,6 @@
 
 namespace mlnet {
 
-class tensor{};
-
 class lart {
 
 	public:
