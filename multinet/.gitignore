@@ -2,3 +2,21 @@
 .project
 .DS_Store
 build/*
+*.so
+
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+runtest
+mlnetwork-tests
+
+#dtrace stuff
+!include/dtrace/headers/dtrace.h
+include/dtrace/headers/*.h
+include/dtrace/objects/*

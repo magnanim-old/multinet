@@ -1,11 +1,11 @@
-cmake_minimum_required (VERSION 3.2 FATAL_ERROR)
+cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
 
-project (mlnetwork LANGUAGES CXX)
+project (multinet C CXX)
 set (PROJECT_VENDOR 			"Matteo Magnani")
 set (PROJECT_CONTACT 			"matteo.magnani@it.uu.se")
 set (PROJECT_URL 				"https://github.com/magnanim/multinet")
 set (PROJECT_DESCRIPTION 		"mlnetwork")
-set (CMAKE_BUILD_TYPE 			"Release")
+set (CMAKE_BUILD_TYPE 			"Debug")
 
 file (READ 						"${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_FULL)
 string (REGEX REPLACE 			"[\n\r]" "" PROJECT_VERSION_FULL "${PROJECT_VERSION_FULL}")
@@ -36,15 +36,13 @@ else()
 endif()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -DNDEBUG")
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fsanitize=address -fno-omit-frame-pointer")
-
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -DNDEBUG -msse2 -DDLIB_NO_GUI_SUPPORT -DDLIB_ISO_CPP_ONLY")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fopenmp -fmessage-length=0 -funroll-loops -fno-omit-frame-pointer -march=native")
 else()
 	if (CMAKE_COMPILER_IS_CLANGXX)
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNDEBUG")
+		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNDEBUG -Wextra -Wall")
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fsanitize=address -fno-omit-frame-pointer -D__extern_always_inline=\"extern __always_inline\"")
-	
+		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -fsanitize=address -funroll-loops -fno-omit-frame-pointer -D__extern_always_inline=\"extern __always_inline\"")
 	else()
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fsanitize=address -no-inline-min-size -no-inline-max-size")
@@ -52,31 +50,72 @@ else()
 endif()
 
 include_directories (include)
-file (GLOB_RECURSE SOURCES src/*.cpp)
 
-find_package (Doxygen)
-if (DOXYGEN_FOUND)
-	set (DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/multiplenetwork.doxyfile)
-	set (DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+file (GLOB_RECURSE SOURCES src/*.cpp lib/dlib-19.4/dlib/all/source.cpp)
 
-	configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+option(DOXY "Generate DoxyGen documentation" OFF)
+if(DOXY)
+	find_package (Doxygen)
+	if (DOXYGEN_FOUND)
+		set (DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/multinet.doxyfile)
+		set (DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+		configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+		add_custom_target(doc ALL
+			COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "Generating API documentation with Doxygen"
+			VERBATIM)
+	else()
+		message (FATAL_ERROR "Doxygen is needed to build the documentation.")
+	endif()
+endif(DOXY)
 
-	add_custom_target(doc ALL
-		COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMENT "Generating API documentation with Doxygen"
-		VERBATIM)
+set(PROBE_PATH "")
+option(dtrace "Add dtrace support to target" OFF)
+if(dtrace)
+	if(NOT WIN32)
+		execute_process(COMMAND which dtrace OUTPUT_VARIABLE out)
+		if (NOT out)
+			message(FATAL_ERROR "dtrace generator not found!")
+		endif()
 
-else()
-	message (FATAL_ERROR "Doxygen is needed to build the documentation.")
-endif()
+		file(GLOB providers "include/dtrace/providers/*.d")
 
-add_library (mlnetwork SHARED ${SOURCES})
+		foreach(provider ${providers})
+			get_filename_component(p ${provider} NAME_WE)
+			execute_process(COMMAND dtrace -h -s ${provider} -o include/dtrace/headers/${p}.h)
+		endforeach()
 
-install (TARGETS mlnetwork 
+		if(UNIX AND NOT APPLE)
+			file(MAKE_DIRECTORY include/dtrace/objects)
+			foreach(provider ${providers})
+				get_filename_component(p ${provider} NAME_WE)
+				execute_process(COMMAND dtrace -G -s include/dtrace/providers/${p}.d -o include/dtrace/objects/${p}.o)
+				set(PROBE_PATH include/dtrace/objects/${p}.o)
+			endforeach()
+		endif()
+
+		add_definitions(-DUSE_DYNAMIC_TRACE)
+	endif()
+endif(dtrace)
+
+find_package(Eigen3 REQUIRED)
+include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
+find_package(BLAS REQUIRED)
+
+include_directories(lib)
+include_directories(lib/dlib)
+
+add_library (multinet SHARED ${SOURCES} ${PROBE_PATH})
+
+TARGET_LINK_LIBRARIES(multinet)
+
+
+install (TARGETS multinet
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib)
 
-
 add_subdirectory(test)
+
+
