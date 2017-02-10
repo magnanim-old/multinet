@@ -24,6 +24,9 @@ int main(int argn, char* argv[]) {
 	test_begin("All unit tests");
 	try {
 
+	test_lart();
+
+	/*
 	test_begin("UTILITY FUNCTIONS AND CLASSES");
 	test_math();
 	test_random();
@@ -40,10 +43,9 @@ int main(int argn, char* argv[]) {
 	test_community();
 	test_evolution();
 	test_randomwalks();
-  test_modularity();
+	test_modularity();
 	test_transformation();
 
-	/*
 
 	test_dynamics();
 	*/

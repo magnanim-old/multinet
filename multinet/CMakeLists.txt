@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.2 FATAL_ERROR)
+cmake_minimum_required (VERSION 3.0 FATAL_ERROR)
 
 project (mlnetwork LANGUAGES CXX)
 set (PROJECT_VENDOR 			"Matteo Magnani")
@@ -44,7 +44,7 @@ else()
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNDEBUG")
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fsanitize=address -fno-omit-frame-pointer -D__extern_always_inline=\"extern __always_inline\"")
-	
+
 	else()
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fsanitize=address -no-inline-min-size -no-inline-max-size")
@@ -54,26 +54,26 @@ endif()
 include_directories (include)
 file (GLOB_RECURSE SOURCES src/*.cpp)
 
-find_package (Doxygen)
-if (DOXYGEN_FOUND)
-	set (DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/multiplenetwork.doxyfile)
-	set (DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+#find_package (Doxygen)
+#if (DOXYGEN_FOUND)
+#	set (DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/multiplenetwork.doxyfile)
+#	set (DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
-	configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+#	configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
-	add_custom_target(doc ALL
-		COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMENT "Generating API documentation with Doxygen"
-		VERBATIM)
+#	add_custom_target(doc ALL
+#		COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+#		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#		COMMENT "Generating API documentation with Doxygen"
+#		VERBATIM)
 
-else()
-	message (FATAL_ERROR "Doxygen is needed to build the documentation.")
-endif()
+#else()
+#	message (FATAL_ERROR "Doxygen is needed to build the documentation.")
+#endif()
 
 add_library (mlnetwork SHARED ${SOURCES})
 
-install (TARGETS mlnetwork 
+install (TARGETS mlnetwork
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib)
