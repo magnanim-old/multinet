@@ -16,7 +16,7 @@ public:
 			 eps
 			 gamma
 	*/
-	actor_list get_ml_community(MLNetworkSharedPtr mnet, uint32_t t, float eps, float gamma);
+	hash_set<ActorSharedPtr> get_ml_community(MLNetworkSharedPtr mnet, uint32_t t, float eps, float gamma);
 
 };
 
