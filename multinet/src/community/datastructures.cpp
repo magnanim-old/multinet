@@ -47,4 +47,5 @@ int community::size() const {
 	return actors.size();
 }
 */
+
 }

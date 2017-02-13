@@ -19,7 +19,7 @@ void test_end(const std::string& name) {
 	std::cout << std::endl;
 }
 
-int main(int argn, char* argv[]) {
+int main() {
 
 	test_begin("All unit tests");
 	try {
@@ -40,11 +40,10 @@ int main(int argn, char* argv[]) {
 	test_community();
 	test_evolution();
 	test_randomwalks();
-  test_modularity();
+	test_modularity();
 	test_transformation();
 
 	/*
-
 	test_dynamics();
 	*/
 	}
