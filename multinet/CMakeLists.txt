@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.2 FATAL_ERROR)
+cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
 
 project (mlnetwork LANGUAGES CXX)
 set (PROJECT_VENDOR 			"Matteo Magnani")
