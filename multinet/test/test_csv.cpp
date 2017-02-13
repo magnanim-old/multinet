@@ -15,7 +15,7 @@ void test_csv() {
 	CSVReader csv;
 	csv.trimFields(true);
 	csv.setFieldSeparator(',');
-	csv.open("test/test.csv");
+	csv.open("./test.csv");
 	std::cout << "done!" << std::endl;
 	vector<string> v = csv.getNext();
 	std::cout << "Testing CSV settings...";

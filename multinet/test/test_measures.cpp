@@ -18,7 +18,7 @@ void test_measures() {
 
 	test_begin("Actor measures");
 	std::cout << "Reading the multilayer network...";
-	MLNetworkSharedPtr mnet = read_multilayer("test/io2.mpx","mlnet 2",',');
+	MLNetworkSharedPtr mnet = read_multilayer("./io2.mpx","mlnet 2",',');
 	std::cout << "done!" << std::endl;
 	LayerSharedPtr l1 = mnet->get_layer("l1");
 	LayerSharedPtr l2 = mnet->get_layer("l2");
@@ -64,7 +64,7 @@ void test_measures() {
 	std::cout << "done!" << std::endl;
 
 
-	MLNetworkSharedPtr mnet5 = read_multilayer("test/io5.mpx","mlnet 5",',');
+	MLNetworkSharedPtr mnet5 = read_multilayer("./io5.mpx","mlnet 5",',');
 	l1 = mnet5->get_layer("l1");
 	l2 = mnet5->get_layer("l2");
 	double sim;
