@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
 
-project (mlnetwork LANGUAGES CXX)
+project (multinet LANGUAGES CXX)
 set (PROJECT_VENDOR 			"Matteo Magnani")
 set (PROJECT_CONTACT 			"matteo.magnani@it.uu.se")
 set (PROJECT_URL 				"https://github.com/magnanim/multinet")
@@ -41,9 +41,9 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 
 else()
 	if (CMAKE_COMPILER_IS_CLANGXX)
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNDEBUG")
+		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNDEBUG -Wextra -Wall")
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fsanitize=address -fno-omit-frame-pointer -D__extern_always_inline=\"extern __always_inline\"")
+		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fno-omit-frame-pointer -D__extern_always_inline=\"extern __always_inline\"")
 
 	else()
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
@@ -56,7 +56,7 @@ file (GLOB_RECURSE SOURCES src/*.cpp)
 
 find_package (Doxygen)
 if (DOXYGEN_FOUND)
-	set (DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/multiplenetwork.doxyfile)
+	set (DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/multinet.doxyfile)
 	set (DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 	configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 	add_custom_target(doc ALL
@@ -68,9 +68,9 @@ else()
 	message (FATAL_ERROR "Doxygen is needed to build the documentation.")
 endif()
 
-add_library (mlnetwork SHARED ${SOURCES})
+add_library (multinet SHARED ${SOURCES})
 
-install (TARGETS mlnetwork
+install (TARGETS multinet
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib)
