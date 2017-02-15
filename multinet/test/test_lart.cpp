@@ -11,7 +11,7 @@ void test_lart() {
 
 	lart k;
 
-	MLNetworkSharedPtr mnet3 = read_multilayer("data/toy.mpx","toy",',');
+	MLNetworkSharedPtr mnet3 = read_multilayer("test/data/sample.mpx","sample",',');
 	uint32_t t = 4;
 	float eps = 1;
 	float gamma = 1;

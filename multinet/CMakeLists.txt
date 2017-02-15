@@ -70,6 +70,8 @@ file (GLOB_RECURSE SOURCES src/*.cpp)
 
 add_library (mlnetwork SHARED ${SOURCES})
 
+include_directories (/home/mikki/boost/)
+
 install (TARGETS mlnetwork
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib

@@ -3,10 +3,8 @@
 
 #include "datastructures.h"
 
-#include "community/flattening.h"
-//#include "community/lbl.h"
-//#include "community/single_ext.h"
-#include "community/multilayer.h"
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 
 namespace mlnet {
@@ -74,6 +72,26 @@ hash_set<CommunitySharedPtr> find_max_communities_max_layers(MLNetworkSharedPtr 
 
 void find_max_communities_max_layers(const clique_adjacency_graph& adjacency, CommunitySharedPtr& A,
 		vector<CliqueSharedPtr> Candidates, hash_set<CliqueSharedPtr>& processedCliques, layer_sets& processedLayerCombinations, size_t m, hash_set<CommunitySharedPtr>& result);
+
+class lart {
+
+public:
+	/*
+		Use: lart k;
+			 k.get_ml_community(MLNetworkSharedPtr, uint32_t, float, float);
+		Pre: MLNetworkSharedPtr is a multilayer network
+			 t is the number of number of steps for random walker to take
+			 eps
+			 gamma
+	*/
+	hash_set<ActorSharedPtr> get_ml_community(MLNetworkSharedPtr mnet, uint32_t t, float eps, float gamma);
+
+	std::vector<boost::numeric::ublas::matrix<int>> ml_network2adj_matrix(MLNetworkSharedPtr mnet);
+
+};
+
+
+
 }
 
 #endif /* MULTIPLENETWORK_COMMUNITY_H_ */

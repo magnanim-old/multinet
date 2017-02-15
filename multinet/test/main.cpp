@@ -21,6 +21,8 @@ void test_end(const std::string& name) {
 
 int main() {
 
+	test_lart();
+	/*
 	test_begin("All unit tests");
 	try {
 
@@ -43,15 +45,14 @@ int main() {
 	test_modularity();
 	test_transformation();
 
-	/*
 	test_dynamics();
-	*/
 	}
 	catch (std::exception& e) {
 		std::cout << "[Error] UNIT TEST NOT PASSED: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 	test_end("All unit tests");
+	*/
 
 	return EXIT_SUCCESS;
 }
