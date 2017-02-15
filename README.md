@@ -1,4 +1,4 @@
-mlnetwork
+multinet
 ===============
 
 A library for the analysis and mining of multilayer networks, based on the forthcoming book: Multilayer Social Networks, by Dickison, Magnani and Rossi, Cambridge University Press. This is also available as an R library on CRAN.
@@ -49,7 +49,7 @@ testing suite will reside in `build/test`. In order run the test suite execute:
 
 ```sh
 cd multinet/<build_directory>/test
-./mlnetwork-tests
+./multinet-tests
 ```
 
 To install the library in your system use the generated Makefile script:
