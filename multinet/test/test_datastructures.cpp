@@ -65,7 +65,7 @@ void test_datastructures() {
 	ActorSharedPtr a3 = mnet->add_actor("Matteo");
 	if (mnet->add_actor("Matteo")) throw FailedUnitTestException("Duplicate actor insertion not caught");
 	if (mnet->get_actor("Matteo") != a3) throw FailedUnitTestException("Could not retrieve actor");
-	int num_actors=0;
+	size_t num_actors=0;
 	for (ActorSharedPtr actor : *mnet->get_actors()) {
 		num_actors++;
 		std::cout << "A" << actor->id << " ";
@@ -81,7 +81,7 @@ void test_datastructures() {
 	if (mnet->add_layer("Facebook",UNDIRECTED)) throw FailedUnitTestException("Duplicate actor insertion not caught");
 	mnet->set_directed(l1,l2,true);
 	if (mnet->get_layer("Facebook") != l3) throw FailedUnitTestException("Could not retrieve layer");
-	int num_layers=0;
+	size_t num_layers=0;
 	for (LayerSharedPtr layer : *mnet->get_layers()) {
 		num_layers++;
 		std::cout << "L" << layer->id << " ";
@@ -104,7 +104,7 @@ void test_datastructures() {
 	NodeSharedPtr n3v1 = mnet->add_node(a2,l3);
 	NodeSharedPtr n3v2 = mnet->add_node(a3,l3);
 
-	int num_nodes=0;
+	size_t num_nodes=0;
 	for (NodeSharedPtr node : *mnet->get_nodes()) {
 		num_nodes++;
 		std::cout << "N" << node->id << " ";
@@ -124,7 +124,7 @@ void test_datastructures() {
 	if (mnet->get_edge(n1v0,n1v1) != mnet->get_edge(n1v1,n1v0)) throw FailedUnitTestException("Failed comparison of edges (same undirected edge, inverted end points)");
 
 
-	int num_edges=0;
+	size_t num_edges=0;
 	for (EdgeSharedPtr edge : *mnet->get_edges()) {
 		num_edges++;
 		std::cout << "N" << edge->v1->id << (edge->directionality?"->":"--") << "N" << edge->v2->id << " ";

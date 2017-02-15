@@ -35,6 +35,7 @@ private:
 	std::string message;
 };
 
+void test_lart();
 void test_math();
 void test_random();
 void test_counter();
