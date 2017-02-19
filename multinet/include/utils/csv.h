@@ -38,7 +38,12 @@ public:
 	 * @param path csv file
 	 */
 	void open(const std::string& path);
-
+    
+    /**
+     * Closes a csv file.
+     */
+    void close();
+    
 	/**
 	 * Checks if the end of file has been reached.
 	 * @return true if there is at least one row still to be read

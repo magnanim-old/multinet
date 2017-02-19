@@ -3,12 +3,6 @@
 
 #include "datastructures.h"
 
-#include "community/flattening.h"
-//#include "community/lbl.h"
-//#include "community/single_ext.h"
-#include "community/multilayer.h"
-
-
 namespace mlnet {
 
 typedef std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> > clique_adjacency_graph;

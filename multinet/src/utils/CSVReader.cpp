@@ -29,6 +29,10 @@ void CSVReader::open(const std::string& path) {
 	do {(getline(infile, next))?has_next=true:has_next=false;} while (next=="" && has_next);
 	row_number = 0;
 }
+    
+    void CSVReader::close() {
+        infile.close();
+    }
 
 bool CSVReader::hasNext() const {
 	return has_next;
