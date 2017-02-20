@@ -20,7 +20,6 @@ void test_end(const std::string& name) {
 }
 
 int main() {
-
 	test_lart();
 	/*
 	test_begin("All unit tests");
@@ -45,6 +44,7 @@ int main() {
 	test_modularity();
 	test_transformation();
 
+	/*
 	test_dynamics();
 	}
 	catch (std::exception& e) {

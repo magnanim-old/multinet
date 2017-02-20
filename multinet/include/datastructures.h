@@ -29,6 +29,7 @@
 #ifndef MLNET_DATASTRUCTURES_H_
 #define MLNET_DATASTRUCTURES_H_
 
+#include "dtrace/headers/dtrace.h"
 #include "utils.h"
 #include "exceptions.h"
 #include <string>

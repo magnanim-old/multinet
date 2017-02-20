@@ -20,7 +20,7 @@ void test_io() {
 	test_begin("IO");
 
 	std::cout << "Reading network io1 from file...";
-	MLNetworkSharedPtr mnet1 = read_multilayer("test/io1.mpx","mlnet 1",',');
+	MLNetworkSharedPtr mnet1 = read_multilayer("./io1.mpx","mlnet 1",',');
 	if (mnet1->get_actors()->size()!=5 ||
 		mnet1->get_layers()->size()!=2 ||
 		mnet1->get_nodes()->size()!=7 ||
@@ -28,7 +28,7 @@ void test_io() {
 	std::cout << "done! " << mnet1->to_string() << std::endl;
 
 	std::cout << "Reading network io2 from file...";
-	MLNetworkSharedPtr mnet2 = read_multilayer("test/io2.mpx","mlnet 2",',');
+	MLNetworkSharedPtr mnet2 = read_multilayer("./io2.mpx","mlnet 2",',');
 	if (mnet2->get_actors()->size()!=6 ||
 		mnet2->get_layers()->size()!=2 ||
 		mnet2->get_nodes()->size()!=8 ||
@@ -36,7 +36,7 @@ void test_io() {
 	std::cout << "done! " << mnet2->to_string() << std::endl;
 
 	std::cout << "Reading network io3 from file...";
-	MLNetworkSharedPtr mnet3 = read_multilayer("test/io3.mpx","mlnet 3",',');
+	MLNetworkSharedPtr mnet3 = read_multilayer("./io3.mpx","mlnet 3",',');
 	if (mnet3->get_actors()->size()!=7 ||
 		mnet3->get_layers()->size()!=2 ||
 		mnet3->get_nodes()->size()!=8 ||

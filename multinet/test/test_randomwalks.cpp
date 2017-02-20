@@ -21,7 +21,7 @@ void test_randomwalks() {
 	//log("TESTING Random Walks");
 
 	//log("Reading network toy from file...",false);
-	MLNetworkSharedPtr mnet3 = read_multilayer("test/toy.mpx","toy",',');
+	MLNetworkSharedPtr mnet3 = read_multilayer("./toy.mpx","toy",',');
 	//log("done! ",false);
 	//log(mnet3->to_string());
 
