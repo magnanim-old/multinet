@@ -13,6 +13,10 @@ namespace mlnet {
     
     community::community() {}
     
+    CommunitySharedPtr community::create() {
+        return CommunitySharedPtr(new community());
+    }
+    
     std::string community::to_string() const {
         std::string result = "";
         size_t idx = 0;
@@ -38,6 +42,10 @@ namespace mlnet {
     
     communities::communities() {}
     
+    CommunitiesSharedPtr communities::create() {
+        return CommunitiesSharedPtr(new communities());
+    }
+    
     std::string communities::to_string() const {
         std::string result = "";
         for (CommunitySharedPtr com: data) {
@@ -47,10 +55,14 @@ namespace mlnet {
     }
     
     void communities::add_community(CommunitySharedPtr com) {
-        data.insert(com);
+        data.push_back(com);
     }
     
-    const hash_set<CommunitySharedPtr>& communities::get_communities() const {
+    CommunitySharedPtr communities::get_community(int i) {
+        return data.at(i);
+    }
+    
+    const vector<CommunitySharedPtr>& communities::get_communities() const {
         return data;
     }
 }

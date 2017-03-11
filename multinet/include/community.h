@@ -1,5 +1,5 @@
-#ifndef MULTIPLENETWORK_COMMUNITY_H_
-#define MULTIPLENETWORK_COMMUNITY_H_
+#ifndef MULTINET_COMMUNITY_H_
+#define MULTINET_COMMUNITY_H_
 
 #include "datastructures.h"
 
@@ -7,10 +7,21 @@ namespace mlnet {
 
     
 /* COMMON DATA STRUCTURES */
+    
+    class community;
+    class communities;
+    typedef std::shared_ptr<community> CommunitySharedPtr;
+    typedef std::shared_ptr<communities> CommunitiesSharedPtr;
 
+    /**
+     * A community - that is a set of nodes.
+     */
     class community {
-        public:
+        private:
         community();
+        
+        public:
+        static CommunitySharedPtr create();
         std::string to_string() const;
         void add_node(NodeSharedPtr);
         const hash_set<NodeSharedPtr>& get_nodes() const;
@@ -19,25 +30,30 @@ namespace mlnet {
         hash_set<NodeSharedPtr> data;
     };
     
-    typedef std::shared_ptr<community> CommunitySharedPtr;
     
+    /**
+     * A set of communities. Each community can be accessed by index.
+     */
     class communities {
-        public:
+        private:
         communities();
+        
+        public:
+        static CommunitiesSharedPtr create();
         std::string to_string() const;
         void add_community(CommunitySharedPtr);
-        const hash_set<CommunitySharedPtr>& get_communities() const;
+        CommunitySharedPtr get_community(int i);
+        const vector<CommunitySharedPtr>& get_communities() const;
         
         private:
-        hash_set<CommunitySharedPtr> data;
+        vector<CommunitySharedPtr> data;
     };
     
-    typedef std::shared_ptr<communities> CommunitiesSharedPtr;
 
 /* ALGORITHMS */
 
     
 }
 
-#endif /* MULTIPLENETWORK_COMMUNITY_H_ */
+#endif /* MULTINET_COMMUNITY_H_ */
 
