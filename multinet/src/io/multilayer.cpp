@@ -314,7 +314,16 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 	return mnet;
 }
 
-void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char sep) {
+    
+    void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char sep) {
+        hash_set<LayerSharedPtr> layers;
+        for (LayerSharedPtr layer: *mnet->get_layers()) {
+            layers.insert(layer);
+        }
+        write_multilayer(mnet, path, layers, sep);
+    }
+    
+void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, const hash_set<LayerSharedPtr>& layers, char sep) {
 	std::ofstream outfile;
 	outfile.open(path.data());
 
@@ -323,10 +332,13 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 
 	outfile << "#LAYERS" << std::endl;
 	for (LayerSharedPtr layer: *mnet->get_layers()) {
+        if (layers.count(layer)==0) continue;
 		outfile << layer->name << sep << layer->name << sep << (mnet->is_directed(layer,layer)?"DIRECTED":"UNDIRECTED") << std::endl;
 	}
 	for (LayerSharedPtr layer1: *mnet->get_layers()) {
+        if (layers.count(layer1)==0) continue;
 		for (LayerSharedPtr layer2: *mnet->get_layers()) {
+            if (layers.count(layer2)==0) continue;
 			if (layer1==layer2)
 				continue;
 			outfile << layer1->name << sep << layer2->name << sep << (mnet->is_directed(layer1,layer2)?"DIRECTED":"UNDIRECTED") << std::endl;
@@ -342,6 +354,7 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 
 	outfile << "#NODE ATTRIBUTES" << std::endl;
 	for (LayerSharedPtr layer: *mnet->get_layers()) {
+        if (layers.count(layer)==0) continue;
 		for (AttributeSharedPtr attr: mnet->node_features(layer)->attributes()) {
 			outfile << layer->name << sep << attr->name()<< sep << attr->type_as_string() << std::endl;
 		}
@@ -350,7 +363,9 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 
 	outfile << "#EDGE ATTRIBUTES" << std::endl;
 	for (LayerSharedPtr layer1: *mnet->get_layers()) {
+        if (layers.count(layer1)==0) continue;
 		for (LayerSharedPtr layer2: *mnet->get_layers()) {
+            if (layers.count(layer2)==0) continue;
 			for (AttributeSharedPtr attr: mnet->edge_features(layer1,layer2)->attributes()) {
 				outfile << layer1->name << sep << layer2->name << sep << attr->name()<< sep << attr->type_as_string() << std::endl;
 			}
@@ -378,6 +393,7 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 
 	outfile << "#NODES" << std::endl;
 	for (LayerSharedPtr layer: *mnet->get_layers()) {
+        if (layers.count(layer)==0) continue;
 		for (NodeSharedPtr node: *mnet->get_nodes(layer)) {
 			outfile << node->actor->name << sep << node->layer->name;
 			AttributeStoreSharedPtr node_attrs = mnet->node_features(layer);
@@ -398,7 +414,9 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 
 	outfile << "#EDGES" << std::endl;
 	for (LayerSharedPtr layer1: *mnet->get_layers()) {
+        if (layers.count(layer1)==0) continue;
 		for (LayerSharedPtr layer2: *mnet->get_layers()) {
+            if (layers.count(layer2)==0) continue;
 			for (EdgeSharedPtr edge: *mnet->get_edges(layer1,layer2)) {
 				outfile << edge->v1->actor->name << sep << edge->v1->layer->name << sep << edge->v2->actor->name << sep << edge->v2->layer->name;
 				AttributeStoreSharedPtr edge_attrs = mnet->edge_features(layer1,layer2);
@@ -419,8 +437,16 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 	outfile.close();
 }
 
+    
+    void write_multiplex(const MLNetworkSharedPtr& mnet, const string& path, char sep) {
+        hash_set<LayerSharedPtr> layers;
+        for (LayerSharedPtr layer: *mnet->get_layers()) {
+            layers.insert(layer);
+        }
+        write_multiplex(mnet, path, layers, sep);
+    }
 
-	void write_multiplex(const MLNetworkSharedPtr& mnet, const string& path, char sep) {
+	void write_multiplex(const MLNetworkSharedPtr& mnet, const string& path, const hash_set<LayerSharedPtr>& layers, char sep) {
 		std::ofstream outfile;
 		outfile.open(path.data());
 
@@ -429,6 +455,7 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 
 		outfile << "#LAYERS" << std::endl;
 		for (LayerSharedPtr layer: *mnet->get_layers()) {
+            if (layers.count(layer)==0) continue;
 			outfile << layer->name << sep << (mnet->is_directed(layer,layer)?"DIRECTED":"UNDIRECTED") << std::endl;
 		}
 		outfile << std::endl;
@@ -441,6 +468,7 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 
 		outfile << "#NODE ATTRIBUTES" << std::endl;
 		for (LayerSharedPtr layer: *mnet->get_layers()) {
+            if (layers.count(layer)==0) continue;
 			for (AttributeSharedPtr attr: mnet->node_features(layer)->attributes()) {
 				outfile << layer->name << sep << attr->name()<< sep << attr->type_as_string() << std::endl;
 			}
@@ -449,6 +477,7 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 
 		outfile << "#EDGE ATTRIBUTES" << std::endl;
 		for (LayerSharedPtr layer: *mnet->get_layers()) {
+            if (layers.count(layer)==0) continue;
 			for (AttributeSharedPtr attr: mnet->edge_features(layer,layer)->attributes()) {
 				outfile << layer->name << sep << attr->name()<< sep << attr->type_as_string() << std::endl;
 			}
@@ -475,6 +504,7 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 
 		outfile << "#NODES" << std::endl;
 		for (LayerSharedPtr layer: *mnet->get_layers()) {
+            if (layers.count(layer)==0) continue;
 			for (NodeSharedPtr node: *mnet->get_nodes(layer)) {
 				outfile << node->actor->name << sep << node->layer->name;
 				AttributeStoreSharedPtr node_attrs = mnet->node_features(layer);
@@ -495,6 +525,7 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, char s
 
 		outfile << "#EDGES" << std::endl;
 		for (LayerSharedPtr layer: *mnet->get_layers()) {
+            if (layers.count(layer)==0) continue;
 			for (EdgeSharedPtr edge: *mnet->get_edges(layer,layer)) {
 					outfile << edge->v1->actor->name << sep << edge->v2->actor->name << sep << edge->v2->layer->name;
 					AttributeStoreSharedPtr edge_attrs = mnet->edge_features(layer,layer);

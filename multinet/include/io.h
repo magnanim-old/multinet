@@ -119,6 +119,9 @@ MLNetworkSharedPtr read_dl(const std::string& infile, const std::string& network
  * @param separator character to be used to separate fields in the output file
  *
  */
+void write_multilayer(const MLNetworkSharedPtr& mlnet, const std::string& outfile, const hash_set<LayerSharedPtr>& layers, char separator);
+    
+    
 void write_multilayer(const MLNetworkSharedPtr& mlnet, const std::string& outfile, char separator);
 
 /**
@@ -129,6 +132,8 @@ void write_multilayer(const MLNetworkSharedPtr& mlnet, const std::string& outfil
  * @param separator character to be used to separate fields in the output file
  *
  */
+void write_multiplex(const MLNetworkSharedPtr& mlnet, const std::string& outfile, const hash_set<LayerSharedPtr>& layers, char separator);
+    
 void write_multiplex(const MLNetworkSharedPtr& mlnet, const std::string& outfile, char separator);
 
 
