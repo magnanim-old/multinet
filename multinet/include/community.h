@@ -2,8 +2,6 @@
 #define MULTINET_COMMUNITY_H_
 
 #include "datastructures.h"
-#include <Eigen/Dense>
-
 
 namespace mlnet {
 
@@ -52,7 +50,4 @@ namespace mlnet {
 
 }
 
-#include "community/lart.h"
-
 #endif /* MULTINET_COMMUNITY_H_ */
-

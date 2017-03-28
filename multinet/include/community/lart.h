@@ -1,7 +1,7 @@
-#include "datastructures.h"
+#ifndef LART_H_
+#define LART_H_
 
-#include <Eigen/Sparse>
-#include <Eigen/Dense>
+#include "cutils.h"
 
 namespace mlnet {
 
@@ -20,13 +20,6 @@ public:
 	*/
 	hash_set<ActorSharedPtr> get_ml_community(MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma);
 
-	/*
-		Use : std::vector<Eigen::MatrixXd> a = ml_network2adj_matrix(MLNetworkSharedPtr ptr);
-		Pre : MLNetworkSharedPtr is a non empty multilayer network
-		Post: a is a list of Matrixes that is the adjacency matrix of mnet.
-			Each matrix represents one layer
-	*/
-	std::vector<Eigen::SparseMatrix<double>> ml_network2adj_matrix(MLNetworkSharedPtr mnet);
 
 private:
 
@@ -63,14 +56,6 @@ private:
 		This algorithm contains DTrace and SystemTap probe points for performance testing and tuning.
 	*/
 
-	/*
-		Use: auto A = supraA(a, eps);
-		Pre: a is a list of adjacency matrixes. eps is the probability for the walker to move between layers
-		Post: A is the supra adjacency matrix from the list of matrixes, with inter layer connections
-			on the off diagonal blocks.
-
-	*/
-	Eigen::SparseMatrix<double> supraA(std::vector<Eigen::SparseMatrix<double>> a, double eps);
 
 	/*
 		Use: auto m = block_diag(a);
@@ -145,9 +130,6 @@ private:
 	vector<double> modMLPX(vector<lart::cluster> x, std::vector<Eigen::SparseMatrix<double>> a,
 		double gamma, Eigen::SparseMatrix<double> sA);
 
-	void modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma,
-		Eigen::SparseMatrix<double>& sA);
-
 	/*
 		Use: auto p = get_partition(clusters, maxmodix, L, N);
 		Pre: clusters are the computed clusters of the agglomerative functions
@@ -162,3 +144,5 @@ private:
 };
 
 }
+
+#endif

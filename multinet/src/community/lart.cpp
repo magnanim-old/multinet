@@ -1,4 +1,4 @@
-#include "community.h"
+#include "community/lart.h"
 
 namespace mlnet {
 
@@ -52,64 +52,13 @@ vector<int> lart::get_partition(vector<lart::cluster> clusters, int maxmodix, si
 	return result;
 }
 
-void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a,
-	double gamma, Eigen::SparseMatrix<double>& sA) {
-
-	double twoum = 0.0;
-	for (int j = 0; j < sA.outerSize(); j++) {
-		for (Eigen::SparseMatrix<double>::InnerIterator it(sA, j); it; ++it) {
-			twoum += it.value();
-		}
-	}
-
-	size_t L = a.size();
-	size_t N = a[0].rows();
-
-
-	Eigen::SparseMatrix<double> copy (sA);
-
-	std::vector<Eigen::Triplet<double>> tlist;
-	tlist.reserve(copy.rows() * 1.5);
-	// Cache the inter layer weights because they don't change
-	for (size_t i = 0; i < N; i++) {
-		tlist.push_back(Eigen::Triplet<double>(i, N + i, sA.coeff(i, N + i)));
-		tlist.push_back(Eigen::Triplet<double>(N + i, i, sA.coeff(N + i, i)));
-	}
-
-	for (size_t i = 0; i < L; i++) {
-		Eigen::MatrixXd d = sum(a[i], 0);
-
-		Eigen::MatrixXd	product = d * d.transpose();
-
-		double asum = 0;
-		for (int j = 0; j < a[i].outerSize(); j++) {
-			for (Eigen::SparseMatrix<double>::InnerIterator it(a[i], j); it; ++it) {
-				asum += it.value();
-			}
-		}
-
-		Eigen::MatrixXd	s1 = product.array() / asum;
-		Eigen::MatrixXd	s2 = s1.array() * gamma;
-		Eigen::MatrixXd s3 = Eigen::MatrixXd(copy.block(i * N, i * N, N, N)) - s2;
-
-		for (int j = 0; j < s3.rows(); j++) {
-			for (int k = 0; k < s3.cols(); k++) {
-				tlist.push_back(Eigen::Triplet<double>(j + (i * N), k + (i * N), s3(j, k)));
-			}
-		}
-	}
-
-	sA.setFromTriplets(tlist.begin(), tlist.end());
-	sA /= twoum;
-}
-
 vector<double> lart::modMLPX(vector<lart::cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double> sA0) {
 	vector<double> r;
 
 	size_t L = a.size();
 	size_t N = a[0].rows();
 
-	modmat(a, gamma, sA0);
+	cutils::modmat(a, gamma, 0, sA0);
 
 	double diag = 0.0;
 	for (int i = 0; i < sA0.rows(); i++){
@@ -400,86 +349,33 @@ Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<dou
 	return m;
 }
 
-Eigen::SparseMatrix<double> lart::supraA(std::vector<Eigen::SparseMatrix<double>> a, double eps) {
-	Eigen::SparseMatrix<double> A = block_diag(a);
-	size_t L = a.size();
-	size_t N = a[0].rows();
-
-	for (size_t i = 0; i  < L - 1; ++i) {
-		for (size_t j = i + 1; j < L; ++j) {
-			Eigen::MatrixXd d = sum(a[i].cwiseProduct(a[j]), 1);
-
-			std::vector<Eigen::Triplet<double>> tlist;
-			tlist.reserve(a[i].rows());
-
-			for (int k = 0; k < A.outerSize(); k++) {
-				for (Eigen::SparseMatrix<double>::InnerIterator it(A, k); it; ++it) {
-					tlist.push_back(Eigen::Triplet<double>(it.row(), it.col(), it.value()));
-				}
-			}
-			int ix_a = i * N;
-			int ix_b = (i + 1) * N;
-
-			for (int k = 0; k < a[i].rows(); k++) {
-				double intra = d(k, 0) + eps;
-				tlist.push_back(Eigen::Triplet<double>(ix_a + k, ix_b + k, intra));
-				tlist.push_back(Eigen::Triplet<double>(ix_b + k, ix_a + k, intra));
-			}
-
-			for (int k = 0; k < A.rows(); k++) {
-				tlist.push_back(Eigen::Triplet<double>(k, k, eps));
-			}
-			A.setFromTriplets(tlist.begin(), tlist.end());
-		}
-	}
-	return A;
-}
-
-std::vector<Eigen::SparseMatrix<double>> lart::ml_network2adj_matrix(MLNetworkSharedPtr mnet) {
-	size_t N = mnet->get_layers()->size();
-	size_t M = mnet->get_actors()->size();
-
-	std::vector<Eigen::SparseMatrix<double>> adj(N);
-
-	for (LayerSharedPtr l: *mnet->get_layers()) {
-		Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double> (M, M);
-		size_t reserve = M /2;
-		m.reserve(Eigen::VectorXi::Constant(reserve, reserve));
-
-		DTRACE2(ML2AM_RESERVE, M, reserve);
-
-		for (EdgeSharedPtr e: *mnet->get_edges(l, l)) {
-			int v1_id = e->v1->actor->id;
-			int v2_id = e->v2->actor->id;
-			m.insert(v1_id - 1, v2_id - 1) = 1;
-			m.insert(v2_id - 1, v1_id - 1) = 1;
-		}
-		adj[l->id - 1] = m;
-	}
-
-	DTRACE2(ML2AM_END, N, M);
-	return adj;
-}
 
 hash_set<ActorSharedPtr> lart::get_ml_community(
 	MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma) {
 
 	hash_set<ActorSharedPtr> actors;
 
-	std::vector<Eigen::SparseMatrix<double>> a = ml_network2adj_matrix(mnet);
+	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
+
+	std::cout << a[0] << std::endl;
+	std::cout << a[1] << std::endl;
 
 	if (a.size() < 1) {
 		return actors;
 	}
-
-	Eigen::SparseMatrix<double> sA = supraA(a, eps);
-	Eigen::SparseMatrix<double> sA0 = supraA(a, 0);
+	std::cout << "1" <<std::endl;
+	Eigen::SparseMatrix<double> sA = cutils::supraA(a, eps);
+	std::cout << "2" <<std::endl;
+	Eigen::SparseMatrix<double> sA0 = cutils::supraA(a, 0);
 	sA0.prune(0, 0); // Used in clustering, don't want to see any zero's
+	std::cout << "3" <<std::endl;
 
 	Eigen::SparseMatrix<double> dA = diagA(sA);
 	Eigen::SparseMatrix<double> aP = dA * sA;
 	Eigen::SparseMatrix<double> Pt = matrix_power(aP, t);
+	std::cout << "4" <<std::endl;
 	Eigen::MatrixXd Dt = Dmat(Pt, dA, a.size());
+	std::cout << "5" <<std::endl;
 	std::vector<lart::cluster> clusters = AgglomerativeClustering(Dt.sparseView(), sA0);
 
 	vector<double> mod = modMLPX(clusters, a, gamma, sA0);
@@ -490,10 +386,9 @@ hash_set<ActorSharedPtr> lart::get_ml_community(
 	//for (size_t i = 0; i < partition.size(); i++) {
 	//	std::cout << partition[i] << " ";
 	//}
-	//std::cout << std::endl;
+	//std::cout << std::endl;*/
 
 	return actors;
 }
 
 }
-

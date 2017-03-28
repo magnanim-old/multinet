@@ -30,6 +30,9 @@
 #define MLNET_DATASTRUCTURES_H_
 
 #include "dtrace/headers/dtrace.h"
+#include <Eigen/Sparse>
+#include <Eigen/Dense>
+
 #include "utils.h"
 #include "exceptions.h"
 #include <string>

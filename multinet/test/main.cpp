@@ -20,7 +20,8 @@ void test_end(const std::string& name) {
 }
 
 int main() {
-	test_lart();
+	test_glouvain();
+//	test_lart();
 	/*
 	test_begin("All unit tests");
 	try {
@@ -35,6 +36,7 @@ int main() {
 	test_propertymatrix();
 	test_end("UTILITY FUNCTIONS AND CLASSES");
 
+	test_lart();
 	test_datastructures();
 	test_io();
 	test_measures();
