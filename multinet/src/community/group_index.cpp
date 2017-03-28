@@ -41,7 +41,7 @@ group_index::group_index(std::vector<int> v){
 	nodes_iterator.resize(n_nodes);
 
 	for(size_t i = 0; i < n_nodes; i++){
-		nodes[i]= v[i]-1;
+		nodes[i] = v[i]-1;
 	}
 
 	n_groups = * max_element(nodes.begin(),nodes.end()) + 1;
@@ -61,6 +61,28 @@ void group_index::move(int node, int group){
     //update its group asignment
 	nodes[node]=group;
 }
+
+
+vector<int> group_index::toVector() {
+	
+	vector<int> v (n_nodes);
+    vector<bool> track_move(n_nodes, true);
+    size_t g_n = 1;
+
+	list<int>::iterator it;
+
+	for(size_t i = 0; i < n_nodes; i++){
+		if(track_move[i]){
+			for(it=groups[nodes[i]].begin(); it != groups[nodes[i]].end();it++){
+				v[*it] = g_n;
+                track_move[*it] = false;
+			}
+            g_n++;
+		}
+	}	
+	return v;
+}
+
 
 }
 

@@ -43,6 +43,8 @@ struct group_index {
 
 	size_t n_nodes;
 	size_t n_groups;
+	
+	std::vector<int> toVector();
 
 	std::vector<std::list<int>> groups; //the index of each node in a group is stored in a linked list
 	std::vector<std::list<int>::iterator> nodes_iterator; //stores the position of the node in the list for the group it belongs to

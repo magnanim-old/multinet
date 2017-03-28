@@ -5,6 +5,7 @@ namespace mlnet {
 
 hash_set<ActorSharedPtr> glouvain::get_ml_community(MLNetworkSharedPtr mnet, double gamma, double omega) {
 
+	hash_set<ActorSharedPtr> actors;
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 	Eigen::SparseMatrix<double> B = cutils::supraA(a, 0);
 
@@ -29,8 +30,6 @@ hash_set<ActorSharedPtr> glouvain::get_ml_community(MLNetworkSharedPtr mnet, dou
 	double dtot = 0;
 	double eps = std::numeric_limits<double>::min();
 
-	std::cout << eps << std::endl;
-
 	while (Sb != S2) {
 		Sb = S2;
 		std::vector<int> yb;
@@ -42,32 +41,31 @@ hash_set<ActorSharedPtr> glouvain::get_ml_community(MLNetworkSharedPtr mnet, dou
 				yb = y;
 				dstep = 0;
 
-
 				group_index g(y);
 				std::random_shuffle (M_len.begin(), M_len.end());
 				for (int i : M_len) {
-					std::cout << i << " i" << std::endl;
-					double di = move(g, i, M.row(i));
+					double di = move(g, i, M.col(i));
 					dstep = dstep + di;
 				}
 				dtot = dtot + dstep;
-				// y = group_handler;
+				y = g.toVector();
 
 			}
 			yb = y;
 		}
 
-		//S = y(S);
-		//S2 = y(S2);
+		S = y;
+		S2 = y;
 
 		if (Sb == S2) {
-			//P
+			std::cout << "Sb and S2 are equal" << std::endl
+			return actors;
 		}
+
+		
 
 	}
 
-	std::cout << "out" << std::endl;
-	hash_set<ActorSharedPtr> actors;
 	return actors;
 }
 
