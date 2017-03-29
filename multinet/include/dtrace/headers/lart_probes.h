@@ -141,7 +141,7 @@ __extension__ extern unsigned short ml_find__dist__start_semaphore __attribute__
 #define ML_FIND_DIST_START() \
 DTRACE_PROBE (ml, find__dist__start)
 
-/* ML_FIND_DIST_END ( int x, int y, char * val ) */
+/* ML_FIND_DIST_END ( int x, int y, char* val ) */
 #if defined STAP_SDT_V1
 #define ML_FIND_DIST_END_ENABLED() __builtin_expect (find__dist__end_semaphore, 0)
 #define ml_find__dist__end_semaphore find__dist__end_semaphore

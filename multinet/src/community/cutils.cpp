@@ -133,17 +133,17 @@ Eigen::SparseMatrix<double> cutils::supraA(std::vector<Eigen::SparseMatrix<doubl
 }
 
 std::vector<Eigen::SparseMatrix<double>> cutils::ml_network2adj_matrix(MLNetworkSharedPtr mnet) {
-	size_t N = mnet->get_layers()->size();
-	size_t M = mnet->get_actors()->size();
+	size_t L = mnet->get_layers()->size();
+	size_t N = mnet->get_actors()->size();
 
-	std::vector<Eigen::SparseMatrix<double>> adj(N);
+	std::vector<Eigen::SparseMatrix<double>> adj(L);
 
 	for (LayerSharedPtr l: *mnet->get_layers()) {
-		Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double> (M, M);
-		size_t reserve = M /2;
+		Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double> (N, N);
+		size_t reserve = N /2;
 		m.reserve(Eigen::VectorXi::Constant(reserve, reserve));
 
-		DTRACE2(ML2AM_RESERVE, M, reserve);
+		DTRACE2(ML2AM_RESERVE, N, reserve);
 
 		for (EdgeSharedPtr e: *mnet->get_edges(l, l)) {
 			int v1_id = e->v1->actor->id;
@@ -154,7 +154,7 @@ std::vector<Eigen::SparseMatrix<double>> cutils::ml_network2adj_matrix(MLNetwork
 		adj[l->id - 1] = m;
 	}
 
-	DTRACE2(ML2AM_END, N, M);
+	DTRACE2(ML2AM_END, L, N);
 	return adj;
 }
 

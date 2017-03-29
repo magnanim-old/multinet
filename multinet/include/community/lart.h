@@ -18,7 +18,7 @@ public:
 			 gamma
 		Post: (?)
 	*/
-	hash_set<ActorSharedPtr> get_ml_community(MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma);
+	CommunitiesSharedPtr get_ml_community(MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma);
 
 
 private:
@@ -138,7 +138,7 @@ private:
 			N is the amount of columns in L
 		Post: p is the list of actors with their assigned cluster id's
 	*/
-	vector<int> get_partition(vector<lart::cluster> clusters, int maxmodix, size_t L, size_t N);
+	CommunitiesSharedPtr get_partition(MLNetworkSharedPtr mnet, vector<lart::cluster> clusters, int maxmodix, size_t L, size_t N);
 
 
 };

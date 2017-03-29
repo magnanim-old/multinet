@@ -11,7 +11,7 @@ function timestamp:long(ts) {
   return gettimeofday_ms() - ts
 }
 
-probe process("libmultinet.so").function("mlnet::lart::ml_network2adj_matrix")
+probe process("libmultinet.so").function("mlnet::cutils::ml_network2adj_matrix")
 {
   tmp_ts["ml_network2adj_matrix", "start"] = gettimeofday_ms();
 }
@@ -22,12 +22,12 @@ probe process("libmultinet.so").mark("ml2am__end")
     msecs_to_string(timestamp(tmp_ts["ml_network2adj_matrix", "start"])), $arg1, $arg2, $arg2);
 }
 
-probe process("libmultinet.so").function("mlnet::lart::supraA")
+probe process("libmultinet.so").function("mlnet::cutils::supraA")
 {
   tmp_ts["supraA", "start"] = gettimeofday_ms();
 }
 
-probe process("libmultinet.so").function("mlnet::lart::supraA").return
+probe process("libmultinet.so").function("mlnet::cutils::supraA").return
 {
   printf("Finished with supraA: %s\n", msecs_to_string(timestamp(tmp_ts["supraA", "start"])));
 }

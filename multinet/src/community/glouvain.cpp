@@ -58,11 +58,11 @@ hash_set<ActorSharedPtr> glouvain::get_ml_community(MLNetworkSharedPtr mnet, dou
 		S2 = y;
 
 		if (Sb == S2) {
-			std::cout << "Sb and S2 are equal" << std::endl
+			std::cout << "Sb and S2 are equal" << std::endl;
 			return actors;
 		}
 
-		
+
 
 	}
 

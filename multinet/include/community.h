@@ -48,6 +48,8 @@ namespace mlnet {
         vector<CommunitySharedPtr> data;
     };
 
+
+
 }
 
 #endif /* MULTINET_COMMUNITY_H_ */

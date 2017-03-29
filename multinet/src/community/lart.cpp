@@ -2,7 +2,7 @@
 
 namespace mlnet {
 
-vector<int> lart::get_partition(vector<lart::cluster> clusters, int maxmodix, size_t L, size_t N) {
+CommunitiesSharedPtr lart::get_partition(MLNetworkSharedPtr mnet, vector<lart::cluster> clusters, int maxmodix, size_t L, size_t N) {
 
 	struct partition {
 		std::vector<int> vals;
@@ -42,14 +42,49 @@ vector<int> lart::get_partition(vector<lart::cluster> clusters, int maxmodix, si
 	size_t l = r.size();
 	size_t n = L * N;
 
-	vector<int> result(n);
+
+	CommunitiesSharedPtr communities = communities::create();
 	for (size_t i = 0; i < l; i++) {
+		CommunitySharedPtr c = community::create();
 		for (size_t j = 0; j < r[i].vals.size(); j++) {
-			result[r[i].vals[j]] = i;
+			// Node id -> community i
+			NodeListSharedPtr list = mnet->get_nodes();
+			(*c).add_node((*list).get_at_index(r[i].vals[j]));
 		}
+		(*communities).add_community(c);
 	}
 
-	return result;
+	std::cout << (*communities).to_string() << std::endl;
+
+	for (size_t i = 0; i < l; i++) {
+		//community tmp = community.create();
+
+		for (size_t j = 0; j < r[i].vals.size(); j++) {
+			//std::cout << r[i].vals[j] << ",";
+			//tmp[r[i].vals[j]] = i;
+		}
+		//std::cout << std::endl;
+
+		//v[i] = tmp;
+	}
+
+	/*
+	NodeListSharedPtr list = mnet->get_nodes();
+
+
+	vector<vector<int>> k(L);
+	for (size_t i = 0; i < L; i++) {
+		vector<int> v;
+		for (size_t j = i * N; j < (1 + i) * N; j++) {
+			v.push_back(result[j]);
+			std::cout << result[j] << ",";
+		}
+		std::cout << std::endl;
+		k[i] = v;
+	}*/
+
+
+	//return v;
 }
 
 vector<double> lart::modMLPX(vector<lart::cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double> sA0) {
@@ -350,45 +385,35 @@ Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<dou
 }
 
 
-hash_set<ActorSharedPtr> lart::get_ml_community(
+CommunitiesSharedPtr lart::get_ml_community(
 	MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma) {
-
-	hash_set<ActorSharedPtr> actors;
 
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 
-	std::cout << a[0] << std::endl;
-	std::cout << a[1] << std::endl;
-
-	if (a.size() < 1) {
-		return actors;
-	}
-	std::cout << "1" <<std::endl;
 	Eigen::SparseMatrix<double> sA = cutils::supraA(a, eps);
-	std::cout << "2" <<std::endl;
 	Eigen::SparseMatrix<double> sA0 = cutils::supraA(a, 0);
 	sA0.prune(0, 0); // Used in clustering, don't want to see any zero's
-	std::cout << "3" <<std::endl;
 
 	Eigen::SparseMatrix<double> dA = diagA(sA);
 	Eigen::SparseMatrix<double> aP = dA * sA;
 	Eigen::SparseMatrix<double> Pt = matrix_power(aP, t);
-	std::cout << "4" <<std::endl;
 	Eigen::MatrixXd Dt = Dmat(Pt, dA, a.size());
-	std::cout << "5" <<std::endl;
 	std::vector<lart::cluster> clusters = AgglomerativeClustering(Dt.sparseView(), sA0);
 
 	vector<double> mod = modMLPX(clusters, a, gamma, sA0);
 	auto maxmod = std::max_element(std::begin(mod), std::end(mod));
 	int maxmodix = std::distance(std::begin(mod), maxmod);
-	vector<int> partition = get_partition(clusters, maxmodix, a.size(), a[0].rows());
+	CommunitiesSharedPtr c = get_partition(mnet, clusters, maxmodix, a.size(), a[0].rows());
+	return c;
 
-	//for (size_t i = 0; i < partition.size(); i++) {
-	//	std::cout << partition[i] << " ";
-	//}
-	//std::cout << std::endl;*/
 
-	return actors;
+	/*
+	std::ofstream f("output.txt");
+	for(vector<int>::const_iterator i = partition.begin(); i != partition.end(); ++i) {
+		f << i - partition.begin() << " " << *i << "\n";
+	}
+
+	return actors;*/
 }
 
 }

@@ -1,7 +1,7 @@
 #ifndef CUTILS_H_ /* Community utils, common routines used by multilayer community detection algorithms */
 #define CUTILS_H_
 
-#include "datastructures.h"
+#include "community.h"
 
 namespace mlnet {
 
