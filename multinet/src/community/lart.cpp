@@ -43,48 +43,46 @@ CommunitiesSharedPtr lart::get_partition(MLNetworkSharedPtr mnet, vector<lart::c
 	size_t n = L * N;
 
 
-	CommunitiesSharedPtr communities = communities::create();
+	// matrix nodeid2cid
+	vector<int> result(n);
 	for (size_t i = 0; i < l; i++) {
-		CommunitySharedPtr c = community::create();
 		for (size_t j = 0; j < r[i].vals.size(); j++) {
-			// Node id -> community i
-			NodeListSharedPtr list = mnet->get_nodes();
-			(*c).add_node((*list).get_at_index(r[i].vals[j]));
+			result[r[i].vals[j]] = i;
 		}
-		(*communities).add_community(c);
 	}
 
-	std::cout << (*communities).to_string() << std::endl;
-
-	for (size_t i = 0; i < l; i++) {
-		//community tmp = community.create();
-
-		for (size_t j = 0; j < r[i].vals.size(); j++) {
-			//std::cout << r[i].vals[j] << ",";
-			//tmp[r[i].vals[j]] = i;
-		}
-		//std::cout << std::endl;
-
-		//v[i] = tmp;
-	}
-
-	/*
-	NodeListSharedPtr list = mnet->get_nodes();
-
-
-	vector<vector<int>> k(L);
+	// aid2cid
+	vector<vector<int>> layered(L);
 	for (size_t i = 0; i < L; i++) {
 		vector<int> v;
 		for (size_t j = i * N; j < (1 + i) * N; j++) {
 			v.push_back(result[j]);
-			std::cout << result[j] << ",";
 		}
-		std::cout << std::endl;
-		k[i] = v;
-	}*/
+		layered[i] = v;
+	}
 
+	// cid2aid
+	std::map<int, vector<int>> cid2aid;
+	for (size_t i = 0; i < layered.size(); i++) {
+		for (size_t j = 0; j < layered[i].size(); j++) {
+			cid2aid[layered[i][j]].push_back(j);
 
-	//return v;
+		}
+	}
+
+	// actual nodeid 2 communities
+	CommunitiesSharedPtr communities = communities::create();
+	for(std::map<int,std::vector<int>>::iterator iter = cid2aid.begin(); iter != cid2aid.end(); ++iter) {
+		CommunitySharedPtr c = community::create();
+		for (size_t i = 0; i < iter->second.size(); i++) {
+			for (NodeSharedPtr n : *mnet->get_nodes(((mnet->get_actors()->get_at_index(iter->second[i]))))) {
+				(*c).add_node(n);
+			} 
+		}
+		(*communities).add_community(c);
+	}
+
+	return communities;
 }
 
 vector<double> lart::modMLPX(vector<lart::cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double> sA0) {
@@ -403,17 +401,10 @@ CommunitiesSharedPtr lart::get_ml_community(
 	vector<double> mod = modMLPX(clusters, a, gamma, sA0);
 	auto maxmod = std::max_element(std::begin(mod), std::end(mod));
 	int maxmodix = std::distance(std::begin(mod), maxmod);
+
 	CommunitiesSharedPtr c = get_partition(mnet, clusters, maxmodix, a.size(), a[0].rows());
 	return c;
 
-
-	/*
-	std::ofstream f("output.txt");
-	for(vector<int>::const_iterator i = partition.begin(); i != partition.end(); ++i) {
-		f << i - partition.begin() << " " << *i << "\n";
-	}
-
-	return actors;*/
 }
 
 }

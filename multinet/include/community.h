@@ -29,7 +29,7 @@ namespace mlnet {
         hash_set<NodeSharedPtr> data;
     };
 
-        /**
+    /**
      * A set of communities. Each community can be accessed by index.
      */
     class communities {
@@ -46,6 +46,8 @@ namespace mlnet {
 
         private:
         vector<CommunitySharedPtr> data;
+
+        //std::ostream& operator<< (std::ostream& os);
     };
 
 

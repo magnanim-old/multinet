@@ -62,6 +62,20 @@ namespace mlnet {
         return data.at(i);
     }
     
+
+    /*std::ostream& communities::operator<<(std::ostream& stream) {
+        for (size_t i = 0; i < data.size(); i++) {
+            hash_set<NodeSharedPtr> p = (*(data[i])).get_nodes();
+
+            for (hash_set<NodeSharedPtr>::iterator it = p.begin(); it != p.end(); ++it) {
+                stream << (*it)->actor->name << "," << (*it)->layer->name << "," << i << std::endl;
+            }
+            stream << "----" << std::endl;
+        }
+          
+        return stream;
+    }*/
+
     const vector<CommunitySharedPtr>& communities::get_communities() const {
         return data;
     }
