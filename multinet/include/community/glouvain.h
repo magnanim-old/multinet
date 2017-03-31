@@ -15,6 +15,8 @@ public:
 	*/
 	hash_set<ActorSharedPtr> get_ml_community(MLNetworkSharedPtr mnet, double gamma, double omega);
 
+	Eigen::SparseMatrix<double> multicat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, double omega);
+
 };
 
 
