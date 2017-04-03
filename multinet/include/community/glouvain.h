@@ -14,6 +14,7 @@ public:
 			 g.get_ml_community(MLNetworkSharedPtr);
 	*/
 	hash_set<ActorSharedPtr> get_ml_community(MLNetworkSharedPtr mnet, double gamma, double omega);
+	Eigen::SparseMatrix<double> metanetwork(Eigen::SparseMatrix<double> B, std::vector<int> S2, size_t L);
 
 };
 

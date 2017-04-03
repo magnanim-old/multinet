@@ -17,7 +17,7 @@
 #include <unordered_map>
 
 
-#define NUM_TOL 1e-10
+#define NUM_TOL 1e-100
 
 namespace mlnet {
 
@@ -88,8 +88,8 @@ double move(group_index & g, int node, Eigen::SparseMatrix<double> mod){
 		}
 	}
 
+	std::cout << mod_max << " modmax" << std::endl;
 	//move current node to most optimal group
-	std::cout << mod_max << std::endl;
 	if(mod_max>NUM_TOL){
 		g.move(node,group_move);
 		d_step+=mod_max;
