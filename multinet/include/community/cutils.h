@@ -8,6 +8,9 @@ namespace mlnet {
 class cutils {
 
 public:
+
+	static CommunitiesSharedPtr nodes2communities(MLNetworkSharedPtr mnet, std::vector<int> nodes2cid);
+
 	/*
 		Use : std::vector<Eigen::MatrixXd> a = ml_network2adj_matrix(MLNetworkSharedPtr ptr);
 		Pre : MLNetworkSharedPtr is a non empty multilayer network
@@ -24,9 +27,6 @@ public:
 
 	*/
 	static Eigen::SparseMatrix<double> supraA(std::vector<Eigen::SparseMatrix<double>> a, double eps);
-
-	static void modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, double omega,
-		Eigen::SparseMatrix<double>& sA);
 
 	/*
 		Use: auto m = block_diag(a);

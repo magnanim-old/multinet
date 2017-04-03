@@ -88,7 +88,7 @@ double move(group_index & g, int node, Eigen::SparseMatrix<double> mod){
 		}
 	}
 
-	std::cout << mod_max << " modmax" << std::endl;
+	//std::cout << mod_max << " modmax" << std::endl;
 	//move current node to most optimal group
 	if(mod_max>NUM_TOL){
 		g.move(node,group_move);
@@ -102,7 +102,6 @@ set_type possible_moves(group_index & g, int node, Eigen::SparseMatrix<double> m
 	set_type unique_groups(g.n_groups);
 	unique_groups.insert(g.nodes[node]);
 	//add nodes with potential positive contribution to unique_groups
-
 	for (int i = 0; i < mod.outerSize(); i++) {
 		for (Eigen::SparseMatrix<double>::InnerIterator it(mod, i); it; ++it) {
 			unique_groups.insert(g.nodes[it.row()]);

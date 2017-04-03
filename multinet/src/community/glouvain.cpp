@@ -9,12 +9,12 @@ Eigen::SparseMatrix<double> glouvain::multicat(std::vector<Eigen::SparseMatrix<d
 	size_t N = a[0].rows();
 
 	Eigen::SparseMatrix<double> B(N * L, N * L);
-	B.reserve(Eigen::VectorXi::Constant(N * L, N * N * L + 2 * N * L));
+	B.reserve(Eigen::VectorXi::Constant(N * L, N * L));
 
 	double twoum = 0.0;
 
 	std::vector<Eigen::Triplet<double>> tlist;
-	tlist.reserve(N * N * L + 2 * N * L);
+	tlist.reserve(N * L);
 
 	for (size_t i = 0; i < L; i++) {
 		Eigen::MatrixXd kout = cutils::sum(a[i], 0);
@@ -25,7 +25,7 @@ Eigen::SparseMatrix<double> glouvain::multicat(std::vector<Eigen::SparseMatrix<d
 		Eigen::SparseMatrix<double> tmp, tmp1;
 		tmp = (Eigen::SparseMatrix<double>(a[i].transpose()) + a[i]) / 2;
 
-		Eigen::MatrixXd tmp2 = kin * kout.transpose();//().transpose()).array() / mm);
+		Eigen::MatrixXd tmp2 = kin * kout.transpose();
 		Eigen::MatrixXd tmp3 = gamma / 2 * (tmp2 + tmp2)/ mm;
 
 		tmp = tmp - tmp3.sparseView();
@@ -48,31 +48,22 @@ Eigen::SparseMatrix<double> glouvain::multicat(std::vector<Eigen::SparseMatrix<d
 	return B;
 }
 
-hash_set<ActorSharedPtr> glouvain::get_ml_community(MLNetworkSharedPtr mnet, double gamma, double omega) {
-
+CommunitiesSharedPtr glouvain::get_ml_community(MLNetworkSharedPtr mnet, double gamma, double omega) {
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
-	Eigen::SparseMatrix<double> B = multicat(a, 1, 0);//cutils::supraA(a, 0);
+	Eigen::SparseMatrix<double> B = multicat(a, gamma, omega);
 
-	//cutils::modmat(a, gamma, omega, B);
 	size_t n = B.rows();
-
 	Eigen::SparseMatrix<double> M(B);
 
-
-	std::vector<int> S(n);
+	std::vector<int> S(n), S2, y;
 	std::iota(S.begin(), S.end(), 0);
-
-	std::vector<int> S0(S.begin(), S.end());
-	std::vector<int> S2(S.begin(), S.end());
-	std::vector<int> y(S.begin(), S.end());
-
+	S2 = S;
+	y = S;
+	
 	std::vector<int> Sb;
 
 	double dtot = 0;
 	double eps = std::numeric_limits<double>::min();
-
-	//std::cout << eps << std::endl;
-
 	while (Sb != S2) {
 		Sb = S2;
 		std::vector<int> yb;
@@ -84,63 +75,60 @@ hash_set<ActorSharedPtr> glouvain::get_ml_community(MLNetworkSharedPtr mnet, dou
 				yb = y;
 				dstep = 0;
 
-
 				group_index g(y);
 				std::vector<int> M_len(M.rows());
 				std::iota(M_len.begin(), M_len.end(), 0);
 				std::random_shuffle (M_len.begin(), M_len.end());
-				std::cout << M << std::endl;
+
 				for (int i : M_len) {
-					//std::cout << i << " i" << std::endl;
-					double di = move(g, i, M.row(i));
+					double di = move(g, i, M.col(i));
 					dstep = dstep + di;
-					std::cout << dstep << std::endl;
 				}
+
 				dtot = dtot + dstep;
 				y = g.toVector();
+
 			}
 			yb = y;
 		}
 
-		//S = y(S);
-		//S2 = y(S2);
+		S = mapV2I(y, S);
+		S2 = S;
 
 		if (Sb == S2) {
-			for (auto i: Sb)
-				std::cout << i << ' ';
-			std::cout << std::endl;
-			//P=sparse(y,1:length(y),1);
-			//Q=full(sum(sum((P*M).*P)));
-
-
-			return actors;
+			break;
 		}
 
-		M = metanetwork(B, S2, a.size());
+		M = metanetwork(B, S2);
 		y = S2;
 		std::sort(y.begin(), y.end());
 		std::vector<int>::iterator it;
 		it = std::unique(y.begin(), y.end());
 		y.resize(std::distance(y.begin(), it));
+
 	}
 
-	//std::cout << "out" << std::endl;
-	hash_set<ActorSharedPtr> actors;
-	return actors;
+	return cutils::nodes2communities(mnet, Sb);
+
 }
 
+std::vector<int> glouvain::mapV2I(std::vector<int> a, std::vector<int> b) {
+	std::vector<int> v(b.size());
+	for (size_t i = 0; i < b.size(); i++) {
+		v[i] = a[b[i]];
+	}
+	return v;
+}
 
-Eigen::SparseMatrix<double> glouvain::metanetwork(Eigen::SparseMatrix<double> B, std::vector<int> S2, size_t L) {
+Eigen::SparseMatrix<double> glouvain::metanetwork(Eigen::SparseMatrix<double> B, std::vector<int> S2) {
 	Eigen::SparseMatrix<double> PP(B.rows(), *std::max_element(S2.begin(), S2.end()) + 1);
 	PP.reserve(B.rows());
 
 	std::vector<Eigen::Triplet<double>> tlist;
 	tlist.reserve(B.rows());
 
-	for (size_t i = 0; i < L; i++) {
-		for (int k = 0; k < PP.cols(); k++) {
-			tlist.push_back(Eigen::Triplet<double>((i) * PP.cols() + k, k, 1));
-		}
+	for (size_t i = 0; i < S2.size(); i++) {
+		tlist.push_back(Eigen::Triplet<double>(i, S2[i], 1));
 	}
 	PP.setFromTriplets(tlist.begin(), tlist.end());
 	return PP.transpose() * B * PP;

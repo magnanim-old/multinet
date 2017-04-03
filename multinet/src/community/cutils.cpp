@@ -2,6 +2,44 @@
 
 namespace mlnet {
 
+CommunitiesSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vector<int> nodes2cid) {
+	size_t L = mnet->get_layers()->size();
+	size_t N = mnet->get_actors()->size();
+
+	vector<vector<int>> layered(L);
+	for (size_t i = 0; i < L; i++) {
+		vector<int> v;
+		for (size_t j = i * N; j < (1 + i) * N; j++) {
+			v.push_back(nodes2cid[j]);
+		}
+		layered[i] = v;
+	}
+
+	// cid2aid
+	std::map<int, vector<int>> cid2aid;
+	for (size_t i = 0; i < layered.size(); i++) {
+		for (size_t j = 0; j < layered[i].size(); j++) {
+			cid2aid[layered[i][j]].push_back(j);
+
+		}
+	}
+
+	// actual nodeid 2 communities
+	CommunitiesSharedPtr communities = communities::create();
+	for(std::map<int,std::vector<int>>::iterator iter = cid2aid.begin(); iter != cid2aid.end(); ++iter) {
+		CommunitySharedPtr c = community::create();
+		for (size_t i = 0; i < iter->second.size(); i++) {
+			for (NodeSharedPtr n : *mnet->get_nodes(((mnet->get_actors()->get_at_index(iter->second[i]))))) {
+				(*c).add_node(n);
+			} 
+		}
+		(*communities).add_community(c);
+	}
+
+	return communities;	
+}
+
+
 Eigen::MatrixXd cutils::sum(Eigen::SparseMatrix<double> X, int axis) {
 	Eigen::MatrixXd d = Eigen::MatrixXd::Zero(X.rows(), 1);
 	for (int i = 0; i < X.outerSize(); i++) {
@@ -43,59 +81,6 @@ Eigen::SparseMatrix<double> cutils::block_diag(std::vector<Eigen::SparseMatrix<d
 	return m;
 }
 
-void cutils::modmat(std::vector<Eigen::SparseMatrix<double>> a,
-	double gamma, double omega, Eigen::SparseMatrix<double>& sA) {
-
-	double twoum = 0.0;
-	for (int j = 0; j < sA.outerSize(); j++) {
-		for (Eigen::SparseMatrix<double>::InnerIterator it(sA, j); it; ++it) {
-			twoum += it.value();
-		}
-	}
-
-	size_t L = a.size();
-	size_t N = a[0].rows();
-
-
-	Eigen::SparseMatrix<double> copy (sA);
-
-	std::vector<Eigen::Triplet<double>> tlist;
-	tlist.reserve(copy.rows() * 1.5);
-
-	// Cache the intra layer weights because they don't change
-	if (omega == 0) {
-		for (size_t i = 0; i < N; i++) {
-			tlist.push_back(Eigen::Triplet<double>(i, N + i, sA.coeff(i, N + i)));
-			tlist.push_back(Eigen::Triplet<double>(N + i, i, sA.coeff(N + i, i)));
-		}
-	}
-
-	for (size_t i = 0; i < L; i++) {
-		Eigen::MatrixXd d = sum(a[i], 0);
-
-		Eigen::MatrixXd	product = d * d.transpose();
-
-		double asum = 0;
-		for (int j = 0; j < a[i].outerSize(); j++) {
-			for (Eigen::SparseMatrix<double>::InnerIterator it(a[i], j); it; ++it) {
-				asum += it.value();
-			}
-		}
-
-		Eigen::MatrixXd	s1 = product.array() / asum;
-		Eigen::MatrixXd	s2 = s1.array() * gamma;
-		Eigen::MatrixXd s3 = Eigen::MatrixXd(copy.block(i * N, i * N, N, N)) - s2;
-
-		for (int j = 0; j < s3.rows(); j++) {
-			for (int k = 0; k < s3.cols(); k++) {
-				tlist.push_back(Eigen::Triplet<double>(j + (i * N), k + (i * N), s3(j, k)));
-			}
-		}
-	}
-
-	sA.setFromTriplets(tlist.begin(), tlist.end());
-	sA /= twoum;
-}
 
 Eigen::SparseMatrix<double> cutils::supraA(std::vector<Eigen::SparseMatrix<double>> a, double eps) {
 	Eigen::SparseMatrix<double> A = block_diag(a);

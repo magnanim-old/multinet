@@ -17,7 +17,6 @@ void test_lart() {
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/friendfeed_ita.mpx","sample",',');
 	uint32_t t = 9;
 	float eps = 1;
-	float gamma = 1;
 
 	k.get_ml_community(mnet3, t, eps);
 

@@ -94,8 +94,6 @@ private:
 	*/
 	Eigen::MatrixXd pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y);
 
-	Eigen::MatrixXd sum(Eigen::SparseMatrix<double> X, int axis);
-
 
 	/*
 		Use: auto clusters = AgglomerativeClustering(Dt, sA, Linkage);
@@ -117,6 +115,8 @@ private:
 	*/
 	lart::dist find_dist(Eigen::SparseMatrix<double> Dt, std::vector<std::vector<int>> merges,
 		Eigen::SparseMatrix<double> sA);
+
+	void modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA);
 
 	/*
 		Use: average_linkage(Dt, clusters, d);

@@ -43,47 +43,67 @@ CommunitiesSharedPtr lart::get_partition(MLNetworkSharedPtr mnet, vector<lart::c
 	size_t n = L * N;
 
 
-	// matrix nodeid2cid
-	vector<int> result(n);
+	vector<int> nodes2cid(n);
 	for (size_t i = 0; i < l; i++) {
 		for (size_t j = 0; j < r[i].vals.size(); j++) {
-			result[r[i].vals[j]] = i;
+			nodes2cid[r[i].vals[j]] = i;
 		}
 	}
 
-	// aid2cid
-	vector<vector<int>> layered(L);
-	for (size_t i = 0; i < L; i++) {
-		vector<int> v;
-		for (size_t j = i * N; j < (1 + i) * N; j++) {
-			v.push_back(result[j]);
-		}
-		layered[i] = v;
-	}
-
-	// cid2aid
-	std::map<int, vector<int>> cid2aid;
-	for (size_t i = 0; i < layered.size(); i++) {
-		for (size_t j = 0; j < layered[i].size(); j++) {
-			cid2aid[layered[i][j]].push_back(j);
-
-		}
-	}
-
-	// actual nodeid 2 communities
-	CommunitiesSharedPtr communities = communities::create();
-	for(std::map<int,std::vector<int>>::iterator iter = cid2aid.begin(); iter != cid2aid.end(); ++iter) {
-		CommunitySharedPtr c = community::create();
-		for (size_t i = 0; i < iter->second.size(); i++) {
-			for (NodeSharedPtr n : *mnet->get_nodes(((mnet->get_actors()->get_at_index(iter->second[i]))))) {
-				(*c).add_node(n);
-			} 
-		}
-		(*communities).add_community(c);
-	}
-
-	return communities;
+	return cutils::nodes2communities(mnet, nodes2cid);
 }
+
+void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA) {
+
+	double twoum = 0.0;
+	for (int j = 0; j < sA.outerSize(); j++) {
+		for (Eigen::SparseMatrix<double>::InnerIterator it(sA, j); it; ++it) {
+			twoum += it.value();
+		}
+	}
+
+	size_t L = a.size();
+	size_t N = a[0].rows();
+
+
+	Eigen::SparseMatrix<double> copy (sA);
+
+	std::vector<Eigen::Triplet<double>> tlist;
+	tlist.reserve(copy.rows() * 1.5);
+
+	// Cache the intra layer weights because they don't change
+	for (size_t i = 0; i < N; i++) {
+		tlist.push_back(Eigen::Triplet<double>(i, N + i, sA.coeff(i, N + i)));
+		tlist.push_back(Eigen::Triplet<double>(N + i, i, sA.coeff(N + i, i)));
+	}
+
+	for (size_t i = 0; i < L; i++) {
+		Eigen::MatrixXd d = cutils::sum(a[i], 0);
+
+		Eigen::MatrixXd	product = d * d.transpose();
+
+		double asum = 0;
+		for (int j = 0; j < a[i].outerSize(); j++) {
+			for (Eigen::SparseMatrix<double>::InnerIterator it(a[i], j); it; ++it) {
+				asum += it.value();
+			}
+		}
+
+		Eigen::MatrixXd	s1 = product.array() / asum;
+		Eigen::MatrixXd	s2 = s1.array() * gamma;
+		Eigen::MatrixXd s3 = Eigen::MatrixXd(copy.block(i * N, i * N, N, N)) - s2;
+
+		for (int j = 0; j < s3.rows(); j++) {
+			for (int k = 0; k < s3.cols(); k++) {
+				tlist.push_back(Eigen::Triplet<double>(j + (i * N), k + (i * N), s3(j, k)));
+			}
+		}
+	}
+
+	sA.setFromTriplets(tlist.begin(), tlist.end());
+	sA /= twoum;
+}
+
 
 vector<double> lart::modMLPX(vector<lart::cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double> sA0) {
 	vector<double> r;
@@ -91,7 +111,7 @@ vector<double> lart::modMLPX(vector<lart::cluster> clusters, std::vector<Eigen::
 	size_t L = a.size();
 	size_t N = a[0].rows();
 
-	cutils::modmat(a, gamma, 0, sA0);
+	modmat(a, gamma, sA0);
 
 	double diag = 0.0;
 	for (int i = 0; i < sA0.rows(); i++){
@@ -329,7 +349,7 @@ Eigen::SparseMatrix<double> lart::diagA(Eigen::SparseMatrix<double> A) {
 
 	DTRACE2(DIAGA_RESERVE, A.rows(), A.rows() / 2);
 
-	Eigen::MatrixXd d = sum(A, 1);
+	Eigen::MatrixXd d = cutils::sum(A, 1);
 
 	std::vector<Eigen::Triplet<double>> tlist;
 	tlist.reserve(A.rows());
@@ -339,20 +359,6 @@ Eigen::SparseMatrix<double> lart::diagA(Eigen::SparseMatrix<double> A) {
 	}
 	dA.setFromTriplets(tlist.begin(), tlist.end());
 	return dA;
-}
-
-Eigen::MatrixXd lart::sum(Eigen::SparseMatrix<double> X, int axis) {
-	Eigen::MatrixXd d = Eigen::MatrixXd::Zero(X.rows(), 1);
-	for (int i = 0; i < X.outerSize(); i++) {
-		for (Eigen::SparseMatrix<double>::InnerIterator it(X, i); it; ++it) {
-			if (axis){
-				d(it.col(), 0) = it.value() + d(it.col(), 0);
-			} else {
-				d(it.row(), 0) = it.value() + d(it.row(), 0);
-			}
-		}
-	}
-	return d;
 }
 
 Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<double>> a) {
