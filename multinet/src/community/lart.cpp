@@ -50,6 +50,10 @@ CommunitiesSharedPtr lart::get_partition(MLNetworkSharedPtr mnet, vector<lart::c
 		}
 	}
 
+	for(auto i: nodes2cid) 
+		std::cout << i << " ";
+	std::cout << '\n';
+
 	return cutils::nodes2communities(mnet, nodes2cid);
 }
 
