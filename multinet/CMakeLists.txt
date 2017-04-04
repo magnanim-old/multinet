@@ -52,6 +52,9 @@ endif()
 
 include_directories (include)
 include_directories (/usr/include/eigen3)
+
+find_package(dlib REQUIRED)
+
 file (GLOB_RECURSE SOURCES src/*.cpp)
 
 option(DOXY "Generate DoxyGen documentation" OFF)
@@ -100,7 +103,7 @@ if(dtrace)
 	endif()
 endif(dtrace)
 
-add_library (multinet SHARED ${SOURCES} ${PROBE_PATH})
+add_library (multinet SHARED ${SOURCES} ${dlib_LIBS} ${PROBE_PATH})
 
 install (TARGETS multinet
 	RUNTIME DESTINATION bin

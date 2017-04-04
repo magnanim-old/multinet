@@ -1,5 +1,5 @@
 #include "community/lart.h"
-
+#include <dlib/clustering.h>
 namespace mlnet {
 
 CommunitiesSharedPtr lart::get_partition(MLNetworkSharedPtr mnet, vector<lart::cluster> clusters, int maxmodix, size_t L, size_t N) {
@@ -203,6 +203,9 @@ std::vector<lart::cluster> lart::AgglomerativeClustering(Eigen::SparseMatrix<dou
 		c.orig.push_back(i);
 		clusters[i] = c;
 	}
+	
+
+
 
 	// This matrix gets updated every iteration
 	Eigen::SparseMatrix<double> tmp(Dt);
@@ -293,6 +296,7 @@ Eigen::MatrixXd lart::Dmat(Eigen::SparseMatrix<double> Pt, Eigen::SparseMatrix<d
 
 	size_t N = Pt.rows() / L;
 	Eigen::MatrixXd Dmat = Eigen::MatrixXd::Zero(N * L, N * L);
+	
 
 	for (size_t i = 0; i < L; ++i) {
 		Eigen::MatrixXd X = Eigen::MatrixXd(newP.block(i * N, 0, N, N * L));
@@ -391,25 +395,21 @@ Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<dou
 
 CommunitiesSharedPtr lart::get_ml_community(
 	MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma) {
-
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
-
 	Eigen::SparseMatrix<double> sA = cutils::supraA(a, eps);
-	Eigen::SparseMatrix<double> sA0 = cutils::supraA(a, 0);
-	sA0.prune(0, 0); // Used in clustering, don't want to see any zero's
-
 	Eigen::SparseMatrix<double> dA = diagA(sA);
 	Eigen::SparseMatrix<double> aP = dA * sA;
 	Eigen::SparseMatrix<double> Pt = matrix_power(aP, t);
 	Eigen::MatrixXd Dt = Dmat(Pt, dA, a.size());
-	std::vector<lart::cluster> clusters = AgglomerativeClustering(Dt.sparseView(), sA0);
 
-	vector<double> mod = modMLPX(clusters, a, gamma, sA0);
-	auto maxmod = std::max_element(std::begin(mod), std::end(mod));
-	int maxmodix = std::distance(std::begin(mod), maxmod);
+	std::vector<unsigned long> labs;
+	dlib::bottom_up_cluster(dlib::mat(Eigen::MatrixXd(Dt)), labs, 4);
 
-	CommunitiesSharedPtr c = get_partition(mnet, clusters, maxmodix, a.size(), a[0].rows());
-	return c;
+	for (unsigned long k : labs)
+		std::cout << k << " ";
+	std::cout << std::endl;
+
+	return communities::create();
 
 }
 
