@@ -31,27 +31,49 @@ __extension__ extern unsigned short ml_ml2am__end_semaphore __attribute__ ((unus
 #define ML_ML2AM_END(arg1, arg2) \
 DTRACE_PROBE2 (ml, ml2am__end, arg1, arg2)
 
-/* ML_BLOCK_DIAG_RESERVE ( size_t M, size_t R ) */
+/* ML_WALK_START ( ) */
 #if defined STAP_SDT_V1
-#define ML_BLOCK_DIAG_RESERVE_ENABLED() __builtin_expect (block__diag__reserve_semaphore, 0)
-#define ml_block__diag__reserve_semaphore block__diag__reserve_semaphore
+#define ML_WALK_START_ENABLED() __builtin_expect (walk__start_semaphore, 0)
+#define ml_walk__start_semaphore walk__start_semaphore
 #else
-#define ML_BLOCK_DIAG_RESERVE_ENABLED() __builtin_expect (ml_block__diag__reserve_semaphore, 0)
+#define ML_WALK_START_ENABLED() __builtin_expect (ml_walk__start_semaphore, 0)
 #endif
-__extension__ extern unsigned short ml_block__diag__reserve_semaphore __attribute__ ((unused)) __attribute__ ((section (".probes")));
-#define ML_BLOCK_DIAG_RESERVE(arg1, arg2) \
-DTRACE_PROBE2 (ml, block__diag__reserve, arg1, arg2)
+__extension__ extern unsigned short ml_walk__start_semaphore __attribute__ ((unused)) __attribute__ ((section (".probes")));
+#define ML_WALK_START() \
+DTRACE_PROBE (ml, walk__start)
 
-/* ML_DIAGA_RESERVE ( size_t M, size_t R ) */
+/* ML_WALK_END ( ) */
 #if defined STAP_SDT_V1
-#define ML_DIAGA_RESERVE_ENABLED() __builtin_expect (diaga__reserve_semaphore, 0)
-#define ml_diaga__reserve_semaphore diaga__reserve_semaphore
+#define ML_WALK_END_ENABLED() __builtin_expect (walk__end_semaphore, 0)
+#define ml_walk__end_semaphore walk__end_semaphore
 #else
-#define ML_DIAGA_RESERVE_ENABLED() __builtin_expect (ml_diaga__reserve_semaphore, 0)
+#define ML_WALK_END_ENABLED() __builtin_expect (ml_walk__end_semaphore, 0)
 #endif
-__extension__ extern unsigned short ml_diaga__reserve_semaphore __attribute__ ((unused)) __attribute__ ((section (".probes")));
-#define ML_DIAGA_RESERVE(arg1, arg2) \
-DTRACE_PROBE2 (ml, diaga__reserve, arg1, arg2)
+__extension__ extern unsigned short ml_walk__end_semaphore __attribute__ ((unused)) __attribute__ ((section (".probes")));
+#define ML_WALK_END() \
+DTRACE_PROBE (ml, walk__end)
+
+/* ML_CLUSTER_START ( ) */
+#if defined STAP_SDT_V1
+#define ML_CLUSTER_START_ENABLED() __builtin_expect (cluster__start_semaphore, 0)
+#define ml_cluster__start_semaphore cluster__start_semaphore
+#else
+#define ML_CLUSTER_START_ENABLED() __builtin_expect (ml_cluster__start_semaphore, 0)
+#endif
+__extension__ extern unsigned short ml_cluster__start_semaphore __attribute__ ((unused)) __attribute__ ((section (".probes")));
+#define ML_CLUSTER_START() \
+DTRACE_PROBE (ml, cluster__start)
+
+/* ML_CLUSTER_END ( size_t clusters ) */
+#if defined STAP_SDT_V1
+#define ML_CLUSTER_END_ENABLED() __builtin_expect (cluster__end_semaphore, 0)
+#define ml_cluster__end_semaphore cluster__end_semaphore
+#else
+#define ML_CLUSTER_END_ENABLED() __builtin_expect (ml_cluster__end_semaphore, 0)
+#endif
+__extension__ extern unsigned short ml_cluster__end_semaphore __attribute__ ((unused)) __attribute__ ((section (".probes")));
+#define ML_CLUSTER_END(arg1) \
+DTRACE_PROBE1 (ml, cluster__end, arg1)
 
 /* ML_DMAT_NEWP_START ( ) */
 #if defined STAP_SDT_V1
@@ -96,39 +118,6 @@ DTRACE_PROBE2 (ml, pdistance__start, arg1, arg2)
 __extension__ extern unsigned short ml_pdistance__end_semaphore __attribute__ ((unused)) __attribute__ ((section (".probes")));
 #define ML_PDISTANCE_END() \
 DTRACE_PROBE (ml, pdistance__end)
-
-/* ML_AGGLO_END ( int clusters ) */
-#if defined STAP_SDT_V1
-#define ML_AGGLO_END_ENABLED() __builtin_expect (agglo__end_semaphore, 0)
-#define ml_agglo__end_semaphore agglo__end_semaphore
-#else
-#define ML_AGGLO_END_ENABLED() __builtin_expect (ml_agglo__end_semaphore, 0)
-#endif
-__extension__ extern unsigned short ml_agglo__end_semaphore __attribute__ ((unused)) __attribute__ ((section (".probes")));
-#define ML_AGGLO_END(arg1) \
-DTRACE_PROBE1 (ml, agglo__end, arg1)
-
-/* ML_AGGLO_PRUNE_START ( ) */
-#if defined STAP_SDT_V1
-#define ML_AGGLO_PRUNE_START_ENABLED() __builtin_expect (agglo__prune__start_semaphore, 0)
-#define ml_agglo__prune__start_semaphore agglo__prune__start_semaphore
-#else
-#define ML_AGGLO_PRUNE_START_ENABLED() __builtin_expect (ml_agglo__prune__start_semaphore, 0)
-#endif
-__extension__ extern unsigned short ml_agglo__prune__start_semaphore __attribute__ ((unused)) __attribute__ ((section (".probes")));
-#define ML_AGGLO_PRUNE_START() \
-DTRACE_PROBE (ml, agglo__prune__start)
-
-/* ML_AGGLO_PRUNE_END ( ) */
-#if defined STAP_SDT_V1
-#define ML_AGGLO_PRUNE_END_ENABLED() __builtin_expect (agglo__prune__end_semaphore, 0)
-#define ml_agglo__prune__end_semaphore agglo__prune__end_semaphore
-#else
-#define ML_AGGLO_PRUNE_END_ENABLED() __builtin_expect (ml_agglo__prune__end_semaphore, 0)
-#endif
-__extension__ extern unsigned short ml_agglo__prune__end_semaphore __attribute__ ((unused)) __attribute__ ((section (".probes")));
-#define ML_AGGLO_PRUNE_END() \
-DTRACE_PROBE (ml, agglo__prune__end)
 
 /* ML_FIND_DIST_START ( ) */
 #if defined STAP_SDT_V1
