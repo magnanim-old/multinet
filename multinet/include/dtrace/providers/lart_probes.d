@@ -14,9 +14,11 @@ provider ml {
    * Fired when reserving memory for diagonal block matrix
    * Returns matrix dimensions
    */
-  probe block__diag__reserve(size_t M, size_t R);
 
-  probe diaga__reserve(size_t M, size_t R);
+  probe walk__start();
+  probe walk__end();
+  probe cluster__start();
+  probe cluster__end(size_t clusters);
 
   probe dmat__newp__start();
   probe dmat__newp__end();
@@ -24,10 +26,6 @@ provider ml {
   probe pdistance__start(int X, int Y);
   probe pdistance__end();
 
-  probe agglo__end(int clusters);
-
-  probe agglo__prune__start();
-  probe agglo__prune__end();
 
   probe find__dist__start();
   probe find__dist__end(int x, int y, char* val);

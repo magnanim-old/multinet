@@ -36,13 +36,14 @@ else()
 endif()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -DNDEBUG")
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fmessage-length=0 -funroll-loops -fsanitize=address -fno-omit-frame-pointer -march=native")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -lcblas -DNDEBUG")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fopenmp -fmessage-length=0 -funroll-loops -fsanitize=address -fno-omit-frame-pointer -march=native")
 else()
 	if (CMAKE_COMPILER_IS_CLANGXX)
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNDEBUG -Wextra -Wall")
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -fsanitize=address -funroll-loops -fno-omit-frame-pointer -D__extern_always_inline=\"extern __always_inline\"")
+
 
 	else()
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
@@ -52,6 +53,10 @@ endif()
 
 include_directories (include)
 include_directories (/usr/include/eigen3)
+
+find_package(BLAS REQUIRED)
+find_package(dlib REQUIRED)
+
 file (GLOB_RECURSE SOURCES src/*.cpp)
 
 option(DOXY "Generate DoxyGen documentation" OFF)
@@ -100,7 +105,7 @@ if(dtrace)
 	endif()
 endif(dtrace)
 
-add_library (multinet SHARED ${SOURCES} ${PROBE_PATH})
+add_library (multinet SHARED ${SOURCES} ${dlib_LIBS} ${PROBE_PATH})
 
 install (TARGETS multinet
 	RUNTIME DESTINATION bin

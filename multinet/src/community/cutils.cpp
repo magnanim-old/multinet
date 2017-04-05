@@ -59,7 +59,6 @@ Eigen::SparseMatrix<double> cutils::block_diag(std::vector<Eigen::SparseMatrix<d
 		a[0].rows() * a.size(), a[0].cols() * a.size());
 
 	m.reserve(Eigen::VectorXi::Constant(a[0].rows(), a[0].rows()));
-	DTRACE2(BLOCK_DIAG_RESERVE, a[0].rows() * a.size(), a[0].rows());
 
 	size_t r, c;
 	r = 0;
@@ -121,26 +120,23 @@ std::vector<Eigen::SparseMatrix<double>> cutils::ml_network2adj_matrix(MLNetwork
 	size_t L = mnet->get_layers()->size();
 	size_t N = mnet->get_actors()->size();
 
-	std::vector<Eigen::SparseMatrix<double>> adj(L);
+	std::vector<Eigen::SparseMatrix<double>> a(L);
 
 	for (LayerSharedPtr l: *mnet->get_layers()) {
 		Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double> (N, N);
-		size_t reserve = N /2;
-		m.reserve(Eigen::VectorXi::Constant(reserve, reserve));
-
-		DTRACE2(ML2AM_RESERVE, N, reserve);
+		m.reserve(Eigen::VectorXi::Constant(N /2, N /2));
 
 		for (EdgeSharedPtr e: *mnet->get_edges(l, l)) {
 			int v1_id = e->v1->actor->id;
 			int v2_id = e->v2->actor->id;
-			m.insert(v1_id - 1, v2_id - 1) = 1;
-			m.insert(v2_id - 1, v1_id - 1) = 1;
+			m.coeffRef(v1_id - 1, v2_id - 1) = 1;
+			m.coeffRef(v2_id - 1, v1_id - 1) = 1;
 		}
-		adj[l->id - 1] = m;
+		a[l->id - 1] = m;
 	}
 
 	DTRACE2(ML2AM_END, L, N);
-	return adj;
+	return a;
 }
 
 

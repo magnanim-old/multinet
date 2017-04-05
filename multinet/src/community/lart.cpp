@@ -1,4 +1,8 @@
 #include "community/lart.h"
+#include <dlib/clustering.h>
+#include <unsupported/Eigen/MatrixFunctions>
+#include <math.h>
+
 
 namespace mlnet {
 
@@ -144,132 +148,9 @@ vector<double> lart::modMLPX(vector<lart::cluster> clusters, std::vector<Eigen::
 	return r;
 }
 
-void lart::average_linkage(Eigen::SparseMatrix<double>& Dt, std::vector<lart::cluster> clusters, lart::dist d) {
-	size_t x = clusters[d.row].orig.size();
-	size_t y = clusters[d.col].orig.size();
-
-	for (int i = 0; i < Dt.rows(); i++) {
-		Dt.coeffRef(d.row, i) = ((Dt.coeff(d.row, i) * x) + (Dt.coeff(i, d.col) * y)) / (x + y);
-		Dt.coeffRef(i, d.row) = Dt.coeff(d.row, i);
-		Dt.coeffRef(i, i) = 0;
-	}
-}
-
-lart::dist lart::find_dist(Eigen::SparseMatrix<double> Dt, std::vector<std::vector<int>> merges, Eigen::SparseMatrix<double> sA) {
-
-	lart::dist d;
-	d.row = -1;
-	d.col = -1;
-	d.val = 1000; // anything above 1 is ok actually
-
-	/*	Iterate the top right corner of the distance matrix created in matrix power
-		to find the smallest distance between nodes OR clusters. Only nodes or clusters
-		that are connected (connection matrix is sA) are allowed to merge.
-	*/
-	Eigen::SparseMatrix<double> t = Dt.triangularView<Eigen::Upper>();
-	for (int i = 0; i < t.outerSize(); i++) {
-		for (Eigen::SparseMatrix<double>::InnerIterator it(t, i); it; ++it) {
-			double tmp = Dt.coeff(it.row(), it.col());
-			if (tmp < d.val && tmp > 0) {
-				for (size_t j = 0; j < merges[it.row()].size(); j++) {
-					for (size_t k = 0; k < merges[it.col()].size(); k++) {
-						if (sA.coeff(merges[it.row()][j], merges[it.col()][k]) > 0){
-							d.row = it.row();
-							d.col = it.col();
-							d.val = tmp;
-
-							/* We found a valid connection (but maybe not the smallest distance)
-								Stop searching for connection and look at more values
-							 */
-							j = merges[it.row()].size();
-							k = merges[it.col()].size();
-							break;
-						}
-					}
-				}
-			}
-
-		}
-	}
-
-	DTRACE3(FIND_DIST_END, d.row, d.col, std::to_string(d.val));
-	return d;
-}
-
-std::vector<lart::cluster> lart::AgglomerativeClustering(Eigen::SparseMatrix<double> Dt, Eigen::SparseMatrix<double> sA) {
-	// TODO Create a parameter for different linkage function and make it more abstract
-	std::vector<lart::cluster> clusters(Dt.rows());
-	for (int i = 0; i < Dt.rows(); i++) {
-		cluster c;
-		c.left = -1;
-		c.right = -1;
-		c.id = i;
-		c.orig.push_back(i);
-		clusters[i] = c;
-	}
-
-	// This matrix gets updated every iteration
-	Eigen::SparseMatrix<double> tmp(Dt);
-
-	// Used to track merges
-	std::vector<std::vector<int>> merges (Dt.rows());
-	for (size_t i = 0; i < merges.size(); i++) {
-		std::vector<int> v = {(int)i};
-		merges[i] = v;
-	}
-
-	// Used to track node id's and merges. TODO: Can we remove this?
-	std::vector<int> labels (Dt.rows());
-	std::iota (std::begin(labels), std::end(labels), 0);
-
-
-	for (int i = 0; i < Dt.rows() - 1; i++) {
-		// Loop invariant: All nodes except two have been merged
-		lart::dist d = find_dist(tmp, merges, sA);
-
-		if (d.row < 0) {
-			// No more connected components were found
-			break;
-		}
-
-		/* Add a new cluster into the mix with its history.
-			Keep the orde */
-		cluster c;
-		c.id = Dt.rows() + i;
-		if (labels[d.row] < labels[d.col]) {
-			c.left = clusters[labels[d.row]].id;
-			c.right = clusters[labels[d.col]].id;
-		} else {
-			c.left = clusters[labels[d.col]].id;
-			c.right = clusters[labels[d.row]].id;
-		}
-
-		/* Merge its history */
-		c.orig.insert(c.orig.begin(), clusters[labels[d.row]].orig.begin(), clusters[labels[d.row]].orig.end());
-		c.orig.insert(c.orig.end(), clusters[labels[d.col]].orig.begin(), clusters[labels[d.col]].orig.end());
-
-		clusters.push_back(c);
-
-		/* Update the distance matrix */
-		average_linkage(tmp, clusters, d);
-		/* Remove the merged node from the distance matrix
-			TODO: Improve the speed.
-		*/
-		DTRACE0(AGGLO_PRUNE_START);
-		tmp.prune([&d](int i, int j, double ) { return i!=d.col && j!=d.col; });
-		DTRACE0(AGGLO_PRUNE_END);
-
-		/* Update labels and history merge. If 0 merges with 10, we remove 10 from the pool and merge with 0 and it becomes cluster number 11 */
-		merges[d.row].push_back(d.col);
-		labels[d.row] = Dt.rows() + i;
-	}
-
-	DTRACE1(AGGLO_END, clusters.size());
-	return clusters;
-}
 
 // TODO: Parallelize this function
-Eigen::MatrixXd lart::pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y) {
+Eigen::MatrixXd lart::pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bool same_obj) {
 	DTRACE2(PDISTANCE_START, X.rows(), Y.rows());
 
 	Eigen::MatrixXd XX = (X.array() * X.array()).rowwise().sum();
@@ -279,13 +160,15 @@ Eigen::MatrixXd lart::pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y) {
 	for (int i = 0; i < distances.rows(); i++) {
 		distances.col(i).array() += XX.array();
 		distances.row(i).array() += YY.array();
-		distances(i, i) = 0.0;
+		if(same_obj) {
+			distances(i, i) = 0;
+		}
 	}
 
-	return distances.array().sqrt();
+	return distances.array().unaryExpr([](const double x) { return x < 0 ? 0 : x;}).sqrt();
 }
 
-Eigen::MatrixXd lart::Dmat(Eigen::SparseMatrix<double> Pt, Eigen::SparseMatrix<double> dA, size_t L) {
+Eigen::MatrixXd lart::Dmat(Eigen::MatrixXd Pt, Eigen::SparseMatrix<double> dA, size_t L) {
 	// NOTE: dA side effect
 	for (int j = 0; j < dA.outerSize(); j++) {
 		for (Eigen::SparseMatrix<double>::InnerIterator it(dA, j); it; ++it) {
@@ -293,14 +176,15 @@ Eigen::MatrixXd lart::Dmat(Eigen::SparseMatrix<double> Pt, Eigen::SparseMatrix<d
 		}
 	}
 
-	Eigen::SparseMatrix<double> newP = Pt * dA;
+	Eigen::MatrixXd newP = Pt * Eigen::MatrixXd(dA);
 
 	size_t N = Pt.rows() / L;
 	Eigen::MatrixXd Dmat = Eigen::MatrixXd::Zero(N * L, N * L);
+	
 
 	for (size_t i = 0; i < L; ++i) {
 		Eigen::MatrixXd X = Eigen::MatrixXd(newP.block(i * N, 0, N, N * L));
-		Eigen::MatrixXd m = pairwise_distance(X, X);
+		Eigen::MatrixXd m = pairwise_distance(X, X, true);
 
 		for (int j = 0; j < m.rows(); j++) {
 			for (int k = 0; k < m.cols(); k++) {
@@ -312,6 +196,7 @@ Eigen::MatrixXd lart::Dmat(Eigen::SparseMatrix<double> Pt, Eigen::SparseMatrix<d
 	for (size_t i = 0; i  < L - 1; ++i) {
 		for (size_t j = i + 1; j < L; ++j) {
 			if (i != j) {
+
 				Eigen::MatrixXd newx = newP.block(i * N, i * N, N, N);
 				Eigen::MatrixXd newy = newP.block(j * N, j * N, N, N);
 
@@ -324,7 +209,7 @@ Eigen::MatrixXd lart::Dmat(Eigen::SparseMatrix<double> Pt, Eigen::SparseMatrix<d
 				m1 << newx,tnewy;
 				m2 << newy,tnewx;
 
-				Eigen::MatrixXd dmat = pairwise_distance(m1, m2);
+				Eigen::MatrixXd dmat = pairwise_distance(m1, m2, false);
 				Dmat.block(i * N, (i+1)*N, N, N) = dmat;
 				Dmat.block((i+1)*N, i * N, N, N) = dmat.transpose();
 			}
@@ -333,25 +218,9 @@ Eigen::MatrixXd lart::Dmat(Eigen::SparseMatrix<double> Pt, Eigen::SparseMatrix<d
 	return Dmat;
 }
 
-Eigen::SparseMatrix<double> lart::matrix_power(Eigen::SparseMatrix<double> m, uint32_t t) {
-	if (t == 0) {
-		return Eigen::MatrixXd::Identity(m.rows(), m.cols()).sparseView();
-	}
-
-	Eigen::SparseMatrix<double> Dt(m);
-	for (uint32_t i = 1; i < t; i++) {
-		// TODO Write more and consider the pruning
-		Dt = Dt * m;//.pruned(0.001, 10);
-		//Dt.makeCompressed();
-	}
-	return Dt;
-}
-
 Eigen::SparseMatrix<double> lart::diagA(Eigen::SparseMatrix<double> A) {
 	Eigen::SparseMatrix<double> dA = Eigen::SparseMatrix<double>(A.rows(), A.cols());
 	dA.reserve(Eigen::VectorXi::Constant(A.rows() / 2, A.rows() / 2));
-
-	DTRACE2(DIAGA_RESERVE, A.rows(), A.rows() / 2);
 
 	Eigen::MatrixXd d = cutils::sum(A, 1);
 
@@ -368,9 +237,8 @@ Eigen::SparseMatrix<double> lart::diagA(Eigen::SparseMatrix<double> A) {
 Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<double>> a) {
 	Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double>(
 		a[0].rows() * a.size(), a[0].cols() * a.size());
-
+ 
 	m.reserve(Eigen::VectorXi::Constant(a[0].rows(), a[0].rows()));
-	DTRACE2(BLOCK_DIAG_RESERVE, a[0].rows() * a.size(), a[0].rows());
 
 	size_t r, c;
 	r = 0;
@@ -392,28 +260,90 @@ Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<dou
 	return m;
 }
 
+unsigned long lart::prcheck(std::vector<Eigen::SparseMatrix<double>> a, Eigen::SparseMatrix<double>& aP) {
+	Eigen::SparseMatrix<double> aplus = Eigen::SparseMatrix<double>(a[0].rows(), a[0].cols());
+	for (size_t i = 0; i < a.size(); i++) {
+		aplus += a[i];
+	}
+
+	std::vector<unsigned long> labels;
+	std::vector<dlib::sample_pair> edges;
+
+	for (int j = 0; j < aplus.outerSize(); j++) {
+		for (Eigen::SparseMatrix<double>::InnerIterator it(aplus, j); it; ++it) {
+			edges.push_back(dlib::sample_pair(it.row(), it.col(), 1));
+		}
+	}
+
+	unsigned long num_clusters = dlib::newman_cluster(edges, labels);
+	std::vector<unsigned long> uq = labels;
+	std::sort(uq.begin(), uq.end());
+	std::vector<unsigned long>::iterator it;
+	it = std::unique(uq.begin(), uq.end());
+	uq.resize(std::distance(uq.begin(), it));
+
+	std::random_device seed;
+	std::mt19937 engine(seed()) ;
+   	std::uniform_int_distribution<int> choose(0, labels.size() - 1);
+
+	if (labels.size() > 0) {
+		for (size_t i = 0; i < uq.size(); i++) {
+			std::vector<unsigned long> tmp;
+
+			int index = choose(engine);
+
+			for (int j = 0; j < aP.rows(); j++) {
+				//aP.coeffRef(index, j) = 0.85 * aP.coeff(index, j) + 0.15 / (a[0].size() * a.size());
+			}
+		}
+
+	}
+	return num_clusters;
+}
+
 
 CommunitiesSharedPtr lart::get_ml_community(
 	MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma) {
-
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
-
 	Eigen::SparseMatrix<double> sA = cutils::supraA(a, eps);
-	Eigen::SparseMatrix<double> sA0 = cutils::supraA(a, 0);
-	sA0.prune(0, 0); // Used in clustering, don't want to see any zero's
-
 	Eigen::SparseMatrix<double> dA = diagA(sA);
+
 	Eigen::SparseMatrix<double> aP = dA * sA;
-	Eigen::SparseMatrix<double> Pt = matrix_power(aP, t);
+	int disconnected = prcheck(a, aP);
+		
+	DTRACE0(WALK_START);
+	Eigen::MatrixXd A = Eigen::MatrixXd(aP);
+	Eigen::MatrixPower<Eigen::MatrixXd> Apow(A);
+	Eigen::MatrixXd Pt = Apow(t);
+	DTRACE0(WALK_END);
+
 	Eigen::MatrixXd Dt = Dmat(Pt, dA, a.size());
-	std::vector<lart::cluster> clusters = AgglomerativeClustering(Dt.sparseView(), sA0);
+	
+	/*if (disconnected) {
+		Dt = Dt.array().unaryExpr([](double v) { return v != 0 ? v : 10.0; });	
+	}*/
 
-	vector<double> mod = modMLPX(clusters, a, gamma, sA0);
-	auto maxmod = std::max_element(std::begin(mod), std::end(mod));
-	int maxmodix = std::distance(std::begin(mod), maxmod);
+	for (int i = 0; i < Dt.rows(); i++)
+		Dt(i, i) = 10;
 
-	CommunitiesSharedPtr c = get_partition(mnet, clusters, maxmodix, a.size(), a[0].rows());
-	return c;
+	DTRACE0(CLUSTER_START);
+	std::vector<unsigned long> labels;
+	dlib::matrix<double> dists = dlib::mat(Dt);
+	dlib::bottom_up_cluster(dists, labels, 2);
+
+	std::vector<unsigned long> uq = labels;
+	std::sort(uq.begin(), uq.end());
+	std::vector<unsigned long>::iterator it;
+	it = std::unique(uq.begin(), uq.end());
+	uq.resize(std::distance(uq.begin(), it));
+
+	DTRACE1(CLUSTER_END, uq.size());
+
+	for (unsigned long k : labels)
+		std::cout << k << " ";
+	std::cout << std::endl;
+
+	return communities::create();
 
 }
 

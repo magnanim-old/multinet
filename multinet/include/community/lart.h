@@ -74,25 +74,18 @@ private:
 	Eigen::SparseMatrix<double> diagA(Eigen::SparseMatrix<double> m);
 
 	/*
-		Use: auto M = matrix_power(m, t);
-		Pre: m is a matrix, t is an unsigned 32bit integer
-		Post: M is a new matrix that is m raised to the power of t
-	*/
-	Eigen::SparseMatrix<double> matrix_power(Eigen::SparseMatrix<double> m, uint32_t t);
-
-	/*
 		Use: auto A = Dmat(Pt, D, L);
 		Pre: Pt (?)
 		Post:
 	*/
-	Eigen::MatrixXd Dmat(Eigen::SparseMatrix<double> Pt, Eigen::SparseMatrix<double> D, size_t L);
+	Eigen::MatrixXd Dmat(Eigen::MatrixXd Pt, Eigen::SparseMatrix<double> D, size_t L);
 
 	/*
 		Use: auto p = pairwise_distance(X, Y);
 		Pre: X and Y are matrices (they may be the same objects)
 		Post: p contains euclidean distances between pairs of X and Y
 	*/
-	Eigen::MatrixXd pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y);
+	Eigen::MatrixXd pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bool same_obj);
 
 
 	/*
@@ -117,6 +110,9 @@ private:
 		Eigen::SparseMatrix<double> sA);
 
 	void modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA);
+
+	unsigned long prcheck(std::vector<Eigen::SparseMatrix<double>> a, Eigen::SparseMatrix<double>& sA);
+
 
 	/*
 		Use: average_linkage(Dt, clusters, d);
