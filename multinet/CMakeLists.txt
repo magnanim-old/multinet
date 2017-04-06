@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
 
-project (multinet LANGUAGES CXX)
+project (multinet C CXX)
 set (PROJECT_VENDOR 			"Matteo Magnani")
 set (PROJECT_CONTACT 			"matteo.magnani@it.uu.se")
 set (PROJECT_URL 				"https://github.com/magnanim/multinet")
@@ -36,7 +36,7 @@ else()
 endif()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -lcblas -DNDEBUG")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -DNDEBUG -ldlib")
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fopenmp -fmessage-length=0 -funroll-loops -fsanitize=address -fno-omit-frame-pointer -march=native")
 else()
 	if (CMAKE_COMPILER_IS_CLANGXX)
@@ -52,10 +52,6 @@ else()
 endif()
 
 include_directories (include)
-include_directories (/usr/include/eigen3)
-
-find_package(BLAS REQUIRED)
-find_package(dlib REQUIRED)
 
 file (GLOB_RECURSE SOURCES src/*.cpp)
 
@@ -105,7 +101,15 @@ if(dtrace)
 	endif()
 endif(dtrace)
 
+include_directories(lib/spectra)
+find_package(Eigen3 REQUIRED)
+include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
+find_package(BLAS REQUIRED)
+
 add_library (multinet SHARED ${SOURCES} ${dlib_LIBS} ${PROBE_PATH})
+
+TARGET_LINK_LIBRARIES(multinet ${dlib_LIBS})
+
 
 install (TARGETS multinet
 	RUNTIME DESTINATION bin

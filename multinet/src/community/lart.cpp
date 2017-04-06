@@ -6,61 +6,6 @@
 
 namespace mlnet {
 
-CommunitiesSharedPtr lart::get_partition(MLNetworkSharedPtr mnet, vector<lart::cluster> clusters, int maxmodix, size_t L, size_t N) {
-
-	struct partition {
-		std::vector<int> vals;
-	};
-
-	vector<partition> parts;
-	partition p;
-	p.vals.resize(L * N);
-	std::iota (std::begin(p.vals), std::end(p.vals), 0);
-	parts.push_back(p);
-
-	for (size_t i = L * N; i < L * N + maxmodix; i++) {
-		vector<int> tmp = {clusters[i].left, clusters[i].right};
-		vector<int> out;
-
-		std::set_symmetric_difference (
-			parts[i-N*L].vals.begin(), parts[i-N*L].vals.end(),
-			tmp.begin(), tmp.end(),
-			std::back_inserter(out));
-
-		out.push_back(i);
-		partition p;
-		p.vals = out;
-		parts.push_back(p);
-	}
-
-
-	vector<partition> r;
-	vector<int> val = parts[parts.size() - 1].vals;
-
-	for (size_t i = 0; i < val.size(); i++) {
-		partition pp;
-		pp.vals = clusters[val[i]].orig;
-		r.push_back(pp);
-	}
-
-	size_t l = r.size();
-	size_t n = L * N;
-
-
-	vector<int> nodes2cid(n);
-	for (size_t i = 0; i < l; i++) {
-		for (size_t j = 0; j < r[i].vals.size(); j++) {
-			nodes2cid[r[i].vals[j]] = i;
-		}
-	}
-
-	for(auto i: nodes2cid) 
-		std::cout << i << " ";
-	std::cout << '\n';
-
-	return cutils::nodes2communities(mnet, nodes2cid);
-}
-
 void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA) {
 
 	double twoum = 0.0;
@@ -112,43 +57,6 @@ void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eige
 	sA /= twoum;
 }
 
-
-vector<double> lart::modMLPX(vector<lart::cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double> sA0) {
-	vector<double> r;
-
-	size_t L = a.size();
-	size_t N = a[0].rows();
-
-	modmat(a, gamma, sA0);
-
-	double diag = 0.0;
-	for (int i = 0; i < sA0.rows(); i++){
-		diag += sA0.coeff(i, i);
-	}
-
-	r.push_back(diag);
-
-	for (size_t i = N * L; i < clusters.size(); i++) {
-		cluster data = clusters[i];
-
-		vector<int> v1 = clusters[data.left].orig;
-		vector<int> v2 = clusters[data.right].orig;
-		double tmp = 0.0;
-
-		for (size_t i = 0; i < v1.size(); i++) {
-			for (size_t j = 0; j < v2.size(); j++) {
-				tmp += sA0.coeff(v1[i], v2[j]);
-			}
-		}
-
-		tmp *= 2;
-		r.push_back(r[r.size() - 1] + tmp);
-	}
-
-	return r;
-}
-
-
 // TODO: Parallelize this function
 Eigen::MatrixXd lart::pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bool same_obj) {
 	DTRACE2(PDISTANCE_START, X.rows(), Y.rows());
@@ -180,7 +88,7 @@ Eigen::MatrixXd lart::Dmat(Eigen::MatrixXd Pt, Eigen::SparseMatrix<double> dA, s
 
 	size_t N = Pt.rows() / L;
 	Eigen::MatrixXd Dmat = Eigen::MatrixXd::Zero(N * L, N * L);
-	
+
 
 	for (size_t i = 0; i < L; ++i) {
 		Eigen::MatrixXd X = Eigen::MatrixXd(newP.block(i * N, 0, N, N * L));
@@ -237,7 +145,7 @@ Eigen::SparseMatrix<double> lart::diagA(Eigen::SparseMatrix<double> A) {
 Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<double>> a) {
 	Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double>(
 		a[0].rows() * a.size(), a[0].cols() * a.size());
- 
+
 	m.reserve(Eigen::VectorXi::Constant(a[0].rows(), a[0].rows()));
 
 	size_t r, c;
@@ -310,7 +218,7 @@ CommunitiesSharedPtr lart::get_ml_community(
 
 	Eigen::SparseMatrix<double> aP = dA * sA;
 	int disconnected = prcheck(a, aP);
-		
+
 	DTRACE0(WALK_START);
 	Eigen::MatrixXd A = Eigen::MatrixXd(aP);
 	Eigen::MatrixPower<Eigen::MatrixXd> Apow(A);
@@ -318,9 +226,9 @@ CommunitiesSharedPtr lart::get_ml_community(
 	DTRACE0(WALK_END);
 
 	Eigen::MatrixXd Dt = Dmat(Pt, dA, a.size());
-	
+
 	/*if (disconnected) {
-		Dt = Dt.array().unaryExpr([](double v) { return v != 0 ? v : 10.0; });	
+		Dt = Dt.array().unaryExpr([](double v) { return v != 0 ? v : 10.0; });
 	}*/
 
 	for (int i = 0; i < Dt.rows(); i++)

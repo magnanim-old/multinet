@@ -20,8 +20,9 @@ void test_end(const std::string& name) {
 }
 
 int main() {
+	test_pmm();
 //	test_glouvain();
-	test_lart();
+//	test_lart();
 	/*
 	test_begin("All unit tests");
 	try {
