@@ -36,7 +36,7 @@ else()
 endif()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -DNDEBUG -ldlib")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -DNDEBUG -ldlib -lcblas")
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fopenmp -fmessage-length=0 -funroll-loops -fsanitize=address -fno-omit-frame-pointer -march=native")
 else()
 	if (CMAKE_COMPILER_IS_CLANGXX)

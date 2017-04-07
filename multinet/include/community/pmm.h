@@ -14,8 +14,8 @@ public:
 			 g.get_ml_community(MLNetworkSharedPtr);
 	*/
 	CommunitiesSharedPtr get_ml_community(MLNetworkSharedPtr mnet, unsigned int k, unsigned int ell, unsigned int maxKmeans);
-	void modularitymaximization(Eigen::SparseMatrix<double> a, unsigned int ell);
-
+	// http://spectralib.org/
+	Eigen::MatrixXd modularitymaximization(Eigen::SparseMatrix<double> a, unsigned int ell);
 
 };
 
