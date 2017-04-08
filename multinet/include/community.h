@@ -48,12 +48,11 @@ namespace mlnet {
         private:
         vector<CommunitySharedPtr> data;
     };
-    
+}
+
 
 /* ALGORITHMS */
-
-    
-}
+#include "community/ml-cpm.h"
 
 #endif /* MULTINET_COMMUNITY_H_ */
 
