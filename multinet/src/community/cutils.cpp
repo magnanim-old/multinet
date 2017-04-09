@@ -6,6 +6,8 @@ CommunitiesSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vec
 	size_t L = mnet->get_layers()->size();
 	size_t N = mnet->get_actors()->size();
 
+	std::cout << "here !" << std::endl;
+
 	vector<vector<int>> layered(L);
 	for (size_t i = 0; i < L; i++) {
 		vector<int> v;
@@ -31,12 +33,12 @@ CommunitiesSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vec
 		for (size_t i = 0; i < iter->second.size(); i++) {
 			for (NodeSharedPtr n : *mnet->get_nodes(((mnet->get_actors()->get_at_index(iter->second[i]))))) {
 				(*c).add_node(n);
-			} 
+			}
 		}
 		(*communities).add_community(c);
 	}
 
-	return communities;	
+	return communities;
 }
 
 
