@@ -115,7 +115,12 @@ CommunitiesSharedPtr glouvain::get_ml_community(MLNetworkSharedPtr mnet, double 
 
 	}
 
-	return cutils::nodes2communities(mnet, Sb);
+	std::vector<unsigned int> labels(Sb.begin(), Sb.end());
+
+	for (unsigned long k : labels)
+		std::cout << k << " ";
+	std::cout << std::endl;
+	return cutils::nodes2communities(mnet, labels);
 }
 
 std::vector<int> glouvain::mapV2I(std::vector<int> a, std::vector<int> b) {

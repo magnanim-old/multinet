@@ -40,11 +40,15 @@ CommunitiesSharedPtr pmm::get_ml_community(MLNetworkSharedPtr mnet, unsigned int
 	pick_initial_centers(k, initial_centers, samples, test.get_kernel());
 	test.train(samples, initial_centers);
 
-	std::vector<unsigned int> nodes;
+	std::vector<unsigned int> labels;
 	for (unsigned long i = 0; i < samples.size(); ++i) {
-		nodes.push_back(test(samples[i]));
+		labels.push_back(test(samples[i]));
 	}
-	return cutils::actors2communities(mnet, nodes);
+
+	for (unsigned long k : labels)
+		std::cout << k << " ";
+	std::cout << std::endl;
+	return cutils::actors2communities(mnet, labels);
 }
 
 Eigen::MatrixXd pmm::modularitymaximization(Eigen::SparseMatrix<double> a, unsigned int ell) {

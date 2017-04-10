@@ -2,7 +2,7 @@
 
 namespace mlnet {
 
-CommunitiesSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vector<int> nodes2cid) {
+CommunitiesSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> nodes2cid) {
 	size_t L = mnet->get_layers()->size();
 	size_t N = mnet->get_actors()->size();
 

@@ -17,7 +17,7 @@ public:
 	*/
 
 	static std::vector<Eigen::SparseMatrix<double>> ml_network2adj_matrix(MLNetworkSharedPtr mnet);
-	static CommunitiesSharedPtr nodes2communities(MLNetworkSharedPtr mnet, std::vector<int> nodes2cid);
+	static CommunitiesSharedPtr nodes2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> nodes2cid);
 	static CommunitiesSharedPtr actors2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> actors2cid);
 	static Eigen::MatrixXd sparse_sum(Eigen::SparseMatrix<double> X, int axis);
 };

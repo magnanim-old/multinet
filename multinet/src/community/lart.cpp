@@ -316,11 +316,13 @@ CommunitiesSharedPtr lart::get_ml_community(
 
 	DTRACE1(CLUSTER_END, uq.size());
 
-	//for (unsigned long k : labels)
-	//	std::cout << k << " ";
-	//std::cout << std::endl;
+	for (unsigned long k : labels)
+		std::cout << k << " ";
+	std::cout << std::endl;
 
-	return communities::nodes2communities(mnet, labels);
+	std::vector<unsigned int> l(labels.begin(), labels.end());
+
+	return cutils::nodes2communities(mnet, l);
 
 }
 
