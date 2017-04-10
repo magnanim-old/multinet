@@ -20,7 +20,6 @@ public:
 	*/
 	CommunitiesSharedPtr get_ml_community(MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma);
 
-
 private:
 
 	/*

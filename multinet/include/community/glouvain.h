@@ -12,6 +12,10 @@ public:
 	/*
 		Use : glouvain g;
 			 g.get_ml_community(MLNetworkSharedPtr);
+
+		Data invariant:
+		Generalized Louvain is a multiplex community detector based on the Louvain community detection
+		method for single layer networks. This implementation is based from http://netwiki.amath.unc.edu/GenLouvain/GenLouvain 
 	*/
 	CommunitiesSharedPtr get_ml_community(MLNetworkSharedPtr mnet, double gamma, double omega, std::string m = "move");
 	Eigen::SparseMatrix<double> metanetwork(Eigen::SparseMatrix<double> B, std::vector<int> S2);
@@ -46,9 +50,9 @@ struct group_index {
 
 	//move node to group
 	void move(int node, int group){
-	    //move node by splicing into list for new group
+		//move node by splicing into list for new group
 		groups[group].splice(groups[group].end(), groups[nodes[node]],nodes_iterator[node]);
-	    //update its group asignment
+		//update its group asignment
 		nodes[node]=group;
 	}; 
 
@@ -57,8 +61,8 @@ struct group_index {
 	
 	std::vector<int> toVector() {
 		vector<int> v (n_nodes);
-	    vector<bool> track_move(n_nodes, true);
-	    size_t g_n = 0;
+		vector<bool> track_move(n_nodes, true);
+		size_t g_n = 0;
 
 		std::list<int>::iterator it;
 
@@ -66,9 +70,9 @@ struct group_index {
 			if(track_move[i]){
 				for(it=groups[nodes[i]].begin(); it != groups[nodes[i]].end();it++){
 					v[*it] = g_n;
-	                track_move[*it] = false;
+					track_move[*it] = false;
 				}
-	            g_n++;
+				g_n++;
 			}
 		}	
 		return v;
@@ -165,12 +169,11 @@ move_list positive_moves(set_type & unique_groups, map_type & mod_c){
 	return moves;
 }
 
-//
+//move best move
 double move(group_index & g, int node, Eigen::SparseMatrix<double> mod){
 	set_type unique_groups = possible_moves(g, node, mod);
 	map_type mod_c = mod_change(g, mod, unique_groups, node);
 
-	//find best move
 	double mod_max=0;
 	double d_step=0;
 	int group_move = g.nodes[node]; //stay in current group if no improvement
