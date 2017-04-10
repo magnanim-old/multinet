@@ -5,6 +5,40 @@
 
 namespace mlnet {
 
+/*vector<double> lart::modMLPX(vector<lart::cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double> sA0) {
+	vector<double> r;
+
+	size_t L = a.size();
+	size_t N = a[0].rows();
+
+	cutils::modmat(a, gamma, 0, sA0);
+
+	double diag = 0.0;
+	for (int i = 0; i < sA0.rows(); i++){
+		diag += sA0.coeff(i, i);
+	}
+
+	r.push_back(diag);
+
+	for (size_t i = N * L; i < clusters.size(); i++) {
+		cluster data = clusters[i];
+
+		vector<int> v1 = clusters[data.left].orig;
+		vector<int> v2 = clusters[data.right].orig;
+		double tmp = 0.0;
+
+		for (size_t i = 0; i < v1.size(); i++) {
+			for (size_t j = 0; j < v2.size(); j++) {
+				tmp += sA0.coeff(v1[i], v2[j]);
+			}
+		}
+
+		tmp *= 2;
+		r.push_back(r[r.size() - 1] + tmp);
+	}
+
+	return r;
+}
 void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA) {
 
 	double twoum = 0.0;
@@ -55,6 +89,7 @@ void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eige
 	sA.setFromTriplets(tlist.begin(), tlist.end());
 	sA /= twoum;
 }
+*/
 
 // TODO: Parallelize this function
 Eigen::MatrixXd lart::pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bool same_obj) {
