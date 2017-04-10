@@ -72,12 +72,7 @@ private:
 	*/
 	Eigen::MatrixXd pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bool same_obj);
 
-
-	void modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA);
-
 	unsigned long prcheck(std::vector<Eigen::SparseMatrix<double>> a, Eigen::SparseMatrix<double>& sA);
-
-	//vector<double> modMLPX(vector<lart::cluster> x, std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double> sA);
 
 };
 
