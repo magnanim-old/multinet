@@ -1,10 +1,8 @@
 #include "community/glouvain.h"
-#include "community/group_handler.h"
 
 namespace mlnet {
 
 Eigen::SparseMatrix<double> glouvain::multicat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, double omega) {
-
 	size_t L = a.size();
 	size_t N = a[0].rows();
 
@@ -48,9 +46,18 @@ Eigen::SparseMatrix<double> glouvain::multicat(std::vector<Eigen::SparseMatrix<d
 	return B;
 }
 
-CommunitiesSharedPtr glouvain::get_ml_community(MLNetworkSharedPtr mnet, double gamma, double omega) {
+CommunitiesSharedPtr glouvain::get_ml_community(MLNetworkSharedPtr mnet, double gamma, double omega, std::string m) {
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 	Eigen::SparseMatrix<double> B = multicat(a, gamma, omega);
+
+	double (*move_func)(group_index &, int, Eigen::SparseMatrix<double>);
+	if ("moverand" == m) {
+		move_func = &moverand;
+	} else if ("moverandw" == m) {
+		move_func = &moverandw;
+	} else {
+		move_func = &move;
+	}
 
 	size_t n = B.rows();
 	Eigen::SparseMatrix<double> M(B);
@@ -81,7 +88,7 @@ CommunitiesSharedPtr glouvain::get_ml_community(MLNetworkSharedPtr mnet, double 
 				std::random_shuffle (M_len.begin(), M_len.end());
 
 				for (int i : M_len) {
-					double di = move(g, i, M.col(i));
+					double di = move_func(g, i, M.col(i));
 					dstep = dstep + di;
 				}
 
@@ -109,7 +116,6 @@ CommunitiesSharedPtr glouvain::get_ml_community(MLNetworkSharedPtr mnet, double 
 	}
 
 	return cutils::nodes2communities(mnet, Sb);
-
 }
 
 std::vector<int> glouvain::mapV2I(std::vector<int> a, std::vector<int> b) {
@@ -133,6 +139,5 @@ Eigen::SparseMatrix<double> glouvain::metanetwork(Eigen::SparseMatrix<double> B,
 	PP.setFromTriplets(tlist.begin(), tlist.end());
 	return PP.transpose() * B * PP;
 }
-
 
 }

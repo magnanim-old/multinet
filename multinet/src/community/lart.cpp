@@ -3,7 +3,6 @@
 #include <unsupported/Eigen/MatrixFunctions>
 #include <math.h>
 
-
 namespace mlnet {
 
 void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA) {
@@ -68,6 +67,7 @@ Eigen::MatrixXd lart::pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bo
 	for (int i = 0; i < distances.rows(); i++) {
 		distances.col(i).array() += XX.array();
 		distances.row(i).array() += YY.array();
+
 		if(same_obj) {
 			distances(i, i) = 0;
 		}
@@ -77,7 +77,7 @@ Eigen::MatrixXd lart::pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bo
 }
 
 Eigen::MatrixXd lart::Dmat(Eigen::MatrixXd Pt, Eigen::SparseMatrix<double> dA, size_t L) {
-	// NOTE: dA side effect
+	// INFO: dA side effect
 	for (int j = 0; j < dA.outerSize(); j++) {
 		for (Eigen::SparseMatrix<double>::InnerIterator it(dA, j); it; ++it) {
 			dA.coeffRef(it.row(), it.col()) = std::sqrt(it.value());

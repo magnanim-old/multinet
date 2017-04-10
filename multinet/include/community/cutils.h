@@ -28,7 +28,6 @@ public:
 	*/
 	static Eigen::MatrixXd sparse_sum(Eigen::SparseMatrix<double> X, int axis);
 
-
 };
 
 }
