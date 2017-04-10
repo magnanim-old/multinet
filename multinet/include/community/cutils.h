@@ -10,6 +10,7 @@ class cutils {
 public:
 
 	static CommunitiesSharedPtr nodes2communities(MLNetworkSharedPtr mnet, std::vector<int> nodes2cid);
+	static CommunitiesSharedPtr actors2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> actors2cid);
 
 	/*
 		Use : std::vector<Eigen::MatrixXd> a = ml_network2adj_matrix(MLNetworkSharedPtr ptr);
@@ -20,22 +21,12 @@ public:
 	static std::vector<Eigen::SparseMatrix<double>> ml_network2adj_matrix(MLNetworkSharedPtr mnet);
 
 	/*
-		Use: auto A = supraA(a, eps);
-		Pre: a is a list of adjacency matrixes. eps is the probability for the walker to move between layers
-		Post: A is the supra adjacency matrix from the list of matrixes, with inter layer connections
-			on the off diagonal blocks.
-
-	*/
-	static Eigen::SparseMatrix<double> supraA(std::vector<Eigen::SparseMatrix<double>> a, double eps);
-
-	/*
 		Use: auto m = block_diag(a);
 		Pre: a is a list of adjacency matrixes
 		Post: m is a a.size() * a[i].size() matrix, with the matrix contents of a
 			stacked diagonally
 	*/
-	static Eigen::SparseMatrix<double> block_diag(std::vector<Eigen::SparseMatrix<double>> a);
-	static Eigen::MatrixXd sum(Eigen::SparseMatrix<double> X, int axis);
+	static Eigen::MatrixXd sparse_sum(Eigen::SparseMatrix<double> X, int axis);
 
 
 };

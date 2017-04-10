@@ -4,8 +4,6 @@
 #include <MatOp/SparseSymMatProd.h>
 #include <Eigen/SVD>
 
-#include <typeinfo>
-
 #include <dlib/matrix.h>
 #include <dlib/clustering.h>
 
@@ -35,7 +33,6 @@ CommunitiesSharedPtr pmm::get_ml_community(MLNetworkSharedPtr mnet, unsigned int
 		samples[i] = sample;
 	}
 
-
 	dlib::kcentroid<kernel_type> kc(kernel_type(0.1), 0.01, 8);
 	dlib::kkmeans<kernel_type> test(kc);
 	test.set_number_of_centers(k);
@@ -43,14 +40,11 @@ CommunitiesSharedPtr pmm::get_ml_community(MLNetworkSharedPtr mnet, unsigned int
 	pick_initial_centers(k, initial_centers, samples, test.get_kernel());
 	test.train(samples, initial_centers);
 
-	std::vector<int> nodes;
+	std::vector<unsigned int> nodes;
 	for (unsigned long i = 0; i < samples.size(); ++i) {
-		//nodes.push_back(test(samples[i]));
 		nodes.push_back(test(samples[i]));
 	}
-
-
-	return cutils::nodes2communities(mnet, nodes);
+	return cutils::actors2communities(mnet, nodes);
 }
 
 Eigen::MatrixXd pmm::modularitymaximization(Eigen::SparseMatrix<double> a, unsigned int ell) {

@@ -17,8 +17,8 @@ Eigen::SparseMatrix<double> glouvain::multicat(std::vector<Eigen::SparseMatrix<d
 	tlist.reserve(N * L);
 
 	for (size_t i = 0; i < L; i++) {
-		Eigen::MatrixXd kout = cutils::sum(a[i], 0);
-		Eigen::MatrixXd kin = cutils::sum(a[i], 1);
+		Eigen::MatrixXd kout = cutils::sparse_sum(a[i], 0);
+		Eigen::MatrixXd kin = cutils::sparse_sum(a[i], 1);
 		double mm = kout.array().sum();
 		twoum += mm;
 

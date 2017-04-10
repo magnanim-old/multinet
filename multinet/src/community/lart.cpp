@@ -31,7 +31,7 @@ void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eige
 	}
 
 	for (size_t i = 0; i < L; i++) {
-		Eigen::MatrixXd d = cutils::sum(a[i], 0);
+		Eigen::MatrixXd d = cutils::sparse_sum(a[i], 0);
 
 		Eigen::MatrixXd	product = d * d.transpose();
 
@@ -130,7 +130,7 @@ Eigen::SparseMatrix<double> lart::diagA(Eigen::SparseMatrix<double> A) {
 	Eigen::SparseMatrix<double> dA = Eigen::SparseMatrix<double>(A.rows(), A.cols());
 	dA.reserve(Eigen::VectorXi::Constant(A.rows() / 2, A.rows() / 2));
 
-	Eigen::MatrixXd d = cutils::sum(A, 1);
+	Eigen::MatrixXd d = cutils::sparse_sum(A, 1);
 
 	std::vector<Eigen::Triplet<double>> tlist;
 	tlist.reserve(A.rows());
@@ -209,11 +209,45 @@ unsigned long lart::prcheck(std::vector<Eigen::SparseMatrix<double>> a, Eigen::S
 	return num_clusters;
 }
 
+Eigen::SparseMatrix<double> lart::supraA(std::vector<Eigen::SparseMatrix<double>> a, double eps) {
+	Eigen::SparseMatrix<double> A = block_diag(a);
+	size_t L = a.size();
+	size_t N = a[0].rows();
+
+	for (size_t i = 0; i  < L - 1; ++i) {
+		for (size_t j = i + 1; j < L; ++j) {
+			Eigen::MatrixXd d = cutils::sparse_sum(a[i].cwiseProduct(a[j]), 1);
+
+			std::vector<Eigen::Triplet<double>> tlist;
+			tlist.reserve(a[i].rows());
+
+			for (int k = 0; k < A.outerSize(); k++) {
+				for (Eigen::SparseMatrix<double>::InnerIterator it(A, k); it; ++it) {
+					tlist.push_back(Eigen::Triplet<double>(it.row(), it.col(), it.value()));
+				}
+			}
+			int ix_a = i * N;
+			int ix_b = (i + 1) * N;
+
+			for (int k = 0; k < a[i].rows(); k++) {
+				double intra = d(k, 0) + eps;
+				tlist.push_back(Eigen::Triplet<double>(ix_a + k, ix_b + k, intra));
+				tlist.push_back(Eigen::Triplet<double>(ix_b + k, ix_a + k, intra));
+			}
+
+			for (int k = 0; k < A.rows(); k++) {
+				tlist.push_back(Eigen::Triplet<double>(k, k, eps));
+			}
+			A.setFromTriplets(tlist.begin(), tlist.end());
+		}
+	}
+	return A;
+}
 
 CommunitiesSharedPtr lart::get_ml_community(
 	MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma) {
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
-	Eigen::SparseMatrix<double> sA = cutils::supraA(a, eps);
+	Eigen::SparseMatrix<double> sA = supraA(a, eps);
 	Eigen::SparseMatrix<double> dA = diagA(sA);
 
 	Eigen::SparseMatrix<double> aP = dA * sA;

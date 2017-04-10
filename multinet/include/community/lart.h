@@ -34,6 +34,14 @@ private:
 			This algorithm contains DTrace and SystemTap probe points for performance testing and tuning.
 	*/
 
+	/*
+		Use: auto A = supraA(a, eps);
+		Pre: a is a list of adjacency matrixes. eps is the probability for the walker to move between layers
+		Post: A is the supra adjacency matrix from the list of matrixes, with inter layer connections
+			on the off diagonal blocks.
+
+	*/
+	Eigen::SparseMatrix<double> supraA(std::vector<Eigen::SparseMatrix<double>> a, double eps);
 
 	/*
 		Use: auto m = block_diag(a);
