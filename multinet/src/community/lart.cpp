@@ -320,7 +320,7 @@ CommunitiesSharedPtr lart::get_ml_community(
 	//	std::cout << k << " ";
 	//std::cout << std::endl;
 
-	return communities::create();
+	return communities::nodes2communities(mnet, labels);
 
 }
 
