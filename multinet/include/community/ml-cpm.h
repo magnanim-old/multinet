@@ -15,7 +15,7 @@
 namespace mlnet {
 
 
-    CommunitiesSharedPtr mlcpm(const MLNetworkSharedPtr& mnet, size_t k, size_t m1, size_t m2, size_t m3);
+    CommunitiesSharedPtr mlcpm(const MLNetworkSharedPtr& mnet, size_t k, size_t m);
 
 /**
  * This method finds all the maximal cliques (1) being a superset of clique A
