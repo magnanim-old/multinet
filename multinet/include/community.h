@@ -43,15 +43,12 @@ namespace mlnet {
 
         CommunitySharedPtr get_community(int i);
         const vector<CommunitySharedPtr>& get_communities() const;
+        
+        void print(std::ostream& stream);
 
         private:
         vector<CommunitySharedPtr> data;
-
-        //std::ostream& operator<< (std::ostream& os);
     };
-
-
-
 }
 
 #endif /* MULTINET_COMMUNITY_H_ */

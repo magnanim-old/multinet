@@ -11,14 +11,17 @@ void test_lart() {
 	test_begin("ML-LART");
 
 	lart k;
-	MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/Downloads/test_100_all.mpx","toy",',');
+	MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/Downloads/DK_pol.mpx","toy",',');
+	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/Downloads/toy2_dc.mpx","toy",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/fftwyt.mpx","toy",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/friendfeed_ita.mpx","sample",',');
 	uint32_t t = 9;
 	double eps = 1;
 	double gamma = 1;
 
-	k.get_ml_community(mnet3, t, eps, gamma);
+	CommunitiesSharedPtr c = k.get_ml_community(mnet3, t, eps, gamma);
+	//*c.print(std::cout);
+
 
 	test_end("ML-LART");
 

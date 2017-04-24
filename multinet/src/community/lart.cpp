@@ -3,6 +3,10 @@
 #include <unsupported/Eigen/MatrixFunctions>
 #include <math.h>
 
+#include <dlib/svm_threaded.h>
+#include <dlib/graph_utils.h>
+
+
 namespace mlnet {
 
 /*vector<double> lart::modMLPX(vector<lart::cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double> sA0) {
@@ -203,44 +207,53 @@ Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<dou
 	return m;
 }
 
-unsigned long lart::prcheck(std::vector<Eigen::SparseMatrix<double>> a, Eigen::SparseMatrix<double>& aP) {
+unsigned long lart::prcheck(std::vector<Eigen::SparseMatrix<double>> a, Eigen::SparseMatrix<double>& aP, int connected) {
 	Eigen::SparseMatrix<double> aplus = Eigen::SparseMatrix<double>(a[0].rows(), a[0].cols());
 	for (size_t i = 0; i < a.size(); i++) {
 		aplus += a[i];
 	}
 
+	typedef dlib::matrix<double,2,1> node_vector_type;
+	typedef dlib::matrix<double,1,1> edge_vector_type;
+	typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
+
+	graph_type g;
+	g.set_number_of_nodes(aplus.rows());
+
 	std::vector<unsigned long> labels;
 	std::vector<dlib::sample_pair> edges;
 
-	for (int j = 0; j < aplus.outerSize(); j++) {
-		for (Eigen::SparseMatrix<double>::InnerIterator it(aplus, j); it; ++it) {
+	Eigen::SparseMatrix<double> t = aplus.triangularView<Eigen::Upper>();
+	for (int j = 0; j < t.outerSize(); j++) {
+		for (Eigen::SparseMatrix<double>::InnerIterator it(t, j); it; ++it) {
 			edges.push_back(dlib::sample_pair(it.row(), it.col(), 1));
+			g.add_edge(it.row(), it.col());
 		}
 	}
 
-	unsigned long num_clusters = dlib::newman_cluster(edges, labels);
-	std::vector<unsigned long> uq = labels;
-	std::sort(uq.begin(), uq.end());
-	std::vector<unsigned long>::iterator it;
-	it = std::unique(uq.begin(), uq.end());
-	uq.resize(std::distance(uq.begin(), it));
+	unsigned long num_clusters = dlib::graph_is_connected(g);
+	std::cout << "is connected? "<< num_clusters << std::endl;
+	if (!num_clusters) {
+		num_clusters = dlib::newman_cluster(edges, labels);
 
-	std::random_device seed;
-	std::mt19937 engine(seed()) ;
-   	std::uniform_int_distribution<int> choose(0, labels.size() - 1);
+		std::vector<unsigned long> uq = labels;
+		std::sort(uq.begin(), uq.end());
+		std::vector<unsigned long>::iterator it;
+		it = std::unique(uq.begin(), uq.end());
+		uq.resize(std::distance(uq.begin(), it));
 
-	if (labels.size() > 0) {
+		std::random_device seed;
+		std::mt19937 engine(seed());
+	   	std::uniform_int_distribution<int> choose(0, labels.size() - 1);
+
 		for (size_t i = 0; i < uq.size(); i++) {
-			std::vector<unsigned long> tmp;
-
 			int index = choose(engine);
-
 			for (int j = 0; j < aP.rows(); j++) {
-				//aP.coeffRef(index, j) = 0.85 * aP.coeff(index, j) + 0.15 / (a[0].size() * a.size());
+				aP.coeffRef(index, j) = 0.85 * aP.coeff(index, j) + 0.15 / (a[0].rows() * a.size());
 			}
 		}
-
 	}
+
 	return num_clusters;
 }
 
@@ -286,7 +299,7 @@ CommunitiesSharedPtr lart::get_ml_community(
 	Eigen::SparseMatrix<double> dA = diagA(sA);
 
 	Eigen::SparseMatrix<double> aP = dA * sA;
-	int disconnected = prcheck(a, aP);
+	int clusters = prcheck(a, aP);
 
 	DTRACE0(WALK_START);
 	Eigen::MatrixXd A = Eigen::MatrixXd(aP);
@@ -296,17 +309,16 @@ CommunitiesSharedPtr lart::get_ml_community(
 
 	Eigen::MatrixXd Dt = Dmat(Pt, dA, a.size());
 
-	/*if (disconnected) {
-		Dt = Dt.array().unaryExpr([](double v) { return v != 0 ? v : 10.0; });
-	}*/
+	if (clusters > 1) {
+		Eigen::SparseMatrix<double> sA0 = supraA(a, 0);
 
-	for (int i = 0; i < Dt.rows(); i++)
-		Dt(i, i) = 10;
+	}
 
 	DTRACE0(CLUSTER_START);
 	std::vector<unsigned long> labels;
 	dlib::matrix<double> dists = dlib::mat(Dt);
-	dlib::bottom_up_cluster(dists, labels, 2);
+
+	dlib::bottom_up_cluster(dists, labels, 7);
 
 	std::vector<unsigned long> uq = labels;
 	std::sort(uq.begin(), uq.end());
@@ -315,6 +327,14 @@ CommunitiesSharedPtr lart::get_ml_community(
 	uq.resize(std::distance(uq.begin(), it));
 
 	DTRACE1(CLUSTER_END, uq.size());
+
+
+	Eigen::IOFormat f(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
+
+	//std::cout << Eigen::MatrixXd(a[0]).format(f) << std::endl;
+	//std::cout << Eigen::MatrixXd(a[1]).format(f) << std::endl;
+
+
 
 	for (unsigned long k : labels)
 		std::cout << k << " ";
