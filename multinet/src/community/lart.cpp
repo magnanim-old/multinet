@@ -206,11 +206,11 @@ Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<dou
 	return m;
 }
 
-std::vector<unsigned long> lart::prcheck(Eigen::SparseMatrix<double>& aP, std::vector<dlib::sample_pair> edges, unsigned int LN) {
-	std::vector<unsigned long> labels;
-	unsigned long num_clusters = dlib::newman_cluster(edges, labels);
+unsigned long lart::prcheck(Eigen::SparseMatrix<double>& aP, std::vector<dlib::sample_pair> edges, unsigned int LN) {
+	std::vector<unsigned long> memb;
+	unsigned long num_clusters = dlib::newman_cluster(edges, memb);
 
-	std::vector<unsigned long> uq = labels;
+	std::vector<unsigned long> uq = memb;
 	std::sort(uq.begin(), uq.end());
 	std::vector<unsigned long>::iterator it;
 	it = std::unique(uq.begin(), uq.end());
@@ -218,7 +218,7 @@ std::vector<unsigned long> lart::prcheck(Eigen::SparseMatrix<double>& aP, std::v
 
 	std::random_device seed;
 	std::mt19937 engine(seed());
-	std::uniform_int_distribution<int> choose(0, labels.size() - 1);
+	std::uniform_int_distribution<int> choose(0, memb.size() - 1);
 
 	for (size_t i = 0; i < uq.size(); i++) {
 		int index = choose(engine);
@@ -227,13 +227,10 @@ std::vector<unsigned long> lart::prcheck(Eigen::SparseMatrix<double>& aP, std::v
 		}
 	}
 
-	std::vector<std::vector<unsigned long>> result;
-	result.push_back(labels);
-	result.push_back(uq);
-	return result;
+	return num_clusters;
 }
 
-int is_connected(std::vector<Eigen::SparseMatrix<double>> a, std::vector<dlib::sample_pair>& edges) {
+int lart::is_connected(std::vector<Eigen::SparseMatrix<double>> a, std::vector<dlib::sample_pair>& edges) {
 	typedef dlib::matrix<double,2,1> node_vector_type;
 	typedef dlib::matrix<double,1,1> edge_vector_type;
 	typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
@@ -292,28 +289,55 @@ Eigen::SparseMatrix<double> lart::supraA(std::vector<Eigen::SparseMatrix<double>
 	return A;
 }
 
-void updateDt(Eigen::SparseMatrix<double>& Dt, Eigen::SparseMatrix<double> g,
-				std::vector<std::vector<unsigned long>> labels) {
-	std::vector<unsigned long> memb = lables[0];
-	std::vector<unsigned long> n_comp = lables[1];
-	for (size_t i = 0; i < labels.size() - 1; i++) {
-		for (size_t j = i + 1; j < labels.size(); j++) {
+std::vector<unsigned long> lart::find_ix(std::vector<unsigned long> x, unsigned long y) {
+	std::vector<unsigned long> ix;
+
+	std::vector<unsigned long>::iterator iter = x.begin();
+
+	while ((iter = std::find_if(iter, x.end(), [&y] (unsigned long o) { return o == y; })) != x.end())
+	{
+		ix.push_back(iter - x.begin());
+		iter++;
+
+	}
+	
+	return ix;
+}
+
+void lart::updateDt(Eigen::MatrixXd& Dt, Eigen::SparseMatrix<double> g) {
+	std::vector<unsigned long> memb;
+	std::vector<dlib::sample_pair> edges;
+	for (int j = 0; j < g.outerSize(); j++) {
+		for (Eigen::SparseMatrix<double>::InnerIterator it(g, j); it; ++it) {
+			edges.push_back(dlib::sample_pair(it.row(), it.col(), 1));
+		}
+	}
+
+	unsigned long num_clusters = dlib::newman_cluster(edges, memb);
+
+	std::vector<unsigned long> n_comp = memb;
+	std::sort(n_comp.begin(), n_comp.end());
+	std::vector<unsigned long>::iterator it;
+	it = std::unique(n_comp.begin(), n_comp.end());
+	n_comp.resize(std::distance(n_comp.begin(), it));
+
+	for (size_t i = 0; i < n_comp.size() - 1; i++) {
+		for (size_t j = i + 1; j < n_comp.size(); j++) {
 			if (i != j) {
-				std::vector<unsigned long>::iterator iter_row = memb.begin();
-				std::vector<unsigned long>::iterator iter_col = memb.begin();
-				while ((iter_row = std::find_if(iter_row, memb.end(), n_comp[i])) != memb.end()) {
-					while ((iter_col = std::find_if(iter_col, memb.end(), n_comp[j])) != memb.end()) {
-						// time consuming op
-						iter_col++;
+				std::vector<unsigned long> row = find_ix(memb, n_comp[i]);
+				std::vector<unsigned long> col = find_ix(memb, n_comp[j]);
+
+				for (size_t k = 0; k < row.size(); k++) {
+					for (size_t o = 0; o < col.size(); o++) {
+						Dt(row[k], col[o]) = 100;
+						Dt(col[o], row[k]) = 100;
 					}
-					iter_row++;
 				}
 			}
 		}
 	}
 
 }
-
 
 CommunitiesSharedPtr lart::get_ml_community(
 	MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma) {
@@ -326,9 +350,8 @@ CommunitiesSharedPtr lart::get_ml_community(
 	Eigen::SparseMatrix<double> dA = diagA(sA);
 	Eigen::SparseMatrix<double> aP = dA * sA;
 
-	std::vector<std::vector<unsigned long>> pr;
 	if (!connected) {
-		pr = prcheck(aP, edges, a.size() * a[0].rows());
+		prcheck(aP, edges, a.size() * a[0].rows());
 	}
 
 	DTRACE0(WALK_START);
@@ -340,37 +363,23 @@ CommunitiesSharedPtr lart::get_ml_community(
 	Eigen::MatrixXd Dt = Dmat(Pt, dA, a.size());
 
 	if (!connected) {
-		updateDt(Dt, supraA(a, 0), pr);
+		updateDt(Dt, supraA(a, 0));
 	}
 
 	DTRACE0(CLUSTER_START);
 	std::vector<unsigned long> labels;
 	dlib::matrix<double> dists = dlib::mat(Dt);
 
-	dlib::bottom_up_cluster(dists, labels, 2);
+	dlib::bottom_up_cluster(dists, labels, 2, 99);
 
 	std::vector<unsigned long> uq = labels;
 	std::sort(uq.begin(), uq.end());
 	std::vector<unsigned long>::iterator it;
 	it = std::unique(uq.begin(), uq.end());
 	uq.resize(std::distance(uq.begin(), it));
-
 	DTRACE1(CLUSTER_END, uq.size());
 
-
-	Eigen::IOFormat f(Eigen::FullPrecision, 0, ", ", ";\n", "[", "]", "[", "]");
-
-	//std::cout << Eigen::MatrixXd(a[0]).format(f) << std::endl;
-	//std::cout << Eigen::MatrixXd(a[1]).format(f) << std::endl;
-
-
-
-	for (unsigned long k : labels)
-		std::cout << k << " ";
-	std::cout << std::endl;
-
 	std::vector<unsigned int> l(labels.begin(), labels.end());
-
 	return cutils::nodes2communities(mnet, l);
 
 }

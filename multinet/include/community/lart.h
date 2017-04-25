@@ -73,13 +73,18 @@ private:
 	*/
 	Eigen::MatrixXd pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bool same_obj);
 
-	std::vector<std::vector<unsigned long>> prcheck(Eigen::SparseMatrix<double>& aP, std::vector<dlib::sample_pair> edges, unsigned int LN);
+	unsigned long prcheck(Eigen::SparseMatrix<double>& aP, std::vector<dlib::sample_pair> edges, unsigned int LN);
 
 
 	int is_connected(std::vector<Eigen::SparseMatrix<double>> a, std::vector<dlib::sample_pair>& edges);
 
-	void updateDt(Eigen::SparseMatrix<double>& Dt, Eigen::SparseMatrix<double> g,
-				std::vector<std::vector<unsigned long>> labels);
+
+	void updateDt(Eigen::MatrixXd& Dt, Eigen::SparseMatrix<double> g);
+
+
+	std::vector<unsigned long> find_ix(std::vector<unsigned long> x, unsigned long y);
+
+
 
 };
 
