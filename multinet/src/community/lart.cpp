@@ -1,5 +1,4 @@
 #include "community/lart.h"
-#include <dlib/clustering.h>
 #include <unsupported/Eigen/MatrixFunctions>
 #include <math.h>
 
@@ -207,21 +206,44 @@ Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<dou
 	return m;
 }
 
-unsigned long lart::prcheck(std::vector<Eigen::SparseMatrix<double>> a, Eigen::SparseMatrix<double>& aP, int connected) {
-	Eigen::SparseMatrix<double> aplus = Eigen::SparseMatrix<double>(a[0].rows(), a[0].cols());
-	for (size_t i = 0; i < a.size(); i++) {
-		aplus += a[i];
+std::vector<unsigned long> lart::prcheck(Eigen::SparseMatrix<double>& aP, std::vector<dlib::sample_pair> edges, unsigned int LN) {
+	std::vector<unsigned long> labels;
+	unsigned long num_clusters = dlib::newman_cluster(edges, labels);
+
+	std::vector<unsigned long> uq = labels;
+	std::sort(uq.begin(), uq.end());
+	std::vector<unsigned long>::iterator it;
+	it = std::unique(uq.begin(), uq.end());
+	uq.resize(std::distance(uq.begin(), it));
+
+	std::random_device seed;
+	std::mt19937 engine(seed());
+	std::uniform_int_distribution<int> choose(0, labels.size() - 1);
+
+	for (size_t i = 0; i < uq.size(); i++) {
+		int index = choose(engine);
+		for (int j = 0; j < aP.rows(); j++) {
+			aP.coeffRef(index, j) = 0.85 * aP.coeff(index, j) + 0.15 / (LN);
+		}
 	}
 
+	std::vector<std::vector<unsigned long>> result;
+	result.push_back(labels);
+	result.push_back(uq);
+	return result;
+}
+
+int is_connected(std::vector<Eigen::SparseMatrix<double>> a, std::vector<dlib::sample_pair>& edges) {
 	typedef dlib::matrix<double,2,1> node_vector_type;
 	typedef dlib::matrix<double,1,1> edge_vector_type;
 	typedef dlib::graph<node_vector_type, edge_vector_type>::kernel_1a_c graph_type;
 
+	Eigen::SparseMatrix<double> aplus = Eigen::SparseMatrix<double>(a[0].rows(), a[0].cols());
+	for (size_t i = 0; i < a.size(); i++) {
+		aplus += a[i];
+	}
 	graph_type g;
-	g.set_number_of_nodes(aplus.rows());
-
-	std::vector<unsigned long> labels;
-	std::vector<dlib::sample_pair> edges;
+	g.set_number_of_nodes(a[0].rows());
 
 	Eigen::SparseMatrix<double> t = aplus.triangularView<Eigen::Upper>();
 	for (int j = 0; j < t.outerSize(); j++) {
@@ -231,31 +253,9 @@ unsigned long lart::prcheck(std::vector<Eigen::SparseMatrix<double>> a, Eigen::S
 		}
 	}
 
-	unsigned long num_clusters = dlib::graph_is_connected(g);
-	std::cout << "is connected? "<< num_clusters << std::endl;
-	if (!num_clusters) {
-		num_clusters = dlib::newman_cluster(edges, labels);
-
-		std::vector<unsigned long> uq = labels;
-		std::sort(uq.begin(), uq.end());
-		std::vector<unsigned long>::iterator it;
-		it = std::unique(uq.begin(), uq.end());
-		uq.resize(std::distance(uq.begin(), it));
-
-		std::random_device seed;
-		std::mt19937 engine(seed());
-	   	std::uniform_int_distribution<int> choose(0, labels.size() - 1);
-
-		for (size_t i = 0; i < uq.size(); i++) {
-			int index = choose(engine);
-			for (int j = 0; j < aP.rows(); j++) {
-				aP.coeffRef(index, j) = 0.85 * aP.coeff(index, j) + 0.15 / (a[0].rows() * a.size());
-			}
-		}
-	}
-
-	return num_clusters;
+	return dlib::graph_is_connected(g);
 }
+
 
 Eigen::SparseMatrix<double> lart::supraA(std::vector<Eigen::SparseMatrix<double>> a, double eps) {
 	Eigen::SparseMatrix<double> A = block_diag(a);
@@ -292,14 +292,44 @@ Eigen::SparseMatrix<double> lart::supraA(std::vector<Eigen::SparseMatrix<double>
 	return A;
 }
 
+void updateDt(Eigen::SparseMatrix<double>& Dt, Eigen::SparseMatrix<double> g,
+				std::vector<std::vector<unsigned long>> labels) {
+	std::vector<unsigned long> memb = lables[0];
+	std::vector<unsigned long> n_comp = lables[1];
+	for (size_t i = 0; i < labels.size() - 1; i++) {
+		for (size_t j = i + 1; j < labels.size(); j++) {
+			if (i != j) {
+				std::vector<unsigned long>::iterator iter_row = memb.begin();
+				std::vector<unsigned long>::iterator iter_col = memb.begin();
+				while ((iter_row = std::find_if(iter_row, memb.end(), n_comp[i])) != memb.end()) {
+					while ((iter_col = std::find_if(iter_col, memb.end(), n_comp[j])) != memb.end()) {
+						// time consuming op
+						iter_col++;
+					}
+					iter_row++;
+				}
+			}
+		}
+	}
+
+}
+
+
 CommunitiesSharedPtr lart::get_ml_community(
 	MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma) {
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
+
+	std::vector<dlib::sample_pair> edges;
+	int connected = is_connected(a, edges);
+
 	Eigen::SparseMatrix<double> sA = supraA(a, eps);
 	Eigen::SparseMatrix<double> dA = diagA(sA);
-
 	Eigen::SparseMatrix<double> aP = dA * sA;
-	int clusters = prcheck(a, aP);
+
+	std::vector<std::vector<unsigned long>> pr;
+	if (!connected) {
+		pr = prcheck(aP, edges, a.size() * a[0].rows());
+	}
 
 	DTRACE0(WALK_START);
 	Eigen::MatrixXd A = Eigen::MatrixXd(aP);
@@ -309,16 +339,15 @@ CommunitiesSharedPtr lart::get_ml_community(
 
 	Eigen::MatrixXd Dt = Dmat(Pt, dA, a.size());
 
-	if (clusters > 1) {
-		Eigen::SparseMatrix<double> sA0 = supraA(a, 0);
-
+	if (!connected) {
+		updateDt(Dt, supraA(a, 0), pr);
 	}
 
 	DTRACE0(CLUSTER_START);
 	std::vector<unsigned long> labels;
 	dlib::matrix<double> dists = dlib::mat(Dt);
 
-	dlib::bottom_up_cluster(dists, labels, 7);
+	dlib::bottom_up_cluster(dists, labels, 2);
 
 	std::vector<unsigned long> uq = labels;
 	std::sort(uq.begin(), uq.end());

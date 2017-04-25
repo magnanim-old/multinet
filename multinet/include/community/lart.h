@@ -2,6 +2,7 @@
 #define LART_H_
 
 #include "cutils.h"
+#include <dlib/clustering.h>
 
 namespace mlnet {
 
@@ -72,7 +73,13 @@ private:
 	*/
 	Eigen::MatrixXd pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bool same_obj);
 
-	unsigned long prcheck(std::vector<Eigen::SparseMatrix<double>> a, Eigen::SparseMatrix<double>& sA);
+	std::vector<std::vector<unsigned long>> prcheck(Eigen::SparseMatrix<double>& aP, std::vector<dlib::sample_pair> edges, unsigned int LN);
+
+
+	int is_connected(std::vector<Eigen::SparseMatrix<double>> a, std::vector<dlib::sample_pair>& edges);
+
+	void updateDt(Eigen::SparseMatrix<double>& Dt, Eigen::SparseMatrix<double> g,
+				std::vector<std::vector<unsigned long>> labels);
 
 };
 
