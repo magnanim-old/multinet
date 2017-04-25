@@ -16,8 +16,7 @@ public:
 		Pre : MLNetworkSharedPtr is a multilayer network
 			 t is the number of number of steps for random walker to take
 			 eps
-			 gamma
-		Post: (?)
+  		Post: (?)
 	*/
 	CommunitiesSharedPtr get_ml_community(MLNetworkSharedPtr mnet, uint32_t t, double eps, double gamma);
 

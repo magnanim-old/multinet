@@ -21,7 +21,7 @@ CommunitiesSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vec
 		for (size_t j = 0; j < layered[i].size(); j++) {
 			cid2aid[layered[i][j]].push_back(j);
 
-		}
+		} 
 	}
 
 	// actual nodeid 2 communities
@@ -58,13 +58,6 @@ CommunitiesSharedPtr cutils::actors2communities(MLNetworkSharedPtr mnet, std::ve
 			(*communities).add_community(c);
 		}
 	}
-
-	/*for (auto k : (*communities).get_communities()) {
-		for (auto i : (*k).get_nodes()) {
-			std::cout << i->actor->name << std::endl;
-		}
-		std::cout << "--------------------" << std::endl;
-	}*/
 
 	return communities;
 }
