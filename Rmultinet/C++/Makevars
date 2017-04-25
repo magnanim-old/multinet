@@ -1,0 +1,2 @@
+## This is a C++11 package
+CXX_STD = CXX11
