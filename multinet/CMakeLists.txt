@@ -36,7 +36,7 @@ else()
 endif()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -DNDEBUG -ldlib -lboost_serialization")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -DNDEBUG -lboost_serialization -DDLIB_NO_GUI_SUPPORT -DDLIB_ISO_CPP_ONLY")
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fopenmp -fmessage-length=0 -funroll-loops -fno-omit-frame-pointer -march=native")
 else()
 	if (CMAKE_COMPILER_IS_CLANGXX)
@@ -53,7 +53,7 @@ endif()
 
 include_directories (include)
 
-file (GLOB_RECURSE SOURCES src/*.cpp)
+file (GLOB_RECURSE SOURCES src/*.cpp lib/dlib-19.4/dlib/all/source.cpp)
 
 option(DOXY "Generate DoxyGen documentation" OFF)
 if(DOXY)
@@ -101,14 +101,16 @@ if(dtrace)
 	endif()
 endif(dtrace)
 
-include_directories(lib/spectra)
 find_package(Eigen3 REQUIRED)
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 find_package(BLAS REQUIRED)
 
-add_library (multinet SHARED ${SOURCES} ${dlib_LIBS} ${PROBE_PATH})
+include_directories(lib)
+include_directories(lib/dlib)
 
-TARGET_LINK_LIBRARIES(multinet ${dlib_LIBS})
+add_library (multinet SHARED ${SOURCES} ${PROBE_PATH})
+
+TARGET_LINK_LIBRARIES(multinet)
 
 
 install (TARGETS multinet

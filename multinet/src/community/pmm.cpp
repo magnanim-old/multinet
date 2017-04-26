@@ -1,7 +1,7 @@
 #include "community/pmm.h"
 
-#include <SymEigsSolver.h>
-#include <MatOp/SparseSymMatProd.h>
+#include <spectra/SymEigsSolver.h>
+#include <spectra/MatOp/SparseSymMatProd.h>
 #include <Eigen/SVD>
 
 #include <dlib/matrix.h>

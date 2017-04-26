@@ -2,17 +2,150 @@
 #include <unsupported/Eigen/MatrixFunctions>
 #include <math.h>
 
-#include <dlib/svm_threaded.h>
+#include <dlib/graph.h>
 #include <dlib/graph_utils.h>
-
-#include <shark/Models/Trees/LCTree.h>
-#include <shark/Models/Clustering/HierarchicalClustering.h>
-#include <shark/Models/Clustering/HardClusteringModel.h>
-
 
 #define CONNECT_LAST_THRESHOLD 100
 
 namespace mlnet {
+
+vector<long> lart::get_partition(vector<dlib::bu_cluster> clusters, int maxmodix, size_t L, size_t N) {
+
+	struct partition {
+		std::vector<long> vals;
+	};
+
+	vector<partition> parts;
+	partition p;
+	p.vals.resize(L * N);
+	std::iota (std::begin(p.vals), std::end(p.vals), 0);
+	parts.push_back(p);
+
+	for (size_t i = L * N; i < L * N + maxmodix; i++) {
+		vector<long> tmp = {clusters[i].left, clusters[i].right};
+		vector<long> out;
+
+		std::set_symmetric_difference (
+			parts[i-N*L].vals.begin(), parts[i-N*L].vals.end(),
+			tmp.begin(), tmp.end(),
+			std::back_inserter(out));
+
+		out.push_back(i);
+		partition p;
+		p.vals = out;
+		parts.push_back(p);
+	}
+
+
+	vector<partition> r;
+	vector<long> val = parts[parts.size() - 1].vals;
+
+	for (size_t i = 0; i < val.size(); i++) {
+		partition pp;
+		pp.vals = clusters[val[i]].orig;
+		r.push_back(pp);
+	}
+
+	size_t l = r.size();
+	size_t n = L * N;
+
+	vector<long> result(n);
+	for (size_t i = 0; i < l; i++) {
+		for (size_t j = 0; j < r[i].vals.size(); j++) {
+			result[r[i].vals[j]] = i;
+		}
+	}
+
+	return result;
+}
+
+
+vector<double> lart::modMLPX(vector<dlib::bu_cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double> sA0) {
+	vector<double> r;
+
+	size_t L = a.size();
+	size_t N = a[0].rows();
+
+	modmat(a, gamma, sA0);
+
+	double diag = 0.0;
+	for (int i = 0; i < sA0.rows(); i++){
+		diag += sA0.coeff(i, i);
+	}
+
+	r.push_back(diag);
+
+	for (size_t i = N * L; i < clusters.size(); i++) {
+		dlib::bu_cluster data = clusters[i];
+
+		vector<long> v1 = clusters[data.left].orig;
+		vector<long> v2 = clusters[data.right].orig;
+		double tmp = 0.0;
+
+		for (size_t i = 0; i < v1.size(); i++) {
+			for (size_t j = 0; j < v2.size(); j++) {
+				tmp += sA0.coeff(v1[i], v2[j]);
+			}
+		}
+
+		tmp *= 2;
+		r.push_back(r[r.size() - 1] + tmp);
+	}
+
+	return r;
+}
+
+void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA) {
+
+	double twoum = 0.0;
+	for (int j = 0; j < sA.outerSize(); j++) {
+		for (Eigen::SparseMatrix<double>::InnerIterator it(sA, j); it; ++it) {
+			twoum += it.value();
+		}
+	}
+
+	size_t L = a.size();
+	size_t N = a[0].rows();
+
+
+	Eigen::SparseMatrix<double> copy (sA);
+
+	std::vector<Eigen::Triplet<double>> tlist;
+	tlist.reserve(copy.rows() * 1.5);
+
+	// Cache the intra layer weights because they don't change
+	for (size_t i = 0; i < N; i++) {
+		tlist.push_back(Eigen::Triplet<double>(i, N + i, sA.coeff(i, N + i)));
+		tlist.push_back(Eigen::Triplet<double>(N + i, i, sA.coeff(N + i, i)));
+	}
+
+	for (size_t i = 0; i < L; i++) {
+		Eigen::MatrixXd d = cutils::sparse_sum(a[i], 0);
+
+		Eigen::MatrixXd	product = d * d.transpose();
+
+		double asum = 0;
+		for (int j = 0; j < a[i].outerSize(); j++) {
+			for (Eigen::SparseMatrix<double>::InnerIterator it(a[i], j); it; ++it) {
+				asum += it.value();
+			}
+		}
+
+		Eigen::MatrixXd	s1 = product.array() / asum;
+		Eigen::MatrixXd	s2 = s1.array() * gamma;
+		Eigen::MatrixXd s3 = Eigen::MatrixXd(copy.block(i * N, i * N, N, N)) - s2;
+
+		for (int j = 0; j < s3.rows(); j++) {
+			for (int k = 0; k < s3.cols(); k++) {
+				tlist.push_back(Eigen::Triplet<double>(j + (i * N), k + (i * N), s3(j, k)));
+			}
+		}
+	}
+
+	sA.setFromTriplets(tlist.begin(), tlist.end());
+	sA /= twoum;
+}
+
 
 // TODO: Parallelize this function
 Eigen::MatrixXd lart::pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bool same_obj) {
@@ -281,53 +414,24 @@ CommunitiesSharedPtr lart::get_ml_community(
 		updateDt(Dt, supraA(a, 0));
 	}
 
-	using namespace shark;
-	size_t trainingSize = Dt.rows();
-	std::vector<RealVector> tr_d(trainingSize, RealVector(Dt.cols(), 0.0));
-
-	for (std::size_t i = 0; i < trainingSize; i++) {
-		for (std::size_t j = 0; j < trainingSize; j++) {
-			tr_d[i](j) = Dt(i, j);
-		} 
-	} 
-		
-	UnlabeledData<RealVector> training = createDataFromRange(tr_d);
-	LCTree<RealVector> tree(training, TreeConstruction(0, 2));
-	HierarchicalClustering<RealVector> clustering(&tree);
-	HardClusteringModel<RealVector> model(&clustering);
-
-	std::cout << "number of tree nodes: " << tree.nodes() << std::endl;
-	std::cout << "number of clusters: " << clustering.numberOfClusters() << std::endl;
-
-
-
-	for (std::size_t i = 0; i != trainingSize; i++){
-		unsigned int cluster = model(training.element(i));
-		std::cout << "   point " << training.element(i)(0) << "  -->  cluster " << cluster << std::endl;
-	}
-
-
 	DTRACE0(CLUSTER_START);
 	std::vector<unsigned long> labels;
-	dlib::matrix<double> dists = dlib::mat(Dt);
+	std::vector<dlib::bu_cluster> clusters;
 
-	dlib::bottom_up_cluster(dists, labels, 2, CONNECT_LAST_THRESHOLD - 1);
+	dlib::bottom_up_cluster(dlib::mat(Dt), labels, clusters, 2);
 
+	//DTRACE1(CLUSTER_END, uq.size());
 
+	vector<double> mod = modMLPX(clusters, a, gamma, supraA(a, 0));
+	auto maxmod = std::max_element(std::begin(mod), std::end(mod));
+	int maxmodix = std::distance(std::begin(mod), maxmod);
+	vector<long> partition = get_partition(clusters, maxmodix, a.size(), a[0].rows());
 
+	for(auto m: partition)
+		std::cout << m << ",";
+	std::cout << std::endl;
 
-
-
-
-	std::vector<unsigned long> uq = labels;
-	std::sort(uq.begin(), uq.end());
-	std::vector<unsigned long>::iterator it;
-	it = std::unique(uq.begin(), uq.end());
-	uq.resize(std::distance(uq.begin(), it));
-
-	DTRACE1(CLUSTER_END, uq.size());
-
-	std::vector<unsigned int> l(labels.begin(), labels.end());
+	std::vector<unsigned int> l(partition.begin(), partition.end());
 	return cutils::nodes2communities(mnet, l);
 }
 

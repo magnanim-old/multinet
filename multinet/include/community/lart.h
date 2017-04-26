@@ -83,7 +83,11 @@ private:
 
 	std::vector<unsigned long> find_ix(std::vector<unsigned long> x, unsigned long y);
 
+	vector<double> modMLPX(vector<dlib::bu_cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double> sA0);
 
+	void modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA);
+
+	vector<long> get_partition(vector<dlib::bu_cluster> clusters, int maxmodix, size_t L, size_t N);
 
 };
 
