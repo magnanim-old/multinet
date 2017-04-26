@@ -68,6 +68,11 @@ else()
 	message (FATAL_ERROR "Doxygen is needed to build the documentation.")
 endif()
 
+include_directories(lib/spectra)
+find_package(Eigen3 REQUIRED)
+include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
+find_package(BLAS REQUIRED)
+
 add_library (multinet SHARED ${SOURCES})
 
 install (TARGETS multinet
