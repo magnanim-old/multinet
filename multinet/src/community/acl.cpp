@@ -16,6 +16,7 @@ using namespace Eigen;
 
 namespace mlnet {
 
+
 //Returns a square sparse identity matrix of size size
 SparseMatrix<double> acl::sparse_identity_matrix(size_t size){
   SparseMatrix<double> id = SparseMatrix<double>(size,size);
@@ -80,12 +81,14 @@ std::vector<Eigen::SparseMatrix<double>> acl::ml_network2adj_matrix(MLNetworkSha
   
   for (LayerSharedPtr l: *mnet->get_layers()) {
     Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double> (M, M);
+    std::vector<Eigen::Triplet<double>> tlist;
     for (EdgeSharedPtr e: *mnet->get_edges(l, l)) {
       int v1_id = e->v1->actor->id;
       int v2_id = e->v2->actor->id;
-      m.insert(v1_id - 1, v2_id - 1) = 1;
-      m.insert(v2_id - 1, v1_id - 1) = 1;
+      tlist.push_back(Triplet<double>(v1_id - 1, v2_id - 1, 1));
+      tlist.push_back(Triplet<double>(v2_id - 1, v1_id - 1, 1));
     }
+    m.setFromTriplets(tlist.begin(), tlist.end());
     adj[l->id - 1] = m;
   }
 
@@ -249,8 +252,10 @@ std::tuple<std::vector<double>, std::vector<int>> acl::sweep_cut(VectorXd apprv)
 
 //Creates a mapping of matrix IDs to MLnetwork-node ID's
 std::vector<NodeSharedPtr> acl::id2nodes(MLNetworkSharedPtr ml2){
-  std::vector<NodeSharedPtr> mapping(ml2->get_nodes()->size());
-  size_t num_actors = ml2->get_actors()->size();
+  //std::vector<NodeSharedPtr> mapping(ml2->get_nodes()->size());
+  std::vector<NodeSharedPtr> mapping(msize);
+  
+  //size_t num_actors = ml2->get_actors()->size();
   for(NodeSharedPtr n : *ml2->get_nodes()){
     mapping[(n->layer->id-1)*num_actors + n->actor->id -1] = n;
   }
@@ -393,6 +398,14 @@ std::tuple<SparseMatrix<double>, VectorXd> acl::get_classical(MLNetworkSharedPtr
   std::vector<Eigen::Triplet<double>> tlist;
   std::vector<Eigen::SparseMatrix<double>> am = ml_network2adj_matrix(ml);
   SparseMatrix<double> sup = SparseMatrix<double>(am[0].rows() * am.size(), am[0].cols() * am.size());
+
+  //GET KIN
+  VectorXd kin(msize);
+  for(size_t i = 0; i < num_layers; i++){
+    for(size_t j = 0; j < num_actors; j++){
+      kin(j + i*num_actors) = am[i].row(j).sum() + num_layers-1;
+    }
+  }
   
   //ADD ADJ MATRICES
   for (size_t i = 0; i < am.size(); i++) {
@@ -418,16 +431,10 @@ std::tuple<SparseMatrix<double>, VectorXd> acl::get_classical(MLNetworkSharedPtr
 
   //Build matrix
   sup.setFromTriplets(tlist.begin(), tlist.end());
-    
-  //get kin vector
-  VectorXd kin(size);
-  for (size_t i = 0; i < size; ++i) {
-    kin(i) = sup.row(i).sum();
-  }
-
+  
   //Column normalize for transition matrix
   col_normalize(sup);
-
+  
   stat_dense = get_stationary(sup,kin,teleport);
 
   return std::make_tuple(sup, stat_dense);
@@ -446,6 +453,7 @@ CommunitySharedPtr acl::get_community(double teleport, double epsilon, std::vect
   
   seed_dense = getSeeds(seeds);
   sweep_set = aclcut(seed_dense, teleport, epsilon);
+  //print_sweep_set(sweep_set,false);
   cut = get_smallest_conductance_cut(sweep_set); //(conductance, set of nodes)
   c = std::get<1>(cut);
   csize = c.size();
@@ -466,11 +474,11 @@ CommunitiesSharedPtr acl::get_communities(double teleport, double epsilon, std::
 }
 
 acl::acl(MLNetworkSharedPtr ml, int classical, double interlayer, double tp){
-  mapping_attr = id2nodes(ml);
   num_layers = ml->get_layers()->size();
   num_actors = ml->get_actors()->size();
   msize = num_layers*num_actors;
   std::tuple<SparseMatrix<double>, VectorXd> trans_and_stat;
+  mapping_attr = id2nodes(ml);
   
   if(classical == 1){
     //std::cout << "CLASSICAL" << std::endl;
