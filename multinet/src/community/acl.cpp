@@ -253,7 +253,7 @@ std::tuple<std::vector<double>, std::vector<int>> acl::sweep_cut(VectorXd apprv)
 //Creates a mapping of matrix IDs to MLnetwork-node ID's
 std::vector<NodeSharedPtr> acl::id2nodes(MLNetworkSharedPtr ml2){
   //std::vector<NodeSharedPtr> mapping(ml2->get_nodes()->size());
-  std::vector<NodeSharedPtr> mapping(msize);
+  std::vector<NodeSharedPtr> mapping(msize,nullptr);
   
   //size_t num_actors = ml2->get_actors()->size();
   for(NodeSharedPtr n : *ml2->get_nodes()){
@@ -459,7 +459,8 @@ CommunitySharedPtr acl::get_community(double teleport, double epsilon, std::vect
   csize = c.size();
   com = community::create();
   for(size_t i = 0; i < csize; i++){
-    com->add_node(mapping_attr[c[i]]);
+    if(mapping_attr[c[i]])
+      com->add_node(mapping_attr[c[i]]);
   }
 
   return com;
