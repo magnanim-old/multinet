@@ -28,6 +28,22 @@ class acl {
   acl(MLNetworkSharedPtr ml, int classical, double interlayerWeight, double teleport);
 
 
+
+    /*
+    Use:
+    acl a(MLNetworkSharedPtr,int,double,double);
+    std::tuple<CommunitySharedPtr,double> c = a.get_community_conductance(double,double,std::vector<mlnet::NodeSharedPtr>);
+
+    Pre: 
+    teleport is a double indictating the teleportarion parameter of the personalized pagerank vector. Should be in the range (0,1). Values close to 1 indicate a low teleportation rate.
+    epsilon is the truncation parameter of the personalized pagerank approximation. Should be between 1 and number of nodes in ml. 1 means a good approximation and big approximation.
+    seeds is a vector of seeds.
+
+    Post:
+    CommunitySharedPtr corresponding to the communty found using teleport epsilon and seed with its conductance
+  */
+  std::tuple<mlnet::CommunitySharedPtr, double> get_community_conductance(double teleport, double epsilon, std::vector<mlnet::NodeSharedPtr> seeds);
+  
   /*
     Use:
     acl a(MLNetworkSharedPtr,int,double,double);

@@ -441,7 +441,7 @@ std::tuple<SparseMatrix<double>, VectorXd> acl::get_classical(MLNetworkSharedPtr
 }
 
 
-CommunitySharedPtr acl::get_community(double teleport, double epsilon, std::vector<NodeSharedPtr> seeds){
+std::tuple<CommunitySharedPtr, double> acl::get_community_conductance(double teleport, double epsilon, std::vector<NodeSharedPtr> seeds){
   assert(epsilon >= 1);
   epsilon = epsilon/msize;
   std::tuple<std::vector<double>, std::vector<int>> sweep_set;
@@ -463,7 +463,11 @@ CommunitySharedPtr acl::get_community(double teleport, double epsilon, std::vect
       com->add_node(mapping_attr[c[i]]);
   }
 
-  return com;
+  return std::make_tuple(com,std::get<0>(cut));
+}
+
+CommunitySharedPtr acl::get_community(double teleport, double epsilon, std::vector<NodeSharedPtr> seeds){
+  return std::get<0>(get_community_conductance(teleport, epsilon, seeds));
 }
 
 CommunitiesSharedPtr acl::get_communities(double teleport, double epsilon, std::vector<std::vector<NodeSharedPtr>> seeds){
