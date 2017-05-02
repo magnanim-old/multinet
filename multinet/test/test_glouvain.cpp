@@ -11,7 +11,8 @@ void test_glouvain() {
 	test_begin("ML-GLOUVAIN");
 
 	glouvain k;
-	MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/Downloads/DK_pol.mpx","toy",',');
+	MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet/multinet/test/toy.mpx","toy",',');
+
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/Downloads/test_1500_all.mpx","toy",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/fftwyt.mpx","toy",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/friendfeed_ita.mpx","sample",',');

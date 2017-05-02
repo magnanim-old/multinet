@@ -312,6 +312,8 @@ Eigen::SparseMatrix<double> lart::supraA(std::vector<Eigen::SparseMatrix<double>
 	size_t L = a.size();
 	size_t N = a[0].rows();
 
+	//TODO edge weight might be a bit too much giving an unfair advantage
+
 	for (size_t i = 0; i  < L - 1; ++i) {
 		for (size_t j = i + 1; j < L; ++j) {
 			Eigen::MatrixXd d = cutils::sparse_sum(a[i].cwiseProduct(a[j]), 1);

@@ -31,17 +31,23 @@ Eigen::SparseMatrix<double> glouvain::multicat(std::vector<Eigen::SparseMatrix<d
 		for (size_t j = 0; j < N; j++) {
 			for (size_t k = 0; k < N; k++) {
 				tlist.push_back(
-					Eigen::Triplet<double>(j + (i * N), k + ( i * N), tmp.coeff(j, k)));
+					Eigen::Triplet<double>(j + (i * N), k + (i * N), tmp.coeff(j, k)));
 			}
 		}
 	}
 
-	for (size_t i = 0; i < N; i++) {
-		tlist.push_back(
-			Eigen::Triplet<double>(i, i + N, omega));
-		tlist.push_back(
-			Eigen::Triplet<double>(i + N, i, omega));
+	for (size_t i = 0; i  < L - 1; ++i) {
+		for (size_t j = i + 1; j < L; ++j) {
+			int ix_i = i * N;
+			int ix_j = j * N;
+
+			for (int k = 0; k < a[i].rows(); k++) {
+				tlist.push_back(Eigen::Triplet<double>((ix_i + k), (ix_j + k), omega));
+				tlist.push_back(Eigen::Triplet<double>((ix_j + k), (ix_i + k), omega));
+			}
+		}
 	}
+
 	B.setFromTriplets(tlist.begin(), tlist.end());
 	return B;
 }
