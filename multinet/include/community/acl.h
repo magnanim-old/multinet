@@ -17,7 +17,7 @@ class acl {
     acl a(MLNetworkSharedPtr,int,double,double);
     
     Pre:
-    MLNetworkSharedPtr is an undirected multiplex network.
+    MLNetworkSharedPtr is an undirected multiplex network. Number of nodes should also equal number of actors * number of layers(all nodes should be initiated).
     Classical is an int indictating what random walk. 1 for classical, 0 for relaxed
     interlayerWeight is the interlayer weights of the random walks. If classical random walk is choosen, then interlayerweight should be between [0, inf). If relaxed: [0,1].
     teleport is a teleportration paratmeter for calculating node strength. 0 uses the largest eigenvector, > 0 uses a "pagerank" approach with random teleportation. Use > 0 for disconnected networks. 0.1 recommended.

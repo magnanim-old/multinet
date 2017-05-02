@@ -11,6 +11,7 @@
 #include <algorithm>
 #include "community/acl.h"
 #include <community.h>
+#include <stdexcept> 
 
 using namespace Eigen;
 
@@ -496,5 +497,10 @@ acl::acl(MLNetworkSharedPtr ml, int classical, double interlayer, double tp){
   transitionMatrix_attr = std::get<0>(trans_and_stat);
   rm = transitionMatrix_attr;
   stationaryDistribution_attr = std::get<1>(trans_and_stat)*msize;
+  //Error if precondition violeted
+  for(unsigned int i = 0; i < stationaryDistribution_attr.size(); i++){
+    if(stationaryDistribution_attr(i) == 0)
+      throw std::invalid_argument("Disconnected node");
+  }
 }
 }
