@@ -49,7 +49,6 @@ Eigen::SparseMatrix<double> glouvain::multicat(std::vector<Eigen::SparseMatrix<d
 CommunitiesSharedPtr glouvain::get_ml_community(MLNetworkSharedPtr mnet, double gamma, double omega, std::string m) {
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 	Eigen::SparseMatrix<double> B = multicat(a, gamma, omega);
-
 	double (*move_func)(group_index &, int, Eigen::SparseMatrix<double>);
 	if ("moverand" == m) {
 		move_func = &moverand;
@@ -66,7 +65,7 @@ CommunitiesSharedPtr glouvain::get_ml_community(MLNetworkSharedPtr mnet, double 
 	std::iota(S.begin(), S.end(), 0);
 	S2 = S;
 	y = S;
-	
+
 	std::vector<int> Sb;
 
 	double dtot = 0;

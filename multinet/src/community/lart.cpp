@@ -324,19 +324,22 @@ Eigen::SparseMatrix<double> lart::supraA(std::vector<Eigen::SparseMatrix<double>
 					tlist.push_back(Eigen::Triplet<double>(it.row(), it.col(), it.value()));
 				}
 			}
-			int ix_a = i * N;
-			int ix_b = (i + 1) * N;
+
+			int ix_i = i * N;
+			int ix_j = j * N;
 
 			for (int k = 0; k < a[i].rows(); k++) {
 				double intra = d(k, 0) + eps;
-				tlist.push_back(Eigen::Triplet<double>(ix_a + k, ix_b + k, intra));
-				tlist.push_back(Eigen::Triplet<double>(ix_b + k, ix_a + k, intra));
+				tlist.push_back(Eigen::Triplet<double>((ix_i + k), (ix_j + k), intra));
+				tlist.push_back(Eigen::Triplet<double>((ix_j + k), (ix_i + k), intra));
 			}
 
 			for (int k = 0; k < A.rows(); k++) {
 				tlist.push_back(Eigen::Triplet<double>(k, k, eps));
 			}
 			A.setFromTriplets(tlist.begin(), tlist.end());
+			std::cout << A << std::endl;
+
 		}
 	}
 	return A;
@@ -395,6 +398,8 @@ CommunitiesSharedPtr lart::get_ml_community(
 	int connected = is_connected(a, edges);
 
 	Eigen::SparseMatrix<double> sA = supraA(a, eps);
+	return NULL;//cutils::nodes2communities(mnet, l);
+
 	Eigen::SparseMatrix<double> dA = diagA(sA);
 	Eigen::SparseMatrix<double> aP = dA * sA;
 
@@ -416,9 +421,15 @@ CommunitiesSharedPtr lart::get_ml_community(
 
 	DTRACE0(CLUSTER_START);
 	std::vector<unsigned long> labels;
-	std::vector<dlib::bu_cluster> clusters;
+	std::vector<dlib::bu_cluster> clusters(Dt.rows());
 
-	dlib::bottom_up_cluster(dlib::mat(Dt), labels, clusters, 2);
+	dlib::bottom_up_cluster(dlib::mat(Dt), labels, 2, 100, clusters);
+
+	//for (auto m: labels)
+	//	std::cout << m << ",";
+	//std::cout << std::endl;
+
+
 
 	//DTRACE1(CLUSTER_END, uq.size());
 
@@ -427,9 +438,10 @@ CommunitiesSharedPtr lart::get_ml_community(
 	int maxmodix = std::distance(std::begin(mod), maxmod);
 	vector<long> partition = get_partition(clusters, maxmodix, a.size(), a[0].rows());
 
-	for(auto m: partition)
-		std::cout << m << ",";
-	std::cout << std::endl;
+	//for (auto m: partition)
+	//	std::cout << m << ",";
+	//std::cout << std::endl;
+
 
 	std::vector<unsigned int> l(partition.begin(), partition.end());
 	return cutils::nodes2communities(mnet, l);
