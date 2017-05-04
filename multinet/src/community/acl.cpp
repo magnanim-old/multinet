@@ -176,11 +176,13 @@ std::tuple<std::vector<double>, std::vector<int>> acl::sweep_cut(VectorXd apprv)
   double volc = mm;
   double c = 0;
   double e;
+  size_t nonzeroes = 0;
   
   //CONVERT TO NORMAL VECTOR
   std::vector<std::tuple<double, int>> nodes;
   for (size_t i=0; i< size; ++i){
     nodes.push_back(std::make_tuple(apprv(i), i));
+    if(stationaryDistribution_attr(i) > 0) nonzeroes++;
   }
   
   //SORT
@@ -235,9 +237,12 @@ std::tuple<std::vector<double>, std::vector<int>> acl::sweep_cut(VectorXd apprv)
     vol += stationaryDistribution_attr(ia);
     volc = mm-vol;
 
+    //round to zero for numerical errors
+    if (std::abs(c) < 0.00000001) c = 0; 
+    
     //whole network == conductance 1
     e = c/std::min(vol,volc);
-    if(i == nodes.size() -1){
+    if(i == nonzeroes -1){
       conductances.push_back(1);
     }else{
       conductances.push_back(e);
@@ -321,6 +326,8 @@ std::tuple<std::vector<double>, std::vector<int>> acl::aclcut(VectorXd seeds, do
   //Rescale apprv
   for(unsigned int i = 0; i < apprv.size(); i++){
     apprv(i) = apprv(i)/stationaryDistribution_attr(i);
+    if(std::isnan(apprv(i)) || std::isinf(apprv(i)))
+      apprv(i) = 0;
   }
 
   //GET SWEEP SETS
@@ -497,10 +504,5 @@ acl::acl(MLNetworkSharedPtr ml, int classical, double interlayer, double tp){
   transitionMatrix_attr = std::get<0>(trans_and_stat);
   rm = transitionMatrix_attr;
   stationaryDistribution_attr = std::get<1>(trans_and_stat)*msize;
-  //Error if precondition violeted
-  for(unsigned int i = 0; i < stationaryDistribution_attr.size(); i++){
-    if(stationaryDistribution_attr(i) == 0)
-      throw std::invalid_argument("Disconnected node");
-  }
 }
 }
