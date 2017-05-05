@@ -67,9 +67,10 @@ void acl::col_normalize(SparseMatrix<double>& A){
     colSums[i] = A.col(i).sum();
   }
 
-  for(size_t i = 0; i < size; ++i) {    
+  for(size_t i = 0; i < size; ++i) {
     for (SparseMatrix<double>::InnerIterator it(A,i); it; ++it){
-      A.coeffRef(it.col(), it.row()) /= colSums[it.index()];
+      //A.coeffRef(it.col(), it.row()) /= colSums[it.index()];
+      it.valueRef() = it.value()/colSums[i];
     }    
   }
 }
@@ -86,7 +87,8 @@ std::vector<Eigen::SparseMatrix<double>> acl::ml_network2adj_matrix(MLNetworkSha
     for (EdgeSharedPtr e: *mnet->get_edges(l, l)) {
       int v1_id = e->v1->actor->id;
       int v2_id = e->v2->actor->id;
-      tlist.push_back(Triplet<double>(v1_id - 1, v2_id - 1, 1));
+      //if undirected push edge both ways
+      if(!(e->directionality)) tlist.push_back(Triplet<double>(v1_id - 1, v2_id - 1, 1));
       tlist.push_back(Triplet<double>(v2_id - 1, v1_id - 1, 1));
     }
     m.setFromTriplets(tlist.begin(), tlist.end());
