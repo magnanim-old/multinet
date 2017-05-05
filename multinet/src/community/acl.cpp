@@ -152,12 +152,10 @@ VectorXd acl::appr(VectorXd s, double teleport, double epsilon){
 	q.push(i.index());
       }
     }
-
-    
   }
   //std::cout << "---Apprv iteration: " << count << " ------ apprv sum: " << apprv.sum() << " --------- res sum: " << residual.sum() << std::endl;
-
   //std::cout << apprv << std::endl;
+  if(count == max_iter) std::cout << "Warning: max iter reached" << std::endl;
   return apprv;
 }
 
