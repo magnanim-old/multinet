@@ -69,7 +69,6 @@ void acl::col_normalize(SparseMatrix<double>& A){
 
   for(size_t i = 0; i < size; ++i) {
     for (SparseMatrix<double>::InnerIterator it(A,i); it; ++it){
-      //A.coeffRef(it.col(), it.row()) /= colSums[it.index()];
       it.valueRef() = it.value()/colSums[i];
     }    
   }
@@ -168,7 +167,7 @@ void acl::insert_sorted( std::vector<int> &cont, int value ) {
 //returns conductances of the sweeps and the ordered pprv; so conductance[i] corresponds to pprv[0:i-1]
 std::tuple<std::vector<double>, std::vector<int>> acl::sweep_cut(VectorXd apprv){
   size_t size = msize;
-  double mm = stationaryDistribution_attr.sum(); //Should be 1
+  double mm = stationaryDistribution_attr.sum();
   std::vector<int> S;
   std::vector<int> S_sorted;
   std::vector<double> conductances;
@@ -323,7 +322,7 @@ std::tuple<std::vector<double>, std::vector<int>> acl::aclcut(VectorXd seeds, do
   VectorXd apprv(transitionMatrix_attr.rows());
   apprv = appr(seeds, teleport, epsilon);
 
-  //Rescale apprv
+  //Rescale apprv and set nodes with zero node strength to 0
   for(unsigned int i = 0; i < apprv.size(); i++){
     apprv(i) = apprv(i)/stationaryDistribution_attr(i);
     if(std::isnan(apprv(i)) || std::isinf(apprv(i)))
@@ -337,23 +336,13 @@ std::tuple<std::vector<double>, std::vector<int>> acl::aclcut(VectorXd seeds, do
 //Returns transition matrix and node strengths for the classical relaxed walk
 std::tuple<SparseMatrix<double>, VectorXd> acl::get_relaxed(MLNetworkSharedPtr ml, double re, double teleport){
   std::vector<Eigen::SparseMatrix<double>> am = ml_network2adj_matrix(ml);
-  size_t num_layers = am.size();
-  size_t num_actors = am[0].rows();
-  size_t msize = num_layers*num_actors;
   Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double>(msize,msize);
   std::vector<Eigen::Triplet<double>> tlist;
   std::vector<std::vector<int>> relaxed_edges(num_actors);
   std::vector<std::vector<int>> layer_edges(msize);
   size_t r, c;
   VectorXd stat_dense(num_layers);
-  
-  //GET KIN
-  VectorXd kin(msize);
-  for(size_t i = 0; i < num_layers; i++){
-    for(size_t j = 0; j < num_actors; j++){
-      kin(j + i*num_actors) = am[i].row(j).sum();
-    }
-  }
+  VectorXd kin = VectorXd::Zero(msize);
  
   //Get triplets
   r = 0;
@@ -362,7 +351,8 @@ std::tuple<SparseMatrix<double>, VectorXd> acl::get_relaxed(MLNetworkSharedPtr m
     for (int j = 0; j < am[i].outerSize(); j++) {
       for (Eigen::SparseMatrix<double>::InnerIterator it(am[i], j); it; ++it) {
 	relaxed_edges[it.col()].push_back(r+it.row());
-	layer_edges[c + it.col()].push_back(r+it.row());	
+	layer_edges[c + it.col()].push_back(r+it.row());
+	kin(i*num_actors + j) += it.value();
       }
     }
     r += am[i].rows();
@@ -396,30 +386,20 @@ std::tuple<SparseMatrix<double>, VectorXd> acl::get_relaxed(MLNetworkSharedPtr m
 
 //Returns transition matrix and node strengths for the classical random walk
 std::tuple<SparseMatrix<double>, VectorXd> acl::get_classical(MLNetworkSharedPtr ml, double interlayerWeight, double teleport){
-  size_t N = ml->get_layers()->size();
-  size_t M = ml->get_actors()->size();
-  size_t size = N*M;
-  VectorXd stat_dense(M);
   size_t r, c;
   r = 0;
   c = 0;
   std::vector<Eigen::Triplet<double>> tlist;
   std::vector<Eigen::SparseMatrix<double>> am = ml_network2adj_matrix(ml);
   SparseMatrix<double> sup = SparseMatrix<double>(am[0].rows() * am.size(), am[0].cols() * am.size());
-
-  //GET KIN
-  VectorXd kin(msize);
-  for(size_t i = 0; i < num_layers; i++){
-    for(size_t j = 0; j < num_actors; j++){
-      kin(j + i*num_actors) = am[i].row(j).sum() + num_layers-1;
-    }
-  }
+  VectorXd kin = VectorXd::Ones(msize)*(num_layers-1);
   
   //ADD ADJ MATRICES
   for (size_t i = 0; i < am.size(); i++) {
     for (int j = 0; j < am[i].outerSize(); j++) {
       for (Eigen::SparseMatrix<double>::InnerIterator it(am[i], j); it; ++it) {
 	tlist.push_back(Eigen::Triplet<double>(r + it.row(), c + it.col(), it.value()));
+	kin(i*num_actors + j) += it.value();
       }
     }
     r += am[i].rows();
@@ -427,12 +407,11 @@ std::tuple<SparseMatrix<double>, VectorXd> acl::get_classical(MLNetworkSharedPtr
   }
 
   //ADD INTERLAYER EDGES
-  for (size_t i = 0; i  < size; ++i) {
-    for (size_t j = 0; j < size; ++j) {
-      if((abs(j-i) % M == 0)  || (abs(i-j) % M == 0)){
-	if(i != j){
-	  tlist.push_back(Eigen::Triplet<double>(j, i, interlayerWeight));	  
-	}
+  for(size_t a = 0; a < num_actors; a++){
+    for(size_t l1 = 0; l1 < num_layers; l1++){
+      for(size_t l2 = 0; l2 < num_layers; l2++){
+	if(l1 == l2) continue;
+	tlist.push_back(Eigen::Triplet<double>(a + num_actors*l2, l1*num_actors + a, interlayerWeight));
       }
     }
   }
@@ -443,9 +422,7 @@ std::tuple<SparseMatrix<double>, VectorXd> acl::get_classical(MLNetworkSharedPtr
   //Column normalize for transition matrix
   col_normalize(sup);
   
-  stat_dense = get_stationary(sup,kin,teleport);
-
-  return std::make_tuple(sup, stat_dense);
+  return std::make_tuple(sup, get_stationary(sup,kin,teleport));
 }
 
 
