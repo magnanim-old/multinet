@@ -37,7 +37,8 @@ int main() {
 	test_datastructures();
 	test_io();
 	test_measures();
-	test_community();
+    test_community();
+    test_community_cpm();
 	test_evolution();
 	test_randomwalks();
 	test_modularity();

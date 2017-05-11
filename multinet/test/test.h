@@ -51,6 +51,7 @@ void test_randomwalks();
 void test_evolution();
 void test_modularity();
 void test_community();
+void test_community_cpm();
 void test_dynamics();
 
 #endif /* MLNET_TEST_H_ */
