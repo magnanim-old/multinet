@@ -17,7 +17,7 @@ class acl {
     acl a(MLNetworkSharedPtr,int,double,double);
     
     Pre:
-    MLNetworkSharedPtr is an undirected multiplex network. Number of nodes should also equal number of actors * number of layers(all nodes should be initiated).
+    MLNetworkSharedPtr is a multiplex network.
     Classical is an int indictating what random walk. 1 for classical, 0 for relaxed
     interlayerWeight is the interlayer weights of the random walks. If classical random walk is choosen, then interlayerweight should be between [0, inf). If relaxed: [0,1].
     teleport is a teleportration paratmeter for calculating node strength. 0 uses the largest eigenvector, > 0 uses a "pagerank" approach with random teleportation. Use > 0 for disconnected networks. 0.1 recommended.
@@ -27,8 +27,6 @@ class acl {
   */
   acl(MLNetworkSharedPtr ml, int classical, double interlayerWeight, double teleport);
 
-
-
     /*
     Use:
     acl a(MLNetworkSharedPtr,int,double,double);
@@ -36,8 +34,8 @@ class acl {
 
     Pre: 
     teleport is a double indictating the teleportarion parameter of the personalized pagerank vector. Should be in the range (0,1). Values close to 1 indicate a low teleportation rate.
-    epsilon is the truncation parameter of the personalized pagerank approximation. Should be between 1 and number of nodes in ml. 1 means a good approximation and big approximation.
-    seeds is a vector of seeds.
+    epsilon is the truncation parameter of the personalized pagerank approximation. Should be between 1 and number of nodes in ml. 1 means a good and big approximation.
+    seeds is a vector of seeds that the PPRV is centered around.
 
     Post:
     CommunitySharedPtr corresponding to the communty found using teleport epsilon and seed with its conductance
@@ -58,22 +56,6 @@ class acl {
     CommunitySharedPtr corresponding to the communty found using teleport epsilon and seed
   */
   CommunitySharedPtr get_community(double teleport, double epsilon, std::vector<mlnet::NodeSharedPtr> seeds);
-  
-  /*
-    Use:
-    acl a(MLNetworkSharedPtr,int,double,double);
-    CommunitiesSharedPtr cs = a.get_communities(double,double,std::vector<std::vector<mlnet::NodeSharedPtr>>);
-
-    Pre: 
-    teleport is a double indictating the teleportarion parameter of the personalized pagerank vector. Should be in the range (0,1). Values close to 1 indicate a low teleportation rate.
-    epsilon is the truncation parameter of the personalized pagerank approximation. Should be between 1 and number of nodes in ml. 1 means a good approximation and big approximation.
-    seeds is a vector of seeds.
-
-    Post:
-    CommunitiesSharedPtr where the communities correspond to the supplied seed nodes in the same order
-  */
-  mlnet::CommunitiesSharedPtr get_communities(double teleport, double epsilon, std::vector<std::vector<mlnet::NodeSharedPtr>> seeds);  
-
   
  private:
   size_t num_layers;
