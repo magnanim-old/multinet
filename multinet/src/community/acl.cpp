@@ -189,7 +189,7 @@ namespace mlnet {
     VectorXd residual = s;
     teleport = (1-teleport)/(1+teleport); //Lazy tp
     int count = 0;
-    int max_iter = 100000000; //Will stop after this amount of iterations and print warning. Maybe should be a param.
+    int max_iter = 1000000000; //Will stop after this amount of iterations and print warning. Maybe should be a param.
     int current;
     double oldResidual;
     double delta;
