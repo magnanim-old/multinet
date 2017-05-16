@@ -20,7 +20,6 @@ void test_end(const std::string& name) {
 }
 
 int main() {
-
 	test_begin("All unit tests");
 	try {
 
@@ -33,21 +32,22 @@ int main() {
 	test_sortedrandomset();
 	test_propertymatrix();
 	test_end("UTILITY FUNCTIONS AND CLASSES");
-
 	test_datastructures();
 	test_io();
+
+	test_lart();
+	test_glouvain();
+	test_pmm();
+
 	test_measures();
-	test_community();
 	test_evolution();
 	test_randomwalks();
 	test_modularity();
 	test_transformation();
-
-	/*
 	test_dynamics();
-	*/
-	}
-	catch (std::exception& e) {
+	test_community();
+
+	} catch (std::exception& e) {
 		std::cout << "[Error] UNIT TEST NOT PASSED: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}

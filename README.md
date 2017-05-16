@@ -9,8 +9,8 @@ Documentation
 
 * A doxygen generated *API reference* which lists all types and functions
 of the library.
-* *Unit Tests* containing small code snippets used to test each library
-feature.
+* [Unit Tests](test/) which contain small code snippets used to test each
+library feature.
 
 Requirements
 ------------
@@ -38,7 +38,7 @@ make
 
 This compiles and generates a sahred library into the `build` directory in the
 root library. A different location can be specified by executing cmake from
-another folder. 
+another folder.
 
 The documentation is generated inside the `build/doc` directory, while the
 testing suite will reside in `build/test`. In order run the test suite execute:
