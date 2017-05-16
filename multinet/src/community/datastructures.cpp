@@ -30,7 +30,7 @@ namespace mlnet {
         return result;
     }
     
-    void community::add_node(NodeSharedPtr node) {
+    void community::add_node(const NodeSharedPtr& node) {
         data.insert(node);
     }
     
@@ -40,13 +40,13 @@ namespace mlnet {
    
     // COMMUNITIES
     
-    communities::communities() {}
+    community_structure::community_structure() {}
     
-    CommunitiesSharedPtr communities::create() {
-        return CommunitiesSharedPtr(new communities());
+    CommunityStructureSharedPtr community_structure::create() {
+        return CommunityStructureSharedPtr(new community_structure());
     }
     
-    std::string communities::to_string() const {
+    std::string community_structure::to_string() const {
         std::string result = "";
         for (CommunitySharedPtr com: data) {
             result += com->to_string() + "\n";
@@ -54,15 +54,15 @@ namespace mlnet {
         return result;
     }
     
-    void communities::add_community(CommunitySharedPtr com) {
+    void community_structure::add_community(const CommunitySharedPtr& com) {
         data.push_back(com);
     }
     
-    CommunitySharedPtr communities::get_community(int i) {
+    CommunitySharedPtr community_structure::get_community(int i) {
         return data.at(i);
     }
     
-    const vector<CommunitySharedPtr>& communities::get_communities() const {
+    const vector<CommunitySharedPtr>& community_structure::get_communities() const {
         return data;
     }
 }
