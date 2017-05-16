@@ -42,7 +42,6 @@ int main() {
 	test_transformation();
 	test_dynamics();
 
-
 	test_lart();
 	test_glouvain();
 	test_pmm();

@@ -1,6 +1,10 @@
 cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
 
+<<<<<<< HEAD
 project (multinet C CXX)
+=======
+project (multinet LANGUAGES CXX)
+>>>>>>> e0d4d395e122f4ebb7ce45aac877b7cd90d07615
 set (PROJECT_VENDOR 			"Matteo Magnani")
 set (PROJECT_CONTACT 			"matteo.magnani@it.uu.se")
 set (PROJECT_URL 				"https://github.com/magnanim/multinet")
@@ -42,7 +46,7 @@ else()
 	if (CMAKE_COMPILER_IS_CLANGXX)
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNDEBUG -Wextra -Wall")
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -fsanitize=address -funroll-loops -fno-omit-frame-pointer -D__extern_always_inline=\"extern __always_inline\"")
+		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fno-omit-frame-pointer -D__extern_always_inline=\"extern __always_inline\"")
 	else()
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fsanitize=address -no-inline-min-size -no-inline-max-size")
@@ -110,6 +114,7 @@ add_library (multinet SHARED ${SOURCES} ${PROBE_PATH})
 
 TARGET_LINK_LIBRARIES(multinet)
 
+add_library (multinet SHARED ${SOURCES})
 
 install (TARGETS multinet
 	RUNTIME DESTINATION bin
