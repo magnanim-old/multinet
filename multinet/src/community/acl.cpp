@@ -20,14 +20,14 @@ namespace mlnet {
   // CONSTRUCTOR //
   /////////////////
   
-  acl::acl(MLNetworkSharedPtr ml, int classical, double interlayer, double tp){
+  acl::acl(MLNetworkSharedPtr ml, int random_walk, double interlayer, double tp){
     num_layers = ml->get_layers()->size();
     num_actors = ml->get_actors()->size();
     msize = num_layers*num_actors;
     std::tuple<SparseMatrix<double>, VectorXd> trans_and_stat;
     mapping_attr = id2nodes(ml);
   
-    if(classical == 1){
+    if(random_walk == 1){
       //std::cout << "CLASSICAL" << std::endl;
       trans_and_stat = get_classical(ml, interlayer,tp);
     }else{

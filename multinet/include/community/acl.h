@@ -18,14 +18,14 @@ class acl {
     
     Pre:
     MLNetworkSharedPtr is a multiplex network.
-    Classical is an int indictating what random walk. 1 for classical, 0 for relaxed
+    random_walk is an int indictating what random walk. 1 for classical, 0 for relaxed
     interlayerWeight is the interlayer weights of the random walks. If classical random walk is choosen, then interlayerweight should be between [0, inf). If relaxed: [0,1].
     teleport is a teleportration paratmeter for calculating node strength. 0 uses the largest eigenvector, > 0 uses a "pagerank" approach with random teleportation. Use > 0 for disconnected networks. 0.1 recommended.
     
     Post:
     a will be initiated with a transistion matrix and node strengths corresponding to ml with supplied random walk using interlayerWeight
   */
-  acl(MLNetworkSharedPtr ml, int classical, double interlayerWeight, double teleport);
+  acl(MLNetworkSharedPtr ml, int random_walk, double interlayerWeight, double teleport);
 
     /*
     Use:
