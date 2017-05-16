@@ -476,7 +476,7 @@ void lart::exp_by_squaring_iterative(Eigen::SparseMatrix<double>& x, int t) {
 	}
 }
 
-CommunitiesSharedPtr lart::fit(
+CommunityStructureSharedPtr lart::fit(
 	MLNetworkSharedPtr mnet, int t, double eps, double gamma) {
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 

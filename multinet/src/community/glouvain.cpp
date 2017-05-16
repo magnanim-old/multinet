@@ -74,7 +74,7 @@ Eigen::SparseMatrix<double> glouvain::metanetwork(Eigen::SparseMatrix<double> B,
 	return PP.transpose() * B * PP;
 }
 
-CommunitiesSharedPtr glouvain::fit(MLNetworkSharedPtr mnet, std::string m, double gamma, double omega) {
+CommunityStructureSharedPtr glouvain::fit(MLNetworkSharedPtr mnet, std::string m, double gamma, double omega) {
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 	Eigen::SparseMatrix<double> B = ng_modularity(a, gamma, omega);
 

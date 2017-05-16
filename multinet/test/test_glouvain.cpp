@@ -11,7 +11,7 @@ void test_glouvain() {
 	test_begin("ML-GLOUVAIN");
 
 	glouvain k;
-	MLNetworkSharedPtr mnet = read_multilayer("aucs.mpx","aucs",',');
+	MLNetworkSharedPtr mnet = read_multilayer("../data/aucs.mpx","aucs",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet-evaluation/data/monastery","aucs",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet-evaluation/data/1k_mix","toy",',');
 

@@ -40,8 +40,8 @@ public:
 	*/
 	static std::vector<int> range(size_t size, bool randomize);
 
-	static CommunitiesSharedPtr nodes2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> nodes2cid);
-	static CommunitiesSharedPtr actors2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> actors2cid);
+	static CommunityStructureSharedPtr nodes2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> nodes2cid);
+	static CommunityStructureSharedPtr actors2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> actors2cid);
 
 };
 

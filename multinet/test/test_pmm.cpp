@@ -11,7 +11,7 @@ void test_pmm() {
 	test_begin("ML-PMM");
 
 	pmm p;
-	MLNetworkSharedPtr mnet = read_multilayer("aucs.mpx","aucs",',');
+	MLNetworkSharedPtr mnet = read_multilayer("../data/aucs.mpx","aucs",',');
 
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/fftwyt.mpx","toy",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/friendfeed_ita.mpx","sample",',');

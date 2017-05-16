@@ -1,10 +1,6 @@
 cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
-
-<<<<<<< HEAD
-project (multinet C CXX)
-=======
 project (multinet LANGUAGES CXX)
->>>>>>> e0d4d395e122f4ebb7ce45aac877b7cd90d07615
+
 set (PROJECT_VENDOR 			"Matteo Magnani")
 set (PROJECT_CONTACT 			"matteo.magnani@it.uu.se")
 set (PROJECT_URL 				"https://github.com/magnanim/multinet")
@@ -83,38 +79,28 @@ if(dtrace)
 			message(FATAL_ERROR "dtrace generator not found!")
 		endif()
 
-		file(GLOB providers "include/dtrace/providers/*.d")
+		execute_process(COMMAND dtrace -h -s include/multinet_probes.d -o include/multinet_probes.h RESULT_VARIABLE dtrace_r)
 
-		foreach(provider ${providers})
-			get_filename_component(p ${provider} NAME_WE)
-			execute_process(COMMAND dtrace -h -s ${provider} -o include/dtrace/headers/${p}.h)
-		endforeach()
-
-		if(UNIX AND NOT APPLE)
-			file(MAKE_DIRECTORY include/dtrace/objects)
-			foreach(provider ${providers})
-				get_filename_component(p ${provider} NAME_WE)
-				execute_process(COMMAND dtrace -G -s include/dtrace/providers/${p}.d -o include/dtrace/objects/${p}.o)
-				set(PROBE_PATH include/dtrace/objects/${p}.o)
-			endforeach()
+		if (${dtrace_r})
+			message(FATAL_ERROR "DTrace support requested but tool failed")
 		endif()
 
+
 		add_definitions(-DUSE_DYNAMIC_TRACE)
+
+		message (STATUS "DTrace support is active.")
 	endif()
 endif(dtrace)
 
-find_package(Eigen3 REQUIRED)
-include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 find_package(BLAS REQUIRED)
 
-include_directories(lib)
+include_directories(lib/eigen3)
+include_directories(lib/spectra/include)
 include_directories(lib/dlib)
 
 add_library (multinet SHARED ${SOURCES} ${PROBE_PATH})
 
 TARGET_LINK_LIBRARIES(multinet)
-
-add_library (multinet SHARED ${SOURCES})
 
 install (TARGETS multinet
 	RUNTIME DESTINATION bin

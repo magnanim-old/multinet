@@ -18,7 +18,7 @@ public:
 		Generalized Louvain is a multiplex community detector based on the Louvain community detection
 		method for single layer networks. This implementation is based from http://netwiki.amath.unc.edu/GenLouvain/GenLouvain
 	*/
-	CommunitiesSharedPtr fit(MLNetworkSharedPtr mnet, std::string m, double gamma, double omega);
+	CommunityStructureSharedPtr fit(MLNetworkSharedPtr mnet, std::string m, double gamma, double omega);
 	Eigen::SparseMatrix<double> metanetwork(Eigen::SparseMatrix<double> B, std::vector<int> S2);
 
 	Eigen::SparseMatrix<double> ng_modularity(std::vector<Eigen::SparseMatrix<double>> a, double gamma, double omega);

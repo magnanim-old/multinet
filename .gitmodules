@@ -1,0 +1,6 @@
+[submodule "multinet/lib/dlib"]
+	path = multinet/lib/dlib
+	url = https://github.com/mkdubik/dlib
+[submodule "multinet/lib/spectra"]
+	path = multinet/lib/spectra
+	url = https://github.com/yixuan/spectra.git

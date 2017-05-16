@@ -18,7 +18,7 @@ public:
 			 eps
   		Post: (?)
 	*/
-	CommunitiesSharedPtr fit(MLNetworkSharedPtr mnet, int t, double eps, double gamma);
+	CommunityStructureSharedPtr fit(MLNetworkSharedPtr mnet, int t, double eps, double gamma);
 
 private:
 

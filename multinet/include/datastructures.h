@@ -29,7 +29,7 @@
 #ifndef MLNET_DATASTRUCTURES_H_
 #define MLNET_DATASTRUCTURES_H_
 
-#include "dtrace/headers/dtrace.h"
+#include "dtrace.h"
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
 

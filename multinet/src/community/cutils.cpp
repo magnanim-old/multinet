@@ -2,7 +2,7 @@
 
 namespace mlnet {
 
-CommunitiesSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> nodes2cid) {
+CommunityStructureSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> nodes2cid) {
 	size_t L = mnet->get_layers()->size();
 	size_t N = mnet->get_actors()->size();
 
@@ -25,7 +25,7 @@ CommunitiesSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vec
 	}
 
 	// actual nodeid 2 communities
-	CommunitiesSharedPtr communities = communities::create();
+	CommunityStructureSharedPtr communities = community_structure::create();
 	for(std::map<int,std::vector<int>>::iterator iter = cid2aid.begin(); iter != cid2aid.end(); ++iter) {
 		CommunitySharedPtr c = community::create();
 		for (size_t i = 0; i < iter->second.size(); i++) {
@@ -39,8 +39,8 @@ CommunitiesSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vec
 	return communities;
 }
 
-CommunitiesSharedPtr cutils::actors2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> actors2cid) {
-	CommunitiesSharedPtr communities = communities::create();
+CommunityStructureSharedPtr cutils::actors2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> actors2cid) {
+	CommunityStructureSharedPtr communities = community_structure::create();
 
 	for (size_t i = 0; i < actors2cid.size(); i++) {
 		std::vector<CommunitySharedPtr> cptr = (*communities).get_communities();

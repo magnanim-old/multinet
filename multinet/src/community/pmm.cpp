@@ -1,7 +1,7 @@
 #include "community/pmm.h"
 
-#include <spectra/SymEigsSolver.h>
-#include <spectra/MatOp/SparseSymMatProd.h>
+#include <SymEigsSolver.h>
+#include <MatOp/SparseSymMatProd.h>
 #include <Eigen/SVD>
 
 #include <dlib/matrix.h>
@@ -9,7 +9,7 @@
 
 namespace mlnet {
 
-CommunitiesSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, unsigned int ell) {
+CommunityStructureSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, unsigned int ell) {
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 
 	Eigen::MatrixXd features = Eigen::MatrixXd(a[0].rows(), ell * a.size());
@@ -20,7 +20,7 @@ CommunitiesSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, unsigned 
 		} catch (std::exception e) {
 			std::cerr << e.what();
 			DTRACE4(PMM_END, mnet->name.c_str(), k, ell, 0);
-			return communities::create();
+			return community_structure::create();
 		}
 	}
 

@@ -17,6 +17,4 @@ runtest
 mlnetwork-tests
 
 #dtrace stuff
-!include/dtrace/headers/dtrace.h
-include/dtrace/headers/*.h
-include/dtrace/objects/*
+include/multinet_probes.h
