@@ -24,7 +24,7 @@ void test_community() {
     ActorSharedPtr a1 = mnet->get_actor("U54");
     ActorSharedPtr a2 = mnet->get_actor("U4");
 	LayerSharedPtr l1 = mnet->get_layer("lunch");
-	LayerSharedPtr l2 = mnet->get_layer("leisure");	
+	LayerSharedPtr l2 = mnet->get_layer("leisure");
 
 	CommunitySharedPtr c1_1 = community::create();
 	c1_1->add_node(mnet->get_node(a1,l1));
@@ -45,7 +45,7 @@ void test_community() {
     CommunityStructureSharedPtr com2 = community_structure::create();
     com2->add_community(c2_1);
     com2->add_community(c2_2);
-    
+
     CommunitySharedPtr c3_1 = community::create();
     c3_1->add_node(mnet->get_node(a1,l1));
     c3_1->add_node(mnet->get_node(a2,l1));
@@ -55,18 +55,18 @@ void test_community() {
     CommunityStructureSharedPtr com3 = community_structure::create();
     com3->add_community(c3_1);
     com3->add_community(c3_2);
-    
+
     //std::cout << com->to_string() << std::endl;
 
     std::cout << "Testing community comparison function...";
     if (std::abs(community_jaccard(c1_1,c3_1)-1.0/3)>.01) throw FailedUnitTestException("Wrong community_jaccard function: " + to_string(community_jaccard(c1_1,c3_1)));
     std::cout << "done!" << std::endl;
-    
+
     std::cout << "Testing community comparison function...";
     std::cout << normalized_mutual_information(com1,com1,4) << " ";
     std::cout << normalized_mutual_information(com1,com2,4) << " ";
     std::cout << normalized_mutual_information(com1,com3,4) << " ";
     std::cout << "done!" << std::endl;
-    
+
 	test_end("community data structures");
 }

@@ -1,0 +1,3 @@
+[submodule "multinet/lib/dlib"]
+	path = multinet/lib/dlib
+	url = https://github.com/mkdubik/dlib

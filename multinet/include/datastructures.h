@@ -29,8 +29,9 @@
 #ifndef MLNET_DATASTRUCTURES_H_
 #define MLNET_DATASTRUCTURES_H_
 
-#include <../lib/eigen3/Eigen/Sparse>
-#include <../lib/eigen3/Eigen/Dense>
+#include "dtrace.h"
+#include <Eigen/Sparse>
+#include <Eigen/Dense>
 
 #include "utils.h"
 #include "exceptions.h"
