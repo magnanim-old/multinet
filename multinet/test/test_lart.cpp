@@ -13,7 +13,7 @@ void test_lart() {
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet/multinet/test/toy.mpx","toy",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/Downloads/3k_mix025_all.txt","toy",' ');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet-evaluation/data/5k_mix025","toy",' ');
-	MLNetworkSharedPtr mnet3 = read_multilayer("../data/aucs.mpx","aucs",',');
+	MLNetworkSharedPtr mnet3 = read_multilayer("aucs.mpx","aucs",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/1k_mix_025.mpx","sample",',');
 	uint32_t t = 2;
 	double eps = 1;
