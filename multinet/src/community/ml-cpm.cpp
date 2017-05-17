@@ -8,15 +8,15 @@
 #include "community.h"
 
 namespace mlnet {
-    CommunitiesSharedPtr mlcpm(const MLNetworkSharedPtr& mnet, size_t k, size_t m) {
+    CommunityStructureSharedPtr mlcpm(const MLNetworkSharedPtr& mnet, size_t k, size_t m) {
         // Step 1: find max-cliques
         hash_set<CliqueSharedPtr> C = find_max_cliques(mnet,k,m);
         //if (C.size()==0)
-            return communities::create();
+            return community_structure::create();
         // Step 2: bluid adjacency graph
-        std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> > adjacency = build_max_adjacency_graph(C,k,m2);
+        std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> > adjacency = build_max_adjacency_graph(C,k,m);
         // Step 3: extract communities
-        return find_max_communities_max_layers(mnet,adjacency,m3);
+        return find_max_communities_max_layers(mnet,adjacency,m);
     }
     
     hash_set<CliqueSharedPtr> find_max_cliques(const MLNetworkSharedPtr& mnet, size_t k, size_t m) {
@@ -268,33 +268,33 @@ namespace mlnet {
         return result;
     }
 
-    CommunitiesSharedPtr find_max_communities_max_layers(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, int m) {
+    CommunityStructureSharedPtr find_max_communities_max_layers(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, int m) {
         // result: empty set of communities
-        CommunitiesSharedPtr result;
+        CommunityStructureSharedPtr result;
         // A: empty community on all layers
-        CommunitySharedPtr A(new community());
-        hash_set<LayerSharedPtr> all_layers;
+        ActorCommunitySharedPtr A = actor_community::create();
         for (LayerSharedPtr layer: *mnet->get_layers()) {
-            all_layers.insert(layer);
+            A->add_layer(layer);
         }
-        A->layers.insert(all_layers.begin(),all_layers.end());
         
         hash_set<CliqueSharedPtr> AlreadySeen;
         for (auto clique_pair : adjacency) {
             //std::cout << "----NEW ITERATION----";
-            CommunitySharedPtr A(new community());
-            A->cliques.insert(clique_pair.first);
-            A->layers.insert(clique_pair.first->layers.begin(),clique_pair.first->layers.end());
+            xx CLIQUE SET? ActorCommunitySharedPtr A = actor_community::create();
+            for (ActorSharedPtr actor: clique_pair.first->actors)
+                A->add_actor(actor);
+            for (LayerSharedPtr layer: clique_pair.first->layers)
+                A->add_layer(layer);
             vector<CliqueSharedPtr> Candidates(clique_pair.second.begin(),clique_pair.second.end());
-            layer_sets empty;
+            hash_set<LayerSharedPtr> empty;
             find_max_communities_max_layers(adjacency,A,Candidates,AlreadySeen,empty,m,result);
             AlreadySeen.insert(clique_pair.first);
         }
         return result;
     }
     
-    void find_max_communities_max_layers(const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr& A,
-                                         vector<CliqueSharedPtr> Candidates, hash_set<CliqueSharedPtr>& processedCliques, hash_set<LayerSharedPtr>& processedLayerCombinations, int m, CommunitiesSharedPtr& result) {
+    void find_max_communities_max_layers(const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, ActorCommunitySharedPtr& A,
+                                         vector<CliqueSharedPtr> Candidates, hash_set<CliqueSharedPtr>& processedCliques, hash_set<LayerSharedPtr>& processedLayerCombinations, int m, CommunityStructureSharedPtr& result) {
         
         /*
          std::cout << "PROCESS: { ";
@@ -324,8 +324,8 @@ namespace mlnet {
         while (Candidates.size()!=0) {
             CliqueSharedPtr c = Candidates.back();
             Candidates.pop_back();
-            hash_set<LayerSharedPtr> i = s_intersection(A->layers,c->layers);
-            if (i.size()==A->layers.size()) {
+            hash_set<LayerSharedPtr> i = s_intersection(A->get_layers(),c->layers);
+            if (i.size()==A->get_layers().size()) {
                 if (processedCliques.count(c)>0) {
                     //std::cout << "  ABORT! " << std::endl;
                     return;
@@ -353,7 +353,7 @@ namespace mlnet {
             }
             //std::cout << std::endl;
         }
-        result->add_community(A);
+        result->add_community(A->to_community());
         /*std::cout << "RESULT: { ";
          for (auto b: A->cliques) {
          std::cout << b->id << "_";
@@ -366,16 +366,16 @@ namespace mlnet {
          std::cout << l->id;
          std::cout << std::endl;
          */
-        processedLayerCombinations.insert(A->layers);
+        processedLayerCombinations.insert(A->get_layers());
         
         layer_sets candidate_layer_combinations;
         for (CliqueSharedPtr c: stack) {
-            hash_set<LayerSharedPtr> s = s_intersection(A->layers,c->layers);
+            hash_set<LayerSharedPtr> s = s_intersection(A->get_layers(),c->layers);
             sorted_set<LayerSharedPtr> to_be_processed(s.begin(), s.end()); // FIXME
             candidate_layer_combinations.insert(to_be_processed);
         }
         for (sorted_set<LayerSharedPtr> layers: candidate_layer_combinations) {
-            CommunitySharedPtr comm(new community());
+            ActorCommunitySharedPtr comm = actor_community::create());
             comm->cliques.insert(A->cliques.begin(),A->cliques.end());
             comm->layers.insert(layers.begin(),layers.end());
             find_max_communities_max_layers(adjacency,comm,stack,processedCliques,processedLayerCombinations,m,result);

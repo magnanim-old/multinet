@@ -43,55 +43,54 @@ namespace mlnet {
     actor_community::actor_community() {}
     
     ActorCommunitySharedPtr actor_community::create() {
-        return CommunitySharedPtr(new community());
+        return ActorCommunitySharedPtr(new actor_community());
     }
     
     std::string actor_community::to_string() const {
         std::string result = "";
         size_t idx = 0;
-        for (NodeSharedPtr node: data) {
+        for (ActorSharedPtr actor: actors) {
             if (idx==0) result += "[";
-            result += node->to_string();
-            if (idx!=data.size()-1) result += ", ";
+            result += actor->to_string();
+            if (idx!=actors.size()-1) result += ", ";
+            else result += "]";
+            idx++;
+        }
+        for (LayerSharedPtr layer: layers) {
+            if (idx==0) result += "::[";
+            result += layer->to_string();
+            if (idx!=layers.size()-1) result += ", ";
             else result += "]";
             idx++;
         }
         return result;
     }
     
-    void actor_community::add_node(ActorSharedPtr actor) {
+    void actor_community::add_actor(ActorSharedPtr actor) {
         actors.insert(actor);
     }
     
-    const hash_set<ActorSharedPtr>& actor_community::get_nodes() const {
+    const hash_set<ActorSharedPtr>& actor_community::get_actors() const {
         return actors;
     }
     
-    int actor_community::num_actors() {
-        return actors.size();
-    }
-    
     void actor_community::add_layer(LayerSharedPtr layer) {
-        layers.insert(actor);
+        layers.insert(layer);
     }
     
     const hash_set<LayerSharedPtr>& actor_community::get_layers() const {
         return layers;
     }
     
-    int actor_community::num_layers() {
-        return layers.size();
-    }
-    
     // COMMUNITIES
     
-    communities::communities() {}
+    community_structure::community_structure() {}
     
-    CommunitiesSharedPtr communities::create() {
-        return CommunitiesSharedPtr(new communities());
+    CommunityStructureSharedPtr community_structure::create() {
+        return CommunityStructureSharedPtr(new community_structure());
     }
     
-    std::string communities::to_string() const {
+    std::string community_structure::to_string() const {
         std::string result = "";
         for (CommunitySharedPtr com: data) {
             result += com->to_string() + "\n";
@@ -99,15 +98,15 @@ namespace mlnet {
         return result;
     }
     
-    void communities::add_community(CommunitySharedPtr com) {
+    void community_structure::add_community(CommunitySharedPtr com) {
         data.push_back(com);
     }
     
-    CommunitySharedPtr communities::get_community(int i) {
+    CommunitySharedPtr community_structure::get_community(int i) {
         return data.at(i);
     }
     
-    const vector<CommunitySharedPtr>& communities::get_communities() const {
+    const vector<CommunitySharedPtr>& community_structure::get_communities() const {
         return data;
     }
 }

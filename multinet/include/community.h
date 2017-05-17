@@ -10,16 +10,16 @@ namespace mlnet {
     
     class community;
     class actor_community;
-    class communities;
+    class community_structure;
     typedef std::shared_ptr<community> CommunitySharedPtr;
     typedef std::shared_ptr<actor_community> ActorCommunitySharedPtr;
-    typedef std::shared_ptr<communities> CommunitiesSharedPtr;
+    typedef std::shared_ptr<community_structure> CommunityStructureSharedPtr;
 
     /**
      * A community - that is a set of nodes.
      */
     class community {
-        private:
+        protected:
         community();
         
         public:
@@ -36,12 +36,13 @@ namespace mlnet {
     /**
      * A community - that is a set of actors on a set of layers.
      */
-    class actor_community : public community {
+    class actor_community {
     private:
         actor_community();
         
     public:
         static ActorCommunitySharedPtr create();
+        CommunitySharedPtr to_community();
         std::string to_string() const;
         void add_actor(ActorSharedPtr);
         const hash_set<ActorSharedPtr>& get_actors() const;
@@ -58,12 +59,12 @@ namespace mlnet {
     /**
      * A set of communities. Each community can be accessed by index.
      */
-    class communities {
+    class community_structure {
         private:
-        communities();
+        community_structure();
         
         public:
-        static CommunitiesSharedPtr create();
+        static CommunityStructureSharedPtr create();
         std::string to_string() const;
         void add_community(CommunitySharedPtr);
         CommunitySharedPtr get_community(int i);

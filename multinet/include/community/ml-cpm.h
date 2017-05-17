@@ -15,7 +15,7 @@
 namespace mlnet {
 
 
-    CommunitiesSharedPtr mlcpm(const MLNetworkSharedPtr& mnet, size_t k, size_t m);
+    CommunityStructureSharedPtr mlcpm(const MLNetworkSharedPtr& mnet, size_t k, size_t m);
 
 /**
  * This method finds all the maximal cliques (1) being a superset of clique A
@@ -28,9 +28,9 @@ namespace mlnet {
     
     std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> > build_max_adjacency_graph(const hash_set<CliqueSharedPtr>& C, int k, int m);
     
-    CommunitiesSharedPtr find_max_communities_max_layers(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, int m);
+    CommunityStructureSharedPtr find_max_communities_max_layers(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, int m);
     
-    void find_max_communities_max_layers(const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, CommunitySharedPtr& A,
-                                         vector<CliqueSharedPtr> Candidates, hash_set<CliqueSharedPtr>& processedCliques, hash_set<LayerSharedPtr>& processedLayerCombinations, int m, CommunitiesSharedPtr& result);
+    void find_max_communities_max_layers(const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, ActorCommunitySharedPtr& A,
+                                         vector<CliqueSharedPtr> Candidates, hash_set<CliqueSharedPtr>& processedCliques, hash_set<LayerSharedPtr>& processedLayerCombinations, int m, CommunityStructureSharedPtr& result);
 }
 #endif // MLNET_MLCPM_H_
