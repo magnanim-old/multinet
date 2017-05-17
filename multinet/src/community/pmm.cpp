@@ -17,8 +17,8 @@ CommunityStructureSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, un
 	for (size_t i = 0; i < a.size(); i++) {
 		try {
 			features.block(0, i * ell, a[i].rows(), ell) = modularitymaximization(a[i], ell);
-		} catch (std::exception e) {
-			std::cerr << e.what();
+		} catch (std::exception &e) {
+			std::cerr << e.what() << std::endl;
 			DTRACE4(PMM_END, mnet->name.c_str(), k, ell, 0);
 			return community_structure::create();
 		}
