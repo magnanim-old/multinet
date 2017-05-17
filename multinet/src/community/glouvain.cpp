@@ -96,7 +96,7 @@ CommunityStructureSharedPtr glouvain::fit(MLNetworkSharedPtr mnet, std::string m
 	std::vector<int> Sb;
 
 	double dtot = 0;
-	double eps = 2.2204e-16;
+	double eps = 2.2204e-5;
 
 	while (Sb != S2) {
 		Sb = S2;
