@@ -246,12 +246,10 @@ Eigen::MatrixXd lart::Dmat(Eigen::SparseMatrix<double> Pt, Eigen::SparseMatrix<d
 
 Eigen::SparseMatrix<double> lart::diagA(Eigen::SparseMatrix<double> A) {
 	Eigen::SparseMatrix<double> dA = Eigen::SparseMatrix<double>(A.rows(), A.cols());
-	dA.reserve(Eigen::VectorXi::Constant(A.rows() / 2, A.rows() / 2));
-
 	Eigen::MatrixXd d = cutils::sparse_sum(A, 1);
 
 	std::vector<Eigen::Triplet<double>> tlist;
-	tlist.reserve(A.rows());
+	tlist.reserve(A.nonZeros() + A.rows());
 
 	for (int k = 0; k < A.rows(); k++) {
 		tlist.push_back(Eigen::Triplet<double>(k, k, 1 / d(k, 0)));
@@ -264,14 +262,16 @@ Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<dou
 	Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double>(
 		a[0].rows() * a.size(), a[0].cols() * a.size());
 
-	m.reserve(Eigen::VectorXi::Constant(a[0].rows(), a[0].rows()));
+	int nnz = 0;
+	for (auto l: a)
+		nnz += l.nonZeros();
 
 	size_t r, c;
 	r = 0;
 	c = 0;
 
 	std::vector<Eigen::Triplet<double>> tlist;
-	tlist.reserve(a[0].rows() * a.size());
+	tlist.reserve(nnz);
 
 	for (size_t i = 0; i < a.size(); i++) {
 		for (int j = 0; j < a[i].outerSize(); j++) {
@@ -317,13 +317,11 @@ unsigned long lart::prcheck(Eigen::SparseMatrix<double>& aP, std::vector<dlib::s
 	for (size_t i = 0; i < uq.size(); i++) {
 		int index = choose(engine);
 		for (int j = 0; j < aP.rows(); j++) {
-			if (!aP.coeff(index, j)) {
-				tlist.push_back(Eigen::Triplet<double>(index, j, 0.85 * aP.coeff(index, j) + 0.15 / (LN)));
-			}
+			tlist.push_back(Eigen::Triplet<double>(index, j, 0.85 * aP.coeff(index, j) + 0.15 / (LN)));
 		}
 	}
 
-	aP.setFromTriplets(tlist.begin(), tlist.end());
+	aP.setFromTriplets(tlist.begin(), tlist.end(), [] (const double, const double &b) { return b; });
 	return num_clusters;
 }
 
