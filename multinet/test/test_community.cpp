@@ -32,7 +32,7 @@ void test_community() {
     CommunitySharedPtr c2 = community::create();
 	c2->add_node(mnet->get_node(a,l1));
 
-	CommunitiesSharedPtr com = communities::create();
+	CommunityStructureSharedPtr com = community_structure::create();
 	com->add_community(c1);
 	com->add_community(c2);
 

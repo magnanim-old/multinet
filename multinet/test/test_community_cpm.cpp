@@ -14,11 +14,11 @@ void test_community_cpm() {
 
 	MLNetworkSharedPtr mnet = read_multilayer("cpm.mpx","aucs",',');
 
-	CommunitiesSharedPtr comm = mlcpm(mnet, 3, 1);
+	CommunityStructureSharedPtr comm = mlcpm(mnet, 3, 1);
     
-    for (CommunitySharedPtr clique: cliques) {
-        for (ActorSharedPtr actor: clique->actors)
-            std::cout << actor->name << " ";
+    for (CommunitySharedPtr c: comm->get_communities()) {
+        for (NodeSharedPtr node: c->get_nodes())
+            std::cout << "(" << node->actor->name << "," << node->layer->name << ") ";
         std::cout << std::endl;
     }
     
