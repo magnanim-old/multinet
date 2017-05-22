@@ -21,11 +21,10 @@ public:
 	CommunityStructureSharedPtr fit(MLNetworkSharedPtr mnet, std::string m, double gamma, double omega);
 	Eigen::SparseMatrix<double> metanetwork(Eigen::SparseMatrix<double> B, std::vector<int> S2);
 
-	Eigen::SparseMatrix<double> ng_modularity(std::vector<Eigen::SparseMatrix<double>> a, double gamma, double omega);
-
 	/* Map indexes of b to values of a:
 	https://stackoverflow.com/questions/5691218/matlab-mapping-values-to-index-of-other-array*/
 	std::vector<int> mapV2I(std::vector<int> a, std::vector<int> b);
+	double Q(Eigen::SparseMatrix<double> M, std::vector<int> y, double twoum);
 
 };
 

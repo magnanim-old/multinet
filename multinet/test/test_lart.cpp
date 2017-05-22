@@ -10,12 +10,12 @@ void test_lart() {
 	test_begin("ML-LART");
 
 	lart k;
-	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet/multinet/test/toy.mpx","toy",',');
-	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/Downloads/3k_mix025_all.txt","toy",' ');
-	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet-evaluation/data/5k_mix025","toy",' ');
-	MLNetworkSharedPtr mnet3 = read_multilayer("../data/aucs.mpx","aucs",',');
+	MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet/multinet/test/toy.mpx","toy",',');
+	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet-evaluation/data/aucs","toy",',');
+	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet-evaluation/data/fftwyt","toy",',');
+	//MLNetworkSharedPtr mnet3 = read_multilayer("../data/aucs.mpx","aucs",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/1k_mix_025.mpx","sample",',');
-	uint32_t t = 2;
+	uint32_t t = 9;
 	double eps = 1;
 	double gamma = 1;
 

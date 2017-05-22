@@ -2,56 +2,6 @@
 
 namespace mlnet {
 
-Eigen::SparseMatrix<double> glouvain::ng_modularity(std::vector<Eigen::SparseMatrix<double>> a, double gamma, double omega) {
-	size_t L = a.size();
-	size_t N = a[0].rows();
-
-	Eigen::SparseMatrix<double> B(N * L, N * L);
-	B.reserve(Eigen::VectorXi::Constant(N * L, N * L));
-
-	double twoum = 0.0;
-
-	std::vector<Eigen::Triplet<double>> tlist;
-	tlist.reserve(N * L);
-
-	for (size_t i = 0; i < L; i++) {
-		Eigen::MatrixXd kout = cutils::sparse_sum(a[i], 0);
-		Eigen::MatrixXd kin = cutils::sparse_sum(a[i], 1);
-		double mm = kout.array().sum();
-		twoum += mm;
-
-		Eigen::SparseMatrix<double> tmp, tmp1;
-		tmp = (Eigen::SparseMatrix<double>(a[i].transpose()) + a[i]) / 2;
-
-		Eigen::MatrixXd tmp2 = kin * kout.transpose();
-		Eigen::MatrixXd tmp3 = gamma / 2 * (tmp2 + tmp2)/ mm;
-
-		tmp = tmp - tmp3.sparseView();
-
-		for (size_t j = 0; j < N; j++) {
-			for (size_t k = 0; k < N; k++) {
-				tlist.push_back(
-					Eigen::Triplet<double>(j + (i * N), k + (i * N), tmp.coeff(j, k)));
-			}
-		}
-	}
-
-	for (size_t i = 0; i  < L - 1; ++i) {
-		for (size_t j = i + 1; j < L; ++j) {
-			int ix_i = i * N;
-			int ix_j = j * N;
-
-			for (int k = 0; k < a[i].rows(); k++) {
-				tlist.push_back(Eigen::Triplet<double>((ix_i + k), (ix_j + k), omega));
-				tlist.push_back(Eigen::Triplet<double>((ix_j + k), (ix_i + k), omega));
-			}
-		}
-	}
-
-	B.setFromTriplets(tlist.begin(), tlist.end());
-	return B;
-}
-
 std::vector<int> glouvain::mapV2I(std::vector<int> a, std::vector<int> b) {
 	std::vector<int> v(b.size());
 	for (size_t i = 0; i < b.size(); i++) {
@@ -74,9 +24,27 @@ Eigen::SparseMatrix<double> glouvain::metanetwork(Eigen::SparseMatrix<double> B,
 	return PP.transpose() * B * PP;
 }
 
+double glouvain::Q(Eigen::SparseMatrix<double> M, std::vector<int> y, double twoum) {
+	Eigen::SparseMatrix<double> P(y.size(), y.size());
+
+	std::vector<Eigen::Triplet<double>> tlist;
+	tlist.reserve(y.size());
+
+	for (size_t i = 0; i < y.size(); i++) {
+		tlist.push_back(Eigen::Triplet<double>(i, i, 1));
+	}
+
+	P.setFromTriplets(tlist.begin(), tlist.end());
+	return Eigen::MatrixXd((P*M).cwiseProduct(P)).sum() / twoum;
+}
+
 CommunityStructureSharedPtr glouvain::fit(MLNetworkSharedPtr mnet, std::string m, double gamma, double omega) {
+	DTRACE4(GLOUVAIN_START, mnet->name.c_str(), m.c_str(), std::to_string(gamma), std::to_string(omega));
+
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
-	Eigen::SparseMatrix<double> B = ng_modularity(a, gamma, omega);
+
+	double twoum = 0.0;
+	Eigen::SparseMatrix<double> B = cutils::ng_modularity(twoum, a, gamma, omega);
 
 	double (*move_func)(group_index &, int, Eigen::SparseMatrix<double>);
 	if ("moverandw" == m) {
@@ -99,6 +67,7 @@ CommunityStructureSharedPtr glouvain::fit(MLNetworkSharedPtr mnet, std::string m
 	double eps = 2.2204e-5;
 
 	while (Sb != S2) {
+		DTRACE4(GLOUVAIN_PASS, y.size(), M.rows(), M.cols(), std::to_string(Q(M, y, twoum)));
 		Sb = S2;
 		std::vector<int> yb;
 
@@ -106,6 +75,7 @@ CommunityStructureSharedPtr glouvain::fit(MLNetworkSharedPtr mnet, std::string m
 			double dstep = 1.0;
 
 			while (yb != y && (dstep/dtot > 2 * eps) && (dstep > 10 * eps)) {
+				DTRACE0(GLOUVAIN_FIRST_PHASE_START);
 				yb = y;
 				dstep = 0;
 
@@ -118,6 +88,7 @@ CommunityStructureSharedPtr glouvain::fit(MLNetworkSharedPtr mnet, std::string m
 				dtot = dtot + dstep;
 				y = g.toVector();
 
+				DTRACE3(GLOUVAIN_FIRST_PHASE_END, y.size(), std::to_string(dstep), std::to_string(dtot));
 			}
 			yb = y;
 		}
@@ -132,11 +103,12 @@ CommunityStructureSharedPtr glouvain::fit(MLNetworkSharedPtr mnet, std::string m
 		M = metanetwork(B, S2);
 		y = cutils::unique(S2);
 
+		DTRACE0(GLOUVAIN_PASS_END);
 	}
 
 	std::vector<unsigned int> partition(Sb.begin(), Sb.end());
-	DTRACE5(GLOUVAIN_END, mnet->name.c_str(), m.c_str(), std::to_string(gamma), std::to_string(omega),
-		std::set<unsigned int>(partition.begin(), partition.end()).size());
+
+	DTRACE4(GLOUVAIN_END, y.size(), M.rows(), M.cols(), std::to_string(Q(M, y, twoum)));
 
 	return cutils::nodes2communities(mnet, partition);
 }

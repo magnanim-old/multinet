@@ -2,6 +2,57 @@
 
 namespace mlnet {
 
+Eigen::SparseMatrix<double> cutils::ng_modularity(double &twoum, std::vector<Eigen::SparseMatrix<double>> a, double gamma, double omega) {
+	size_t L = a.size();
+	size_t N = a[0].rows();
+
+	Eigen::SparseMatrix<double> B(N * L, N * L);
+	B.reserve(Eigen::VectorXi::Constant(N * L, N * L));
+
+	twoum = 0.0;
+
+	std::vector<Eigen::Triplet<double>> tlist;
+	tlist.reserve(N * L);
+
+	for (size_t i = 0; i < L; i++) {
+		Eigen::MatrixXd kout = cutils::sparse_sum(a[i], 0);
+		Eigen::MatrixXd kin = cutils::sparse_sum(a[i], 1);
+		double mm = kout.array().sum();
+		twoum = twoum + mm;
+
+		Eigen::SparseMatrix<double> tmp, tmp1;
+		tmp = (Eigen::SparseMatrix<double>(a[i].transpose()) + a[i]) / 2;
+
+		Eigen::MatrixXd tmp2 = kin * kout.transpose();
+		Eigen::MatrixXd tmp3 = gamma / 2 * (tmp2 + tmp2)/ mm;
+
+		tmp = tmp - tmp3.sparseView();
+
+		for (size_t j = 0; j < N; j++) {
+			for (size_t k = 0; k < N; k++) {
+				tlist.push_back(
+					Eigen::Triplet<double>(j + (i * N), k + (i * N), tmp.coeff(j, k)));
+			}
+		}
+	}
+
+	for (size_t i = 0; i  < L - 1; ++i) {
+		for (size_t j = i + 1; j < L; ++j) {
+			int ix_i = i * N;
+			int ix_j = j * N;
+
+			for (int k = 0; k < a[i].rows(); k++) {
+				tlist.push_back(Eigen::Triplet<double>((ix_i + k), (ix_j + k), omega));
+				tlist.push_back(Eigen::Triplet<double>((ix_j + k), (ix_i + k), omega));
+			}
+		}
+	}
+	B.setFromTriplets(tlist.begin(), tlist.end());
+
+	twoum = twoum + (N * L * (L - 1) * omega);
+	return B;
+}
+
 CommunityStructureSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> nodes2cid) {
 	size_t L = mnet->get_layers()->size();
 	size_t N = mnet->get_actors()->size();

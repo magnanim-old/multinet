@@ -42,6 +42,7 @@ public:
 
 	static CommunityStructureSharedPtr nodes2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> nodes2cid);
 	static CommunityStructureSharedPtr actors2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> actors2cid);
+	static Eigen::SparseMatrix<double> ng_modularity(double& twom, std::vector<Eigen::SparseMatrix<double>> a, double gamma, double omega);
 
 };
 

@@ -5,11 +5,14 @@
 #include <dlib/graph.h>
 #include <dlib/graph_utils.h>
 
+#include <algorithm>
+
+
 #define CONNECT_LAST_THRESHOLD 100
 
 namespace mlnet {
 
-vector<long> lart::get_partition(vector<dlib::bu_cluster> clusters, int maxmodix, size_t L, size_t N) {
+vector<unsigned int> lart::get_partition(vector<dlib::bu_cluster> clusters, int maxmodix, size_t L, size_t N) {
 
 	struct partition {
 		std::vector<long> vals;
@@ -19,6 +22,7 @@ vector<long> lart::get_partition(vector<dlib::bu_cluster> clusters, int maxmodix
 	partition p;
 	p.vals.resize(L * N);
 	std::iota (std::begin(p.vals), std::end(p.vals), 0);
+
 	parts.push_back(p);
 
 	for (size_t i = L * N; i < L * N + maxmodix; i++) {
@@ -30,12 +34,10 @@ vector<long> lart::get_partition(vector<dlib::bu_cluster> clusters, int maxmodix
 			tmp.begin(), tmp.end(),
 			std::back_inserter(out));
 
-		out.push_back(i);
 		partition p;
 		p.vals = out;
 		parts.push_back(p);
 	}
-
 
 	vector<partition> r;
 	vector<long> val = parts[parts.size() - 1].vals;
@@ -49,11 +51,24 @@ vector<long> lart::get_partition(vector<dlib::bu_cluster> clusters, int maxmodix
 	size_t l = r.size();
 	size_t n = L * N;
 
-	vector<long> result(n);
+	vector<unsigned int> result(n);
 	for (size_t i = 0; i < l; i++) {
 		for (size_t j = 0; j < r[i].vals.size(); j++) {
-			result[r[i].vals[j]] = i;
+			result[r[i].vals[j]] = (unsigned int)i;
 		}
+	}
+
+	std::map<unsigned int, unsigned int> mapy;
+	unsigned int j = 0;
+	for (size_t i = 0; i < result.size(); i++) {
+		if(!mapy.count(result[i])) {
+			mapy[result[i]] = j;
+			j++;
+		}
+	}
+
+	for (size_t i = 0; i < result.size(); i++) {
+		result[i] = mapy[result[i]];
 	}
 
 	return result;
@@ -61,15 +76,16 @@ vector<long> lart::get_partition(vector<dlib::bu_cluster> clusters, int maxmodix
 
 
 vector<double> lart::modMLPX(vector<dlib::bu_cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma) {
-
 	Eigen::SparseMatrix<double> sA0 = supraA(a, 0);
-
 	vector<double> r;
 
 	size_t L = a.size();
 	size_t N = a[0].rows();
 
-	modmat(a, gamma, sA0);
+	double twoum = 0.0;
+
+	sA0 = cutils::ng_modularity(twoum, a, gamma, 0);
+	sA0 = sA0 / twoum;
 
 	double diag = 0.0;
 	for (int i = 0; i < sA0.rows(); i++){
@@ -100,6 +116,7 @@ vector<double> lart::modMLPX(vector<dlib::bu_cluster> clusters, std::vector<Eige
 
 void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA) {
 
+
 	double twoum = 0.0;
 	for (int j = 0; j < sA.outerSize(); j++) {
 		for (Eigen::SparseMatrix<double>::InnerIterator it(sA, j); it; ++it) {
@@ -110,10 +127,9 @@ void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eige
 	size_t L = a.size();
 	size_t N = a[0].rows();
 
-
 	Eigen::SparseMatrix<double> copy (sA);
 	std::vector<Eigen::Triplet<double>> tlist;
-	tlist.reserve(copy.rows() * 1.5);
+	tlist.reserve(copy.nonZeros());
 
 	if (a.size() > 1) {
 		// Cache the intra layer weights because they don't change
@@ -124,7 +140,7 @@ void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eige
 	}
 
 	for (size_t i = 0; i < L; i++) {
-		Eigen::MatrixXd d = cutils::sparse_sum(a[i], 0);
+		Eigen::MatrixXd d = cutils::sparse_sum(a[i], 1);
 		Eigen::MatrixXd	product = d * d.transpose();
 
 		double asum = 0;
@@ -150,8 +166,6 @@ void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eige
 }
 
 Eigen::MatrixXd lart::pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bool same_obj) {
-	DTRACE2(LART_PDISTANCE_START, X.rows(), Y.rows());
-
 	Eigen::MatrixXd XX = (X.array() * X.array()).rowwise().sum();
 	Eigen::MatrixXd YY = (Y.array() * Y.array()).rowwise().sum().transpose();
 	Eigen::MatrixXd distances = (X * Y.transpose()).unaryExpr([](const double x) { return x * -2;});
@@ -476,6 +490,8 @@ void lart::exp_by_squaring_iterative(Eigen::SparseMatrix<double>& x, int t) {
 
 CommunityStructureSharedPtr lart::fit(
 	MLNetworkSharedPtr mnet, int t, double eps, double gamma) {
+	DTRACE4(LART_START, mnet->name.c_str(), t, std::to_string(eps), std::to_string(gamma));
+
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 
 	std::vector<dlib::sample_pair> edges;
@@ -507,15 +523,14 @@ CommunityStructureSharedPtr lart::fit(
 	Dt.resize(0,0);
 
 	vector<double> mod = modMLPX(clusters, a, gamma);
+
 	auto maxmod = std::max_element(std::begin(mod), std::end(mod));
 	int maxmodix = std::distance(std::begin(mod), maxmod);
-	vector<long> partition = get_partition(clusters, maxmodix, a.size(), a[0].rows());
 
-	DTRACE5(LART_END, mnet->name.c_str(), t, std::to_string(eps), std::to_string(gamma),
-		std::set<long>(partition.begin(), partition.end()).size());
+	vector<unsigned int> partition = get_partition(clusters, maxmodix, a.size(), a[0].rows());
 
-	std::vector<unsigned int> l(partition.begin(), partition.end());
-	return cutils::nodes2communities(mnet, l);
+	DTRACE0(LART_END);
+	return cutils::nodes2communities(mnet, partition);
 }
 
 }

@@ -89,7 +89,8 @@ private:
 
 	void modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA);
 
-	vector<long> get_partition(vector<dlib::bu_cluster> clusters, int maxmodix, size_t L, size_t N);
+	vector<unsigned int> get_partition(vector<dlib::bu_cluster> clusters, int maxmodix, size_t L, size_t N);
+
 
 };
 
