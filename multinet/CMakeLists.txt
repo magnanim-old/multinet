@@ -1,13 +1,13 @@
 cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
-project (multinet LANGUAGES CXX)
+project (multinet LANGUAGES C CXX)
 
 set (PROJECT_VENDOR 			"Matteo Magnani")
 set (PROJECT_CONTACT 			"matteo.magnani@it.uu.se")
-set (PROJECT_URL 				"https://github.com/magnanim/multinet")
+set (PROJECT_URL 			"https://github.com/magnanim/multinet")
 set (PROJECT_DESCRIPTION 		"Multilayer social network analysis library")
 set (CMAKE_BUILD_TYPE 			"Debug")
 
-file (READ 						"${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_FULL)
+file (READ 				"${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_FULL)
 string (REGEX REPLACE 			"[\n\r]" "" PROJECT_VERSION_FULL "${PROJECT_VERSION_FULL}")
 string (REGEX REPLACE 			"^([0-9]+)\\.[0-9]+\\.[0-9]+$" "\\1" PROJECT_VERSION_MAJOR "${PROJECT_VERSION_FULL}")
 string (REGEX REPLACE 			"^[0-9]+\\.([0-9]+)\\.[0-9]+$" "\\1" PROJECT_VERSION_MINOR "${PROJECT_VERSION_FULL}")
@@ -54,7 +54,13 @@ endif()
 include_directories (include)
 include_directories (lib/eigen3)
 include_directories (lib/spectra)
-file (GLOB_RECURSE SOURCES src/*.cpp)
+include_directories (lib/dlib)
+include_directories (lib/eclat/eclat/src)
+include_directories (lib/eclat/tract/src)
+include_directories (lib/eclat/math/src)
+include_directories (lib/eclat/util/src)
+include_directories (lib/eclat/apriori/src)
+file (GLOB_RECURSE SOURCES lib/eclat/*.c src/*.cpp)
 
 find_package (Doxygen)
 if (DOXYGEN_FOUND)
@@ -70,7 +76,6 @@ else()
   message (FATAL_ERROR "Doxygen is needed to build the documentation.")
 endif()
 
-file (GLOB_RECURSE SOURCES src/*.cpp lib/dlib-19.4/dlib/all/source.cpp)
 
 option(DOXY "Generate DoxyGen documentation" OFF)
 if(DOXY)
@@ -112,10 +117,6 @@ if(dtrace)
 endif(dtrace)
 
 find_package(BLAS REQUIRED)
-
-include_directories(lib/eigen3)
-include_directories(lib/spectra/include)
-include_directories(lib/dlib)
 
 add_library (multinet SHARED ${SOURCES} ${PROBE_PATH})
 
