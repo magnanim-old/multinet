@@ -11,26 +11,37 @@ extern "C" {
 
 namespace mlnet {
 
-    CommunityStructureSharedPtr read_supporting_tids(FILE* file) {
-        char c;
+    CommunityStructureSharedPtr read_supporting_tids(const ActorListSharedPtr& actors, FILE* file) {
+        CommunityStructureSharedPtr communities = community_structure::create();
+        CommunitySharedPtr current = community::create();
+        actor_id id;
+        int c;
+        bool new_number=true;
         while (1) {
             c=getc(file);
             if (c==EOF) {
-                std::cout << "END" << std::endl;
+                if (current->get_nodes().size()>0)
+                    current = community::create();
                 break;
             }
             else if (c==' ') {
+                if (!new_number) std::cout << actors->get_at_index(id-1)->name; // add actor to community
                 std::cout << " ";
+                new_number=true;
             }
             else if (c=='\n') {
-                std::cout << "X";
+                communities->add_community(current);
+                current = community::create();
+                if (!new_number) std::cout << actors->get_at_index(id-1)->name << std::endl;
+                new_number=true;
             }
             else if (c>='0' && c<='9') {
-                std::cout << c;
+                if (new_number) id=(int)(c-'0');
+                else id=id*10+(int)(c-'0');
+                new_number=false;
             }
-            else std::cout << "#" << c;
         }
-        return community_structure::create();
+        return communities;
     }
 
     
@@ -74,10 +85,10 @@ namespace mlnet {
             ;
         FILE* f_out = std::tmpfile();
         if (!f_out)
-            ;
-        FILE* f_tid = std::tmpfile();
+            std::cout << "fout" << std::endl;
+        FILE* f_tid = fopen("/Users/matteomagnani/piropiro.tr","w"); //std::tmpfile();
         if (!f_tid)
-            ;
+            std::cout << "ftid" << std::endl;
         
         int     k = 0;             /* loop variables, counters */
         char    *s;                   /* to traverse the options */
@@ -198,7 +209,7 @@ namespace mlnet {
         //    std::cout << "e" << std::endl;            /* set a pattern spectrum if req. */
         if (isr_setfmt(report, scan, hdr, sep, imp, info) != 0)
             std::cout << "e" << std::endl;            /* set the output format strings */
-        k = isr_tidopen(report, f_tid, NULL);  /* open the file for */
+        k = isr_tidopen(report, NULL, fn_tid);  /* open the file for */
         if (k) std::cout << "e" << std::endl;   /* transaction ids */
         k = isr_open(report, f_out, NULL);
         if (k) std::cout << "e" << std::endl;
@@ -208,14 +219,16 @@ namespace mlnet {
         if (k) std::cout << "e" << std::endl;              /* find frequent item sets */
         //if (stats)                    /* print item set statistics */
         //    isr_prstats(report, stdout, 0);
+        isr_tidflush(report);
         
-        rewind(f_tid);
-        read_supporting_tids(f_tid);
+        rewind(report->tidfile);
+        read_supporting_tids(actors, report->tidfile);
         
         if (isr_close   (report) != 0)/* close item set output file */
             std::cout << "e" << std::endl;
+
         if (isr_tidclose(report) != 0)/* close trans. id output file */
-            std::cout << "e" << std::endl;
+            std::cout << errno << std::endl;
         
         //CLEANUP;
         if (eclat)  eclat_delete(eclat, 0);

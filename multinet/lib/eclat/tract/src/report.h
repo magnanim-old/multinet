@@ -311,6 +311,7 @@ extern CCHAR*    isr_name     (ISREPORT *rep);
 
 extern int       isr_tidopen  (ISREPORT *rep, FILE *file, CCHAR *name);
 extern int       isr_tidclose (ISREPORT *rep);
+extern void       isr_tidflush (ISREPORT *rep);
 extern void      isr_tidcfg   (ISREPORT *rep, TID tracnt, ITEM miscnt);
 extern FILE*     isr_tidfile  (ISREPORT *rep);
 extern CCHAR*    isr_tidname  (ISREPORT *rep);

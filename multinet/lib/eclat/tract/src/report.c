@@ -375,7 +375,7 @@ int isr_wgtout (ISREPORT *rep, RSUPP supp, double wgt)
 
 /*--------------------------------------------------------------------*/
 
-static void isr_tidflush (ISREPORT *rep)
+void isr_tidflush (ISREPORT *rep)
 {                               /* --- flush the output buffer */
   assert(rep);                  /* check the function arguments */
   fwrite(rep->tidbuf, sizeof(char), (size_t)(rep->tidnxt-rep->tidbuf),
@@ -384,7 +384,7 @@ static void isr_tidflush (ISREPORT *rep)
   #ifndef NDEBUG                /* in debug mode */
   fflush(rep->tidfile);         /* flush the output buffer */
   #endif                        /* after every flush operation */
-}  /* isr_tidflush() */
+  }  /* isr_tidflush() */
 
 /*--------------------------------------------------------------------*/
 
@@ -393,7 +393,7 @@ static void isr_tidputc (ISREPORT *rep, int c)
   assert(rep);                  /* check the function arguments */
   if (rep->tidnxt >= rep->tidend)     /* if output buffer is full, */
     isr_tidflush(rep);          /* flush it (write it to the file) */
-  *rep->tidnxt++ = (char)c;     /* store the given character */
+    *rep->tidnxt++ = (char)c;     /* store the given character */
 }  /* isr_tidputc() */
 
 /*--------------------------------------------------------------------*/
@@ -928,7 +928,7 @@ int isr_open (ISREPORT *rep, FILE *file, const char *name)
   else if (!*name) {            /* if an empty name is given */
     file = stdout; rep->name = "<stdout>"; }
   else {                        /* if a proper name is given */
-    file = fopen(rep->name = name, "w");
+    file = fopen(rep->name = name, "w+");
     if (!file) return E_FOPEN;  /* open file with given name */
   }                             /* and check for an error */
   rep->file = file;             /* store the new output file */
@@ -974,7 +974,7 @@ int isr_tidopen (ISREPORT *rep, FILE *file, const char *name)
   else if (!*name) {            /* if an empty name is given */
     file = stdout;           rep->tidname = "<stdout>"; }
   else {                        /* if a proper name is given */
-    file = fopen(rep->tidname = name, "w");
+    file = fopen(rep->tidname = name, "w+");
     if (!file) return E_FOPEN;  /* open file with given name */
   }                             /* and check for an error */
   rep->tidfile = file;          /* store the new output file */
