@@ -11,6 +11,29 @@ extern "C" {
 
 namespace mlnet {
 
+    CommunityStructureSharedPtr read_supporting_tids(FILE* file) {
+        char c;
+        while (1) {
+            c=getc(file);
+            if (c==EOF) {
+                std::cout << "END" << std::endl;
+                break;
+            }
+            else if (c==' ') {
+                std::cout << " ";
+            }
+            else if (c=='\n') {
+                std::cout << "X";
+            }
+            else if (c>='0' && c<='9') {
+                std::cout << c;
+            }
+            else std::cout << "#" << c;
+        }
+        return community_structure::create();
+    }
+
+    
     CommunityStructureSharedPtr abacus(const MLNetworkSharedPtr& mnet, const vector<CommunityStructureSharedPtr>& single_layer_communities, int min_sup) {
         
         ActorListSharedPtr actors = mnet->get_actors();
@@ -48,6 +71,12 @@ namespace mlnet {
         
         FILE* f_inp = std::tmpfile();
         if (!f_inp)
+            ;
+        FILE* f_out = std::tmpfile();
+        if (!f_out)
+            ;
+        FILE* f_tid = std::tmpfile();
+        if (!f_tid)
             ;
         
         int     k = 0;             /* loop variables, counters */
@@ -107,10 +136,8 @@ namespace mlnet {
         
         if ((cmfilt >= 0) && (target & (ISR_CLOSED|ISR_MAXIMAL)))
             mode |= (cmfilt > 0) ? ECL_VERT : ECL_HORZ;
-        if (fn_tid) {                 /* if to write transaction ids. */
-            if (strcmp(fn_tid, "-") == 0) fn_tid = "";
-            mode |= ECL_TIDS;           /* turn "-" into "" for consistency */
-        }                             /* set transaction identifier flag */
+        mode |= ECL_TIDS;           /* turn "-" into "" for consistency */
+                                   /* set transaction identifier flag */
         mode = (mode & ~ECL_FIM16)    /* add packed items to search mode */
         | ((pack <= 0) ? 0 : (pack < 16) ? pack : 16);
         if (target & ISR_RULES)       /* if to find association rules, */
@@ -128,15 +155,15 @@ namespace mlnet {
         tread = trd_create();         /* create a transaction reader */
         if (!tread) std::cout << "e" << std::endl;   /* and configure the characters */
         trd_allchs(tread, recseps, fldseps, blanks, "", comment);
-        if (fn_sel) {                 /* if an item selection is given */
-            if (trd_open(tread, NULL, fn_sel) != 0)
-                std::cout << "e" << std::endl;
-            m = (target == ISR_RULES)   /* depending on the target type */
-            ? ib_readapp(ibase,tread) /* read the item appearances */
-            : ib_readsel(ibase,tread);/* or a simple item selection */
-            if (m < 0) std::cout << "e" << std::endl;
-            trd_close(tread);           /* close the input file */
-        }                             /* print a log message */
+        //if (fn_sel) {                 /* if an item selection is given */
+        //    if (trd_open(tread, NULL, fn_sel) != 0)
+        //        std::cout << "e" << std::endl;
+        //    m = (target == ISR_RULES)   /* depending on the target type */
+        //    ? ib_readapp(ibase,tread) /* read the item appearances */
+        //    : ib_readsel(ibase,tread);/* or a simple item selection */
+        //    if (m < 0) std::cout << "e" << std::endl;
+        //    trd_close(tread);           /* close the input file */
+        //}                             /* print a log message */
         
         /* --- read transaction database --- */
         tabag = tbg_create(ibase);    /* create a transaction bag */
@@ -171,21 +198,25 @@ namespace mlnet {
         //    std::cout << "e" << std::endl;            /* set a pattern spectrum if req. */
         if (isr_setfmt(report, scan, hdr, sep, imp, info) != 0)
             std::cout << "e" << std::endl;            /* set the output format strings */
-        k = isr_tidopen(report, NULL, fn_tid);  /* open the file for */
+        k = isr_tidopen(report, f_tid, NULL);  /* open the file for */
         if (k) std::cout << "e" << std::endl;   /* transaction ids */
-        k = isr_open(report, NULL, fn_out);
+        k = isr_open(report, f_out, NULL);
         if (k) std::cout << "e" << std::endl;
         if (isr_setup(report) < 0)    /* open the item set file and */
             std::cout << "e" << std::endl;            /* set up the item set reporter */
         k = eclat_mine(eclat, prune, 0);
         if (k) std::cout << "e" << std::endl;              /* find frequent item sets */
-        if (stats)                    /* print item set statistics */
-            isr_prstats(report, stdout, 0);
+        //if (stats)                    /* print item set statistics */
+        //    isr_prstats(report, stdout, 0);
+        
+        rewind(f_tid);
+        read_supporting_tids(f_tid);
+        
         if (isr_close   (report) != 0)/* close item set output file */
             std::cout << "e" << std::endl;
         if (isr_tidclose(report) != 0)/* close trans. id output file */
             std::cout << "e" << std::endl;
-
+        
         //CLEANUP;
         if (eclat)  eclat_delete(eclat, 0);
         if (report) isr_delete(report, 0);
@@ -196,8 +227,7 @@ namespace mlnet {
         //remove(community_file_name.data());
         
         return community_structure::create();
-        
-
     }
+    
     
 }
