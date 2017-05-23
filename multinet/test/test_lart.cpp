@@ -24,8 +24,39 @@ void test_lart() {
 	CommunityStructureSharedPtr c = k.fit(mnet3, t, eps, gamma);
 
     
+    ActorSharedPtr a1 = mnet3->get_actor("U4");
+    ActorSharedPtr a2 = mnet3->get_actor("U54");
+    ActorSharedPtr a3 = mnet3->get_actor("U18");
+    LayerSharedPtr l1 = mnet3->get_layer("lunch");
+    LayerSharedPtr l2 = mnet3->get_layer("leisure");
+    NodeSharedPtr n1_1 = mnet3->get_node(a1,l1);
+    NodeSharedPtr n1_2 = mnet3->get_node(a1,l2);
+    NodeSharedPtr n2_1 = mnet3->get_node(a2,l1);
+    NodeSharedPtr n2_2 = mnet3->get_node(a2,l2);
+    NodeSharedPtr n3_1 = mnet3->get_node(a3,l1);
+    NodeSharedPtr n3_2 = mnet3->get_node(a3,l2);
+    CommunitySharedPtr c1_1 = community::create();
+    c1_1->add_node(n1_1);
+    c1_1->add_node(n2_1);
+    CommunitySharedPtr c1_2 = community::create();
+    c1_2->add_node(n3_1);
+    CommunityStructureSharedPtr com1 = community_structure::create();
+    com1->add_community(c1_1);
+    com1->add_community(c1_2);
     
-    abacus(mnet3);
+    
+    CommunitySharedPtr c2_1 = community::create();
+    c2_1->add_node(n1_1);
+    c2_1->add_node(n2_1);
+    CommunitySharedPtr c2_2 = community::create();
+    c2_2->add_node(n2_1);
+    c2_2->add_node(n3_1);
+    CommunityStructureSharedPtr com2 = community_structure::create();
+    com2->add_community(c2_1);
+    com2->add_community(c2_2);
+
+    vector<CommunityStructureSharedPtr> communities = {com1, com2};
+    abacus(mnet3, communities, 1);
     
 	//std::ofstream out("/home/guest/multinet/multinet/test/DK_Pol_lart.txt");
 	//(*c).print(std::cout);

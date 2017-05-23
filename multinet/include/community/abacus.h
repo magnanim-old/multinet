@@ -3,7 +3,7 @@
 
 namespace mlnet {
 
-	CommunityStructureSharedPtr abacus(const MLNetworkSharedPtr& mnet);
+    CommunityStructureSharedPtr abacus(const MLNetworkSharedPtr& mnet, const vector<CommunityStructureSharedPtr>& single_layer_communities, int min_support);
 
 }
 

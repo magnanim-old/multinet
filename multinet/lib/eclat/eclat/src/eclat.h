@@ -85,6 +85,7 @@ ECLAT;                          /* (opaque structure) */
 /*----------------------------------------------------------------------
   Functions
 ----------------------------------------------------------------------*/
+
 extern ECLAT* eclat_create (int target, double smin, double smax,
                             double conf, ITEM zmin, ITEM zmax,
                             int eval, int agg, double thresh,
