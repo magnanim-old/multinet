@@ -3,6 +3,7 @@
 
 #include "datastructures.h"
 
+
 namespace mlnet {
 
 /* COMMON DATA STRUCTURES */
@@ -28,6 +29,7 @@ namespace mlnet {
         const hash_set<NodeSharedPtr>& get_nodes() const;
 
         private:
+        
         hash_set<NodeSharedPtr> data;
     };
 
@@ -88,7 +90,11 @@ namespace mlnet {
 
 
     /* ALGORITHMS */
+    
 
 }
+
+#include "community/abacus.h"
+#include "community/labelpropagationsinglelayer.h"
 
 #endif /* MULTINET_COMMUNITY_H_ */

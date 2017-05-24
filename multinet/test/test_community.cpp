@@ -68,5 +68,9 @@ void test_community() {
     std::cout << normalized_mutual_information(com1,com3,4) << " ";
     std::cout << "done!" << std::endl;
 
+    std::cout << "Running algorithms...";
+    abacus(mnet, 1);
+    std::cout << "done!" << std::endl;
+    
 	test_end("community data structures");
 }

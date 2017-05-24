@@ -8,7 +8,7 @@ node::node(node_id id, const ActorSharedPtr& actor, const LayerSharedPtr& layer)
 	layer(layer) {}
 
 std::string node::to_string() const {
-	return "Node: " + basic_component::to_string() + " as " + actor->to_string() + " on " + layer->to_string();
+	return actor->to_string() + "::" + layer->to_string();
 }
 
 }

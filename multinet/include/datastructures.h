@@ -183,6 +183,7 @@ class actor : public named_component {
 public:
 	/** Constructor */
 	actor(actor_id, const string& name);
+
 	/** Output function, presenting a complete description of the actor */
 	string to_string() const;
 };
