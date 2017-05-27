@@ -157,7 +157,7 @@ static int getsd (const char *s, const char **end)
 
 /*--------------------------------------------------------------------*/
 
-static void isr_flush (ISREPORT *rep)
+void isr_flush (ISREPORT *rep) // MM: removed static
 {                               /* --- flush the output buffer */
   assert(rep);                  /* check the function arguments */
   fwrite(rep->buf, sizeof(char),(size_t)(rep->next-rep->buf),rep->file);
@@ -375,7 +375,7 @@ int isr_wgtout (ISREPORT *rep, RSUPP supp, double wgt)
 
 /*--------------------------------------------------------------------*/
 
-void isr_tidflush (ISREPORT *rep)
+void isr_tidflush (ISREPORT *rep) // MM: removed static
 {                               /* --- flush the output buffer */
   assert(rep);                  /* check the function arguments */
   fwrite(rep->tidbuf, sizeof(char), (size_t)(rep->tidnxt-rep->tidbuf),

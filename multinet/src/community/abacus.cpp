@@ -10,75 +10,107 @@ extern "C" {
 
 namespace mlnet {
 
-    CommunityStructureSharedPtr read_supporting_tids(const ActorListSharedPtr& actors, FILE* file) {
-        CommunityStructureSharedPtr communities = community_structure::create();
-        CommunitySharedPtr current = community::create();
-        actor_id id;
+    void read_layers(ActorCommunitySharedPtr& com, FILE* file, const LayerListSharedPtr& layers) {
+        bool found_separator=false;
+        bool reading_number=false;
         int c;
-        bool new_number=true;
+        int lid; // layer identifier
         while (1) {
             c=getc(file);
-            if (c==EOF) {
-                if (current->get_nodes().size()>0)
-                    current = community::create();
-                break;
+            if (c=='\n' || c==EOF) {
+                if (reading_number) com->add_layer(layers->get_at_index(lid));
+                return;
+            }
+            
+            if (!found_separator && c!=':') {
+                continue;
+            }
+            else if (c==':') {
+                found_separator=true;
+                continue;
+            }
+            
+            if (c>='0' && c<='9') {
+                if (!reading_number) lid=(int)(c-'0');
+                else lid=lid*10+(int)(c-'0');
+                reading_number=true;
             }
             else if (c==' ') {
-                if (!new_number) std::cout << actors->get_at_index(id-1)->name; // add actor to community
-                std::cout << " ";
-                //current->add_node();
-                new_number=true;
-            }
-            else if (c=='\n') {
-                communities->add_community(current);
-                current = community::create();
-                if (!new_number) std::cout << actors->get_at_index(id-1)->name << std::endl;
-                new_number=true;
-            }
-            else if (c>='0' && c<='9') {
-                if (new_number) id=(int)(c-'0');
-                else id=id*10+(int)(c-'0');
-                new_number=false;
+                if (reading_number) com->add_layer(layers->get_at_index(lid));
+                reading_number=false;
+                found_separator=false;
             }
         }
+    }
+    
+    int read_actors(ActorCommunitySharedPtr& com, FILE* tidfile, const ActorListSharedPtr& actors) {
+        actor_id id;
+        int c;
+        bool reading_number=false;
+        while (1) {
+            c=getc(tidfile);
+            if (c>='0' && c<='9') {
+                if (!reading_number) id=(int)(c-'0');
+                else id=id*10+(int)(c-'0');
+                reading_number=true;
+            }
+            else if (c==' ' || c=='\n' || c==EOF) {
+                if (reading_number) com->add_actor(actors->get_at_index(id-1));
+                reading_number=false;
+                if (c==EOF) return 0;
+                if (c=='\n') return 1;
+            }
+        }
+
+    }
+    
+    ActorCommunityStructureSharedPtr read_eclat_communities(const ActorListSharedPtr& actors, const LayerListSharedPtr& layers, FILE* file, FILE* tidfile) {
+        ActorCommunityStructureSharedPtr communities = actor_community_structure::create();
+        ActorCommunitySharedPtr current = actor_community::create();
+        while (read_actors(current,tidfile,actors)) {
+            read_layers(current,file,layers);
+            if (current->get_actors().size()>0) {
+                communities->add_community(current);
+                current = actor_community::create();
+            }
+        }
+        communities->add_community(current);
         return communities;
     }
 
-    CommunityStructureSharedPtr abacus(const MLNetworkSharedPtr& mnet, int min_sup) {
-        vector<CommunityStructureSharedPtr> single_layer_communities;
+    ActorCommunityStructureSharedPtr abacus(const MLNetworkSharedPtr& mnet, int min_actors, int min_layers) {
+        hash_map<LayerSharedPtr,CommunityStructureSharedPtr> single_layer_communities;
         for (LayerSharedPtr layer: *mnet->get_layers()) {
-            single_layer_communities.push_back(label_propagation_single(mnet,layer));
+            single_layer_communities[layer] = label_propagation_single(mnet,layer);
         }
-        return eclat_merge(mnet, single_layer_communities, min_sup);
+        return eclat_merge(mnet, single_layer_communities, min_actors, min_layers);
     }
     
-    CommunityStructureSharedPtr eclat_merge(const MLNetworkSharedPtr& mnet, const vector<CommunityStructureSharedPtr>& single_layer_communities, int min_sup) {
+    ActorCommunityStructureSharedPtr eclat_merge(const MLNetworkSharedPtr& mnet, const hash_map<LayerSharedPtr,CommunityStructureSharedPtr>& single_layer_communities, int min_actors, int min_layers) {
         
         ActorListSharedPtr actors = mnet->get_actors();
+        LayerListSharedPtr layers = mnet->get_layers();
         hash_map<int,vector<string> > transactions;
         
-        int layer = 0;
-        for (CommunityStructureSharedPtr cs: single_layer_communities) {
-            string layer_str = to_string(layer);
+        for (auto pair: single_layer_communities) {
+            string layer_str = to_string(mnet->get_layers()->get_index(pair.first));
             int community = 0;
-            for (CommunitySharedPtr c: cs->get_communities()) {
+            for (CommunitySharedPtr c: (pair.second)->get_communities()) {
                 string community_str = to_string(community);
                 for (NodeSharedPtr node: c->get_nodes()) {
                     transactions[actors->get_index(node->actor)].push_back(community_str + ":" + layer_str);
                 }
                 community++;
             }
-            layer++;
         }
         
-        
-        FILE* f_inp = std::tmpfile();
+        FILE* f_inp = fopen("/Users/matteomagnani/piropiro","w+"); //std::tmpfile();
         if (!f_inp)
             ;
-        FILE* f_out = std::tmpfile();
+        FILE* f_out = fopen("/Users/matteomagnani/piropiro.out","w+"); //std::tmpfile();
         if (!f_out)
             std::cout << "fout" << std::endl;
-        FILE* f_tid = std::tmpfile();
+        FILE* f_tid = fopen("/Users/matteomagnani/piropiro.tr","w+"); //std::tmpfile();
         if (!f_tid)
             std::cout << "ftid" << std::endl;
         
@@ -91,8 +123,8 @@ namespace mlnet {
         CCHAR   *sep     = " ";       /* item separator for output */
         CCHAR   *imp     = " <- ";    /* implication sign for ass. rules */
         CCHAR   *dflt    = " (%S)";   /* default format for check */
+        CCHAR   *info    = dflt;      /* format for information output */
         int     target   = ISR_CLOSED;       /* target type (e.g. closed/maximal) */
-        ITEM    zmin     = 1;         /* minimum rule/item set size */
         ITEM    zmax     = ITEM_MAX;  /* maximum rule/item set size */
         double  smax     = 100;       /* maximum support of an item set */
         double  conf     = 80;        /* minimum confidence (in percent) */
@@ -104,11 +136,12 @@ namespace mlnet {
         int     algo     = 'a';       /* variant of eclat algorithm */
         int     mode     = ECL_DEFAULT|ECL_PREFMT;   /* search mode */
         int     pack     = 16;        /* number of bit-packed items */
+        int     cmfilt   = -1;        /* mode for closed/maximal filtering */
         int     mtar     = 0;         /* mode for transaction reading */
         int     scan     = 0;         /* flag for scanable item output */
         ITEM    m;                    /* number of items */
         TID     n;                    /* number of transactions */
-        SUPP    w;                    /* total transaction weight */
+        //SUPP    w;                    /* total transaction weight */
 
         TABREAD  *tread  = NULL; /* table/transaction reader */
         ITEMBASE *ibase  = NULL; /* item base */
@@ -124,7 +157,8 @@ namespace mlnet {
         }
         rewind(f_inp);
         
-        
+        if ((cmfilt >= 0) && (target & (ISR_CLOSED|ISR_MAXIMAL)))
+            mode |= (cmfilt > 0) ? ECL_VERT : ECL_HORZ;
         mode |= ECL_TIDS;
         mode = (mode & ~ECL_FIM16)    /* add packed items to search mode */
         | ((pack <= 0) ? 0 : (pack < 16) ? pack : 16);
@@ -148,14 +182,14 @@ namespace mlnet {
         tread = NULL;                 /* then delete the table reader */
         m = ib_cnt(ibase);            /* get the number of items, */
         n = tbg_cnt(tabag);           /* the number of transactions, */
-        w = tbg_wgt(tabag);           /* the total transaction weight */
-        if (w != (SUPP)n)
-            ;
+        //w = tbg_wgt(tabag);           /* the total transaction weight */
+        //if (w != (SUPP)n)
+        //    ;
         if ((m <= 0) || (n <= 0))     /* check for at least one item */
-            return community_structure::create();
+            return actor_community_structure::create();
         
         /* --- find frequent item sets/association rules --- */
-        eclat = eclat_create(target, min_sup, smax, conf, zmin, zmax,
+        eclat = eclat_create(target, -min_actors, smax, conf, min_layers, zmax,
                              eval, agg, thresh, algo, mode);
         if (!eclat) std::cout << "e" << std::endl;   /* create an eclat miner */
         k = eclat_data(eclat, tabag, 0, sort);
@@ -176,10 +210,12 @@ namespace mlnet {
         if (k) std::cout << "e" << std::endl;              /* find frequent item sets */
         //if (stats)                    /* print item set statistics */
         //    isr_prstats(report, stdout, 0);
+        isr_flush(report);
         isr_tidflush(report);
         
+        rewind(report->file);
         rewind(report->tidfile);
-        CommunityStructureSharedPtr result = read_supporting_tids(actors, report->tidfile);
+        ActorCommunityStructureSharedPtr result = read_eclat_communities(actors, layers, report->file, report->tidfile);
         
         //if (isr_close   (report) != 0)/* close item set output file - not needed: temporary file */
         

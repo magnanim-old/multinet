@@ -3,9 +3,9 @@
 
 namespace mlnet {
     
-    CommunityStructureSharedPtr eclat_merge(const MLNetworkSharedPtr& mnet, const vector<CommunityStructureSharedPtr>& single_layer_communities, int min_support);
+    ActorCommunityStructureSharedPtr eclat_merge(const MLNetworkSharedPtr& mnet, const hash_map<LayerSharedPtr,CommunityStructureSharedPtr>& single_layer_communities, int min_actors, int min_layers);
     
-    CommunityStructureSharedPtr abacus(const MLNetworkSharedPtr& mnet, int min_support);
+    ActorCommunityStructureSharedPtr abacus(const MLNetworkSharedPtr& mnet, int min_actors, int min_layers);
 
 }
 

@@ -185,6 +185,8 @@
 
 #define DIFFSIZE(p,q) ((size_t)((int*)(p)-(int*)(q)) *sizeof(int))
 
+#define QUIET // Added MM
+
 #ifndef QUIET                   /* if not quiet version, */
 #define MSG         fprintf     /* print messages */
 #define XMSG        if (eclat->mode & ECL_VERBOSE) fprintf
