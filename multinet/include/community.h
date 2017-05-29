@@ -86,6 +86,8 @@ namespace mlnet {
 
     double f_measure(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
 
+    double fm_index(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
+
 
     /* ALGORITHMS */
 

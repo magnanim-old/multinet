@@ -37,7 +37,7 @@ endif()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -DNDEBUG -msse2 -DDLIB_NO_GUI_SUPPORT -DDLIB_ISO_CPP_ONLY")
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fopenmp -fmessage-length=0 -funroll-loops -fno-omit-frame-pointer -march=native")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -O4 -fopenmp -fmessage-length=0 -funroll-loops -fno-omit-frame-pointer -march=native")
 else()
 	if (CMAKE_COMPILER_IS_CLANGXX)
 		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNDEBUG -Wextra -Wall")
@@ -94,7 +94,7 @@ endif(dtrace)
 
 find_package(BLAS REQUIRED)
 
-include_directories(lib/eigen3)
+include_directories(/usr/include/eigen3)
 include_directories(lib/spectra/include)
 include_directories(lib/dlib)
 

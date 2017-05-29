@@ -2,6 +2,7 @@
 
 #include <SymEigsSolver.h>
 #include <MatOp/SparseSymMatProd.h>
+
 #include <Eigen/SVD>
 
 #include <dlib/matrix.h>
@@ -60,8 +61,22 @@ CommunityStructureSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, un
 }
 
 Eigen::MatrixXd pmm::modularitymaximization(Eigen::SparseMatrix<double> a, unsigned int ell) {
-	Spectra::SparseSymMatProd<double> op(a);
-	Spectra::SymEigsSolver<double, Spectra::LARGEST_ALGE, Spectra::SparseSymMatProd<double>> eigs(&op, ell, a.rows());
+	std::vector<Eigen::SparseMatrix<double>> in = {a};
+	double twoum = 0;
+
+	Eigen::SparseMatrix<double> mod = cutils::ng_modularity(twoum, in, 1, 1);
+
+	if (ell > (a.rows() - 1)) {
+		ell = a.rows() - 1;
+	}
+
+	unsigned int conv_speed = ell = 2 * ell;
+	if (conv_speed > a.rows()) {
+		conv_speed = a.rows();
+	}
+
+	Spectra::SparseSymMatProd<double> op(mod);
+	Spectra::SymEigsSolver<double, Spectra::LARGEST_ALGE, Spectra::SparseSymMatProd<double>> eigs(&op, ell, conv_speed);
 	eigs.init();
 	eigs.compute();
 	return eigs.eigenvectors();

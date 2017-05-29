@@ -21,7 +21,7 @@ void test_end(const std::string& name) {
 
 int main() {
 	test_begin("All unit tests");
-	test_lart();
+	test_pmm();
 	try {
 
 	/*test_begin("UTILITY FUNCTIONS AND CLASSES");

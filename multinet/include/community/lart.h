@@ -80,7 +80,7 @@ private:
 	int is_connected(std::vector<Eigen::SparseMatrix<double>> a, std::vector<dlib::sample_pair>& edges);
 
 
-	void updateDt(Eigen::MatrixXd& Dt, Eigen::SparseMatrix<double> g);
+	void updateDt(Eigen::MatrixXd& Dt, std::vector<Eigen::SparseMatrix<double>>);
 
 
 	std::vector<unsigned long> find_ix(std::vector<unsigned long> x, unsigned long y);

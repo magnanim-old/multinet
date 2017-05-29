@@ -407,7 +407,8 @@ std::vector<unsigned long> lart::find_ix(std::vector<unsigned long> x, unsigned 
 	return ix;
 }
 
-void lart::updateDt(Eigen::MatrixXd& Dt, Eigen::SparseMatrix<double> g ) {
+void lart::updateDt(Eigen::MatrixXd& Dt, std::vector<Eigen::SparseMatrix<double>> a) {
+	Eigen::SparseMatrix<double> g = supraA(a, 0);
 
 	std::vector<unsigned long> memb;
 	std::vector<dlib::sample_pair> edges;
@@ -500,6 +501,7 @@ CommunityStructureSharedPtr lart::fit(
 	Eigen::SparseMatrix<double> sA = supraA(a, eps);
 	Eigen::SparseMatrix<double> dA = diagA(sA);
 	Eigen::SparseMatrix<double> aP = dA * sA;
+	sA.resize(0,0);
 
 	if (!connected) {
 		prcheck(aP, edges, a.size() * a[0].rows());
@@ -512,7 +514,7 @@ CommunityStructureSharedPtr lart::fit(
 	Eigen::MatrixXd Dt = Dmat(aP, dA, a.size());
 
 	if (!connected) {
-		updateDt(Dt, sA);
+		updateDt(Dt, a);
 	}
 
 	std::vector<unsigned long> labels;
