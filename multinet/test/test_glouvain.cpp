@@ -22,7 +22,7 @@ void test_glouvain() {
 	double omega = 1.0;
 	std::string move = "move";
 
-	(*(k.fit(mnet, move, gamma, omega))).print(std::cout);
+	//(*(k.fit(mnet, move, gamma, omega))).print(std::cout);
 
 	test_end("ML-GLOUVAIN");
 

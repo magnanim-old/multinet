@@ -2,12 +2,14 @@
 #include <unordered_set>
 #include <string>
 #include "../include/community/lart.h"
+#include "../include/community/abacus.h"
 
 using namespace mlnet;
 
 void test_lart() {
 
 	test_begin("ML-LART");
+
 
 	lart k;
 	MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet/multinet/test/toy.mpx","toy",',');
@@ -20,6 +22,8 @@ void test_lart() {
 	double gamma = 1;
 
 	CommunityStructureSharedPtr c = k.fit(mnet3, t, eps, gamma);
+
+
 
 	//std::ofstream out("/home/guest/multinet/multinet/test/DK_Pol_lart.txt");
 	//(*c).print(std::cout);

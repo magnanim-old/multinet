@@ -68,5 +68,19 @@ void test_community() {
     std::cout << normalized_mutual_information(com1,com3,4) << " ";
     std::cout << "done!" << std::endl;
 
+    MLNetworkSharedPtr toy = read_multilayer("toy.mpx","aucs",',');
+
+    std::cout << "Running algorithms..."<< std::endl;
+    std::cout << "ABACUS"<< std::endl;
+    ActorCommunityStructureSharedPtr communities = abacus(toy, 3, 1);
+    std::cout << "actor-version"<< std::endl;
+    std::cout << communities->to_string();
+    std::cout << "node-version"<< std::endl;
+    CommunityStructureSharedPtr n_communities = to_node_communities(communities,toy);
+    std::cout << n_communities->to_string();
+    std::cout << "modularity (NOTE: not defined for overlapping communities): ";
+    std::cout << modularity(toy,n_communities,1) << std::endl;
+    std::cout << "done!" << std::endl;
+    
 	test_end("community data structures");
 }

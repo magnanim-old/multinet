@@ -10,15 +10,15 @@
 
 namespace mlnet {
 
-CommunityStructureSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, unsigned int ell) {
-	DTRACE3(PMM_START, mnet->name.c_str(), k, ell);
+CommunityStructureSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, unsigned int ell, double gamma) {
+	DTRACE4(PMM_START, mnet->name.c_str(), k, ell, std::to_string(gamma));
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 
 	Eigen::MatrixXd features = Eigen::MatrixXd(a[0].rows(), ell * a.size());
 
 	for (size_t i = 0; i < a.size(); i++) {
 		try {
-			features.block(0, i * ell, a[i].rows(), ell) = modularitymaximization(a[i], ell);
+			features.block(0, i * ell, a[i].rows(), ell) = modularitymaximization(a[i], ell, gamma);
 			DTRACE0(PMM_FEATURES_END);
 		} catch (std::exception &e) {
 			DTRACE1(PMM_ERROR, e.what());
@@ -60,19 +60,28 @@ CommunityStructureSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, un
 	return cutils::actors2communities(mnet, partition);
 }
 
-Eigen::MatrixXd pmm::modularitymaximization(Eigen::SparseMatrix<double> a, unsigned int ell) {
+Eigen::MatrixXd pmm::modularitymaximization(Eigen::SparseMatrix<double> a, unsigned int ell, double gamma) {
 	std::vector<Eigen::SparseMatrix<double>> in = {a};
 	double twoum = 0;
 
-	Eigen::SparseMatrix<double> mod = cutils::ng_modularity(twoum, in, 1, 1);
+	Eigen::SparseMatrix<double> mod = cutils::ng_modularity(twoum, in, gamma, 1);
 
 	if (ell > (a.rows() - 1)) {
 		ell = a.rows() - 1;
 	}
 
-	unsigned int conv_speed = ell = 2 * ell;
+	unsigned int conv_speed = 2 * ell;
 	if (conv_speed > a.rows()) {
 		conv_speed = a.rows();
+	}
+
+	if (ell >= conv_speed) {
+		if (conv_speed == a.rows()) {
+			ell = ell -1;
+		} else {
+			conv_speed = conv_speed + 1;
+		}
+
 	}
 
 	Spectra::SparseSymMatProd<double> op(mod);

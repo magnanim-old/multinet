@@ -19,8 +19,8 @@ public:
 			+ k is the amount of clusters to return
 			+ ell is number of structural features to extract from each dimension
 	*/
-	CommunityStructureSharedPtr fit(MLNetworkSharedPtr mnet, unsigned int k, unsigned int ell);
-	Eigen::MatrixXd modularitymaximization(Eigen::SparseMatrix<double> a, unsigned int ell);
+	CommunityStructureSharedPtr fit(MLNetworkSharedPtr mnet, unsigned int k, unsigned int ell, double gamma);
+	Eigen::MatrixXd modularitymaximization(Eigen::SparseMatrix<double> a, unsigned int ell, double gamma);
 };
 
 

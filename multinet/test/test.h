@@ -35,6 +35,7 @@ private:
 	std::string message;
 };
 
+void test_community_single_layer();
 void test_pmm();
 void test_lart();
 void test_glouvain();
