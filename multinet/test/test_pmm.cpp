@@ -11,19 +11,13 @@ void test_pmm() {
 	test_begin("ML-PMM");
 
 	pmm p;
-	MLNetworkSharedPtr mnet = read_multilayer("/home/guest/multinet-evaluation/data/aucs","aucs", ',');
+	MLNetworkSharedPtr mnet = read_multilayer("aucs.mpx","aucs",',');
 
-	std::vector<int> k = {5, 10, 20, 40, 60, 100};
-	double gamma = 1.5;
-
-	for (size_t i = 0; i < k.size(); i++) {
-		CommunityStructureSharedPtr c = p.fit(mnet, k[i], k[i] * 2, gamma);
-		//for (size_t j = 0; i < ell.size(); j++) {
-		//}
-	}
-
-
-
+	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/fftwyt.mpx","toy",',');
+	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/mikki/Downloads/friendfeed_ita.mpx","sample",',');
+	unsigned int k = 5;
+	unsigned int ell = 3;
+	p.fit(mnet, k, ell);
 	test_end("ML-PMM");
 }
 

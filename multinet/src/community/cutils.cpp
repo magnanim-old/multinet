@@ -1,6 +1,91 @@
+
 #include "community/cutils.h"
 
 namespace mlnet {
+
+Eigen::SparseMatrix<double> cutils::supraA(std::vector<Eigen::SparseMatrix<double>> a, double eps, bool use_node_degrees, bool use_self_loop) {
+	Eigen::SparseMatrix<double> A;
+
+	if (use_self_loop) {
+		A = block_diag(a, eps);
+	} else {
+		A = block_diag(a, 0);
+	}
+
+
+	size_t L = a.size();
+	size_t N = a[0].rows();
+
+	for (size_t i = 0; i  < L - 1; ++i) {
+		for (size_t j = i + 1; j < L; ++j) {
+			Eigen::MatrixXd d = cutils::sparse_sum(a[i].cwiseProduct(a[j]), 1);
+
+			std::vector<Eigen::Triplet<double>> tlist;
+			tlist.reserve(a[0].rows());
+
+			for (int k = 0; k < A.outerSize(); k++) {
+				for (Eigen::SparseMatrix<double>::InnerIterator it(A, k); it; ++it) {
+					tlist.push_back(Eigen::Triplet<double>(it.row(), it.col(), it.value()));
+				}
+			}
+
+			int ix_i = i * N;
+			int ix_j = j * N;
+
+			if (use_node_degrees) {
+				for (int k = 0; k < a[i].rows(); k++) {
+					double intra = d(k, 0) + eps;
+					tlist.push_back(Eigen::Triplet<double>((ix_i + k), (ix_j + k), intra));
+					tlist.push_back(Eigen::Triplet<double>((ix_j + k), (ix_i + k), intra));
+				}
+			} else {
+				for (int k = 0; k < a[i].rows(); k++) {
+					tlist.push_back(Eigen::Triplet<double>((ix_i + k), (ix_j + k), eps));
+					tlist.push_back(Eigen::Triplet<double>((ix_j + k), (ix_i + k), eps));
+				}
+			}
+			A.setFromTriplets(tlist.begin(), tlist.end());
+
+		}
+	}
+	return A;
+}
+
+Eigen::SparseMatrix<double> cutils::block_diag(std::vector<Eigen::SparseMatrix<double>> a, double eps) {
+	Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double>(
+		a[0].rows() * a.size(), a[0].cols() * a.size());
+
+	int nnz = 0;
+	for (auto l: a)
+		nnz += l.nonZeros();
+
+	size_t r, c;
+	r = 0;
+	c = 0;
+
+	std::vector<Eigen::Triplet<double>> tlist;
+	tlist.reserve(nnz);
+
+	for (size_t i = 0; i < a.size(); i++) {
+		for (int j = 0; j < a[i].outerSize(); j++) {
+			for (Eigen::SparseMatrix<double>::InnerIterator it(a[i], j); it; ++it) {
+				tlist.push_back(Eigen::Triplet<double>(r + it.row(), c + it.col(), it.value()));
+			}
+		}
+		r += a[i].rows();
+		c += a[i].cols();
+	}
+
+	for (int i = 0; i < m.rows(); i++) {
+		tlist.push_back(Eigen::Triplet<double>(i, i, eps));
+	}
+
+	m.setFromTriplets(tlist.begin(), tlist.end());
+	return m;
+}
+
+
+
 
 Eigen::SparseMatrix<double> cutils::ng_modularity(double &twoum, std::vector<Eigen::SparseMatrix<double>> a, double gamma, double omega) {
 	size_t L = a.size();
@@ -57,57 +142,52 @@ CommunityStructureSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, s
 	size_t L = mnet->get_layers()->size();
 	size_t N = mnet->get_actors()->size();
 
-	vector<vector<int>> layered(L);
+	hash_map<long, std::set<NodeSharedPtr> > result;
+
 	for (size_t i = 0; i < L; i++) {
-		vector<int> v;
+		LayerSharedPtr l = mnet->get_layers()->get_at_index(i);
+
 		for (size_t j = i * N; j < (1 + i) * N; j++) {
-			v.push_back(nodes2cid[j]);
-		}
-		layered[i] = v;
-	}
+			ActorSharedPtr a = mnet->get_actors()->get_at_index(j - (i * N));
 
-	// cid2aid
-	std::map<int, vector<int>> cid2aid;
-	for (size_t i = 0; i < layered.size(); i++) {
-		for (size_t j = 0; j < layered[i].size(); j++) {
-			cid2aid[layered[i][j]].push_back(j);
-
+			NodeSharedPtr n = mnet->get_node(a,l);
+			if (n) result[nodes2cid[j]].insert(n);
 		}
 	}
 
-	// actual nodeid 2 communities
 	CommunityStructureSharedPtr communities = community_structure::create();
-	for(std::map<int,std::vector<int>>::iterator iter = cid2aid.begin(); iter != cid2aid.end(); ++iter) {
+
+	for (auto pair: result) {
 		CommunitySharedPtr c = community::create();
-		for (size_t i = 0; i < iter->second.size(); i++) {
-			for (NodeSharedPtr n : *mnet->get_nodes(((mnet->get_actors()->get_at_index(iter->second[i]))))) {
-				(*c).add_node(n);
-			}
+		for (NodeSharedPtr node: pair.second) {
+			c->add_node(node);
 		}
-		(*communities).add_community(c);
+		communities->add_community(c);
 	}
 
 	return communities;
 }
 
 CommunityStructureSharedPtr cutils::actors2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> actors2cid) {
-	CommunityStructureSharedPtr communities = community_structure::create();
+	hash_map<long, std::set<NodeSharedPtr> > result;
 
 	for (size_t i = 0; i < actors2cid.size(); i++) {
-		std::vector<CommunitySharedPtr> cptr = (*communities).get_communities();
-
-		if (actors2cid[i] < cptr.size()) {
-			CommunitySharedPtr c = (*communities).get_community(actors2cid[i]);
-			for (NodeSharedPtr n : *mnet->get_nodes(((mnet->get_actors()->get_at_index(i))))) {
-				(*c).add_node(n);
+		NodeListSharedPtr nodes = mnet->get_nodes(mnet->get_actors()->get_at_index(i));
+		for (auto n: *nodes) {
+			if (n) {
+				result[actors2cid[i]].insert(n);
 			}
-		} else {
-			CommunitySharedPtr c = community::create();
-			for (NodeSharedPtr n : *mnet->get_nodes(((mnet->get_actors()->get_at_index(i))))) {
-				(*c).add_node(n);
-			}
-			(*communities).add_community(c);
 		}
+	}
+
+	CommunityStructureSharedPtr communities = community_structure::create();
+
+	for (auto pair: result) {
+		CommunitySharedPtr c = community::create();
+		for (NodeSharedPtr node: pair.second) {
+			c->add_node(node);
+		}
+		communities->add_community(c);
 	}
 
 	return communities;
@@ -140,12 +220,13 @@ std::vector<Eigen::SparseMatrix<double>> cutils::ml_network2adj_matrix(MLNetwork
 		tlist.reserve(mnet->get_edges()->size());
 
 		for (EdgeSharedPtr e: *mnet->get_edges(l, l)) {
-			int v1_id = e->v1->actor->id;
-			int v2_id = e->v2->actor->id;
-			tlist.push_back(Eigen::Triplet<double>(v1_id - 1, v2_id - 1, 1));
+			int v1_id = mnet->get_actors()->get_index(e->v1->actor);
+			int v2_id = mnet->get_actors()->get_index(e->v2->actor);
+
+			tlist.push_back(Eigen::Triplet<double>(v1_id, v2_id, 1));
 
 			if (!(e->directionality)) {
-				tlist.push_back(Eigen::Triplet<double>(v2_id - 1, v1_id - 1, 1));
+				tlist.push_back(Eigen::Triplet<double>(v2_id, v1_id, 1));
 			}
 
 		}

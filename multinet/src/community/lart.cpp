@@ -58,25 +58,13 @@ vector<unsigned int> lart::get_partition(vector<dlib::bu_cluster> clusters, int 
 		}
 	}
 
-	std::map<unsigned int, unsigned int> mapy;
-	unsigned int j = 0;
-	for (size_t i = 0; i < result.size(); i++) {
-		if(!mapy.count(result[i])) {
-			mapy[result[i]] = j;
-			j++;
-		}
-	}
-
-	for (size_t i = 0; i < result.size(); i++) {
-		result[i] = mapy[result[i]];
-	}
 
 	return result;
 }
 
 
 vector<double> lart::modMLPX(vector<dlib::bu_cluster> clusters, std::vector<Eigen::SparseMatrix<double>> a, double gamma) {
-	Eigen::SparseMatrix<double> sA0 = supraA(a, 0);
+	Eigen::SparseMatrix<double> sA0 = cutils::supraA(a, 0, false, false);
 	vector<double> r;
 
 	size_t L = a.size();
@@ -85,7 +73,6 @@ vector<double> lart::modMLPX(vector<dlib::bu_cluster> clusters, std::vector<Eige
 	double twoum = 0.0;
 
 	sA0 = cutils::ng_modularity(twoum, a, gamma, 0);
-	sA0 = sA0 / twoum;
 
 	double diag = 0.0;
 	for (int i = 0; i < sA0.rows(); i++){
@@ -112,57 +99,6 @@ vector<double> lart::modMLPX(vector<dlib::bu_cluster> clusters, std::vector<Eige
 	}
 
 	return r;
-}
-
-void lart::modmat(std::vector<Eigen::SparseMatrix<double>> a, double gamma, Eigen::SparseMatrix<double>& sA) {
-
-
-	double twoum = 0.0;
-	for (int j = 0; j < sA.outerSize(); j++) {
-		for (Eigen::SparseMatrix<double>::InnerIterator it(sA, j); it; ++it) {
-			twoum += it.value();
-		}
-	}
-
-	size_t L = a.size();
-	size_t N = a[0].rows();
-
-	Eigen::SparseMatrix<double> copy (sA);
-	std::vector<Eigen::Triplet<double>> tlist;
-	tlist.reserve(copy.nonZeros());
-
-	if (a.size() > 1) {
-		// Cache the intra layer weights because they don't change
-		for (size_t i = 0; i < N; i++) {
-			tlist.push_back(Eigen::Triplet<double>(i, N + i, sA.coeff(i, N + i)));
-			tlist.push_back(Eigen::Triplet<double>(N + i, i, sA.coeff(N + i, i)));
-		}
-	}
-
-	for (size_t i = 0; i < L; i++) {
-		Eigen::MatrixXd d = cutils::sparse_sum(a[i], 1);
-		Eigen::MatrixXd	product = d * d.transpose();
-
-		double asum = 0;
-		for (int j = 0; j < a[i].outerSize(); j++) {
-			for (Eigen::SparseMatrix<double>::InnerIterator it(a[i], j); it; ++it) {
-				asum += it.value();
-			}
-		}
-
-		Eigen::MatrixXd	s1 = product.array() / asum;
-		Eigen::MatrixXd	s2 = s1.array() * gamma;
-		Eigen::MatrixXd s3 = Eigen::MatrixXd(copy.block(i * N, i * N, N, N)) - s2;
-
-		for (int j = 0; j < s3.rows(); j++) {
-			for (int k = 0; k < s3.cols(); k++) {
-				tlist.push_back(Eigen::Triplet<double>(j + (i * N), k + (i * N), s3(j, k)));
-			}
-		}
-	}
-
-	sA.setFromTriplets(tlist.begin(), tlist.end());
-	sA /= twoum;
 }
 
 Eigen::MatrixXd lart::pairwise_distance(Eigen::MatrixXd X, Eigen::MatrixXd Y, bool same_obj) {
@@ -272,39 +208,6 @@ Eigen::SparseMatrix<double> lart::diagA(Eigen::SparseMatrix<double> A) {
 	return dA;
 }
 
-Eigen::SparseMatrix<double> lart::block_diag(std::vector<Eigen::SparseMatrix<double>> a, double eps) {
-	Eigen::SparseMatrix<double> m = Eigen::SparseMatrix<double>(
-		a[0].rows() * a.size(), a[0].cols() * a.size());
-
-	int nnz = 0;
-	for (auto l: a)
-		nnz += l.nonZeros();
-
-	size_t r, c;
-	r = 0;
-	c = 0;
-
-	std::vector<Eigen::Triplet<double>> tlist;
-	tlist.reserve(nnz);
-
-	for (size_t i = 0; i < a.size(); i++) {
-		for (int j = 0; j < a[i].outerSize(); j++) {
-			for (Eigen::SparseMatrix<double>::InnerIterator it(a[i], j); it; ++it) {
-				tlist.push_back(Eigen::Triplet<double>(r + it.row(), c + it.col(), it.value()));
-			}
-		}
-		r += a[i].rows();
-		c += a[i].cols();
-	}
-
-	for (int i = 0; i < m.rows(); i++) {
-		tlist.push_back(Eigen::Triplet<double>(i, i, eps));
-	}
-
-	m.setFromTriplets(tlist.begin(), tlist.end());
-	return m;
-}
-
 unsigned long lart::prcheck(Eigen::SparseMatrix<double>& aP, std::vector<dlib::sample_pair> edges, unsigned int LN) {
 	std::vector<unsigned long> memb;
 	unsigned long num_clusters = dlib::newman_cluster(edges, memb);
@@ -362,41 +265,6 @@ int lart::is_connected(std::vector<Eigen::SparseMatrix<double>> a, std::vector<d
 	return dlib::graph_is_connected(g);
 }
 
-Eigen::SparseMatrix<double> lart::supraA(std::vector<Eigen::SparseMatrix<double>> a, double eps) {
-	Eigen::SparseMatrix<double> A = block_diag(a, eps);
-	size_t L = a.size();
-	size_t N = a[0].rows();
-
-
-	for (size_t i = 0; i  < L - 1; ++i) {
-		for (size_t j = i + 1; j < L; ++j) {
-			Eigen::MatrixXd d = cutils::sparse_sum(a[i].cwiseProduct(a[j]), 1);
-
-			std::vector<Eigen::Triplet<double>> tlist;
-			tlist.reserve(a[0].rows());
-
-			for (int k = 0; k < A.outerSize(); k++) {
-				for (Eigen::SparseMatrix<double>::InnerIterator it(A, k); it; ++it) {
-					tlist.push_back(Eigen::Triplet<double>(it.row(), it.col(), it.value()));
-				}
-			}
-
-			int ix_i = i * N;
-			int ix_j = j * N;
-
-			for (int k = 0; k < a[i].rows(); k++) {
-				double intra = d(k, 0) + eps;
-				tlist.push_back(Eigen::Triplet<double>((ix_i + k), (ix_j + k), intra));
-				tlist.push_back(Eigen::Triplet<double>((ix_j + k), (ix_i + k), intra));
-			}
-
-			A.setFromTriplets(tlist.begin(), tlist.end());
-
-		}
-	}
-	return A;
-}
-
 std::vector<unsigned long> lart::find_ix(std::vector<unsigned long> x, unsigned long y) {
 	std::vector<unsigned long> ix;
 	std::vector<unsigned long>::iterator iter = x.begin();
@@ -408,7 +276,7 @@ std::vector<unsigned long> lart::find_ix(std::vector<unsigned long> x, unsigned 
 }
 
 void lart::updateDt(Eigen::MatrixXd& Dt, std::vector<Eigen::SparseMatrix<double>> a) {
-	Eigen::SparseMatrix<double> g = supraA(a, 0);
+	Eigen::SparseMatrix<double> g = cutils::supraA(a, 0, false, false);
 
 	std::vector<unsigned long> memb;
 	std::vector<dlib::sample_pair> edges;
@@ -498,7 +366,7 @@ CommunityStructureSharedPtr lart::fit(
 	std::vector<dlib::sample_pair> edges;
 	int connected = is_connected(a, edges);
 
-	Eigen::SparseMatrix<double> sA = supraA(a, eps);
+	Eigen::SparseMatrix<double> sA = cutils::supraA(a, eps, true, true);
 	Eigen::SparseMatrix<double> dA = diagA(sA);
 	Eigen::SparseMatrix<double> aP = dA * sA;
 	sA.resize(0,0);

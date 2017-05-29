@@ -21,10 +21,9 @@ void test_end(const std::string& name) {
 
 int main() {
 	test_begin("All unit tests");
-	test_pmm();
 	try {
 
-	/*test_begin("UTILITY FUNCTIONS AND CLASSES");
+	test_begin("UTILITY FUNCTIONS AND CLASSES");
 	test_math();
 	test_random();
 	test_counter();
@@ -47,7 +46,7 @@ int main() {
 	test_modularity();
 	test_transformation();
 	test_dynamics();
-	test_community();*/
+	test_community();
 
 	} catch (std::exception& e) {
 		std::cout << "[Error] UNIT TEST NOT PASSED: " << e.what() << std::endl;
