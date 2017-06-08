@@ -102,10 +102,6 @@ endif(dtrace)
 
 find_package(BLAS REQUIRED)
 
-include_directories(/usr/include/eigen3)
-include_directories(lib/spectra/include)
-include_directories(lib/dlib)
-
 add_library (multinet SHARED ${SOURCES} ${PROBE_PATH})
 
 TARGET_LINK_LIBRARIES(multinet)
