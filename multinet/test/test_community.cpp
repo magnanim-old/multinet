@@ -9,7 +9,6 @@
 #include "test.h"
 #include <unordered_set>
 #include <string>
-#include "../include/multinet.h"
 
 using namespace mlnet;
 
@@ -68,9 +67,10 @@ void test_community() {
     std::cout << normalized_mutual_information(com1,com3,4) << " ";
     std::cout << "done!" << std::endl;
 
-    MLNetworkSharedPtr toy = read_multilayer("toy.mpx","aucs",',');
+    MLNetworkSharedPtr toy = read_multilayer("toy.mpx","toy",',');
 
     std::cout << "Running algorithms..."<< std::endl;
+    std::cout << "====================="<< std::endl;
     std::cout << "ABACUS"<< std::endl;
     ActorCommunityStructureSharedPtr communities = abacus(toy, 3, 1);
     std::cout << "actor-version"<< std::endl;
@@ -78,9 +78,16 @@ void test_community() {
     std::cout << "node-version"<< std::endl;
     CommunityStructureSharedPtr n_communities = to_node_communities(communities,toy);
     std::cout << n_communities->to_string();
-    std::cout << "modularity (NOTE: not defined for overlapping communities): ";
-    std::cout << modularity(toy,n_communities,1) << std::endl;
-    std::cout << "done!" << std::endl;
+    
+    std::cout << "====================="<< std::endl;
+    std::cout << "LART"<< std::endl;
+    lart k; uint32_t t = 9; double eps = 1; double gamma = 1;
+    n_communities = k.fit(mnet, t, eps, gamma);
+    std::cout << n_communities->to_string();
+
+    //std::cout << "modularity (NOTE: not defined for overlapping communities): ";
+    //std::cout << modularity(toy,n_communities,1) << std::endl;
+    //std::cout << "done!" << std::endl;
     
 	test_end("community data structures");
 }

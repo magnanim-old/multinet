@@ -1,8 +1,6 @@
 #include "test.h"
 #include <unordered_set>
 #include <string>
-#include "../include/multinet.h"
-#include "../include/community/glouvain.h"
 
 using namespace mlnet;
 

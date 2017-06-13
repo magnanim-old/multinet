@@ -1,4 +1,4 @@
-#include "community/pmm.h"
+#include "community.h"
 
 #include <SymEigsSolver.h>
 #include <MatOp/SparseSymMatProd.h>

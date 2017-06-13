@@ -1,11 +1,6 @@
 #ifndef ACL_H_
 #define ACL_H_
 
-//#include "../multinet-clustering/multinet/include/multinet.h"
-//#include <Eigen/Sparse>
-//#include <Eigen/Dense>
-#include <community.h>
-
 namespace mlnet {
 
 class acl {

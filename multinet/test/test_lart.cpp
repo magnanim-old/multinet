@@ -1,8 +1,6 @@
 #include "test.h"
 #include <unordered_set>
 #include <string>
-#include "../include/community/lart.h"
-#include "../include/community/abacus.h"
 
 using namespace mlnet;
 
@@ -44,7 +42,7 @@ void test_lart() {
 	lart k;
 	//MLNetworkSharedPtr mnet = read_multilayer("/home/guest/multinet-evaluation/data/1k_mix01","toy",' ');
 	//MLNetworkSharedPtr mnet = read_multilayer("/home/guest/multinet-evaluation/data/1k_mix01","toy",' ');
-	MLNetworkSharedPtr mnet = read_multilayer("/home/guest/multinet-evaluation/data/1k_mix01","toy",' ');
+	//MLNetworkSharedPtr mnet = read_multilayer("/home/guest/multinet-evaluation/data/1k_mix01","toy",' ');
 
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet-evaluation/data/aucs","toy",',');
 	//MLNetworkSharedPtr mnet3 = read_multilayer("/home/guest/multinet-evaluation/data/fftwyt","toy",',');
@@ -54,11 +52,11 @@ void test_lart() {
 	double eps = 1;
 	double gamma = 1;
 
-	CommunityStructureSharedPtr c = k.fit(mnet, t, eps, gamma);
-	CommunityStructureSharedPtr truth = read_truth2(mnet);
+	//CommunityStructureSharedPtr c = k.fit(mnet, t, eps, gamma);
+	//CommunityStructureSharedPtr truth = read_truth2(mnet);
 
-	std::cout << modularity(mnet, c, gamma) << std::endl;
-	std::cout << normalized_mutual_information(c, truth, mnet->get_nodes()->size()) << std::endl;
+	//std::cout << modularity(mnet, c, gamma) << std::endl;
+	//std::cout << normalized_mutual_information(c, truth, mnet->get_nodes()->size()) << std::endl;
 
 
 	//std::ofstream out("/home/guest/multinet/multinet/test/DK_Pol_lart.txt");

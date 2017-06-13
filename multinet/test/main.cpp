@@ -36,7 +36,8 @@ int main() {
 	test_io();
 
     test_community_single_layer();
-	test_lart();
+    test_community();
+	//test_lart();
 	test_glouvain();
 	test_pmm();
 
@@ -46,7 +47,6 @@ int main() {
 	test_modularity();
 	test_transformation();
 	test_dynamics();
-	test_community();
 
 	} catch (std::exception& e) {
 		std::cout << "[Error] UNIT TEST NOT PASSED: " << e.what() << std::endl;
