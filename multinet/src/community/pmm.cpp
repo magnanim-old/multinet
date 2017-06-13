@@ -2,63 +2,97 @@
 
 #include <SymEigsSolver.h>
 #include <MatOp/SparseSymMatProd.h>
+
 #include <Eigen/SVD>
 
 #include <dlib/matrix.h>
 #include <dlib/clustering.h>
+#include <dlib/svm.h>
+#include <dlib/matrix.h>
+#include <random>
+
 
 namespace mlnet {
 
 CommunityStructureSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, unsigned int ell) {
+	DTRACE3(PMM_START, mnet->name.c_str(), k, ell);
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 
-	Eigen::MatrixXd features = Eigen::MatrixXd(a[0].rows(), ell * a.size());
+	if (ell > (a[0].rows() - 1)) {
+		ell = a[0].rows() - 1;
+	}
 
+	Eigen::MatrixXd features = Eigen::MatrixXd::Zero(a[0].rows(), ell * a.size());
+
+	#pragma omp parallel for
 	for (size_t i = 0; i < a.size(); i++) {
-		try {
-			features.block(0, i * ell, a[i].rows(), ell) = modularitymaximization(a[i], ell);
-		} catch (std::exception &e) {
-			std::cerr << e.what() << std::endl;
-			DTRACE4(PMM_END, mnet->name.c_str(), k, ell, 0);
-			return community_structure::create();
-		}
+		features.block(0, i * ell, a[i].rows(), ell) = modularitymaximization(a[i], ell);
 	}
 
-	//Eigen::BDCSVD<Eigen::MatrixXd> svd(features, Eigen::ComputeFullU);
-	Eigen::JacobiSVD<Eigen::MatrixXd> svd(features, Eigen::ComputeFullU);
+	DTRACE0(PMM_SVD_START);
+	Eigen::JacobiSVD<Eigen::MatrixXd> svd(features, Eigen::ComputeThinU);
+	features = svd.matrixU();
+	DTRACE0(PMM_SVD_END);
 
-	typedef dlib::matrix<double,0,1> sample_t;
-	typedef dlib::radial_basis_kernel<sample_t> kernel_type;
-	std::vector<sample_t> initial_centers;
-
-	std::vector<sample_t> samples(features.rows());
-	for (int i = 0; i < features.rows(); i++) {
-		sample_t sample(features.cols());
-		for (int j = 0; j < features.cols(); j++) {
-			sample(j) = features.coeff(i, j);
-		}
-		samples[i] = sample;
+	if (features.cols() > (k - 1)) {
+		features.conservativeResize(Eigen::NoChange, k - 1);
 	}
 
-	dlib::kcentroid<kernel_type> kc(kernel_type(0.1), 0.01, 8);
-	dlib::kkmeans<kernel_type> test(kc);
-	test.set_number_of_centers(k);
+	features.normalize();
+	DTRACE0(PMM_KMEANS_START);
+	typedef dlib::matrix<double, 1, 0> sample_type;
+	std::vector<sample_type> samples;
 
-	pick_initial_centers(k, initial_centers, samples, test.get_kernel());
-	test.train(samples, initial_centers);
+	for (int i = 0; i < features.rows(); ++i) {
+		sample_type s;
+		s.set_size(1, features.cols());
+		for (int j = 0; j < features.cols(); ++j) {
+			s(0, j) = features(i, j);
+		}
+		samples.push_back(s);
+	}
 
-	std::vector<unsigned int> partition;
+	std::vector<sample_type> centers;
+
+	dlib::pick_initial_centers(k, centers, samples, dlib::linear_kernel<sample_type>());
+	dlib::find_clusters_using_kmeans(samples, centers);
+
+	std::vector<unsigned int> partition(samples.size(), 0);
 	for (unsigned long i = 0; i < samples.size(); ++i) {
-		partition.push_back(test(samples[i]));
+		unsigned long best_idx = -1;
+		double best_dist = 1e100;
+		for (unsigned long j = 0; j < centers.size(); ++j) {
+			if (dlib::length(samples[i] - centers[j]) < best_dist) {
+				best_dist = length(samples[i] - centers[j]);
+				best_idx = j;
+			}
+		}
+		partition[i] = best_idx;
 	}
 
-	DTRACE4(PMM_END, mnet->name.c_str(), k, ell, std::set<unsigned int>(partition.begin(), partition.end()).size());
+	DTRACE0(PMM_END);
 	return cutils::actors2communities(mnet, partition);
 }
 
 Eigen::MatrixXd pmm::modularitymaximization(Eigen::SparseMatrix<double> a, unsigned int ell) {
-	Spectra::SparseSymMatProd<double> op(a);
-	Spectra::SymEigsSolver<double, Spectra::LARGEST_ALGE, Spectra::SparseSymMatProd<double>> eigs(&op, ell, a.rows());
+	Eigen::MatrixXd d = cutils::sparse_sum(a, 1);
+
+	unsigned int conv_speed = 2 * ell;
+	if (conv_speed > a.rows()) {
+		conv_speed = a.rows();
+	}
+
+	if (ell >= conv_speed) {
+		if (conv_speed == a.rows()) {
+			ell = ell - 1;
+		} else {
+			conv_speed = conv_speed + 1;
+		}
+
+	}
+
+	matrix_vector_multiplication op(a, d);
+	Spectra::SymEigsSolver<double, Spectra::LARGEST_ALGE, matrix_vector_multiplication> eigs(&op, ell, conv_speed);
 	eigs.init();
 	eigs.compute();
 	return eigs.eigenvectors();

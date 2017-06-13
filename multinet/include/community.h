@@ -75,34 +75,34 @@ namespace mlnet {
         vector<CommunitySharedPtr> data;
     };
 
-    
+
     /**
      * A set of communities. Each community can be accessed by index.
      */
     class actor_community_structure {
     private:
         actor_community_structure();
-        
+
     public:
         static ActorCommunityStructureSharedPtr create();
         std::string to_string() const;
         void add_community(const ActorCommunitySharedPtr&);
         ActorCommunitySharedPtr get_community(int i);
         const vector<ActorCommunitySharedPtr>& get_communities() const;
-        
+
         void print(std::ostream& stream);
-        
+
     private:
         vector<ActorCommunitySharedPtr> data;
     };
 
-    
+
     /* Community translation functions */
     CommunityStructureSharedPtr to_node_communities(const ActorCommunityStructureSharedPtr& comm, const MLNetworkSharedPtr& net);
     CommunitySharedPtr to_node_community(const ActorCommunitySharedPtr& comm, const MLNetworkSharedPtr& net);
-    
+
     /* Community evaluation (internal) */
-    
+
     double modularity(const MLNetworkSharedPtr& mnet, const CommunityStructureSharedPtr& groups, double c);
     double modularity(const MLNetworkSharedPtr& mnet, const hash_map<NodeSharedPtr,long>& groups, double c); // for back-compatibility
 
@@ -118,9 +118,11 @@ namespace mlnet {
 
     double f_measure(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
 
+    double fm_index(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
+
 
     /* ALGORITHMS */
-    
+
 
 }
 
