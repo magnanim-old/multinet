@@ -63,6 +63,8 @@ double neighborhoodWeightening(const MLNetworkSharedPtr& mnet,const ActorSharedP
 		/*find the neighbours of these two actors in all every layer*/
 		for(LayerSharedPtr layer: *mnet->get_layers())
 		{
+			/*skip the flattened layer that we added*/
+			if(layer->name !="flattened" ){
 			/*first find the corresponding nodes of these actors in this layer*/
 			NodeSharedPtr node1 = mnet->get_node(act1,layer);
 			NodeSharedPtr node2 = mnet->get_node(act2,layer);
@@ -99,6 +101,7 @@ double neighborhoodWeightening(const MLNetworkSharedPtr& mnet,const ActorSharedP
 		  }
 		  numerator+=numOfCommonNeighbors;
 		  denumerator = denumerator+ numOfNeighborsNode1+numOfNeighborsNode2;
+		 }
 		}
 		if(denumerator!=0){
 		expectedWeight= (double)numerator/(double)denumerator;
