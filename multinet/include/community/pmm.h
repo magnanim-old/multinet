@@ -1,8 +1,6 @@
 #ifndef PMM_H_
 #define PMM_H_
 
-#include "cutils.h"
-
 namespace mlnet {
 
 class pmm {

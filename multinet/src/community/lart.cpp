@@ -1,4 +1,4 @@
-#include "community/lart.h"
+#include "community.h"
 #include <unsupported/Eigen/MatrixFunctions>
 #include <math.h>
 

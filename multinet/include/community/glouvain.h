@@ -1,7 +1,6 @@
 #ifndef GLOUVAIN_H_
 #define GLOUVAIN_H_
 
-#include "cutils.h"
 #include <list>
 #include <limits>
 
@@ -155,104 +154,20 @@ struct group_index {
 	std::vector<int> nodes; //stores the group a node belongs to
 };
 
-set_type possible_moves(group_index & g, int node, Eigen::SparseMatrix<double> mod){
-	set_type unique_groups(g.n_groups);
-	unique_groups.insert(g.nodes[node]);
-	//add nodes with potential positive contribution to unique_groups
-	for (int i = 0; i < mod.outerSize(); i++) {
-		for (Eigen::SparseMatrix<double>::InnerIterator it(mod, i); it; ++it) {
-			if (it.value() > 0) {
-				unique_groups.insert(g.nodes[it.row()]);
-			}
-		}
-	}
-
-	return unique_groups;
-}
+    set_type possible_moves(group_index & g, int node, Eigen::SparseMatrix<double> mod);
 
 //calculates changes in modularity for sparse modularity matrix
-map_type mod_change(group_index & g, Eigen::SparseMatrix<double> mod, set_type & unique_groups, int current_node){
-	int current_group = g.nodes[current_node];
-	map_type mod_c;
-
-	double mod_current = mod.coeff(current_node, 0);
-	for(set_type::iterator it=unique_groups.begin(); it!=unique_groups.end();++it){
-		mod_c[*it] = 0;
-	}
-
-	for (int i = 0; i < mod.outerSize(); i++) {
-		for (Eigen::SparseMatrix<double>::InnerIterator it(mod, i); it; ++it) {
-			if (unique_groups.count(g.nodes[it.row()])) {
-				mod_c[g.nodes[it.row()]] += it.value();
-			}
-		}
-	}
-
-	mod_c[current_group]-=mod_current;
-	mod_current=mod_c[current_group];
-	for (set_type::iterator it=unique_groups.begin(); it!=unique_groups.end(); ++it) {
-		mod_c[*it]-= mod_current;
-	}
-
-	return mod_c;
-}
+    map_type mod_change(group_index & g, Eigen::SparseMatrix<double> mod, set_type & unique_groups, int current_node);
 
 //find moves that improve modularity
-move_list positive_moves(set_type & unique_groups, map_type & mod_c){
-	move_list moves;
-	for(set_type::iterator it=unique_groups.begin();it!=unique_groups.end();++it){
-		if(mod_c[*it]>NUM_TOL){
-			moves.first.push_back(*it);
-			moves.second.push_back(mod_c[*it]);
-		}
-	}
-	return moves;
-}
+    move_list positive_moves(set_type & unique_groups, map_type & mod_c);
 
 //move best move
-double move(group_index & g, int node, Eigen::SparseMatrix<double> mod){
-	set_type unique_groups = possible_moves(g, node, mod);
-	map_type mod_c = mod_change(g, mod, unique_groups, node);
-	double mod_max = 0;
-	double d_step = 0;
-	int group_move = g.nodes[node]; //stay in current group if no improvement
-	for(set_type::iterator it=unique_groups.begin();it!=unique_groups.end();++it){
-		if(mod_c[*it]>mod_max){
-			mod_max=mod_c[*it];
-			group_move=*it;
-		}
-	}
-
-	//move current node to most optimal group
-	if(mod_max > NUM_TOL){
-		g.move(node, group_move);
-		d_step+=mod_max;
-	}
-	return d_step;
-}
-
-// Random engine used for random movement function, moverandw
-std::default_random_engine generator((unsigned int)time(0));
-
+    double move(group_index & g, int node, Eigen::SparseMatrix<double> mod);
+    
 //move to random group with probability proportional to increase in modularity
-double moverandw(group_index & g, int node, Eigen::SparseMatrix<double> mod) {
-	set_type unique_groups = possible_moves(g, node, mod);
-	map_type mod_c = mod_change(g, mod, unique_groups, node);
-
-	//find modularity increasing moves
-	move_list mod_pos = positive_moves(unique_groups, mod_c);
-
-	//move node to a random group that increases modularity with probability proportional to the increase
-	double d_step=0;
-	if (!mod_pos.first.empty()) {
-		std::discrete_distribution<int> randindex(mod_pos.second.begin(),mod_pos.second.end());
-		int randmove = randindex(generator);
-		g.move(node, mod_pos.first[randmove]);
-		d_step = mod_pos.second[randmove];
-	}
-	return d_step;
-}
-
+    double moverandw(group_index & g, int node, Eigen::SparseMatrix<double> mod);
+    
 class metanet {
 
 public:

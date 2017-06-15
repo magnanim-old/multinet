@@ -1,7 +1,6 @@
 #ifndef LART_H_
 #define LART_H_
 
-#include "cutils.h"
 #include <dlib/clustering.h>
 
 namespace mlnet {

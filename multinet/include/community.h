@@ -3,7 +3,6 @@
 
 #include "datastructures.h"
 
-
 namespace mlnet {
 
 /* COMMON DATA STRUCTURES */
@@ -126,7 +125,12 @@ namespace mlnet {
 
 }
 
-#include "community/abacus.h"
+#include "community/cutils.h"
 #include "community/labelpropagationsinglelayer.h"
+#include "community/acl.h"
+#include "community/lart.h"
+#include "community/pmm.h"
+#include "community/glouvain.h"
+#include "community/abacus.h"
 
 #endif /* MULTINET_COMMUNITY_H_ */
