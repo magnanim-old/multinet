@@ -35,7 +35,9 @@ int main() {
 	test_datastructures();
 	test_io();
 
+
     test_community_single_layer();
+    test_flattening();
 	test_lart();
 	test_glouvain();
 	test_pmm();
