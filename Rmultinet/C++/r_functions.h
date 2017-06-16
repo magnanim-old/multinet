@@ -22,6 +22,7 @@ class RMLNetwork {
 	public:
 	std::string name() const {return ptr->name;}
 	RMLNetwork(MLNetworkSharedPtr ptr) : ptr(ptr) {}
+    ~RMLNetwork() {Rcout << ptr.use_count() << std::endl;}
 	MLNetworkSharedPtr get_mlnet() const {return ptr;}
 };
 
@@ -52,6 +53,8 @@ CharacterVector layers(const RMLNetwork& mnet);
 CharacterVector actors(const RMLNetwork& mnet, const CharacterVector& layer_names);
 CharacterMatrix nodes(const RMLNetwork& mnet, const CharacterVector& layer_names);
 CharacterMatrix edges(const RMLNetwork& mnet, const CharacterVector& layer_names1, const CharacterVector& layer_names2);
+
+DataFrame edges_idx(const RMLNetwork& rmnet);
 
 int numLayers(const RMLNetwork& mnet);
 long numActors(const RMLNetwork& mnet, const CharacterVector& layers);

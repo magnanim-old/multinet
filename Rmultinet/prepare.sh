@@ -1,3 +1,4 @@
+mkdir src
 cd src
 cp -r ../../multinet/include/* .
 mkdir multinet

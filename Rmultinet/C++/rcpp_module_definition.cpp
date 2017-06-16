@@ -86,6 +86,9 @@ RCPP_MODULE(multinet){
     function("actors.ml", &actors, List::create( _["mlnetwork"], _["layers"]=CharacterVector()), "Returns the list of actors present in the input layers, or in the whole multilayer network if no layers are specified");
     function("nodes.ml", &nodes, List::create( _["mlnetwork"], _["layers"]=CharacterVector()), "Returns the list of nodes in the input layers, or in the whole multilayer network if no layers are specified");
     function("edges.ml", &edges, List::create( _["mlnetwork"], _["layers1"]=CharacterVector(), _["layers2"]=CharacterVector()), "Returns the list of edges among nodes in the input layers (if only one set of layers is specified), or from the first set of input layers to the second set of input layers, or in the whole multilayer network if no layers are specified");
+    
+    function("edges_tmp.ml", &edges_idx, List::create( _["mlnetwork"]), "miao");
+
 
     function("num.layers.ml", &numLayers, List::create( _["mlnetwork"]), "Returns the number of layers in the input mlnetwork");
     function("num.actors.ml", &numActors, List::create( _["mlnetwork"], _["layers"]=CharacterVector()), "Returns the number of actors in the set of input layers, or in the whole mlnetwork if no layers are specified");

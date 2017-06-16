@@ -12,7 +12,7 @@
 using namespace mlnet;
 using namespace Rcpp;
 
-RCPP_EXPOSED_CLASS_NODECL(RMLNetwork)
+RCPP_EXPOSED_CLASS(RMLNetwork)
 RCPP_EXPOSED_CLASS(REvolutionModel)
 
 //RCPP_EXPOSED_CLASS(MLNetwork)
@@ -145,6 +145,19 @@ CharacterMatrix nodes(const RMLNetwork& rmnet, const CharacterVector& layer_name
     return res;
 }
 
+DataFrame edges_idx(const RMLNetwork& rmnet) {
+    MLNetworkSharedPtr mnet = rmnet.get_mlnet();
+    NumericVector from, to, directed;
+    NodeListSharedPtr nodes = mnet->get_nodes();
+    EdgeListSharedPtr edges = mnet->get_edges();
+    for (EdgeSharedPtr edge: *edges) {
+        from.push_back(nodes->get_index(edge->v1));
+        to.push_back(nodes->get_index(edge->v2));
+        directed=(edge->directionality==DIRECTED)?1:0;
+    }
+    return DataFrame::create(_["from"] = from, _["to"] = to, _["dir"] = directed );
+}
+
 CharacterMatrix edges(const RMLNetwork& rmnet, const CharacterVector& layer_names1, const CharacterVector& layer_names2) {
 	MLNetworkSharedPtr mnet = rmnet.get_mlnet();
 		std::vector<LayerSharedPtr> layers1 = resolve_layers(mnet,layer_names1);
@@ -270,7 +283,8 @@ std::unordered_set<std::string> actor_neighbors(const RMLNetwork& rmnet, const s
 		mode = OUT;
 	else
         stop("unexpected value: mode " + mode_name);
-    for (ActorSharedPtr neigh: *neighbors(mnet,actor,layers,mode)) {
+    ActorListSharedPtr actors = neighbors(mnet,actor,layers,mode);
+    for (ActorSharedPtr neigh: *actors) {
         res_neighbors.insert(neigh->name);
     }
 	return res_neighbors;
@@ -292,8 +306,9 @@ std::unordered_set<std::string> actor_xneighbors(const RMLNetwork& rmnet, const 
 	else if (mode_name == "out")
 		mode = OUT;
 	else
-		stop("unexpected value: mode " + mode_name);
-	for (ActorSharedPtr neigh: *xneighbors(mnet,actor,layers,mode)) {
+        stop("unexpected value: mode " + mode_name);
+    ActorListSharedPtr actors = xneighbors(mnet,actor,layers,mode);
+    for (ActorSharedPtr neigh: *actors) {
 		res_xneighbors.insert(neigh->name);
 	}
 	return res_xneighbors;

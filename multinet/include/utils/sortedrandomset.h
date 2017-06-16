@@ -1,6 +1,6 @@
 /**
  * sortedrandomset.h
- * 
+ *
  * A sorted random map is a class used to store a set of objects that can be accessed:
  * 1. by key in (average) log time.
  * 2. by index (position) in constant time.
@@ -32,8 +32,12 @@
 
 namespace mlnet {
 
-template <class ELEMENT_TYPE> class sorted_random_set;
-
+    template <class ELEMENT_TYPE> class sorted_random_set;
+    template <class ELEMENT_TYPE> class sorted_random_set_entry;
+    
+    template <class ELEMENT_TYPE> using SortedRandomSetEntrySharedPtr = std::shared_ptr<sorted_random_set_entry<ELEMENT_TYPE> >;
+    template <class ELEMENT_TYPE> using constSortedRandomSetEntrySharedPtr = std::shared_ptr<const sorted_random_set_entry<ELEMENT_TYPE> >;
+    
 /**
  * An entry in a sorted set, which is implemented as a skip list.
  */
@@ -45,7 +49,7 @@ private:
 	/** The object corresponding to this entry */
 	ELEMENT_TYPE obj_ptr;
 	/** An array of pointers to the next entry, for each level in the skip list */
-    std::vector<sorted_random_set_entry<ELEMENT_TYPE>*> forward; // array of pointers
+    std::vector<SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> > forward; // array of pointers
     /** The number of entries before the next entry on each level, used for positional access */
     std::vector<int> link_length;
 
@@ -79,11 +83,11 @@ class sorted_random_set {
 private:
 	float P = 0.5;
 
-    sorted_random_set_entry<ELEMENT_TYPE> *header;
+    SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> header;
     /* Number of entries for which the sorted set is optimized. */
-    long capacity = 1;
+    size_t capacity = 1;
     /* Current number of entries. */
-    long num_entries = 0;
+    size_t num_entries = 0;
     /* Maximum level */
 	int MAX_LEVEL = 0;
     /* Current maximum level in use. */
@@ -98,7 +102,7 @@ public:
 	 * Creates a sorted set optimized to store a pre-defined number of entries
 	 * @param start_capacity the initial capacity for which the sorted set is optimized.
 	 */
-    sorted_random_set(long start_capacity);
+    sorted_random_set(size_t start_capacity);
 
     /** Iterator over the objects in this collection */
 	class iterator {
@@ -106,7 +110,7 @@ public:
 		public:
 		iterator();
 		/** Returns an iterator pointing at the input object */
-		iterator(sorted_random_set_entry<ELEMENT_TYPE>* iter);
+		iterator(SortedRandomSetEntrySharedPtr<ELEMENT_TYPE>);
 		/** Return the object pointed by this iterator */
 		ELEMENT_TYPE operator*();
 		/** Moves the iterator to the next object in the collection (prefix) */
@@ -119,20 +123,20 @@ public:
 	    bool operator!=(const sorted_random_set<ELEMENT_TYPE>::iterator& rhs);
 		private:
 		/** Entry currently pointed to by this iterator */
-		sorted_random_set_entry<ELEMENT_TYPE>* current;
+		SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> current;
 	};
 	/** Returns an iterator to the first object in the collection */
 	sorted_random_set<ELEMENT_TYPE>::iterator begin() const;
 	/** Returns an iterator after the last object in the collection */
 	sorted_random_set<ELEMENT_TYPE>::iterator end() const;
 	/** Returns the number of objects in the collection */
-    long size() const;
+    size_t size() const;
 	/** Returns true if an object with the input id is present in the collection */
     bool contains(ELEMENT_TYPE) const;
 	/** Returns the position of the input value in the collection, or -1 */
-    long get_index(ELEMENT_TYPE) const;
-	/** Returns the object at the given position in the collection, or NULL */
-    ELEMENT_TYPE get_at_index(long) const;
+    size_t get_index(ELEMENT_TYPE) const;
+	/** Returns the object at the given position in the collection, or nullptr */
+    ELEMENT_TYPE get_at_index(size_t) const;
 	/** Returns a random object, uniform probability */
     ELEMENT_TYPE get_at_random() const;
 	/**
@@ -161,22 +165,22 @@ sorted_random_set_entry<ELEMENT_TYPE>::sorted_random_set_entry(int level, ELEMEN
 template <class ELEMENT_TYPE>
 void sorted_random_set_entry<ELEMENT_TYPE>::increment(long skipped_entries) {
 	int current_size = forward.size();
-	forward.resize(current_size+1,NULL);
+	forward.resize(current_size+1,nullptr);
 	link_length.resize(current_size+1,skipped_entries);
 }
 
 template <class ELEMENT_TYPE>
 sorted_random_set<ELEMENT_TYPE>::sorted_random_set() {
-	header = new sorted_random_set_entry<ELEMENT_TYPE>(MAX_LEVEL, NULL);
-    level = 0;
+   	header = std::make_shared<sorted_random_set_entry<ELEMENT_TYPE> >(MAX_LEVEL, nullptr);
+    	level = 0;
 }
 
 template <class ELEMENT_TYPE>
-sorted_random_set<ELEMENT_TYPE>::sorted_random_set(long start_capacity) {
+sorted_random_set<ELEMENT_TYPE>::sorted_random_set(size_t start_capacity) {
 	capacity = start_capacity;
 	MAX_LEVEL = std::ceil(std::log2(capacity));
-	header = new sorted_random_set_entry<ELEMENT_TYPE>(MAX_LEVEL, NULL);
-    level = 0;
+	header = std::make_shared<sorted_random_set_entry<ELEMENT_TYPE> >(MAX_LEVEL, nullptr);
+    	level = 0;
 }
 
 template <class ELEMENT_TYPE>
@@ -186,7 +190,7 @@ typename sorted_random_set<ELEMENT_TYPE>::iterator sorted_random_set<ELEMENT_TYP
 
 template <class ELEMENT_TYPE>
 typename sorted_random_set<ELEMENT_TYPE>::iterator sorted_random_set<ELEMENT_TYPE>::end() const {
-	return iterator(NULL);
+	return iterator(nullptr);
 }
 
 template <class ELEMENT_TYPE>
@@ -195,7 +199,7 @@ ELEMENT_TYPE sorted_random_set<ELEMENT_TYPE>::iterator::operator*() {
 }
 
 template <class ELEMENT_TYPE>
-sorted_random_set<ELEMENT_TYPE>::iterator::iterator(sorted_random_set_entry<ELEMENT_TYPE>* iter) : current(iter) {
+sorted_random_set<ELEMENT_TYPE>::iterator::iterator(SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> iter) : current(iter) {
 }
 
 template <class ELEMENT_TYPE>
@@ -222,47 +226,47 @@ bool sorted_random_set<ELEMENT_TYPE>::iterator::operator!=(const sorted_random_s
 }
 
 template <class ELEMENT_TYPE>
-long sorted_random_set<ELEMENT_TYPE>::size() const {
+size_t sorted_random_set<ELEMENT_TYPE>::size() const {
 	return num_entries;
 }
 
 template <class ELEMENT_TYPE>
 bool sorted_random_set<ELEMENT_TYPE>::contains(ELEMENT_TYPE search_value) const {
-    const sorted_random_set_entry<ELEMENT_TYPE> *x = header;
+    constSortedRandomSetEntrySharedPtr<ELEMENT_TYPE> x = header;
     for (int i = level; i >= 0; i--) {
-        while (x->forward[i] != NULL && x->forward[i]->obj_ptr < search_value) {
+        while (x->forward[i] != nullptr && x->forward[i]->obj_ptr < search_value) {
             x = x->forward[i];
         }
     }
     x = x->forward[0];
-    return x != NULL && x->obj_ptr == search_value;
+    return x != nullptr && x->obj_ptr == search_value;
 }
 
 template <class ELEMENT_TYPE>
-long sorted_random_set<ELEMENT_TYPE>::get_index(ELEMENT_TYPE search_value) const {
-    const sorted_random_set_entry<ELEMENT_TYPE> *x = header;
+size_t sorted_random_set<ELEMENT_TYPE>::get_index(ELEMENT_TYPE search_value) const {
+    constSortedRandomSetEntrySharedPtr<ELEMENT_TYPE> x = header;
     long so_far=0;
     for (int i = level; i >= 0; i--) {
-        while (x->forward[i] != NULL && x->forward[i]->obj_ptr < search_value) {
+        while (x->forward[i] != nullptr && x->forward[i]->obj_ptr < search_value) {
         	so_far+= x->link_length[i];
             x = x->forward[i];
         }
     }
 	so_far+= x->link_length[0];
     x = x->forward[0];
-    if (x != NULL && x->obj_ptr == search_value)
+    if (x != nullptr && x->obj_ptr == search_value)
     	return so_far-1;
     else return -1;
 }
 
 template <class ELEMENT_TYPE>
-ELEMENT_TYPE sorted_random_set<ELEMENT_TYPE>::get_at_index(long pos) const {
+ELEMENT_TYPE sorted_random_set<ELEMENT_TYPE>::get_at_index(size_t pos) const {
 	if (pos < 0 || pos >= num_entries)
 		throw ElementNotFoundException("Index out of bounds");
-    const sorted_random_set_entry<ELEMENT_TYPE> *x = header;
-    long so_far=0;
+    constSortedRandomSetEntrySharedPtr<ELEMENT_TYPE> x = header;
+    size_t so_far=0;
     for (int i = level; i >= 0; i--) {
-        while (x->forward[i] != NULL && x->link_length[i] + so_far <= pos + 1) {
+        while (x->forward[i] != nullptr && x->link_length[i] + so_far <= pos + 1) {
         	so_far+= x->link_length[i];
             x = x->forward[i];
         }
@@ -277,8 +281,8 @@ ELEMENT_TYPE sorted_random_set<ELEMENT_TYPE>::get_at_random() const {
 
 template <class ELEMENT_TYPE>
 bool sorted_random_set<ELEMENT_TYPE>::insert(ELEMENT_TYPE value) {
-	sorted_random_set_entry<ELEMENT_TYPE> *x = header;
-    std::vector<sorted_random_set_entry<ELEMENT_TYPE>*> update;
+	SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> x = header;
+    std::vector<SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> > update;
     update.resize(level+1);
     std::vector<int> skipped_positions_per_level;
     int skipped_positions = 0;
@@ -286,7 +290,7 @@ bool sorted_random_set<ELEMENT_TYPE>::insert(ELEMENT_TYPE value) {
 
     for (int i = level; i >= 0; i--) {
     	skipped_positions_per_level[i] = skipped_positions;
-        while (x->forward[i] != NULL && x->forward[i]->obj_ptr < value) {
+        while (x->forward[i] != nullptr && x->forward[i]->obj_ptr < value) {
         	skipped_positions_per_level[i] += x->link_length[i];
         	skipped_positions += x->link_length[i];
             x = x->forward[i];
@@ -296,7 +300,7 @@ bool sorted_random_set<ELEMENT_TYPE>::insert(ELEMENT_TYPE value) {
     x = x->forward[0];
 
 
-    if (x == NULL || x->obj_ptr != value) {
+    if (x == nullptr || x->obj_ptr != value) {
         num_entries++;
     	if (num_entries>capacity) {
     		// resize the sorted list
@@ -317,13 +321,13 @@ bool sorted_random_set<ELEMENT_TYPE>::insert(ELEMENT_TYPE value) {
         	level = lvl;
         }
 
-        x = new sorted_random_set_entry<ELEMENT_TYPE>(lvl, value);
+        x = std::make_shared<sorted_random_set_entry<ELEMENT_TYPE> >(lvl, value);
 
         for (int i = 0; i <= lvl; i++) {
         	int offset = skipped_positions-skipped_positions_per_level[i];
 
         	x->forward[i] = update[i]->forward[i];
-        	if (update[i]->forward[i]==NULL)
+        	if (update[i]->forward[i]==nullptr)
         		x->link_length[i] = num_entries - skipped_positions;
         	else {
         		x->link_length[i] = update[i]->link_length[i]-offset;
@@ -346,19 +350,19 @@ bool sorted_random_set<ELEMENT_TYPE>::insert(ELEMENT_TYPE value) {
 
 template <class ELEMENT_TYPE>
 bool sorted_random_set<ELEMENT_TYPE>::erase(ELEMENT_TYPE value) {
-	sorted_random_set_entry<ELEMENT_TYPE> *x = header;
-	std::vector<sorted_random_set_entry<ELEMENT_TYPE>*> update;
+	SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> x = header;
+	std::vector<SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> > update;
 	update.resize(MAX_LEVEL+1);
 
 	for (int i = level; i >= 0; i--) {
-		while (x->forward[i] != NULL && x->forward[i]->obj_ptr < value) {
+		while (x->forward[i] != nullptr && x->forward[i]->obj_ptr < value) {
 			x = x->forward[i];
 		}
 		update[i] = x;
 	}
 	x = x->forward[0];
 
-	if (x == NULL) return false;
+	if (x == nullptr) return false;
 
 	if (x->obj_ptr == value) {
 		for (int i = 0; i <= level; i++) {
@@ -370,9 +374,9 @@ bool sorted_random_set<ELEMENT_TYPE>::erase(ELEMENT_TYPE value) {
 				update[i]->link_length[i] += x->link_length[i]-1;
 			}
 		}
-		delete x;
+		//delete x;
 		num_entries--;
-		while (level > 0 && header->forward[level] == NULL) {
+		while (level > 0 && header->forward[level] == nullptr) {
 			level--;
 		}
 		return true;
@@ -388,7 +392,7 @@ void sorted_set<ELEMENT_TYPE>::print(int lev) {
     const Entry<ELEMENT_TYPE> *x = header;
     int num = 0;
     double std = 0;
-    while (x!=NULL) {
+    while (x!=nullptr) {
     	std += x->link_length[lev]*x->link_length[lev];
     	num++;
         x = x->forward[lev];

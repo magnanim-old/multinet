@@ -40,7 +40,6 @@ void test_math();
 void test_random();
 void test_counter();
 void test_csv();
-void test_sortedrandommap();
 void test_sortedrandomset();
 void test_propertymatrix();
 
