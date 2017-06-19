@@ -22,7 +22,6 @@ class RMLNetwork {
 	public:
 	std::string name() const {return ptr->name;}
 	RMLNetwork(MLNetworkSharedPtr ptr) : ptr(ptr) {}
-    ~RMLNetwork() {Rcout << ptr.use_count() << std::endl;}
 	MLNetworkSharedPtr get_mlnet() const {return ptr;}
 };
 

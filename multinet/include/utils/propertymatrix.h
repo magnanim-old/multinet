@@ -139,6 +139,164 @@ VALUE property_matrix<STRUCTURE,CONTEXT,VALUE>::get_default() const {
 }
 
 /**
+ * Basic context summaries
+ */
+    
+    template <class STRUCTURE, class CONTEXT, class VALUE>
+    double min(const property_matrix<STRUCTURE,CONTEXT,VALUE>& P, const CONTEXT& c) {
+        double min = std::numeric_limits<double>::infinity();
+        
+        long checked_columns = 0;
+         for (STRUCTURE s: P.structures()) {
+            if (min>P.get(s,c))
+                min = P.get(s,c);
+             checked_columns++;
+         }
+        if ((P.num_structures>checked_columns) && min>P.get_default())
+            min = P.get_default();
+        return min;
+    }
+    
+    
+    template <class STRUCTURE, class CONTEXT, class VALUE>
+    double max(const property_matrix<STRUCTURE,CONTEXT,VALUE>& P, const CONTEXT& c) {
+        double max = -std::numeric_limits<double>::infinity();
+        
+        long checked_columns = 0;
+        for (STRUCTURE s: P.structures()) {
+            if (max<P.get(s,c))
+                max = P.get(s,c);
+            checked_columns++;
+        }
+        if ((P.num_structures>checked_columns) && max<P.get_default())
+            max = P.get_default();
+        return max;
+    }
+    
+    template <class STRUCTURE, class CONTEXT, class VALUE>
+    double sum(const property_matrix<STRUCTURE,CONTEXT,VALUE>& P, const CONTEXT& c) {
+        double sum = 0.0;
+        
+        long checked_columns = 0;
+        
+        for (STRUCTURE s: P.structures()) {
+            sum += (double)P.get(s,c);
+            checked_columns++;
+        }
+        sum += P.get_default()*(P.num_structures-checked_columns);
+        return sum;
+    }
+    
+    template <class STRUCTURE, class CONTEXT, class VALUE>
+    double mean(const property_matrix<STRUCTURE,CONTEXT,VALUE>& P, const CONTEXT& c) {
+        double sum = sum(P,c);;
+        
+        return sum/P.num_structures;
+    }
+    
+    template <class STRUCTURE, class CONTEXT, class VALUE>
+    double sd(const property_matrix<STRUCTURE,CONTEXT,VALUE>& P, const CONTEXT& c) {
+        double mean = mean(P,c);
+        
+        double sd = 0.0;
+        
+        long checked_columns = 0;
+        
+        for (STRUCTURE s: P.structures()) {
+            sd += (double)pow(P.get(s,c)-mean,2);
+            checked_columns++;
+        }
+        sd += (double)std::pow(P.get_default()-mean,2)*(P.num_structures-checked_columns);
+        return std::sqrt(sd/P.num_structures);
+    }
+    
+    template <class STRUCTURE, class CONTEXT, class VALUE>
+    double skew(const property_matrix<STRUCTURE,CONTEXT,VALUE>& P, const CONTEXT& c) {
+        double sd = sd(P,c);
+        
+        double skew = 0.0;
+        
+        long checked_columns = 0;
+        
+        for (STRUCTURE s: P.structures()) {
+            skew += (double)pow(P.get(s,c)-mean,3);
+            checked_columns++;
+        }
+        skew += (double)std::pow(P.get_default()-mean,3)*(P.num_structures-checked_columns);
+        return skew/std::pow(sd,3)/P.num_structures;
+    }
+    
+    
+    template <class STRUCTURE, class CONTEXT, class VALUE>
+    double kurt(const property_matrix<STRUCTURE,CONTEXT,VALUE>& P, const CONTEXT& c) {
+        double sd = sd(P,c);
+        
+        double kurt = 0.0;
+        
+        long checked_columns = 0;
+        
+        for (STRUCTURE s: P.structures()) {
+            kurt += (double)pow(P.get(s,c)-mean,4);
+            checked_columns++;
+        }
+        kurt += (double)std::pow(P.get_default()-mean,4)*(P.num_structures-checked_columns);
+        return kurt/std::pow(sd,4)/P.num_structures;
+    }
+    
+    template <class STRUCTURE, class CONTEXT, class VALUE>
+    double entropy(const property_matrix<STRUCTURE,CONTEXT,VALUE>& P, const CONTEXT& c) {
+        Counter<double> count;
+        
+        double entropy = 0.0;
+        
+        for (STRUCTURE s: P.structures()) {
+            count.inc(P.get(s,c));
+        }
+        for (auto pair: count.map()) {
+            double fr = pair.second/P.num_structures;
+            entropy += fr*std::log(fr);
+        }
+        return entropy;
+    }
+    
+    
+    /*
+     * K number of bins
+     
+     assumes only non-negative
+     
+     check if empty bins
+     */
+    template <class STRUCTURE, class CONTEXT, class VALUE>
+    double dissimilarity_index(const property_matrix<STRUCTURE,CONTEXT,VALUE>& P, const CONTEXT& c1, const CONTEXT& c2, int K) {
+        Counter<int> hist1;
+        Counter<int> hist2;
+        
+        // build histograms
+        double min = std::min(min(P,c1),min(P,c2));
+        double max = std::max(max(P,c1),max(P,c2));
+        
+        if (min==max) ; // TODO do something...
+        for (STRUCTURE s: P.structures()) {
+            int v1 = std::floor((P.get(s,c1)-min)*K/(max-min));
+            if (v1==K) v1=K-1;
+            hist1.inc(v1);
+            
+            int v2 = std::floor((P.get(s,c2)-min)*K/(max-min));
+            if (v2==K) v2=K-1;
+            hist2.inc(v2);
+        }
+        // compare histograms
+        double diss = 0;
+        for (int i=0; i<K; i++) {
+            diss += hist1.count(i)/K; // NORMALIZE TO FREQUENCY;
+        }
+        
+        return diss*.5;
+    }
+    
+    
+/**
  * Compares two binary vectors, comparing their elements at each coordinate
  * and counting the number of occurrences for all possible configurations (true-true, true-false, false-true, false-false)
  */

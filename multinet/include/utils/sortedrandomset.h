@@ -98,6 +98,25 @@ public:
 	 * Creates a sorted set.
 	 */
     sorted_random_set();
+    
+    
+    /**
+     * Destructs a sorted set, making sure that this does not result in a long sequence of nested calls to entry destructors that would fill in the stack
+     */
+    ~sorted_random_set() {
+        std::vector<SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> > tmp(size());
+        SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> current = header;
+        SortedRandomSetEntrySharedPtr<ELEMENT_TYPE> next = current->forward.at(0);
+        tmp.push_back(current);
+        while (next) {
+            tmp.push_back(next);
+            for (size_t i=0; i<current->forward.size(); i++)
+                current->forward[i] = nullptr;
+            current = next;
+            next = current->forward.at(0);
+        }
+    }
+    
 	/**
 	 * Creates a sorted set optimized to store a pre-defined number of entries
 	 * @param start_capacity the initial capacity for which the sorted set is optimized.

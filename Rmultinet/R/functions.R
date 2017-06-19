@@ -94,6 +94,20 @@ plot.Rcpp_RMLNetwork <- function(x, method="multi", layers=NULL, layer.colors=NU
     }
 }
 
+plot.tmp.ml <- function(net, layout=NULL, vertex.label=F, vertex.color=1, vertex.size=10) {
+    # plot grid: columns and rows
+    num.cols = num.layers.ml(net)
+    num.rows = 1
+    #
+    x.min = min(layout$x)
+    y.min = min(layout$y)
+    x.max = max(layout$x)
+    y.max = max(layout$y)
+    plot(c(),type="n",xlim=c(x.min,x.max+(x.max-x.min)*(num.cols-1)),ylim=c(y.min-(y.max-y.min)*(num.rows-1),y.max))
+    points(layout$x,layout$y)
+}
+
+
 
 # 3d plot
 
