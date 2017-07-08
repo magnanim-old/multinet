@@ -108,7 +108,7 @@ GenericMatrix distance_ml(const RMLNetwork& mnet, const std::string& from, const
 
 // Layout
 
-List multiforce_ml(const RMLNetwork& mnet, const CharacterVector& layer_names, const NumericVector& w_in, const NumericVector& w_out, int iterations);
+DataFrame multiforce_ml(const RMLNetwork& mnet, const NumericVector& w_in, const NumericVector& w_out, const NumericVector& gravity, int iterations);
 
 
 // Preprocessing

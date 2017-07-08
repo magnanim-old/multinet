@@ -94,20 +94,55 @@ plot.Rcpp_RMLNetwork <- function(x, method="multi", layers=NULL, layer.colors=NU
     }
 }
 
-plot.tmp.ml <- function(net, layout=NULL, vertex.label=F, vertex.color=1, vertex.size=10) {
-    # plot grid: columns and rows
+plot.tmp.ml <- function(net, layout=NULL, grid=NULL, vertex.label=F, vertex.color=1, vertex.size=10, ...) {
+    
     num.cols = num.layers.ml(net)
     num.rows = 1
+    if (!is.null(grid)) {
+        if (!length(grid)==2) stop("argument grid must have two elements")
+        num.rows = grid[1]
+        num.cols = grid[2]
+    }
+    
+    if (is.null(layout)) {
+        layout <- layout.multiforce.ml(net)
+    }
+    
+    x_coord <- function(xyz_coord) {
+        xyz_coord$x+xyz_coord$z%%num.cols*width
+    }
+   
+   y_coord <- function(xyz_coord) {
+       xyz_coord$y+(num.rows-1-xyz_coord$z%/%num.cols)*height
+   }
+   
     #
     x.min = min(layout$x)
     y.min = min(layout$y)
     x.max = max(layout$x)
     y.max = max(layout$y)
-    plot(c(),type="n",xlim=c(x.min,x.max+(x.max-x.min)*(num.cols-1)),ylim=c(y.min-(y.max-y.min)*(num.rows-1),y.max))
-    points(layout$x,layout$y)
+    # TODO parametrize margin
+    width = x.max-x.min + .1*(x.max-x.min);
+    x.min = x.min - .05*(x.max-x.min)
+    height = y.max-y.min + .1*(y.max-y.min);
+    y.min = y.min - .05*(y.max-y.min)
+    
+    par(...);
+plot(NA,type="n",xlim=c(x.min,x.min+width*num.cols),ylim=c(y.min,y.min+height*num.rows),xaxt="n",yaxt="n",bty="n",xlab="",ylab="")
+    # draw grid
+    segments((0:num.cols*width)+x.min,y.min,(0:num.cols*width)+x.min,y.min+height*num.rows)
+    segments(x.min,(0:num.rows*height)+y.min,x.min+width*num.cols,(0:num.rows*height)+y.min)
+    # draw edges
+    e <- edges_tmp.ml(net)
+    draw_edge <- function(d) {
+        segments(x_coord(layout[d['from']+1,]),
+        y_coord(layout[d['from']+1,]),x_coord(layout[d['to']+1,]),y_coord(layout[d['to']+1,]))
+    }
+    apply(e,1,draw_edge)
+    # draw nodes
+    points(x_coord(layout),y_coord(layout),pch=16,col=layout$z+1)
+    
 }
-
-
 
 # 3d plot
 

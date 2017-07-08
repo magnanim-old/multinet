@@ -147,7 +147,7 @@ RCPP_MODULE(multinet){
 
 
     // FOR VISUALIZATION
-    function("layout.multiforce.ml", &multiforce_ml, List::create( _["mlnetwork"], _["layers"]=CharacterVector(), _["w_in"], _["w_inter"], _["iterations"]=100), "Multiforce method: computes node coordinates");
+    function("layout.multiforce.ml", &multiforce_ml, List::create( _["mlnetwork"], _["w_in"]=1, _["w_inter"]=1, _["gravity"]=1, _["iterations"]=100), "Multiforce method: computes node coordinates");
     
     //function("sir.ml", &sir_ml, List::create( _["mlnetwork"], _["beta"], _["tau"], _["num_iterations"] = 1000), "Executes a SIR spreading process, returning the number of nodes in each status at each iteration");
 }

@@ -1277,77 +1277,107 @@ GenericMatrix cliquepercolation_ml(const RMLNetwork& rmnet, int k, int m1, int m
 
 // LAYOUT
 
-List multiforce_ml(const RMLNetwork& rmnet, const CharacterVector& layer_names, const NumericVector& w_in, const NumericVector& w_inter, int iterations) {
-	MLNetworkSharedPtr mnet = rmnet.get_mlnet();
-	std::vector<LayerSharedPtr> layers = resolve_layers(mnet,layer_names);
-	hash_map<LayerSharedPtr,double> weight_in, weight_inter;
-	for (int i=0; i<layers.size(); i++) {
-		weight_in[layers.at(i)] = w_in[i];
-		weight_inter[layers.at(i)] = w_inter[i];
-	}
-	hash_map<NodeSharedPtr,xyz_coordinates> coord = multiforce(mnet, 10, 10, weight_in, weight_inter, iterations);
-	int num_rows = mnet->get_nodes()->size();
+DataFrame multiforce_ml(const RMLNetwork& rmnet, const NumericVector& w_in, const NumericVector& w_inter, const NumericVector& gravity, int iterations) {
+    MLNetworkSharedPtr mnet = rmnet.get_mlnet();
+    hash_map<LayerSharedPtr,double> weight_in, weight_inter, weight_gr;
+    LayerListSharedPtr layers = mnet->get_layers();
+    if (w_in.size()==1) {
+        for (int i=0; i<layers->size(); i++) {
+            weight_in[layers->get_at_index(i)] = w_in[0];
+        }
+    }
+    else if (w_in.size()==layers->size()) {
+        for (int i=0; i<layers->size(); i++) {
+            weight_in[layers->get_at_index(i)] = w_in[i];
+        }
+    }
+    else stop("wrong dimension: internal weights (should contain 1 or num.layers.ml weights)");
+    if (w_inter.size()==1) {
+        for (int i=0; i<layers->size(); i++) {
+            weight_inter[layers->get_at_index(i)] = w_inter[0];
+        }
+    }
+    else if (w_inter.size()==layers->size()) {
+        for (int i=0; i<layers->size(); i++) {
+            weight_inter[layers->get_at_index(i)] = w_inter[i];
+        }
+    }
+    else stop("wrong dimension: external weights (should contain 1 or num.layers.ml weights)");
+    if (gravity.size()==1) {
+        for (int i=0; i<layers->size(); i++) {
+            weight_gr[layers->get_at_index(i)] = gravity[0];
+        }
+    }
+    else if (gravity.size()==layers->size()) {
+        for (int i=0; i<layers->size(); i++) {
+            weight_gr[layers->get_at_index(i)] = gravity[i];
+        }
+    }
+    else stop("wrong dimension: gravity (should contain 1 or num.layers.ml weights)");
+
+    hash_map<NodeSharedPtr,xyz_coordinates> coord = multiforce(mnet, 10, 10, weight_in, weight_inter, weight_gr, iterations);
+    int num_rows = mnet->get_nodes()->size();
     CharacterVector actor_n(num_rows);
     CharacterVector layer_n(num_rows);
     NumericVector x_n(num_rows);
     NumericVector y_n(num_rows);
     NumericVector z_n(num_rows);
-	int current_row=0;
-	for (LayerSharedPtr layer: *mnet->get_layers()) {
-		for (NodeSharedPtr node: *mnet->get_nodes(layer)) {
-			actor_n(current_row) = node->actor->name;
-			layer_n(current_row) = node->layer->name;
-			xyz_coordinates c = coord.at(node);
-			x_n(current_row) = c.x;
-			y_n(current_row) = c.y;
-			z_n(current_row) = c.z;
-			current_row++;
-		}
-	}
-	DataFrame nodes = DataFrame::create(
-                             Named("actor")=actor_n,
-                             Named("layer")=layer_n,
-                             Named("x")=x_n,
-                             Named("y")=y_n,
-                             Named("z")=z_n);
-    
-    
-    num_rows = mnet->get_edges()->size()*2;
-    CharacterVector actor_e(num_rows);
-    CharacterVector layer_e(num_rows);
-    NumericVector x_e(num_rows);
-    NumericVector y_e(num_rows);
-    NumericVector z_e(num_rows);
-    LogicalVector dir(num_rows);
-    current_row=0;
-    for (EdgeSharedPtr edge: *mnet->get_edges()) {
-        xyz_coordinates c1 = coord.at(edge->v1);
-        actor_e(current_row) = edge->v1->actor->name;
-        layer_e(current_row) = edge->v1->layer->name;
-        x_e(current_row) = c1.x;
-        y_e(current_row) = c1.y;
-        z_e(current_row) = c1.z;
-        dir(current_row) = (edge->directionality==DIRECTED)?true:false;
-        current_row++;
-        xyz_coordinates c2 = coord.at(edge->v2);
-        actor_e(current_row) = edge->v2->actor->name;
-        layer_e(current_row) = edge->v2->layer->name;
-        x_e(current_row) = c2.x;
-        y_e(current_row) = c2.y;
-        z_e(current_row) = c2.z;
-        dir(current_row) = (edge->directionality==DIRECTED)?true:false;
+    int current_row=0;
+    for (NodeSharedPtr node: *mnet->get_nodes()) {
+        actor_n(current_row) = node->actor->name;
+        layer_n(current_row) = node->layer->name;
+        xyz_coordinates c = coord.at(node);
+        x_n(current_row) = c.x;
+        y_n(current_row) = c.y;
+        z_n(current_row) = c.z;
         current_row++;
     }
-    DataFrame edges = DataFrame::create(
-                                        Named("actor")=actor_e,
-                                        Named("layer")=layer_e,
-                                        Named("x")=x_e,
-                                        Named("y")=y_e,
-                                        Named("z")=z_e,
-                                        Named("directed")=dir);
-    return List::create(
-                        Named("nodes")=nodes,
-                        Named("edges")=edges);
+    DataFrame nodes = DataFrame::create(
+                                        Named("actor")=actor_n,
+                                        Named("layer")=layer_n,
+                                        Named("x")=x_n,
+                                        Named("y")=y_n,
+                                        Named("z")=z_n);
+    
+    /*
+     num_rows = mnet->get_edges()->size()*2;
+     CharacterVector actor_e(num_rows);
+     CharacterVector layer_e(num_rows);
+     NumericVector x_e(num_rows);
+     NumericVector y_e(num_rows);
+     NumericVector z_e(num_rows);
+     LogicalVector dir(num_rows);
+     current_row=0;
+     for (EdgeSharedPtr edge: *mnet->get_edges()) {
+     xyz_coordinates c1 = coord.at(edge->v1);
+     actor_e(current_row) = edge->v1->actor->name;
+     layer_e(current_row) = edge->v1->layer->name;
+     x_e(current_row) = c1.x;
+     y_e(current_row) = c1.y;
+     z_e(current_row) = c1.z;
+     dir(current_row) = (edge->directionality==DIRECTED)?true:false;
+     current_row++;
+     xyz_coordinates c2 = coord.at(edge->v2);
+     actor_e(current_row) = edge->v2->actor->name;
+     layer_e(current_row) = edge->v2->layer->name;
+     x_e(current_row) = c2.x;
+     y_e(current_row) = c2.y;
+     z_e(current_row) = c2.z;
+     dir(current_row) = (edge->directionality==DIRECTED)?true:false;
+     current_row++;
+     }
+     DataFrame edges = DataFrame::create(
+     Named("actor")=actor_e,
+     Named("layer")=layer_e,
+     Named("x")=x_e,
+     Named("y")=y_e,
+     Named("z")=z_e,
+     Named("directed")=dir);
+     return List::create(
+     Named("nodes")=nodes,
+     Named("edges")=edges);
+     */
+    return nodes;
 }
 
 // Pre-processing

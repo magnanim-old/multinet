@@ -12,7 +12,7 @@ double fain(double d, double k) {return d*d/k;}
 /** attractive force, intra-layer */
 double fainter(double d, double k) {return d*d/k;}
 
-hash_map<NodeSharedPtr,xyz_coordinates> multiforce(MLNetworkSharedPtr& mnet, double width, double length, const hash_map<LayerSharedPtr,double>& weight_in, const hash_map<LayerSharedPtr,double>& weight_inter, int iterations) {
+hash_map<NodeSharedPtr,xyz_coordinates> multiforce(MLNetworkSharedPtr& mnet, double width, double length, const hash_map<LayerSharedPtr,double>& weight_in, const hash_map<LayerSharedPtr,double>& weight_inter, const hash_map<LayerSharedPtr,double>& gravity, int iterations) {
 	hash_map<NodeSharedPtr,xyz_coordinates> pos;
 	hash_map<NodeSharedPtr,xyz_coordinates> disp;
 
@@ -52,6 +52,12 @@ hash_map<NodeSharedPtr,xyz_coordinates> multiforce(MLNetworkSharedPtr& mnet, dou
 					disp[v].x = disp[v].x + Delta.x/DeltaNorm*fr(DeltaNorm,k)*weight_in.at(l);
 					disp[v].y = disp[v].y + Delta.y/DeltaNorm*fr(DeltaNorm,k)*weight_in.at(l);
 				}
+                // add effect of gravity, to prevent disc. components from diverging
+                double DeltaNorm = std::sqrt(pos[v].x*pos[v].x+pos[v].y*pos[v].y);
+                if (DeltaNorm==0) continue;
+                disp[v].x = disp[v].x + pos[v].x/DeltaNorm*fain(DeltaNorm,k)*gravity.at(l);
+                disp[v].y = disp[v].y + pos[v].y/DeltaNorm*fain(DeltaNorm,k)*gravity.at(l);
+                
 			}
 		}
 		// calculate attractive forces inside each layer
@@ -71,7 +77,7 @@ hash_map<NodeSharedPtr,xyz_coordinates> multiforce(MLNetworkSharedPtr& mnet, dou
 				disp[u].y = disp[u].y + Delta.y/DeltaNorm*fain(DeltaNorm,k)*weight_in.at(l);
 			}
 		}
-		// calculate attractive forces across layers
+        // calculate attractive forces across layers
 		for (ActorSharedPtr a: *mnet->get_actors()) {
 			for (NodeSharedPtr v: *mnet->get_nodes(a)) {
 				for (NodeSharedPtr u: *mnet->get_nodes(a)) {
@@ -95,8 +101,8 @@ hash_map<NodeSharedPtr,xyz_coordinates> multiforce(MLNetworkSharedPtr& mnet, dou
 			if (dispNorm==0) continue;
 			pos[v].x = pos[v].x + (disp[v].x/dispNorm)*std::min(dispNorm,temp);
 			pos[v].y = pos[v].y + (disp[v].y/dispNorm)*std::min(dispNorm,temp);
-			//pos[v].x = std::min(width/2, std::max(-width/2, pos[v].x)); // suggest to remove
-			//pos[v].y = std::min(length/2, std::max(-length/2, pos[v].y)); // suggest to remove
+			//pos[v].x = std::min(width/2, std::max(-width/2, pos[v].x)); // suggest to remove - it might actually be useful...
+			//pos[v].y = std::min(length/2, std::max(-length/2, pos[v].y)); // suggest to remove - it might actually be useful...
 		}
 		// reduce the temperature
 		temp -= start_temp/iterations;

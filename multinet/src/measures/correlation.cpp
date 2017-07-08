@@ -61,7 +61,7 @@ property_matrix<ActorSharedPtr,LayerSharedPtr,double> actor_degree_property_matr
 	for (ActorSharedPtr actor: *mnet->get_actors()) {
 		for (LayerSharedPtr layer: *mnet->get_layers()) {
 			NodeSharedPtr node = mnet->get_node(actor,layer);
-			if (!node) P.set(actor,layer,0);
+			if (!node) P.set_na(actor,layer);
 			else P.set(actor,layer,mnet->neighbors(node,mode)->size());
 		}
 	}
