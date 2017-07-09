@@ -20,7 +20,7 @@ public:
 			mnet is the multilayer network
 			move is either "move" that places nodes into communities that give the highest modularity gain or "moverandw" which places the nodes into communities at random proportional to their modularity gain (higher gain, higher chance of being selected into communituy)
 			gamma is the resolution parameter
-			omgea is the inter-layer coupling weight parameter
+			omega is the inter-layer coupling weight parameter
 			limit is the number of modularity scores for the actors to hold in memory at once.
 				The algorithm is faster if this number is high but consumes much more memory
 		Post:

@@ -1,7 +1,5 @@
 
 #include "utils.h"
-#include "community/flattening.h"
-#include "community/labelpropagationsinglelayer.h"
 #include "community.h"
 #include <cstdio>
 #include <stdio.h>

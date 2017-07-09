@@ -67,24 +67,50 @@ void test_community() {
     std::cout << normalized_mutual_information(com1,com3,4) << " ";
     std::cout << "done!" << std::endl;
 
-    MLNetworkSharedPtr toy = read_multilayer("toy.mpx","toy",',');
+    MLNetworkSharedPtr cpm = read_multilayer("cpm.mpx","toy",',');
 
     std::cout << "Running algorithms..."<< std::endl;
     std::cout << "====================="<< std::endl;
     std::cout << "ABACUS"<< std::endl;
-    ActorCommunityStructureSharedPtr communities = abacus(toy, 3, 1);
+    int min_actors = 3;
+    int min_layers = 1;
+    ActorCommunityStructureSharedPtr communities = abacus(cpm, min_actors, min_layers);
     std::cout << "actor-version"<< std::endl;
     std::cout << communities->to_string();
     std::cout << "node-version"<< std::endl;
-    CommunityStructureSharedPtr n_communities = to_node_communities(communities,toy);
+    CommunityStructureSharedPtr n_communities = to_node_communities(communities,cpm);
     std::cout << n_communities->to_string();
     
     std::cout << "====================="<< std::endl;
     std::cout << "LART"<< std::endl;
     lart k; uint32_t t = 9; double eps = 1; double gamma = 1;
-    n_communities = k.fit(mnet, t, eps, gamma);
+    n_communities = k.fit(cpm, t, eps, gamma);
     std::cout << n_communities->to_string();
 
+    
+    std::cout << "====================="<< std::endl;
+    std::cout << "GLOUVAIN" << std::endl;
+    glouvain gl;
+    double l_gamma = 1.0;
+    double l_omega = 1.0;
+    double l_limit = 10000;
+    std::string move = "move";
+    
+    n_communities = gl.fit(cpm, move, l_gamma, l_omega, l_limit);
+    std::cout << n_communities->to_string();
+    
+    std::cout << "====================="<< std::endl;
+    std::cout << "ML-CPM" << std::endl;
+    size_t cpm_k = 3;
+    size_t cpm_m = 1;
+    n_communities = mlcpm(cpm, cpm_k, cpm_m);
+    std::cout << n_communities->to_string();
+    
+    std::cout << "====================="<< std::endl;
+    std::cout << "Flattening" << std::endl;
+    n_communities = flattenAndDetectComs(cpm,ZeroOne,LabelPropagation);
+    std::cout << n_communities->to_string();
+    
     //std::cout << "modularity (NOTE: not defined for overlapping communities): ";
     //std::cout << modularity(toy,n_communities,1) << std::endl;
     //std::cout << "done!" << std::endl;

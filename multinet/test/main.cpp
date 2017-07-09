@@ -38,11 +38,8 @@ int main() {
 
     test_community_single_layer();
     test_flattening();
-	  test_lart();
     test_community();
-	test_glouvain();
-	test_pmm();
-
+	
 	test_measures();
     test_community();
     test_community_cpm();

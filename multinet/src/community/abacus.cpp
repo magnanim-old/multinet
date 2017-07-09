@@ -104,15 +104,15 @@ namespace mlnet {
             }
         }
         
-        FILE* f_inp = fopen("/Users/matteomagnani/piropiro","w+"); //std::tmpfile();
+        FILE* f_inp = std::tmpfile();
         if (!f_inp)
-            ;
-        FILE* f_out = fopen("/Users/matteomagnani/piropiro.out","w+"); //std::tmpfile();
+            throw FileNotFoundException("Cannot open tmp file");
+        FILE* f_out = std::tmpfile();
         if (!f_out)
-            std::cout << "fout" << std::endl;
-        FILE* f_tid = fopen("/Users/matteomagnani/piropiro.tr","w+"); //std::tmpfile();
+            throw FileNotFoundException("Cannot open tmp file");
+        FILE* f_tid = std::tmpfile();
         if (!f_tid)
-            std::cout << "ftid" << std::endl;
+            throw FileNotFoundException("Cannot open tmp file");
         
         int     k = 0;             /* result variable */
         CCHAR   *recseps = NULL;      /* record  separators */
@@ -217,6 +217,9 @@ namespace mlnet {
         rewind(report->tidfile);
         ActorCommunityStructureSharedPtr result = read_eclat_communities(actors, layers, report->file, report->tidfile);
         
+        std::fclose(f_inp);
+        std::fclose(f_out);
+        std::fclose(f_tid);
         //if (isr_close   (report) != 0)/* close item set output file - not needed: temporary file */
         
         //if (isr_tidclose(report) != 0)/* close trans. id output file */

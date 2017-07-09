@@ -130,6 +130,7 @@ namespace mlnet {
 
 #include "community/cutils.h"
 #include "community/labelpropagationsinglelayer.h"
+#include "community/flattening.h"
 #include "community/acl.h"
 #include "community/ml-cpm.h"
 #include "community/lart.h"
