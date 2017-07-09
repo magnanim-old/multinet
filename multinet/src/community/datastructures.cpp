@@ -53,22 +53,21 @@ namespace mlnet {
         for (ActorSharedPtr actor: actors) {
             if (idx==0) result += "[";
             result += actor->to_string();
-            if (idx!=actors.size()-1) result += ",";
-            else result += "]::";
+            if (idx!=actors.size()-1) result += ", ";
+            else result += "]";
             idx++;
         }
-        idx = 0;
         for (LayerSharedPtr layer: layers) {
-            if (idx==0) result += "[";
+            if (idx==0) result += "::[";
             result += layer->to_string();
-            if (idx!=layers.size()-1) result += ",";
+            if (idx!=layers.size()-1) result += ", ";
             else result += "]";
             idx++;
         }
         return result;
     }
     
-    void actor_community::add_actor(const ActorSharedPtr& actor) {
+    void actor_community::add_actor(ActorSharedPtr actor) {
         actors.insert(actor);
     }
     
@@ -76,7 +75,7 @@ namespace mlnet {
         return actors;
     }
     
-    void actor_community::add_layer(const LayerSharedPtr& layer) {
+    void actor_community::add_layer(LayerSharedPtr layer) {
         layers.insert(layer);
     }
     
@@ -84,14 +83,14 @@ namespace mlnet {
         return layers;
     }
     
-    // COMMUNITY STRUCTURE
-
+    // COMMUNITIES
+    
     community_structure::community_structure() {}
-
+    
     CommunityStructureSharedPtr community_structure::create() {
         return CommunityStructureSharedPtr(new community_structure());
     }
-
+    
     std::string community_structure::to_string() const {
         std::string result = "";
         for (CommunitySharedPtr com: data) {
@@ -122,7 +121,7 @@ namespace mlnet {
         return data;
     }
     
-    
+
     actor_community_structure::actor_community_structure() {}
     
     ActorCommunityStructureSharedPtr actor_community_structure::create() {
@@ -159,6 +158,7 @@ namespace mlnet {
     }
     
     const vector<ActorCommunitySharedPtr>& actor_community_structure::get_communities() const {
+
         return data;
     }
     

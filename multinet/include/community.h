@@ -20,7 +20,7 @@ namespace mlnet {
      * A community - that is a set of nodes.
      */
     class community {
-        private:
+        protected:
         community();
 
         public:
@@ -39,28 +39,31 @@ namespace mlnet {
     class actor_community {
     private:
         actor_community();
-
     public:
         static ActorCommunitySharedPtr create();
+        CommunitySharedPtr to_community();
         std::string to_string() const;
-        void add_actor(const ActorSharedPtr&);
+        void add_actor(ActorSharedPtr);
         const hash_set<ActorSharedPtr>& get_actors() const;
-        void add_layer(const LayerSharedPtr&);
+        int num_actors() const;
+        void add_layer(LayerSharedPtr);
         const hash_set<LayerSharedPtr>& get_layers() const;
-
+        int num_layers() const;
+        
     private:
         hash_set<ActorSharedPtr> actors;
         hash_set<LayerSharedPtr> layers;
     };
 
 
+    
     /**
      * A set of communities. Each community can be accessed by index.
      */
     class community_structure {
         private:
         community_structure();
-
+        
         public:
         static CommunityStructureSharedPtr create();
         std::string to_string() const;
@@ -128,6 +131,7 @@ namespace mlnet {
 #include "community/cutils.h"
 #include "community/labelpropagationsinglelayer.h"
 #include "community/acl.h"
+#include "community/ml-cpm.h"
 #include "community/lart.h"
 #include "community/pmm.h"
 #include "community/glouvain.h"
