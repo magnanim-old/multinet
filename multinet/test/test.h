@@ -35,7 +35,12 @@ private:
 	std::string message;
 };
 
+void test_community_single_layer();
+void test_flattening();
+void test_pmm();
 void test_lart();
+void test_glouvain();
+
 void test_math();
 void test_random();
 void test_counter();
@@ -52,6 +57,7 @@ void test_randomwalks();
 void test_evolution();
 void test_modularity();
 void test_community();
+void test_community_cpm();
 void test_dynamics();
 
 #endif /* MLNET_TEST_H_ */

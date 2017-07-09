@@ -105,5 +105,16 @@ string clique::to_string() {
     ss << "]";
     return ss.str();
 }
+    
+    CliqueSharedPtr clique::create() {
+        CliqueSharedPtr result(new clique());
+        return result;
+    }
 
+    CliqueSharedPtr clique::create(const std::unordered_set<ActorSharedPtr>& actors, const std::unordered_set<LayerSharedPtr>& layers) {
+        CliqueSharedPtr result(new clique(actors, layers));
+        return result;
+    }
+    
+    
 }

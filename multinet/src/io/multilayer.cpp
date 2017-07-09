@@ -26,18 +26,18 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 	/****************************/
 	// C(++), I hate you...
 	//std::cout << "hate" << std::endl;
-	int (*touppercase)(int) = toupper;
+	 int (*touppercase)(int) = toupper;
 	//std::cout << "you" << std::endl;
 	/****************************/
 	vector<int> actor_attr_type;
 	vector<string> actor_attr_names;
 	vector<int> layer_attr_type;
 	vector<string> layer_attr_names;
-	hash_map<string,hash_map<string,vector<int> > > edge_attr_type;
-	hash_map<string,hash_map<string,vector<string> > > edge_attr_names;
+	hash_map<string,hash_map<string,vector<int> >> edge_attr_type;
+	hash_map<string,hash_map<string,vector<string> >> edge_attr_names;
 	hash_map<string,vector<int> > node_attr_type;
 	hash_map<string,vector<string> > node_attr_names;
-	hash_map<string,hash_map<string,edge_directionality> > _edge_directionality;
+	hash_map<string,hash_map<string,edge_directionality>> _edge_directionality;
 
 	// Default section, in case only an edge list is provided
 	Section current_sect = DEFAULT;

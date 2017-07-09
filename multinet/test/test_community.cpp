@@ -1,5 +1,5 @@
 /*
- * testNetwork.cpp
+ * testCommunity.cpp
  *
  * Created on: Feb 7, 2014
  * Author: matteomagnani
@@ -9,7 +9,6 @@
 #include "test.h"
 #include <unordered_set>
 #include <string>
-#include "../include/multinet.h"
 
 using namespace mlnet;
 
@@ -17,96 +16,104 @@ using namespace mlnet;
 
 void test_community() {
 
-	test_begin("ML-CPM");
+	test_begin("community data structures");
 
-	//MLNetworkSharedPtr mnet = read_multilayer("data/aucs.mpx","cpm net",',');
-	//mnet->erase(mnet->get_layer("work"));
-	//mnet->erase(mnet->get_layer("leisure"));
-	//mnet->erase(mnet->get_layer("facebook"));
-	//mnet->erase(mnet->get_layer("lunch"));
-	//hash_set<CommunitySharedPtr> comm = ml_cpm(mnet,3,1,1,1);
+	MLNetworkSharedPtr mnet = read_multilayer("aucs.mpx","aucs",',');
 
-	//int i=0;
-	//for (CommunitySharedPtr c: comm) {
-	//	std::cout << (i++) << " "  << c->to_string() << std::endl;
-	//}
-	/*
-	hash_set<CliqueSharedPtr> C = find_max_cliques(mnet,3,1);
+    ActorSharedPtr a1 = mnet->get_actor("U54");
+    ActorSharedPtr a2 = mnet->get_actor("U4");
+	LayerSharedPtr l1 = mnet->get_layer("lunch");
+	LayerSharedPtr l2 = mnet->get_layer("leisure");
 
-	int i=0;
-	for (CliqueSharedPtr c: C) {
-		std::cout << (i++) << " " << c->to_string() << std::endl;
-	}
+	CommunitySharedPtr c1_1 = community::create();
+	c1_1->add_node(mnet->get_node(a1,l1));
+	c1_1->add_node(mnet->get_node(a1,l2));
+    CommunitySharedPtr c1_2 = community::create();
+    c1_2->add_node(mnet->get_node(a2,l1));
+    c1_2->add_node(mnet->get_node(a2,l2));
+	CommunityStructureSharedPtr com1 = community_structure::create();
+	com1->add_community(c1_1);
+	com1->add_community(c1_2);
 
-	std::cout << std::endl;
-	C = find_max_cliques_it(mnet,3,1);
+    CommunitySharedPtr c2_1 = community::create();
+    c2_1->add_node(mnet->get_node(a1,l1));
+    c2_1->add_node(mnet->get_node(a1,l2));
+    c2_1->add_node(mnet->get_node(a2,l1));
+    CommunitySharedPtr c2_2 = community::create();
+    c2_2->add_node(mnet->get_node(a2,l2));
+    CommunityStructureSharedPtr com2 = community_structure::create();
+    com2->add_community(c2_1);
+    com2->add_community(c2_2);
 
-	// We need to read the network from a file: testIO() must have been passed
-	log("TESTING community detection");
-	log("Reading the network...",false);
-	// Creating an empty multiple network and initializing it
-	MLNetworkSharedPtr mnet_a = read_multilayer("/Users/matteomagnani/Dropbox/Research/Archive/13NetworkScience/code/fig6a.mnet","6a",',');
-	MLNetworkSharedPtr mnet_b = read_multilayer("/Users/matteomagnani/Dropbox/Research/Archive/13NetworkScience/code/fig6b.mnet","6b",',');
+    CommunitySharedPtr c3_1 = community::create();
+    c3_1->add_node(mnet->get_node(a1,l1));
+    c3_1->add_node(mnet->get_node(a2,l1));
+    CommunitySharedPtr c3_2 = community::create();
+    c3_2->add_node(mnet->get_node(a1,l2));
+    c3_2->add_node(mnet->get_node(a2,l2));
+    CommunityStructureSharedPtr com3 = community_structure::create();
+    com3->add_community(c3_1);
+    com3->add_community(c3_2);
 
-	//mnet_read_edgelist(mnet, "test/toy.mnet");
+    //std::cout << com->to_string() << std::endl;
 
-	log("done!");
+    std::cout << "Testing community comparison function...";
+    if (std::abs(community_jaccard(c1_1,c3_1)-1.0/3)>.01) throw FailedUnitTestException("Wrong community_jaccard function: " + to_string(community_jaccard(c1_1,c3_1)));
+    std::cout << "done!" << std::endl;
 
-	log("Computing communities...");
-	hash<NodeSharedPtr,long> membership = label_propagation(mnet_a,1);
+    std::cout << "Testing community comparison function...";
+    std::cout << normalized_mutual_information(com1,com1,4) << " ";
+    std::cout << normalized_mutual_information(com1,com2,4) << " ";
+    std::cout << normalized_mutual_information(com1,com3,4) << " ";
+    std::cout << "done!" << std::endl;
 
+    MLNetworkSharedPtr cpm = read_multilayer("cpm.mpx","toy",',');
 
-	double mod = modularity(mnet,groups_toy,1);
-	log(std::to_string(mod) + " ",false);
-	log("done 1 - toy!");
+    std::cout << "Running algorithms..."<< std::endl;
+    std::cout << "====================="<< std::endl;
+    std::cout << "ABACUS"<< std::endl;
+    int min_actors = 3;
+    int min_layers = 1;
+    ActorCommunityStructureSharedPtr communities = abacus(cpm, min_actors, min_layers);
+    std::cout << "actor-version"<< std::endl;
+    std::cout << communities->to_string();
+    std::cout << "node-version"<< std::endl;
+    CommunityStructureSharedPtr n_communities = to_node_communities(communities,cpm);
+    std::cout << n_communities->to_string();
+    
+    std::cout << "====================="<< std::endl;
+    std::cout << "LART"<< std::endl;
+    lart k; uint32_t t = 9; double eps = 1; double gamma = 1;
+    n_communities = k.fit(cpm, t, eps, gamma);
+    std::cout << n_communities->to_string();
 
-
-	for (LayerSharedPtr layer: mnet_a->get_layers()) {
-		for (NodeSharedPtr node: mnet_a->get_nodes(layer))
-		log(layer->name + " " + node->actor->name + " -> " + to_string(membership.at(node)));
-	}
-
-	log("GR1!");
-	double mod = modularity(mnet_a,membership,0);
-	log(std::to_string(mod) + " ",false);
-	log("done 0!");
-	mod = modularity(mnet_a,membership,.5);
-	log(std::to_string(mod) + " ",false);
-	log("done .5!");
-	mod = modularity(mnet_a,membership,1);
-	log(std::to_string(mod) + " ",false);
-	log("done 1!");
-
-	log("GR2!");
-	mod = modularity(mnet_b,groups2,0);
-	log(std::to_string(mod) + " ",false);
-	log("done 0!");
-	mod = modularity(mnet_b,groups2,.5);
-	log(std::to_string(mod) + " ",false);
-	log("done .5!");
-	mod = modularity(mnet_b,groups2,1);
-	log(std::to_string(mod) + " ",false);
-	log("done 1!");
-	log("GR3!");
-	mod = modularity(mnet_b,groups3,0);
-	log(std::to_string(mod) + " ",false);
-	log("done 0!");
-	mod = modularity(mnet_b,groups3,.5);
-	log(std::to_string(mod) + " ",false);
-	log("done .5!");
-	mod = modularity(mnet_b,groups3,1);
-	log(std::to_string(mod) + " ",false);
-	log("done 1!");
-	log("GR4!");
-	mod = modularity(mnet_b,groups4,0);
-	log(std::to_string(mod) + " ",false);
-	log("done 0!");
-	mod = modularity(mnet_b,groups4,.5);
-	log(std::to_string(mod) + " ",false);
-	log("done .5!");
-	mod = modularity(mnet_b,groups4,1);
-	log(std::to_string(mod) + " ",false);
-	log("done 1!");
-	 */
-	test_end("ML-CPM");
+    
+    std::cout << "====================="<< std::endl;
+    std::cout << "GLOUVAIN" << std::endl;
+    glouvain gl;
+    double l_gamma = 1.0;
+    double l_omega = 1.0;
+    double l_limit = 10000;
+    std::string move = "move";
+    
+    n_communities = gl.fit(cpm, move, l_gamma, l_omega, l_limit);
+    std::cout << n_communities->to_string();
+    
+    std::cout << "====================="<< std::endl;
+    std::cout << "ML-CPM" << std::endl;
+    size_t cpm_k = 3;
+    size_t cpm_m = 1;
+    n_communities = mlcpm(cpm, cpm_k, cpm_m);
+    std::cout << n_communities->to_string();
+    
+    std::cout << "====================="<< std::endl;
+    std::cout << "Flattening" << std::endl;
+    n_communities = flattenAndDetectComs(cpm,ZeroOne,LabelPropagation);
+    std::cout << n_communities->to_string();
+    
+    //std::cout << "modularity (NOTE: not defined for overlapping communities): ";
+    //std::cout << modularity(toy,n_communities,1) << std::endl;
+    //std::cout << "done!" << std::endl;
+    
+	test_end("community data structures");
 }

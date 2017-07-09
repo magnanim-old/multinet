@@ -120,11 +120,6 @@ int check_dominance(const Path& p1, const Path& p2);
 
 */
 
-/**********************************************************************/
-/** Clustering ********************************************************/
-/**********************************************************************/
-
-double modularity(const MLNetworkSharedPtr& mnet, const hash_map<NodeSharedPtr,long>& groups, double c);
 
 } // namespace mlnet
 

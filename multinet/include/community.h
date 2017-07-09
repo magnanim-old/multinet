@@ -1,80 +1,141 @@
-#ifndef MULTIPLENETWORK_COMMUNITY_H_
-#define MULTIPLENETWORK_COMMUNITY_H_
+#ifndef MULTINET_COMMUNITY_H_
+#define MULTINET_COMMUNITY_H_
 
 #include "datastructures.h"
 
-#include "community/flattening.h"
-//#include "community/lbl.h"
-//#include "community/single_ext.h"
-#include "community/multilayer.h"
-
-
 namespace mlnet {
 
-typedef std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> > clique_adjacency_graph;
+/* COMMON DATA STRUCTURES */
 
-struct layer_set_comparator {
-	bool operator()(const sorted_set<LayerSharedPtr>& a, const sorted_set<LayerSharedPtr>& b) const {
-		if (a.size() != b.size()) return a.size() < b.size();
-		sorted_set<LayerSharedPtr>::iterator it1 = a.begin();
-		sorted_set<LayerSharedPtr>::iterator it2 = b.begin();
-		for (size_t i=0; i<a.size(); i++) {
-			if ((*it1)<(*it2))
-				return true;
-			if ((*it1)>(*it2))
-				return false;
-			++it1; ++it2;
-		}
-		return false;
-	}
-};
+    class community;
+    class actor_community;
+    class community_structure;
+    class actor_community_structure;
+    typedef std::shared_ptr<community> CommunitySharedPtr;
+    typedef std::shared_ptr<actor_community> ActorCommunitySharedPtr;
+    typedef std::shared_ptr<community_structure> CommunityStructureSharedPtr;
+    typedef std::shared_ptr<actor_community_structure> ActorCommunityStructureSharedPtr;
 
-typedef std::set<sorted_set<LayerSharedPtr>, layer_set_comparator > layer_sets;
+    /**
+     * A community - that is a set of nodes.
+     */
+    class community {
+        protected:
+        community();
 
-class cpm_community {
+        public:
+        static CommunitySharedPtr create();
+        std::string to_string() const;
+        void add_node(const NodeSharedPtr&);
+        const hash_set<NodeSharedPtr>& get_nodes() const;
 
-public:
-	cpm_community(long id, hash_set<CliqueSharedPtr> cliques, hash_set<LayerSharedPtr> layers);
-	cpm_community();
-	std::set<ActorSharedPtr> actors();
-	size_t size() const;
-	bool operator==(const cpm_community& comp) const;
-	bool operator!=(const cpm_community& comp) const;
-	bool operator<(const cpm_community& comp) const;
-	bool operator>(const cpm_community& comp) const;
-	std::string to_string();
+        private:
+        hash_set<NodeSharedPtr> data;
+    };
 
-	long id;
-	std::set<CliqueSharedPtr> cliques;
-	std::set<LayerSharedPtr> layers;
-};
+    /**
+     * A community, defined as a set of actors in a set of layers.
+     */
+    class actor_community {
+    private:
+        actor_community();
+    public:
+        static ActorCommunitySharedPtr create();
+        CommunitySharedPtr to_community();
+        std::string to_string() const;
+        void add_actor(ActorSharedPtr);
+        const hash_set<ActorSharedPtr>& get_actors() const;
+        int num_actors() const;
+        void add_layer(LayerSharedPtr);
+        const hash_set<LayerSharedPtr>& get_layers() const;
+        int num_layers() const;
+        
+    private:
+        hash_set<ActorSharedPtr> actors;
+        hash_set<LayerSharedPtr> layers;
+    };
 
-typedef std::shared_ptr<cpm_community> CommunitySharedPtr;
 
-hash_set<CommunitySharedPtr> ml_cpm(MLNetworkSharedPtr mnet, size_t k, size_t m1, int m2, int m3);
+    
+    /**
+     * A set of communities. Each community can be accessed by index.
+     */
+    class community_structure {
+        private:
+        community_structure();
+        
+        public:
+        static CommunityStructureSharedPtr create();
+        std::string to_string() const;
+        void add_community(const CommunitySharedPtr&);
+        CommunitySharedPtr get_community(int i);
+        const vector<CommunitySharedPtr>& get_communities() const;
 
-hash_map<ActorSharedPtr,hash_set<LayerSharedPtr> > get_mlneighbors(MLNetworkSharedPtr mnet, ActorSharedPtr actor);
+        void print(std::ostream& stream);
 
-hash_set<LayerSharedPtr> neighboring_layers(MLNetworkSharedPtr mnet, ActorSharedPtr actor1, ActorSharedPtr actor2);
+        private:
+        vector<CommunitySharedPtr> data;
+    };
 
-hash_set<CliqueSharedPtr> find_max_cliques(MLNetworkSharedPtr mnet, hash_set<LayerSharedPtr> layers, size_t k, size_t m);
 
-hash_set<CliqueSharedPtr> find_max_cliques(MLNetworkSharedPtr mnet, size_t k, size_t m);
-hash_set<CliqueSharedPtr> find_max_cliques_it(MLNetworkSharedPtr mnet, size_t k, size_t m);
+    /**
+     * A set of communities. Each community can be accessed by index.
+     */
+    class actor_community_structure {
+    private:
+        actor_community_structure();
 
-void find_max_cliques(MLNetworkSharedPtr mnet, CliqueSharedPtr& A, hash_map<ActorSharedPtr,hash_set<LayerSharedPtr> >& B, hash_map<ActorSharedPtr,hash_set<LayerSharedPtr> >& C,
-		hash_set<ActorSharedPtr>& in_clique, hash_set<CliqueSharedPtr>& result, size_t k, size_t m);
-void find_max_cliques_it(MLNetworkSharedPtr mnet, CliqueSharedPtr& A, hash_map<ActorSharedPtr,hash_set<LayerSharedPtr> >& B, hash_map<ActorSharedPtr,hash_set<LayerSharedPtr> >& C, hash_set<CliqueSharedPtr>& result, size_t k, size_t m);
+    public:
+        static ActorCommunityStructureSharedPtr create();
+        std::string to_string() const;
+        void add_community(const ActorCommunitySharedPtr&);
+        ActorCommunitySharedPtr get_community(int i);
+        const vector<ActorCommunitySharedPtr>& get_communities() const;
 
-std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> > build_adjacency_graph(const hash_set<CliqueSharedPtr>& C, int m);
+        void print(std::ostream& stream);
 
-std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> > build_max_adjacency_graph(const hash_set<CliqueSharedPtr>& C, int k, int m);
+    private:
+        vector<ActorCommunitySharedPtr> data;
+    };
 
-hash_set<CommunitySharedPtr> find_max_communities_max_layers(MLNetworkSharedPtr mnet, const clique_adjacency_graph& adjacency, size_t m);
 
-void find_max_communities_max_layers(const clique_adjacency_graph& adjacency, CommunitySharedPtr& A,
-		vector<CliqueSharedPtr> Candidates, hash_set<CliqueSharedPtr>& processedCliques, layer_sets& processedLayerCombinations, size_t m, hash_set<CommunitySharedPtr>& result);
+    /* Community translation functions */
+    CommunityStructureSharedPtr to_node_communities(const ActorCommunityStructureSharedPtr& comm, const MLNetworkSharedPtr& net);
+    CommunitySharedPtr to_node_community(const ActorCommunitySharedPtr& comm, const MLNetworkSharedPtr& net);
+
+    /* Community evaluation (internal) */
+
+    double modularity(const MLNetworkSharedPtr& mnet, const CommunityStructureSharedPtr& groups, double c);
+    double modularity(const MLNetworkSharedPtr& mnet, const hash_map<NodeSharedPtr,long>& groups, double c); // for back-compatibility
+
+    /* Community comparison functions (external) */
+
+    double community_jaccard(const CommunitySharedPtr& c1, const CommunitySharedPtr& c2);
+
+    double purity(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
+
+    double rand_index(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
+
+    double normalized_mutual_information(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2, int n);
+
+    double f_measure(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
+
+    double fm_index(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
+
+
+    /* ALGORITHMS */
+
+
 }
 
-#endif /* MULTIPLENETWORK_COMMUNITY_H_ */
+#include "community/cutils.h"
+#include "community/labelpropagationsinglelayer.h"
+#include "community/flattening.h"
+#include "community/acl.h"
+#include "community/ml-cpm.h"
+#include "community/lart.h"
+#include "community/pmm.h"
+#include "community/glouvain.h"
+#include "community/abacus.h"
 
+#endif /* MULTINET_COMMUNITY_H_ */

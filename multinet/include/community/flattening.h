@@ -1,26 +1,12 @@
-#ifndef FLATTENING_H_
-#define FLATTENING_H_
-
-#include "datastructures.h"
+#ifndef COMMUNITY_FLATTENING_H_
+#define COMMUNITY_FLATTENING_H_
 
 namespace mlnet {
 
-class berlingerio {
+enum WeighteningType {ZeroOne=0, NumOfLayers=1, Neighborhood=2};
+enum SingleLayerAlgorithm {LabelPropagation =1};
 
-public:
-
-	/*
-		Use: berlingerio k;
-			 hash_set<CommunitySharedPtr> h = k.get_ml_community(MLNetworkSharedPtr);
-		Pre: MLNetworkSharedPtr is a multilayer network
-		Post: h is a hash set ccontaining actor communities
-				e.x: hash_set[A] = B,C,D
-	*/
-	actor_list get_ml_community(MLNetworkSharedPtr mnet);
-
-};
-
+CommunityStructureSharedPtr flattenAndDetectComs(const MLNetworkSharedPtr& mnet, WeighteningType wType,SingleLayerAlgorithm slAlgo);
 }
 
-#endif
-
+#endif /* COMMUNITY_FLATTENING_H_ */
