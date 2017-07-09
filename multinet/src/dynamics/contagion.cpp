@@ -12,6 +12,8 @@
 
 namespace mlnet {
 
+/* Work in progress
+ 
 beta_transition::beta_transition(const std::string& neighbor_status, const std::string& status, double beta, const std::string& new_status) :
 		neighbor_status(neighbor_status), status(status), beta(beta), new_status(new_status) {
 }
@@ -57,5 +59,6 @@ matrix<long> sir(MLNetworkSharedPtr& mnet, double beta, int tau, long num_iterat
 
 	return run(mnet, statuses, init_distribution, seed, transitions, num_iterations);
 }
-
+*/
+    
 }

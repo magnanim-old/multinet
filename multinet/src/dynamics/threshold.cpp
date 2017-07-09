@@ -11,7 +11,8 @@
 #include <iostream>
 
 namespace mlnet {
-
+/* Work in progress
+ 
 threshold_transition::threshold_transition(const std::string& status1, const std::string& status2, double th) :
 		status1(status1), status2(status2), th(th) {
 }
@@ -44,5 +45,5 @@ matrix<long> threshold(MLNetworkSharedPtr& mnet, double perc_adopters, double th
 
 	return run(mnet, statuses, init_distribution, seed, transitions, num_iterations);
 }
-
+*/
 }

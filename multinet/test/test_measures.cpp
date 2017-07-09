@@ -133,7 +133,7 @@ void test_measures() {
 	std::cout << "done!" << std::endl;
 	property_matrix<ActorSharedPtr,LayerSharedPtr,double> DegP = actor_degree_property_matrix(mnet5,INOUT);
 	std::cout << "Testing linear (pearson) degree correlation...";
-	sim = pearson(DegP,l1,l2);
+	/*sim = pearson(DegP,l1,l2);
 	std::cout << "[" << sim << "] ";
 	if (std::abs(sim-0.57735) > 0.0001) throw FailedUnitTestException("Wrong linear (pearson) degree correlation");
 	std::cout << "done!" << std::endl;
@@ -141,7 +141,7 @@ void test_measures() {
 	DegP.rankify();
 	sim = pearson(DegP,l1,l2);
 	std::cout << "[" << sim << "] ";
-	if (std::abs(sim-0.688617) > 0.0001) throw FailedUnitTestException("Wrong linear (pearson) degree correlation");
+	if (std::abs(sim-0.688617) > 0.0001) throw FailedUnitTestException("Wrong linear (pearson) degree correlation");*/
 	std::cout << "done!" << std::endl;
 
 

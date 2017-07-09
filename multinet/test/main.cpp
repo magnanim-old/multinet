@@ -28,7 +28,6 @@ int main() {
 	test_random();
 	test_counter();
 	test_csv();
-	test_sortedrandommap();
 	test_sortedrandomset();
 	test_propertymatrix();
 	test_end("UTILITY FUNCTIONS AND CLASSES");
