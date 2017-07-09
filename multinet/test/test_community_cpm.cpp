@@ -12,7 +12,7 @@ void test_community_cpm() {
 
 	test_begin("community detection: clique percolation");
 
-	MLNetworkSharedPtr mnet = read_multilayer("aucs.mpx","aucs",',');
+	MLNetworkSharedPtr mnet = read_multilayer("cpm.mpx","aucs",',');
 
 	CommunityStructureSharedPtr comm = mlcpm(mnet, 3, 1);
     

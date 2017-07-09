@@ -36,6 +36,7 @@ namespace mlnet {
     };
     typedef std::set<sorted_set<LayerSharedPtr>,layer_set_comparator > layer_sets;
     
+    /* the ML-CPM algorithm uses a special type of community, defined as a set of adjacent cliques */
     class cpm_community {
     public:
         cpm_community();
@@ -77,9 +78,9 @@ namespace mlnet {
     
     std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> > build_max_adjacency_graph(const hash_set<CliqueSharedPtr>& C, size_t k, size_t m);
     
-    hash_set<AdjCliqueCommunitySharedPtr> find_max_communities_max_layers(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, size_t m);
+    hash_set<AdjCliqueCommunitySharedPtr> find_max_communities(MLNetworkSharedPtr mnet, const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, size_t m);
     
-    void find_max_communities_max_layers(const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, AdjCliqueCommunitySharedPtr& A,
+    void find_max_communities(const std::map<CliqueSharedPtr,hash_set<CliqueSharedPtr> >& adjacency, AdjCliqueCommunitySharedPtr& A,
                                          vector<CliqueSharedPtr> Candidates, hash_set<CliqueSharedPtr>& processedCliques, layer_sets& processedLayerCombinations, size_t m, hash_set<AdjCliqueCommunitySharedPtr>& result);
 }
 #endif // MLNET_MLCPM_H_
