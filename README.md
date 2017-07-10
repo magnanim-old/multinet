@@ -1,7 +1,7 @@
 multinet
 ===============
 
-A library for the analysis and mining of multilayer networks, based on the book: Multilayer Social Networks, by Dickison, Magnani and Rossi, Cambridge University Press. This is also available as an R library on CRAN.
+A library for the analysis and mining of multilayer networks, based on the book: Multilayer Social Networks, by Dickison, Magnani and Rossi, Cambridge University Press. This is available as a C++ library and as an R library. A stable version of the R library is also available on CRAN.
 
 
 Documentation
@@ -20,7 +20,7 @@ The multinet library requires:
 * A modern, C++11 ready compiler such as `g++` version 4.7 or higher or `clang` version 3.2 or higher.
 * The *cmake* build system.
 
-Installation
+Installation - C++
 ------------
 
 To download and install the library use the following commands.
@@ -36,8 +36,7 @@ cmake ..
 make
 ```
 
-This compiles and generates a sahred library into the `build` directory in the
-root library. A different location can be specified by executing cmake from
+This compiles and generates a shared library into the `build` directory. A different location can be specified by executing cmake from
 another folder. 
 
 The documentation is generated inside the `build/doc` directory, while the
@@ -55,3 +54,21 @@ cd multinet/build
 make install
 ```
 
+Installation - R
+------------
+The stable version of the R library can be installed directly from R by typing:
+
+```sh
+install.packages("multinet")
+```
+
+To install the latest version you should chdir to Rmultinet, create a /src folder and copy into it:
+1. all the .c, .cpp and .h files from the C++ library (../multinet)
+2. all the files from the C++ directory
+3. all the files from the R directory
+
+Then: 
+```sh
+R CMD build Rmultinet
+R CMD check multinet_1.1.tar.gz
+```
