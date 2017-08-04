@@ -41,7 +41,6 @@ int main() {
 	
 	test_measures();
     test_community();
-    test_community_cpm();
 	test_evolution();
 	test_randomwalks();
 	test_modularity();

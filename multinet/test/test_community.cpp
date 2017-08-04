@@ -67,7 +67,7 @@ void test_community() {
     std::cout << normalized_mutual_information(com1,com3,4) << " ";
     std::cout << "done!" << std::endl;
 
-    MLNetworkSharedPtr cpm = read_multilayer("cpm.mpx","toy",',');
+    MLNetworkSharedPtr cpm = read_multilayer("florentine_families.mpx","toy",',');
 
     std::cout << "Running algorithms..."<< std::endl;
     std::cout << "====================="<< std::endl;
@@ -77,11 +77,11 @@ void test_community() {
     ActorCommunityStructureSharedPtr communities = abacus(cpm, min_actors, min_layers);
     std::cout << "actor-version"<< std::endl;
     std::cout << communities->to_string();
-    std::cout << "node-version"<< std::endl;
+    std::cout << "node-version" << std::endl;
     CommunityStructureSharedPtr n_communities = to_node_communities(communities,cpm);
     std::cout << n_communities->to_string();
     
-    std::cout << "====================="<< std::endl;
+    std::cout << "=====================" << std::endl;
     std::cout << "LART"<< std::endl;
     lart k; uint32_t t = 9; double eps = 1; double gamma = 1;
     n_communities = k.fit(cpm, t, eps, gamma);
@@ -99,14 +99,14 @@ void test_community() {
     n_communities = gl.fit(cpm, move, l_gamma, l_omega, l_limit);
     std::cout << n_communities->to_string();
     
-    std::cout << "====================="<< std::endl;
+    std::cout << "=====================" << std::endl;
     std::cout << "ML-CPM" << std::endl;
     size_t cpm_k = 3;
     size_t cpm_m = 1;
     n_communities = mlcpm(cpm, cpm_k, cpm_m);
     std::cout << n_communities->to_string();
     
-    std::cout << "====================="<< std::endl;
+    std::cout << "=====================" << std::endl;
     std::cout << "Flattening" << std::endl;
     n_communities = flattenAndDetectComs(cpm,ZeroOne,LabelPropagation);
     std::cout << n_communities->to_string();

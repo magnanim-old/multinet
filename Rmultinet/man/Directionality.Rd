@@ -9,18 +9,17 @@ Controlling edge directionality
 Functions to get and set the edge directionality of one or more pairs of layers (that is, the directionality of edges connecting nodes in those layers).
 }
 \usage{
-set.directed.ml(mlnetwork, layers, directed=TRUE)
+set.directed.ml(mlnetwork, directionalities)
 is.directed.ml(mlnetwork, layers1=character(0), layers2=character(0))
 }
 \arguments{
-\item{mlnetwork}{A multilayer network}
-\item{layers}{A vector of layer pairs (l1,l2) whose edge directionality should be updated. Each pair is represented by two consecutive entries in the vector, and the directionality is automatically set for both (l1,l2) and (l2,l1).}
-\item{directed}{Determines if the layer(s) is (are) directed or undirected. If multiple layers are specified, directed should be either a single value or an array with as many values as the number of layers. As by default layers in multilayer networks are undirected, \code{set.directed.ml} is typically called to set directed layers, in which case this parameter can be omitted.}
+\item{mlnetwork}{A multilayer network.}
+\item{directionalities}{A dataframe with three columns where each row contains a pair of layers (l1,l2) and 0 or 1 (indicating resp. undirected and directed edges). Directionality is automatically set for both (l1,l2) and (l2,l1).}
 \item{layers1}{The layer(s) from where the edges start. If layers1 is not provided, all layers are considered.}
 \item{layers2}{The layer(s) where the edges end. If an empty list of layers is passed (default), the ending layers are set as equal to those in parameter layers1.}
 }
 \value{
-\code{is.directed.ml} returns a matrix where each row contains the name of two layers and the corresponding type of edges (directed/undirected).
+\code{is.directed.ml} returns a data frame where each row contains the name of two layers and the corresponding type of edges (directed/undirected).
 }
 \examples{
 net <- ml.empty()
@@ -28,7 +27,12 @@ net <- ml.empty()
 add.layers.ml(net,c("l1","l2"),c(TRUE,FALSE))
 # Setting the directionality of inter-layer edges
 layers = c("l1","l2")
-set.directed.ml(net,layers)
+dir <- data.frame(layers,layers,c(0,1))
+set.directed.ml(net,dir)
 # retrieving all directionalities
-is.directed.ml(net)
+dir <- is.directed.ml(net)
+# copying directionalities to a new network
+net2 <- ml.empty()
+add.layers.ml(net2,c("l1","l2"))
+set.directed.ml(net2,dir)
 }

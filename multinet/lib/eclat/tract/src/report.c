@@ -926,7 +926,8 @@ int isr_open (ISREPORT *rep, FILE *file, const char *name)
   else if (! name) {            /* if no name is given */
     file = NULL;   rep->name = "<null>"; }
   else if (!*name) {            /* if an empty name is given */
-    file = stdout; rep->name = "<stdout>"; }
+    //file = stdout; rep->name = "<stdout>";
+  }
   else {                        /* if a proper name is given */
     file = fopen(rep->name = name, "w+");
     if (!file) return E_FOPEN;  /* open file with given name */
@@ -946,8 +947,9 @@ int isr_close (ISREPORT *rep)
   if (!rep->file) return 0;     /* check for an output file */
   isr_flush(rep);               /* flush the write buffer */
   r  = ferror(rep->file);       /* check the error indicator */
-  r |= ((rep->file == stdout) || (rep->file == stderr))
-     ? fflush(rep->file) : fclose(rep->file);
+  //r |= ((rep->file == stdout) || (rep->file == stderr))
+  //   ? fflush(rep->file) :
+  fclose(rep->file);
   rep->file = NULL;             /* close the current output file */
   fastchk(rep);                 /* check for fast output */
   return r;                     /* return the result of fclose() */
@@ -966,13 +968,14 @@ int isr_tidopen (ISREPORT *rep, FILE *file, const char *name)
   }                             /* and set the pointers */
   if (file) {                   /* if a file is given directly, */
     if      (name)           rep->tidname = name; /* store name */
-    else if (file == stdout) rep->tidname = "<stdout>";
-    else if (file == stderr) rep->tidname = "<stderr>";
+    //else if (file == stdout) rep->tidname = "<stdout>";
+    //else if (file == stderr) rep->tidname = "<stderr>";
     else                     rep->tidname = "<unknown>"; }
   else if (! name) {            /* if no name is given */
     file = NULL;             rep->tidname = "<null>"; }
   else if (!*name) {            /* if an empty name is given */
-    file = stdout;           rep->tidname = "<stdout>"; }
+    //file = stdout;           rep->tidname = "<stdout>";
+  }
   else {                        /* if a proper name is given */
     file = fopen(rep->tidname = name, "w+");
     if (!file) return E_FOPEN;  /* open file with given name */
@@ -992,8 +995,9 @@ int isr_tidclose (ISREPORT *rep)
   if (!rep->tidfile) return 0;  /* check for an output file */
   isr_tidflush(rep);            /* flush the write buffer */
   r  = ferror(rep->tidfile);    /* check the error indicator */
-  r |= ((rep->tidfile == stdout) || (rep->tidfile == stderr))
-     ? fflush(rep->tidfile) : fclose(rep->tidfile);
+  //r |= ((rep->tidfile == stdout) || (rep->tidfile == stderr))
+  //   ? fflush(rep->tidfile) :
+    fclose(rep->tidfile);
   rep->tidfile = NULL;          /* close the current output file */
   fastchk(rep);                 /* check for fast output */
   return r;                     /* return the result of fclose() */

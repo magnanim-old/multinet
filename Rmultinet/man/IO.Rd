@@ -24,6 +24,7 @@ The format used by the package is the following:
  #NODE ATTRIBUTES
  LayerName1,AttributeName1,STRING
  LayerName1,AttributeName2,NUMERIC
+ LayerName2,AttributeName3,STRING
  -- etc.
 
  #EDGE ATTRIBUTES
@@ -32,7 +33,7 @@ The format used by the package is the following:
  LayerName2,AttributeName,NUMERIC
  -- etc.
  -- if type is multilayer, edge attributes are indicated as follows:
- -- LayerName1,LayerName2,AttributeName,STRING
+ -- LayerName1,LayerName1,AttributeName,STRING
  -- LayerName1,LayerName2,AttributeName,NUMERIC
  -- etc.
 
@@ -73,7 +74,7 @@ The format used by the package is the following:
 
  If the #LAYER ATTRIBUTES, #ACTOR ATTRIBUTES, #NODE ATTRIBUTES or #EDGE ATTRIBUTES sections are empty, no attributes are created.
 
- The #LAYERS #ACTORS and #NODES sections are useful only if attributes or unused actors are present, otherwise they can be omitted
+ The #LAYERS #ACTORS and #NODES sections are useful only if (1) attributes are present, or (2) if there are actors not present in any layer, otherwise they can be omitted.
 
  If no section is specified, #EDGES is the default.
 
@@ -81,34 +82,42 @@ The format used by the package is the following:
  \verb{
  Matteo,Luca,Facebook
  Matteo,Mark,Facebook
+ Luca,Mark,Twitter
  ...
  }
 }
 \usage{
-read.ml(file, name="unnamed", sep=',')
+read.ml(file, name="unnamed", sep=',', aligned=FALSE)
 write.ml(mlnetwork, file, format="multilayer", layers=character(0),
   sep=',', merge.actors=TRUE, all.actors=FALSE)
 }
 \arguments{
 \item{file}{The path of the file storing the multilayer network.}
 \item{name}{The name of the multilayer network.}
-\item{mlnetwork}{An object of type MLNetwork.}
+\item{mlnetwork}{A multilayer network.}
 \item{layers}{If specific layers are passed to the function, only those layers are saved to file.}
 \item{format}{Either "multilayer", to use the package's internal format, or "graphml".}
 \item{sep}{The character used in the file to separate text fields, when format="multilayer" is used.}
+\item{aligned}{If true, all actors are added to all layers.}
 \item{merge.actors}{Whether the nodes corresponding to each single actor should be merged into a single node (true) or kept separated (false), when format="graphml" is used.}
 \item{all.actors}{Whether all actors in the multilayer network should be included in the output file (true) or only those present in at least one of the input layers (false), when format="graphml" and merge.actors=TRUE are used.}
 }
 \value{
-\code{read.ml} returns an object of type MLNetwork. \code{write.ml} does not return any value.
+\code{read.ml} returns a multilayer network. \code{write.ml} does not return any value.
 }
 \seealso{
 \link{Getting networks: predefined}, \link{Getting networks: generation}
 }
 \examples{
+# writing a network to file...
 file <- tempfile("aucs.mpx")
 net <- ml.aucs()
 write.ml(net,file)
+# ...and reading it back into a variable
 net <- read.ml(file,"AUCS")
 net
+# the following network has more nodes, because all
+# actors are replicated to all graphs
+net.aligned <- read.ml(file,"AUCS",aligned=TRUE)
+net.aligned
 }

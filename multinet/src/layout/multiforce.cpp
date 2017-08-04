@@ -29,8 +29,8 @@ hash_map<NodeSharedPtr,xyz_coordinates> multiforce(MLNetworkSharedPtr& mnet, dou
 			//double y = drand()*length-length/2;
 			//double x = drand()*width-width/2;
 
-			pos[n].y = x;
-			pos[n].x = y;
+			pos[n].x = x;
+			pos[n].y = y;
 			pos[n].z = mnet->get_layers()->get_index(n->layer);
 		}
 	}

@@ -16,7 +16,7 @@ flatten.ml(mlnetwork, new.layer="flattening", layers=character(0),
 project.ml(mlnetwork, new.layer="projection", layer1, layer2, method="clique")
 }
 \arguments{
-\item{mlnetwork}{A multilayer network}
+\item{mlnetwork}{A multilayer network.}
 \item{new.layer}{Name of the new layer.}
 \item{layers}{An array of layers belonging to the network.}
 \item{layer1}{The layer from which actors are selected.}

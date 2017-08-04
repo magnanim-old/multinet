@@ -34,7 +34,7 @@ evolution.er.ml(n)
 \link{Getting networks: predefined}, \link{Getting networks: IO}
 }
 \references{
-Magnani, Matteo, and Luca Rossi. 2013. Formation of Multiple Networks. In Social Computing, Behavioral-Cultural Modeling and Prediction, 257???64. Springer Berlin Heidelberg.
+Magnani, Matteo, and Luca Rossi. 2013. Formation of Multiple Networks. In Social Computing, Behavioral-Cultural Modeling and Prediction, 257-264. Springer Berlin Heidelberg.
 }
 \examples{
 # we generate a network with two layers, one growing according

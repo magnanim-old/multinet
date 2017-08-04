@@ -224,7 +224,8 @@ namespace mlnet {
     }
     //std::cout << "---Apprv iteration: " << count << " ------ apprv sum: " << apprv.sum() << " --------- res sum: " << residual.sum() << std::endl;
     //std::cout << apprv << std::endl;
-    if(count == max_iter) std::cout << "Warning: max iter reached" << std::endl;
+      if(count == max_iter)
+          ;   /* TODO throw warning: max iterations reached */
     return apprv;
   }
 
@@ -482,11 +483,13 @@ namespace mlnet {
   }
 
   //Prints a sweep set
-  void acl::print_sweep_set(std::tuple<std::vector<double>, std::vector<int>> sweep_sets, bool print_sets){
+  void acl::print_sweep_set(std::tuple<std::vector<double>, std::vector<int>> sweep_sets, bool print_sets) {
 
+      /*
     std::vector<double> cs = std::get<0>(sweep_sets);
     std::vector<int> pprv = std::get<1>(sweep_sets);
 
+      
     std::cout << "PRINT STUFF" << std::endl;
     
     double mini = 1;
@@ -508,6 +511,9 @@ namespace mlnet {
       std::cout << "}" << std::endl;
     }
     if(cs.size() != 0)
-      std::cout << "Lowest conductance: " << i_mini+1 << " " << cs[i_mini] << std::endl;    
+      std::cout << "Lowest conductance: " << i_mini+1 << " " << cs[i_mini] << std::endl;  
+     */
   }
+    
+  
 }

@@ -99,8 +99,10 @@ namespace mlnet {
             bool reset_skip = false;
             std::vector<std::pair<ActorSharedPtr,hash_set<LayerSharedPtr> > > B_ext;
             auto q = b;
+            //std::cout << "Extend " << inst->A->to_string() << " to " << A_ext->to_string() <<std::endl;
+            
             for (++q; q!=inst->B.end(); ++q) {
-                hash_set<LayerSharedPtr> common = s_intersection(new_layers,neighboring_layers(mnet,b->first,q->first)); //TODO encapsulate these two intersections into a single function computing them together, for increased readability...
+                hash_set<LayerSharedPtr> common = s_intersection(q->second,s_intersection(b->second,neighboring_layers(mnet,b->first,q->first))); //TODO encapsulate these two intersections into a single function computing them together, for increased readability...
                 if (common.size()>=m) {
                     std::pair<ActorSharedPtr,hash_set<LayerSharedPtr> > new_b(q->first,hash_set<LayerSharedPtr>(common.begin(),common.end()));
                     B_ext.push_back(new_b);
@@ -112,7 +114,7 @@ namespace mlnet {
             // new set of actors that can be used to extend the clique at the next iteration and have been already used before: C_ext
             std::vector<std::pair<ActorSharedPtr,hash_set<LayerSharedPtr> > > C_ext;
             for (auto c = inst->C.begin(); c!=inst->C.end(); ++c) {
-                hash_set<LayerSharedPtr> common = s_intersection(new_layers,neighboring_layers(mnet,b->first,c->first));
+                hash_set<LayerSharedPtr> common = s_intersection(c->second,s_intersection(b->second,neighboring_layers(mnet,b->first,c->first)));
                 if (common.size()>=m) {
                     std::pair<ActorSharedPtr,hash_set<LayerSharedPtr> > new_c(c->first,hash_set<LayerSharedPtr>(common.begin(),common.end()));
                     C_ext.push_back(new_c);
@@ -243,7 +245,6 @@ namespace mlnet {
                     return;
                 }
                 A->cliques.insert(c);
-                
                 for (auto j: adjacency.at(c)) {
                     if (A->cliques.count(j)>0)
                         continue;

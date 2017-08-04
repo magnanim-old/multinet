@@ -1,3 +1,5 @@
+// Original file modified by removing calls to cerr and abort
+
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_ERROr_ 
@@ -247,9 +249,9 @@ namespace dlib
         static inline void dlib_fatal_error_terminate (
         )
         {
-            std::cerr << "\n**************************** FATAL ERROR DETECTED ****************************";
-            std::cerr << message() << std::endl;
-            std::cerr << "******************************************************************************\n" << std::endl;
+            //std::cerr << "\n**************************** FATAL ERROR DETECTED ****************************";
+            //std::cerr << message() << std::endl;
+            //std::cerr << "******************************************************************************\n" << std::endl;
         }
 
         void check_for_previous_fatal_errors()
@@ -264,16 +266,16 @@ namespace dlib
             static bool is_first_fatal_error = true;
             if (is_first_fatal_error == false)
             {
-                std::cerr << "\n\n ************************** FATAL ERROR DETECTED ************************** " << std::endl;
-                std::cerr << " ************************** FATAL ERROR DETECTED ************************** " << std::endl;
-                std::cerr << " ************************** FATAL ERROR DETECTED ************************** \n" << std::endl;
-                std::cerr << "Two fatal errors have been detected, the first was inappropriately ignored. \n"
-                          << "To prevent further fatal errors from being ignored this application will be \n"
-                          << "terminated immediately and you should go fix this buggy program.\n\n"
-                          << "The error message from this fatal error was:\n" << this->what() << "\n\n" << std::endl;
+                //std::cerr << "\n\n ************************** FATAL ERROR DETECTED ************************** " << std::endl;
+                //std::cerr << " ************************** FATAL ERROR DETECTED ************************** " << std::endl;
+                //std::cerr << " ************************** FATAL ERROR DETECTED ************************** \n" << std::endl;
+                //std::cerr << "Two fatal errors have been detected, the first was inappropriately ignored. \n"
+                //          << "To prevent further fatal errors from being ignored this application will be \n"
+                 //         << "terminated immediately and you should go fix this buggy program.\n\n"
+                 //         << "The error message from this fatal error was:\n" << this->what() << "\n\n" << std::endl;
                 using namespace std;
                 assert(false);
-                abort();
+                //abort();
             }
             else
             {

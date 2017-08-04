@@ -13,16 +13,18 @@
 using namespace std;
 
 namespace mlnet {
-
-MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_name, char separator) {
+    
+    MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_name, char separator) {
+        return read_multilayer(infile, network_name, separator,false);
+    }
+    
+MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_name, char separator, bool node_aligned) {
 	//std::cout << "create" << std::endl;
 	MLNetworkSharedPtr mnet = MLNetwork::create(network_name);
 	enum NetType {MULTIPLEX_NETWORK, MULTILAYER_NETWORK};
 	enum Section {TYPE, LAYERS, ACTOR_ATTRS, EDGE_ATTRS, NODE_ATTRS, ACTORS, EDGES, NODES, DEFAULT};
 	/********************************************/
 	NetType network_type = MULTIPLEX_NETWORK;
-	// Wether the file contains or not a #NODES section. If not, and type is  MULTIPLEX_NETWORK, by default all actors are added to all layers
-	bool true_multiplex = false;
 	/****************************/
 	// C(++), I hate you...
 	//std::cout << "hate" << std::endl;
@@ -95,11 +97,6 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 		if (v[0].find("#ACTORS")!=string::npos) {
 			current_sect = ACTORS;
 			continue;
-		}
-		if (current_sect == TYPE && network_type == MULTIPLEX_NETWORK) {
-			std::transform(v[0].begin(), v[0].end(), v[0].begin(), touppercase);
-			if (v[0]=="ALL NODES")
-				true_multiplex=true;
 		}
 		if (current_sect == ACTOR_ATTRS) {
 			if (v.size()!=2)
@@ -303,7 +300,7 @@ MLNetworkSharedPtr read_multilayer(const string& infile, const string& network_n
 				read_attributes(mnet->edge_features(layer1,layer2), edge->id, edge_attr_type[layer_name1][layer_name2], edge_attr_names[layer_name1][layer_name2], v, 4, csv.rowNum());
 		}
 	}
-	if (true_multiplex) {
+	if (node_aligned) {
 		// Init nodes
 		for (LayerSharedPtr layer: *mnet->get_layers()) {
 			for (ActorSharedPtr actor: *mnet->get_actors()) {

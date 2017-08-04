@@ -10,8 +10,6 @@
 #ifndef MLNET_MLCPM_H_
 #define MLNET_MLCPM_H_
 
-#include "datastructures.h"
-
 namespace mlnet {
 
     class cpm_community;

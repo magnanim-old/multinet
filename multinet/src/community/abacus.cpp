@@ -141,7 +141,7 @@ namespace mlnet {
         int     scan     = 0;         /* flag for scanable item output */
         ITEM    m;                    /* number of items */
         TID     n;                    /* number of transactions */
-        //SUPP    w;                    /* total transaction weight */
+        //SUPP    w;                  /* total transaction weight */
 
         TABREAD  *tread  = NULL; /* table/transaction reader */
         ITEMBASE *ibase  = NULL; /* item base */
@@ -166,18 +166,22 @@ namespace mlnet {
         
         /* --- read item selection/appearance indicators --- */
         ibase = ib_create(0, 0);      /* create an item base */
-        if (!ibase) std::cout << "e" << std::endl;   /* to manage the items */
+        if (!ibase)
+            ;   /* TODO throw exception */
         tread = trd_create();         /* create a transaction reader */
-        if (!tread) std::cout << "e" << std::endl;   /* and configure the characters */
+        if (!tread)
+            ;   /* TODO throw exception */
         trd_allchs(tread, recseps, fldseps, blanks, "", comment);
 
         /* --- read transaction database --- */
         tabag = tbg_create(ibase);    /* create a transaction bag */
-        if (!tabag) std::cout << "e" << std::endl;   /* to store the transactions */
+        if (!tabag)
+            ;   /* TODO throw exception */   /* to store the transactions */
         if (trd_open(tread, f_inp, NULL) != 0)
-            std::cout << "e" << std::endl;
+            ;   /* TODO throw exception */
         k = tbg_read(tabag, tread, mtar);
-        if (k < 0) std::cout << "e" << std::endl;
+        if (k < 0)
+            ;   /* TODO throw exception */
         trd_delete(tread, 1);         /* read the transaction database, */
         tread = NULL;                 /* then delete the table reader */
         m = ib_cnt(ibase);            /* get the number of items, */
@@ -191,23 +195,30 @@ namespace mlnet {
         /* --- find frequent item sets/association rules --- */
         eclat = eclat_create(target, -min_actors, smax, conf, min_layers, zmax,
                              eval, agg, thresh, algo, mode);
-        if (!eclat) std::cout << "e" << std::endl;   /* create an eclat miner */
+        if (!eclat)
+            ;   /* TODO throw exception */   /* create an eclat miner */
         k = eclat_data(eclat, tabag, 0, sort);
-        if (k) std::cout << "e" << std::endl;            /* prepare data for eclat */
+        if (k)
+            ;   /* TODO throw exception */            /* prepare data for eclat */
         report = isr_create(ibase);   /* create an item set reporter */
-        if (!report) std::cout << "e" << std::endl;  /* and configure it */
+        if (!report)
+            ;   /* TODO throw exception */ /* and configure it */
         k = eclat_report(eclat, report);
-        if (k) std::cout << "e" << std::endl;            /* prepare reporter for eclat */
+        if (k)
+            ;   /* TODO throw exception */            /* prepare reporter for eclat */
         if (isr_setfmt(report, scan, hdr, sep, imp, info) != 0)
-            std::cout << "e" << std::endl;            /* set the output format strings */
+            ;   /* TODO throw exception */           /* set the output format strings */
         k = isr_tidopen(report, f_tid, NULL);  /* open the file for */
-        if (k) std::cout << "e" << std::endl;   /* transaction ids */
+        if (k)
+            ;   /* TODO throw exception */   /* transaction ids */
         k = isr_open(report, f_out, NULL);
-        if (k) std::cout << "e" << std::endl;
+        if (k)
+            ;   /* TODO throw exception */
         if (isr_setup(report) < 0)    /* open the item set file and */
-            std::cout << "e" << std::endl;            /* set up the item set reporter */
+            ;   /* TODO throw exception */            /* set up the item set reporter */
         k = eclat_mine(eclat, prune, 0);
-        if (k) std::cout << "e" << std::endl;              /* find frequent item sets */
+        if (k)
+            ;   /* TODO throw exception */              /* find frequent item sets */
         //if (stats)                    /* print item set statistics */
         //    isr_prstats(report, stdout, 0);
         isr_flush(report);

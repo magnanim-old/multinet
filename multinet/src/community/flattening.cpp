@@ -142,9 +142,10 @@ CommunityStructureSharedPtr  flattenAndDetectComs(const MLNetworkSharedPtr& mnet
 				mnet->add_edge(from,to);
 				switch (wType) {
 						case ZeroOne: expectedWeight =1 ; break;
-						case NumOfLayers: std::cout << "I am here "<< std::endl;
-						                  expectedWeight = numOfDimentionsWeightening(mnet,act1,act2) ;break;
-						case Neighborhood: expectedWeight = neighborhoodWeightening(mnet,act1,act2);break;
+						case NumOfLayers:
+                        expectedWeight = numOfDimentionsWeightening(mnet,act1,act2) ;break;
+						case Neighborhood: expectedWeight = neighborhoodWeightening(mnet,act1,act2);
+                        break;
 						default: expectedWeight =1;
 				}
 			    mnet->set_weight(from,to,expectedWeight);

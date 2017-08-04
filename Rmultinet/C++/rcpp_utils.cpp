@@ -48,46 +48,48 @@ std::unordered_set<LayerSharedPtr> resolve_layers_unordered(const MLNetworkShare
 }
 
 
-std::vector<NodeSharedPtr> resolve_nodes(const MLNetworkSharedPtr& mnet, const CharacterVector& nodes) {
-	if (nodes.size()%2 != 0)
-		stop("Nodes must be specified as actor/layer names (i.e., two entries for each node)");
-	int num_nodes = nodes.size()/2;
-	std::vector<NodeSharedPtr> res(num_nodes);
-	for (int i=0; i<num_nodes; i++) {
-		ActorSharedPtr actor = mnet->get_actor(std::string(nodes(i*2)));
-		if (!actor) stop("cannot find actor " + std::string(nodes(i*2)));
-		LayerSharedPtr layer = mnet->get_layer(std::string(nodes(i*2+1)));
-		if (!layer) stop("cannot find layer " + std::string(nodes(i*2+1)));
-		NodeSharedPtr node = mnet->get_node(actor,layer);
-		if (!node) stop("cannot find node " + actor->name + " " + layer->name);
-		res[i] = node;
-	}
+std::vector<NodeSharedPtr> resolve_nodes(const MLNetworkSharedPtr& mnet, const DataFrame& nodes) {
+	std::vector<NodeSharedPtr> res(nodes.nrow());
+    CharacterVector a = nodes(0);
+    CharacterVector l = nodes(1);
+    
+    for (int i=0; i<nodes.nrow(); i++) {
+        ActorSharedPtr actor = mnet->get_actor(std::string(a(i)));
+        if (!actor) stop("cannot find actor " + std::string(a(i)));
+        LayerSharedPtr layer = mnet->get_layer(std::string(l(i)));
+        if (!layer) stop("cannot find layer " + std::string(l(i)));
+        NodeSharedPtr node = mnet->get_node(actor,layer);
+        if (!node) stop("cannot find actor " + actor->name + " on layer " + layer->name);
+        res[i] = node;
+    }
 	return res;
 }
 
-std::vector<EdgeSharedPtr> resolve_edges(const MLNetworkSharedPtr& mnet, const CharacterVector& edges) {
-	if (edges.size()%4 != 0)
-		stop("Edges must be specified as pairs of actor/layer names (i.e., four entries for each edge)");
-	int num_edges = edges.size()/4;
-	std::vector<EdgeSharedPtr> res(num_edges);
-	for (int i=0; i<num_edges; i++) {
-		ActorSharedPtr actor1 = mnet->get_actor(std::string(edges(i*4)));
-		if (!actor1) stop("cannot find actor " + std::string(edges(i*4)));
-		ActorSharedPtr actor2 = mnet->get_actor(std::string(edges(i*4+2)));
-		if (!actor2) stop("cannot find actor " + std::string(edges(i*4+2)));
-		LayerSharedPtr layer1 = mnet->get_layer(std::string(edges(i*4+1)));
-		if (!layer1) stop("cannot find layer " + std::string(edges(i*4+1)));
-		LayerSharedPtr layer2 = mnet->get_layer(std::string(edges(i*4+3)));
-		if (!layer2) stop("cannot find layer " + std::string(edges(i*4+3)));
-		NodeSharedPtr node1 = mnet->get_node(actor1,layer1);
-		if (!node1) stop("cannot find node " + actor1->name + " " + layer1->name);
-		NodeSharedPtr node2 = mnet->get_node(actor2,layer2);
-		if (!node2) stop("cannot find node " + actor2->name + " " + layer2->name);
-		EdgeSharedPtr edge = mnet->get_edge(node1,node2);
-		if (!edge) stop("cannot find edge " + node1->to_string() + " -> " + node2->to_string());
-		res[i] = edge;
-	}
-	return res;
+std::vector<EdgeSharedPtr> resolve_edges(const MLNetworkSharedPtr& mnet, const DataFrame& edges) {
+	std::vector<EdgeSharedPtr> res(edges.nrow());
+    CharacterVector a_from = edges(0);
+    CharacterVector l_from = edges(1);
+    CharacterVector a_to = edges(2);
+    CharacterVector l_to = edges(3);
+    
+    for (int i=0; i<edges.nrow(); i++) {
+        ActorSharedPtr actor1 = mnet->get_actor(std::string(a_from(i)));
+        if (!actor1) stop("cannot find actor " + std::string(a_from(i)));
+        ActorSharedPtr actor2 = mnet->get_actor(std::string(a_to(i)));
+        if (!actor2) stop("cannot find actor " + std::string(a_to(i)));
+        LayerSharedPtr layer1 = mnet->get_layer(std::string(l_from(i)));
+        if (!layer1) stop("cannot find layer " + std::string(l_from(i)));
+        LayerSharedPtr layer2 = mnet->get_layer(std::string(l_to(i)));
+        if (!layer2) stop("cannot find layer " + std::string(l_to(i)));
+        NodeSharedPtr node1 = mnet->get_node(actor1,layer1);
+        if (!node1) stop("cannot find node " + actor1->name + " " + layer1->name);
+        NodeSharedPtr node2 = mnet->get_node(actor2,layer2);
+        if (!node2) stop("cannot find node " + actor2->name + " " + layer2->name);
+        EdgeSharedPtr edge = mnet->get_edge(node1,node2);
+        if (!edge) stop("cannot find edge " + node1->to_string() + " -> " + node2->to_string());
+        res[i] = edge;
+    }
+    return res;
 }
 
 std::vector<ActorSharedPtr> resolve_actors(const MLNetworkSharedPtr& mnet, const CharacterVector& names) {
@@ -135,4 +137,21 @@ edge_mode resolve_mode(std::string mode) {
     	return OUT;
     else stop("Unexpected value: edge mode " + mode);
 	return INOUT; // never reaches here
+}
+
+DataFrame to_dataframe(CommunityStructureSharedPtr cs) {
+    
+    CharacterVector actor, layer;
+    NumericVector community_id;
+    
+    int comm_id=0;
+    for (CommunitySharedPtr com: cs->get_communities()) {
+        for (NodeSharedPtr node: com->get_nodes()) {
+            actor.push_back(node->actor->name);
+            layer.push_back(node->layer->name);
+            community_id.push_back(comm_id);
+        }
+        comm_id++;
+    }
+    return DataFrame::create(_("actor")=actor,_("layer")=layer,_("cid")=community_id);
 }

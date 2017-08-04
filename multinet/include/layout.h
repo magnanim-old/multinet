@@ -16,6 +16,8 @@ namespace mlnet {
         double z;
     };
     
+    hash_map<NodeSharedPtr,xyz_coordinates> circular(MLNetworkSharedPtr& mnet, double radius);
+    
     double fr(double p, double k);
     
     double fain(double p, double k);

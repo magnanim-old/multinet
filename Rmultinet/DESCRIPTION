@@ -2,16 +2,14 @@ Package: multinet
 Type: Package
 Title: Analysis and Mining of Multilayer Social Networks
 Version: 1.1
-Date: 2017-01-15
+Date: 2017-07-20
 Author: Matteo Magnani
 Maintainer: Matteo Magnani <matteo.magnani@it.uu.se>
 Description: Functions for the creation/generation and analysis of multilayer social networks.
 License: GPL
-Depends: igraph (>= 0.7.0), Rcpp (>= 0.11.1), rgl, methods
+Depends: igraph (>= 1.0.1), Rcpp (>= 0.12.11), methods
 LinkingTo: Rcpp
 RcppModules: multinet
 SystemRequirements: A C++11 compiler.
 NeedsCompilation: yes
-Packaged: 2017-01-15 22:39:03 UTC; matteomagnani
 Repository: CRAN
-Date/Publication: 2017-01-17 01:07:57

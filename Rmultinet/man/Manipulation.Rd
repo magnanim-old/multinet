@@ -29,12 +29,12 @@ delete.nodes.ml(mlnetwork, nodes)
 delete.edges.ml(mlnetwork, edges)
 }
 \arguments{
-\item{mlnetwork}{A multilayer network}
+\item{mlnetwork}{A multilayer network.}
 \item{layers}{An array of names of layers.}
 \item{actors}{An array of names of actors.}
 \item{directed}{Determines if the layer(s) is (are) directed or undirected. If multiple layers are specified, directed should be either a single value or an array with as many values as the number of layers.}
-\item{nodes}{A vector of nodes to be updated. Each node is represented by two consecutive entries in the vector, one specifying an actor name and one specifying a layer name. If this is specified, actors, layers and edges should not.}
-\item{edges}{A vector containing the nodes to be connected. Each edge to be created is represented by four consecutive entries in the vector: actor1 name, layer1 name, actor2 name, layer2 name. The directionality of the edge (directed/undirected) is pre-defined depending on the layer(s).}
+\item{nodes}{A dataframe of nodes to be updated. The first column specifies actor names, the second layer names.}
+\item{edges}{A dataframe containing the nodes to be connected. The four columns must contain, in this order: actor1 name, layer1 name, actor2 name, layer2 name. The directionality of the edge (directed/undirected) is pre-defined depending on the layer(s).}
 }
 \seealso{
 \link{Network management: properties}, \link{Network management: edge directionality}
@@ -45,33 +45,42 @@ net <- ml.empty()
 add.layers.ml(net,"l1")
 add.layers.ml(net,c("l2","l3"),c(TRUE,FALSE))
 layers.ml(net)
-# Adding some actors
+# Adding actors A1, A2, A3
 add.actors.ml(net,"A1")
 add.actors.ml(net,c("A2","A3"))
-actors.ml(net)
+# Verifying that the actors have been added correctly
 num.actors.ml(net)
+actors.ml(net)
 # Adding some nodes (actor A3 is not present in layer l3: no corresponding node there)
-add.nodes.ml(net,c("A1","l1","A2","l1","A3","l1","A1","l2","A2","l2","A3","l2"))
-add.nodes.ml(net,c("A1","l3","A2","l3"))
+nodes <- data.frame(
+    c("A1","A2","A3","A1","A2","A3"),
+    c("l1","l1","l1","l2","l2","l2"))
+add.nodes.ml(net,nodes)
+nodes <- data.frame(
+    c("A1","A2"),
+    c("l3","l3"))
+add.nodes.ml(net,nodes)
 nodes.ml(net)
-# We create a vector specifying two edges
-e <- c(c("A2","l2","A3","l2"),c("A1","l1","A3","l2"))
-# Or, equivalently: e <- c("A2","l2","A3","l2","A1","l1","A3","l2")
-# If the edges are available in a matrix M, e.g.,
-#      [,1] [,2] [,3] [,4]
-# [1,] "a1" "l1" "a2" "l2"
-# [2,] "a1" "l1" "a2" "l2"
-# Then as.vector(t(M)) creates the requested input parameter
-add.edges.ml(net,e)
+# We create a data frame specifying two edges:
+# A2,l2 -- A3,l1
+# A2,l2 -- A3,l2
+edges <- data.frame(
+    c("A2","A2"),
+    c("l2","l2"),
+    c("A3","A3"),
+    c("l1","l2"))
+add.edges.ml(net,edges)
 edges.ml(net)
 
-# The following also deletes all nodes from "l1" and the edge with an end-point in "l1"
+# The following deletes layer 1, ans also deletes
+# all nodes from "l1" and the edge with an end-point in "l1"
 delete.layers.ml(net,"l1")
-# The following also deletes the nodes associated to "A1" in layers "l2" and "l3"
+# The following also deletes the nodes associated to
+# "A1" in layers "l2" and "l3"
 delete.actors.ml(net,"A1")
-# nodes and edges
-delete.nodes.ml(net,c("A2","l3"))
-e <- c("A2","l2","A3","l2")
-delete.edges.ml(net,e)
+# deleting node A2,l3 and edge A2,l2 -- A3,l2
+delete.nodes.ml(net,data.frame("A2","l3"))
+edges <- data.frame("A2","l2","A3","l2")
+delete.edges.ml(net,edges)
 net
 }

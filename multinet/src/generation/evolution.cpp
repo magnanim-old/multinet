@@ -15,22 +15,10 @@ namespace mlnet {
 void evolve(MLNetworkSharedPtr& mnet,
 		long num_of_steps,
 		long num_initial_actors,
-		//std::vector<int> num_new_vertexes_per_step,
 		const std::vector<double>& pr_internal_event,
 		const std::vector<double>& pr_external_event,
 		const matrix<double>& dependency,
 		const std::vector<EvolutionModelSharedPtr>& evolution_model) {
-
-	/* init of support data structures
-	std::vector<std::set<entity_id> > free_identities(mnet.getNumNetworks());
-	std::set<entity_id> ids = mnet.getGlobalIdentities();
-
-	//std::cout << "Init identities" << std::endl;
-	for (int n=0; n<mnet.getNumNetworks(); n++) {
-		std::set<entity_id> to_copy(ids.begin(),ids.end());
-		free_identities[n] = to_copy;
-	}
-	*/
 
 	std::vector<double> pr_no_event;
 
@@ -39,18 +27,15 @@ void evolve(MLNetworkSharedPtr& mnet,
 	}
 
 	// Creating num_initial_actors actors
-	//std::cout << "INIT ACTORS" << std::endl;
 	for (uint i=0; i<num_initial_actors; i++)
 		mnet->add_actor("A"+std::to_string(i));
 
 	// Initialization
 	for (uint n=0; n<mnet->get_layers()->size(); n++) {
-		//std::cout << "INIT LAYER " << n << std::endl;
 		evolution_model[n]->init_step(mnet,mnet->get_layers()->get_at_index(n));
 	}
 
 	for (long i=0; i<num_of_steps; i++) {
-		//std::cout << "step " << i << std::endl;
 		for (uint n=0; n<mnet->get_layers()->size(); n++) {
 
 			LayerSharedPtr target_layer = mnet->get_layers()->get_at_index(n);

@@ -359,7 +359,7 @@ void lart::exp_by_squaring_iterative(Eigen::SparseMatrix<double>& x, int t) {
 
 CommunityStructureSharedPtr lart::fit(
 	MLNetworkSharedPtr mnet, int t, double eps, double gamma) {
-	DTRACE4(LART_START, mnet->name.c_str(), t, std::to_string(eps), std::to_string(gamma));
+	//DTRACE4(LART_START, mnet->name.c_str(), t, std::to_string(eps), std::to_string(gamma));
 
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 
@@ -375,9 +375,9 @@ CommunityStructureSharedPtr lart::fit(
 		prcheck(aP, edges, a.size() * a[0].rows());
 	}
 
-	DTRACE0(LART_WALK_START);
+	//DTRACE0(LART_WALK_START);
 	exp_by_squaring_iterative(aP, t);
-	DTRACE0(LART_WALK_END);
+	//DTRACE0(LART_WALK_END);
 
 	Eigen::MatrixXd Dt = Dmat(aP, dA, a.size());
 
@@ -387,9 +387,9 @@ CommunityStructureSharedPtr lart::fit(
 
 	std::vector<unsigned long> labels;
 	std::vector<dlib::bu_cluster> clusters(Dt.rows());
-	DTRACE0(LART_AC_START);
+	//DTRACE0(LART_AC_START);
 	dlib::bottom_up_cluster(dlib::mat(Dt), labels, 2, 100, clusters);
-	DTRACE0(LART_AC_END);
+	//DTRACE0(LART_AC_END);
 	Dt.resize(0,0);
 
 	vector<double> mod = modMLPX(clusters, a, gamma);
@@ -399,7 +399,7 @@ CommunityStructureSharedPtr lart::fit(
 
 	vector<unsigned int> partition = get_partition(clusters, maxmodix, a.size(), a[0].rows());
 
-	DTRACE0(LART_END);
+	//DTRACE0(LART_END);
 	return cutils::nodes2communities(mnet, partition);
 }
 

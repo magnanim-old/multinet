@@ -30,24 +30,24 @@ set.values.ml(mlnetwork, attribute, actors=character(0),
 \item{attribute}{The name of the attribute to be updated.}
 \item{actors}{A vector of actor names. If this is specified, layers, nodes and edges should not.}
 \item{layers}{A vector of layer names. If this is specified, actors, nodes and edges should not.}
-\item{nodes}{A vector of nodes. Each node is represented by two consecutive entries in the vector, one specifying an actor name and one specifying a layer name. If this is specified, actors, layers and edges should not.}
-\item{edges}{A vector of edges. Each edge is represented by four consecutive entries in the vector: actor1 name, layer1 name, actor2 name, layer2 name. If this is specified, actors, layers and nodes should not.}
-\item{values}{A vector of values to be set for the corresponding actors, vertexes or edges.}
+\item{nodes}{A dataframe of nodes to be updated. The first column specifies actor names, the second layer names. If this is specified, actors, layers and edges should not.}
+\item{edges}{A dataframe containing the nodes to be connected. The four columns must contain, in this order: actor1 name, layer1 name, actor2 name, layer2 name. If this is specified, actors, layers and nodes should not.}
+\item{values}{A vector of values to be set for the corresponding actors, layers, nodes or edges.}
 }
 \value{
-\code{list.attributes.ml} returns a matrix with columns: "name", and "type". If node attributes are listed, an additional "layer" column is used. If edge attributes are listed, two columns "layer1" and "layer2" are included.
-\code{get.values.ml} returns a mattrix with the requested objects and their value on the input attribute.
+\code{list.attributes.ml} returns a data frame with columns: "name", and "type". If node attributes are listed, an additional "layer" column is used. If edge attributes are listed, two columns "layer1" and "layer2" are included.
+\code{get.values.ml} returns a data frame with the values for the requested objects.
 }
 \examples{
 net <- ml.aucs()
 list.attributes.ml(net)
 # actor attributes, of string type (default)
 new.attributes.ml(net,c("name","surname"))
-# a numeric attribute associate to the layers
+# a numeric attribute associated to the layers
 new.attributes.ml(net,"num nodes",type="numeric",target="layer")
 # attributes for nodes on the facebook layer
 new.attributes.ml(net,"username",type="string",target="node",layer="facebook")
-# attributes for edges on the lunch layer
+# attributes for edges on the work layer
 new.attributes.ml(net,"strength",type="numeric",target="edge",layer="work")
 # listing the attributes
 list.attributes.ml(net)
@@ -56,7 +56,11 @@ list.attributes.ml(net,"node")
 list.attributes.ml(net,"edge")
 # setting some values for the newly created attributes
 set.values.ml(net,"name",actors=c("U54","U139"),values=c("John","Johanna"))
-e <- c(c("U139","work","U71","work"),c("U139","work","U97","work"))
+e <- data.frame(
+    c("U139","U139"),
+    c("work","work"),
+    c("U71","U97"),
+    c("work","work"))
 set.values.ml(net,"strength",edges=e,values=.47)
 # getting the values back
 get.values.ml(net,"name",actors=c("U139"))
@@ -67,11 +71,11 @@ actors.ml(net) -> a
 layers.ml(net) -> l
 degree.ml(net,actors=a,layers=l,mode="all") -> d
 new.attributes.ml(net,target="actor",type="numeric",attributes="degree")
-set.values.ml(net,attribute="degree",actors=a,values=as.vector(d))
+set.values.ml(net,attribute="degree",actors=a,values=d)
 get.values.ml(net,attribute="degree",actors="U54")
 # select actors based on attribute values (e.g., with degree greater than 40)
 get.values.ml(net,attribute="degree",actors=a) -> degrees
-degrees[degrees[,2]>40,]
+a[degrees>40]
 # list all the attributes again
 list.attributes.ml(net)
 }

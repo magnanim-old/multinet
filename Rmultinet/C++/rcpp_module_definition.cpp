@@ -75,7 +75,7 @@ RCPP_MODULE(multinet){
     function("grow.ml", &growMultiplex, List::create( _["num.actors"], _["num.steps"], _["models"], _["pr.internal"], _["pr.external"], _["dependency"]), "Grows a multiplex network"); // TODO
 
     // IO
-    function("read.ml", &readMultilayer, List::create( _["file"], _["name"]="unnamed", _["sep"]=','), "Reads a multilayer network from a file");
+    function("read.ml", &readMultilayer, List::create( _["file"], _["name"]="unnamed", _["sep"]=',', _["aligned"]=false), "Reads a multilayer network from a file");
     function("write.ml", &writeMultilayer, List::create( _["mlnetwork"], _["file"], _["format"]="multilayer", _["layers"]=CharacterVector(), _["sep"]=',', _["merge.actors"]=true, _["all.actors"]=false), "Writes a multilayer network to a file");
 
     /**************************************/
@@ -87,7 +87,7 @@ RCPP_MODULE(multinet){
     function("nodes.ml", &nodes, List::create( _["mlnetwork"], _["layers"]=CharacterVector()), "Returns the list of nodes in the input layers, or in the whole multilayer network if no layers are specified");
     function("edges.ml", &edges, List::create( _["mlnetwork"], _["layers1"]=CharacterVector(), _["layers2"]=CharacterVector()), "Returns the list of edges among nodes in the input layers (if only one set of layers is specified), or from the first set of input layers to the second set of input layers, or in the whole multilayer network if no layers are specified");
     
-    function("edges_tmp.ml", &edges_idx, List::create( _["mlnetwork"]), "miao");
+    function("edges.idx.ml", &edges_idx, List::create( _["mlnetwork"]), "miao");
 
 
     function("num.layers.ml", &numLayers, List::create( _["mlnetwork"]), "Returns the number of layers in the input mlnetwork");
@@ -109,7 +109,7 @@ RCPP_MODULE(multinet){
     function("add.nodes.ml", &addNodes, List::create( _["mlnetwork"], _["nodes"]), "Adds one or more nodes to a layer of a multilayer network");
     function("add.edges.ml", &addEdges, List::create( _["mlnetwork"], _["edges"]), "Adds one or more edges to a multilayer network - each edge is a quadruple [actor,layer,actor,layer]");
 
-    function("set.directed.ml", &setDirected, List::create( _["mlnetwork"], _["layers"], _["directed"]=true), "Set the directionality of one or more pairs of layers");
+    function("set.directed.ml", &setDirected, List::create( _["mlnetwork"], _["directionalities"]), "Set the directionality of one or more pairs of layers");
 
     function("delete.layers.ml", &deleteLayers, List::create( _["mlnetwork"], _["layers"]), "Deletes one or more layers from a multilayer network");
     function("delete.actors.ml", &deleteActors, List::create( _["mlnetwork"], _["actors"]), "Deletes one or more actors from a multilayer network");
@@ -138,16 +138,23 @@ RCPP_MODULE(multinet){
     function("connective.redundancy.ml", &connective_redundancy_ml, List::create( _["mlnetwork"], _["actors"]=CharacterVector(), _["layers"]=CharacterVector(), _["mode"] = "all"), "Returns the connective redundancy of each actor");
     function("relevance.ml", &relevance_ml, List::create( _["mlnetwork"], _["actors"]=CharacterVector(), _["layers"]=CharacterVector(), _["mode"] = "all"), "Returns the layer relevance of each actor");
     function("xrelevance.ml", &xrelevance_ml, List::create( _["mlnetwork"], _["actors"]=CharacterVector(), _["layers"]=CharacterVector(), _["mode"] = "all"), "Returns the exclusive layer relevance of each actor");
-    function("similarity.ml", &similarity_ml, List::create( _["mlnetwork"], _["layer1"], _["layer2"], _["method"] = "jaccard.edges"), "Computes the similarity between the input layers");
-    function("correlation.ml", &correlation_ml, List::create( _["mlnetwork"], _["layer1"], _["layer2"], _["method"] = "pearson.degree", _["mode"] = "all"), "Computes the correlation between the input layers");
+    function("layer.summary.ml", &summary_ml, List::create( _["mlnetwork"], _["layer"], _["method"] = "entropy.degree", _["mode"] = "all"), "Computes a summary of the input layer");
+    function("layer.comparison.ml", &comparison_ml, List::create( _["mlnetwork"], _["layers"]=CharacterVector(), _["method"] = "jaccard.edges", _["mode"] = "all", _["K"] = 0), "Computes the similarity between the input layers");
     function("distance.ml", &distance_ml, List::create( _["mlnetwork"], _["from"], _["to"]=CharacterVector(), _["method"] = "multiplex"), "Computes the distance between two actors");
 
     // CLUSTERING
-    //function("clique.percolation.ml", &cliquepercolation_ml, List::create( _["mlnetwork"], _["k"]=3, _["m"]=1), "Extension of the clique percolation method");
-
+    function("clique.percolation.ml", &cliquepercolation_ml, List::create( _["mlnetwork"], _["k"]=3, _["m"]=1), "Extension of the clique percolation method");
+    function("glouvain.ml", &glouvain_ml, List::create( _["mlnetwork"], _["gamma"]=1, _["omega"]=1, _["limit"]=0), "Extension of the louvain method");
+    function("abacus.ml", &abacus_ml, List::create( _["mlnetwork"], _["min.actors"]=3, _["min.layers"]=1), "Community extraction based on frequent itemset mining");
+    function("lart.ml", &lart_ml, List::create( _["mlnetwork"], _["t"]=-1, _["eps"]=1, _["gamma"]=1), "Community extraction based on locally adaptive random walks");
 
     // FOR VISUALIZATION
-    function("layout.multiforce.ml", &multiforce_ml, List::create( _["mlnetwork"], _["w_in"]=1, _["w_inter"]=1, _["gravity"]=1, _["iterations"]=100), "Multiforce method: computes node coordinates");
+    function("layout.multiforce.ml", &multiforce_ml, List::create( _["mlnetwork"], _["w_in"]=1, _["w_inter"]=1, _["gravity"]=0, _["iterations"]=100), "Multiforce method: computes node coordinates");
+    function("layout.circular.ml", &circular_ml, List::create( _["mlnetwork"] ), "Circular method: computes node coordinates arranging actors on a circle");
+    // plotting function defined in functions.R
+    
+    
+    function("get.community.list.ml", &to_list, List::create( _["comm.struct"], _["mlnetwork"]), "Converts a community structure (data frame) into a list of communities, layer by layer");
     
     //function("sir.ml", &sir_ml, List::create( _["mlnetwork"], _["beta"], _["tau"], _["num_iterations"] = 1000), "Executes a SIR spreading process, returning the number of nodes in each status at each iteration");
 }
