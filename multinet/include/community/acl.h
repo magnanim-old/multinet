@@ -72,7 +72,7 @@ class acl {
   std::tuple<std::vector<double>, std::vector<int>> sweep_cut(Eigen::VectorXd apprv);
   std::vector<mlnet::NodeSharedPtr> id2nodes(mlnet::MLNetworkSharedPtr ml2);
   std::tuple<double, std::vector<int>> get_smallest_conductance_cut(std::tuple<std::vector<double>, std::vector<int>> sweep_sets);
-  void print_sweep_set(std::tuple<std::vector<double>, std::vector<int>> sweep_sets, bool print_sets);
+  //void print_sweep_set(std::tuple<std::vector<double>, std::vector<int>> sweep_sets, bool print_sets);
   std::tuple<std::vector<double>, std::vector<int>> aclcut(Eigen::VectorXd seeds, double teleport, double epsilon);
   
   

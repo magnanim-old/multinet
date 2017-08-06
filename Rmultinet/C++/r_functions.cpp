@@ -66,10 +66,6 @@ RMLNetwork growMultiplex(int num_actors, long num_of_steps, const GenericVector&
     if (dependency.nrow()!=num_layers || dependency.ncol()!=num_layers ||
         pr_internal_event.size()!=num_layers || pr_external_event.size()!=num_layers)
         stop("The number of evolution models, evolution probabilities and the number of rows/columns of the dependency matrix must be the same");
-    MLNetworkSharedPtr mnet = MLNetwork::create("synthetic");
-    for (int i=0; i<num_layers; i++) {
-        mnet->add_layer("L"+to_string(i),UNDIRECTED);
-    }
     std::vector<double> pr_int(pr_internal_event.size());
     for (int i=0; i<pr_internal_event.size(); i++)
         pr_int[i] = pr_internal_event.at(i);
@@ -88,8 +84,7 @@ RMLNetwork growMultiplex(int num_actors, long num_of_steps, const GenericVector&
     for (int i=0; i<models.size(); i++) {
         models[i] = (as<REvolutionModel>(evolution_model[i])).get_model();
     }
-    evolve(mnet,num_of_steps,num_actors,pr_int,pr_ext,dep,models);
-    return RMLNetwork(mnet);
+    return RMLNetwork(evolve(num_of_steps,num_actors,pr_int,pr_ext,dep,models));
 }
 
 // INFORMATION ON NETWORKS

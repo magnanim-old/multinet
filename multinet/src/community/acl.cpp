@@ -483,9 +483,10 @@ namespace mlnet {
   }
 
   //Prints a sweep set
+    /*
   void acl::print_sweep_set(std::tuple<std::vector<double>, std::vector<int>> sweep_sets, bool print_sets) {
 
-      /*
+      
     std::vector<double> cs = std::get<0>(sweep_sets);
     std::vector<int> pprv = std::get<1>(sweep_sets);
 
@@ -512,8 +513,8 @@ namespace mlnet {
     }
     if(cs.size() != 0)
       std::cout << "Lowest conductance: " << i_mini+1 << " " << cs[i_mini] << std::endl;  
-     */
-  }
+     
+  }*/
     
   
 }
