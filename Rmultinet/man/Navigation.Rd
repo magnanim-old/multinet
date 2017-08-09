@@ -13,7 +13,7 @@ neighbors.ml(mlnetwork, actor, layers=character(0), mode="all")
 xneighbors.ml(mlnetwork, actor, layers=character(0), mode="all")
 }
 \arguments{
-\item{mlnetwork}{A multilayer network}
+\item{mlnetwork}{A multilayer network.}
 \item{actor}{An actor name present in the network, whose neighbors are extracted.}
 \item{layers}{An array of layers belonging to the network. Only the nodes in these layers are returned. If the array is empty, all the nodes in the network are returned.}
 \item{mode}{This argument can take values "in", "out" or "all" to indicate respectively neighbors reachable via incoming edges, via outgoing edges or both.}

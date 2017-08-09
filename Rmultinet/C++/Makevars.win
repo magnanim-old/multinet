@@ -1,1 +1,1 @@
-PKG_CPPFLAGS = -std=c++0x
+PKG_CPPFLAGS = -std=c++0x -Iinclude -Ilib -Ilib/spectra -Ilib/eigen3 -Ilib/eclat

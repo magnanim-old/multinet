@@ -573,17 +573,17 @@ void property_matrix<STRUCTURE,CONTEXT,NUMBER>::rankify() {
 	structure_comparison_function<STRUCTURE,CONTEXT,NUMBER> f(this,&c);
 	std::sort(ranks.begin(), ranks.end(), f);
 
-	uint i=0;
+	size_t i=0;
 	while (i<ranks.size()) {
         pm_value<NUMBER> v1 = get(ranks[i],c);
         if (v1.is_na) {i++; continue;}
-		uint last_tie = i;
+		size_t last_tie = i;
 		while (i+1<ranks.size()) {
             pm_value<NUMBER> v2 = get(ranks[i+1],c);
             if (v1.is_na || v2.val>v1.val) {break;}
 			i++;
 		}
-		for (uint j=last_tie; j<=i; j++) {
+		for (size_t j=last_tie; j<=i; j++) {
 			set(ranks[j],c,((double)last_tie+i)/2+1);
 		}
 		i++;

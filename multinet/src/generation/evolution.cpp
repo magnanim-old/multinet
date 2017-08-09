@@ -65,7 +65,7 @@ MLNetworkSharedPtr evolve(
             else {
                 // EXTERNAL EVOLUTION
 				// choose a layer from which to import edges.
-				uint layer_index = test(dependency[n]);
+				size_t layer_index = test(dependency[n]);
                 LayerSharedPtr external_layer = mnet->get_layers()->get_at_index(layer_index);
                 
                 evolution_model[n]->external_evolution_step(mnet,target_layer,available_actors[n],external_layer);

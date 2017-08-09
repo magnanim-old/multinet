@@ -55,8 +55,8 @@ hash_map<NodeSharedPtr,xyz_coordinates> multiforce(MLNetworkSharedPtr& mnet, dou
                 // add effect of gravity, to prevent disc. components from diverging
                 double DeltaNorm = std::sqrt(pos[v].x*pos[v].x+pos[v].y*pos[v].y);
                 if (DeltaNorm==0) continue;
-                disp[v].x = disp[v].x + pos[v].x/DeltaNorm*fain(DeltaNorm,k)*gravity.at(l);
-                disp[v].y = disp[v].y + pos[v].y/DeltaNorm*fain(DeltaNorm,k)*gravity.at(l);
+                disp[v].x = disp[v].x - pos[v].x/DeltaNorm*fain(DeltaNorm,k)*gravity.at(l);
+                disp[v].y = disp[v].y - pos[v].y/DeltaNorm*fain(DeltaNorm,k)*gravity.at(l);
                 
 			}
 		}

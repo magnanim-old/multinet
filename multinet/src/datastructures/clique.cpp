@@ -11,14 +11,14 @@ bool clique::operator==(const clique& comp) const {
 	if (actors.size() != comp.actors.size() || layers.size() != comp.layers.size()) return false;
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
-	for (uint i = 0; i<actors.size(); i++) {
+	for (size_t i = 0; i<actors.size(); i++) {
 		if ((*it1)!=(*it2))
 			return false;
 		++it1; ++it2;
 	}
 	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
 	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
-	for (uint i = 0; i<layers.size(); i++) {
+	for (size_t i = 0; i<layers.size(); i++) {
 		if ((*itl1)!=(*itl2))
 			return false;
 		++itl1; ++itl2;
@@ -30,14 +30,14 @@ bool clique::operator!=(const clique& comp) const {
 	if (actors.size() != comp.actors.size() || layers.size() != comp.layers.size()) return true;
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
-	for (uint i = 0; i<actors.size(); i++) {
+	for (size_t i = 0; i<actors.size(); i++) {
 		if ((*it1)!=(*it2))
 			return true;
 		++it1; ++it2;
 	}
 	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
 	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
-	for (uint i = 0; i<layers.size(); i++) {
+	for (size_t i = 0; i<layers.size(); i++) {
 		if ((*itl1)!=(*itl2))
 			return true;
 		++itl1; ++itl2;
@@ -50,7 +50,7 @@ bool clique::operator<(const clique& comp) const {
 	if (layers.size() != comp.layers.size()) return layers.size() < comp.layers.size();
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
-	for (uint i = 0; i<actors.size(); i++) {
+	for (size_t i = 0; i<actors.size(); i++) {
 		if ((*it1)<(*it2))
 			return true;
 		if ((*it1)>(*it2))
@@ -59,7 +59,7 @@ bool clique::operator<(const clique& comp) const {
 	}
 	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
 	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
-	for (uint i = 0; i<layers.size(); i++) {
+	for (size_t i = 0; i<layers.size(); i++) {
 		if ((*itl1)<(*itl2))
 			return true;
 		if ((*itl1)>(*itl2))
@@ -74,7 +74,7 @@ bool clique::operator>(const clique& comp) const {
 	if (layers.size() != comp.layers.size()) return layers.size() > comp.layers.size();
 	sorted_set<ActorSharedPtr>::iterator it1 = actors.begin();
 	sorted_set<ActorSharedPtr>::iterator it2 = comp.actors.begin();
-	for (uint i = 0; i<actors.size(); i++) {
+	for (size_t i = 0; i<actors.size(); i++) {
 		if ((*it1)>(*it2))
 			return true;
 		if ((*it1)<(*it2))
@@ -83,7 +83,7 @@ bool clique::operator>(const clique& comp) const {
 	}
 	sorted_set<LayerSharedPtr>::iterator itl1 = layers.begin();
 	sorted_set<LayerSharedPtr>::iterator itl2 = comp.layers.begin();
-	for (uint i = 0; i<layers.size(); i++) {
+	for (size_t i = 0; i<layers.size(); i++) {
 		if ((*itl1)>(*itl2))
 			return true;
 		if ((*itl1)<(*itl2))

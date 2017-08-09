@@ -27,12 +27,11 @@ net <- ml.aucs()
 multigraph <- as.igraph(net)
 # this is a simple graph corresponding to the facebook layer
 facebook1 <- as.igraph(net, "facebook")
-# this includes also the actors of the aucs network
-# without a facebook account
+# this includes also the actors without a facebook account
 facebook2 <- as.igraph(net, "facebook", all.actors=TRUE)
 # two layers are converted to an igraph object, where two
 # nodes are used for each actor: one corresponding to the
 # node on facebook, one to the node on lunch
-facebook.lunch <- as.igraph(net, c("facebook","lunch"),
+f_l_net <- as.igraph(net, c("facebook","lunch"),
     merge.actors=FALSE)
 }

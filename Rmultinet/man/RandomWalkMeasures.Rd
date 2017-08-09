@@ -5,7 +5,7 @@
 Network analysis measures
 }
 \description{
-These functions compute network analysis measures based on multilayer random walks. These measures are currently implemented for networks without inter-layer edges.
+This simulation-based function computes a version of node degree based on multilayer random walks. This is currently implemented for networks without inter-layer edges, and given a pair of layers there is a fixed probability to jumo from one to the other for all nodes. Notice that other random-walk-based methods in the library (such as the lart clustering algorithm) may use transition probabilities that depend on the neighboring structure of each node.
 }
 \usage{
 occupation.ml(mlnetwork,transitions,teleportation=.2,steps=0)

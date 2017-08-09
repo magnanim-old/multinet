@@ -67,21 +67,21 @@ RMLNetwork growMultiplex(int num_actors, long num_of_steps, const GenericVector&
         pr_internal_event.size()!=num_layers || pr_external_event.size()!=num_layers)
         stop("The number of evolution models, evolution probabilities and the number of rows/columns of the dependency matrix must be the same");
     std::vector<double> pr_int(pr_internal_event.size());
-    for (int i=0; i<pr_internal_event.size(); i++)
+    for (size_t i=0; i<pr_internal_event.size(); i++)
         pr_int[i] = pr_internal_event.at(i);
     std::vector<double> pr_ext(pr_external_event.size());
-    for (int i=0; i<pr_external_event.size(); i++)
+    for (size_t i=0; i<pr_external_event.size(); i++)
         pr_ext[i] = pr_external_event.at(i);
     std::vector<std::vector<double> > dep(dependency.nrow());
-    for (int i=0; i<dependency.nrow(); i++) {
+    for (size_t i=0; i<dependency.nrow(); i++) {
         std::vector<double> row(dependency.ncol());
-        for (int j=0; j<dependency.ncol(); j++) {
+        for (size_t j=0; j<dependency.ncol(); j++) {
             row[j] = dependency(i,j);
         }
         dep[i] = row;
     }
     std::vector<EvolutionModelSharedPtr> models(evolution_model.size());
-    for (int i=0; i<models.size(); i++) {
+    for (size_t i=0; i<models.size(); i++) {
         models[i] = (as<REvolutionModel>(evolution_model[i])).get_model();
     }
     return RMLNetwork(evolve(num_of_steps,num_actors,pr_int,pr_ext,dep,models));
@@ -289,14 +289,14 @@ std::unordered_set<std::string> actor_xneighbors(const RMLNetwork& rmnet, const 
 void addLayers(RMLNetwork& rmnet, const CharacterVector& layer_names, const LogicalVector& directed) {
     MLNetworkSharedPtr mnet = rmnet.get_mlnet();
     if (directed.size()==1) {
-        for (int i=0; i<layer_names.size(); i++) {
+        for (size_t i=0; i<layer_names.size(); i++) {
             mnet->add_layer(std::string(layer_names[i]),directed[0]?DIRECTED:UNDIRECTED);
         }
     }
     else if (layer_names.size()!=directed.size())
         stop("Same number of layer names and layer directionalities expected");
     else {
-        for (int i=0; i<layer_names.size(); i++) {
+        for (size_t i=0; i<layer_names.size(); i++) {
             mnet->add_layer(std::string(layer_names[i]),directed[i]?DIRECTED:UNDIRECTED);
         }
     }
@@ -304,7 +304,7 @@ void addLayers(RMLNetwork& rmnet, const CharacterVector& layer_names, const Logi
 
 void addActors(RMLNetwork& rmnet, const CharacterVector& actor_names) {
     MLNetworkSharedPtr mnet = rmnet.get_mlnet();
-    for (int i=0; i<actor_names.size(); i++) {
+    for (size_t i=0; i<actor_names.size(); i++) {
         mnet->add_actor(std::string(actor_names[i]));
     }
 }
@@ -315,7 +315,7 @@ void addNodes(RMLNetwork& rmnet, const DataFrame& nodes) {
     CharacterVector a = nodes(0);
     CharacterVector l = nodes(1);
 
-    for (int i=0; i<nodes.nrow(); i++) {
+    for (size_t i=0; i<nodes.nrow(); i++) {
         ActorSharedPtr actor = mnet->get_actor(std::string(a(i)));
         if (!actor) stop("cannot find actor " + std::string(a(i)));
         LayerSharedPtr layer = mnet->get_layer(std::string(l(i)));
@@ -332,7 +332,7 @@ void addEdges(RMLNetwork& rmnet, const DataFrame& edges) {
     CharacterVector a_to = edges(2);
     CharacterVector l_to = edges(3);
 
-    for (int i=0; i<edges.nrow(); i++) {
+    for (size_t i=0; i<edges.nrow(); i++) {
         ActorSharedPtr actor1 = mnet->get_actor(std::string(a_from(i)));
         if (!actor1) stop("cannot find actor " + std::string(a_from(i)));
         ActorSharedPtr actor2 = mnet->get_actor(std::string(a_to(i)));
@@ -354,7 +354,7 @@ void setDirected(const RMLNetwork& rmnet, const DataFrame& layers_dir) {
     CharacterVector l1 = layers_dir(0);
     CharacterVector l2 = layers_dir(1);
     NumericVector dir = layers_dir(2);
-    for (int i=0; i<layers_dir.nrow(); i++) {
+    for (size_t i=0; i<layers_dir.nrow(); i++) {
         LayerSharedPtr layer1 = mnet->get_layer(std::string(l1(i)));
         if (!layer1) stop("cannot find layer " + std::string(l1(i)));
         LayerSharedPtr layer2 = mnet->get_layer(std::string(l2(i)));
@@ -367,7 +367,7 @@ void setDirected(const RMLNetwork& rmnet, const DataFrame& layers_dir) {
 
 void deleteLayers(RMLNetwork& rmnet, const CharacterVector& layer_names) {
     MLNetworkSharedPtr mnet = rmnet.get_mlnet();
-    for (int i=0; i<layer_names.size(); i++) {
+    for (size_t i=0; i<layer_names.size(); i++) {
         LayerSharedPtr layer = mnet->get_layer(std::string(layer_names(i)));
         mnet->erase(layer);
     }
@@ -375,7 +375,7 @@ void deleteLayers(RMLNetwork& rmnet, const CharacterVector& layer_names) {
 
 void deleteActors(RMLNetwork& rmnet, const CharacterVector& actor_names) {
     MLNetworkSharedPtr mnet = rmnet.get_mlnet();
-    for (int i=0; i<actor_names.size(); i++) {
+    for (size_t i=0; i<actor_names.size(); i++) {
         ActorSharedPtr actor = mnet->get_actor(std::string(actor_names(i)));
         mnet->erase(actor);
     }
@@ -411,14 +411,14 @@ void newAttributes(RMLNetwork& rmnet, const CharacterVector& attribute_names, co
     if (target=="actor") {
         if (layer_name!="" || layer_name1!="" || layer_name2!="")
             stop("No layers should be specified for target 'actor'");
-        for (int i=0; i<attribute_names.size(); i++) {
+        for (size_t i=0; i<attribute_names.size(); i++) {
             mnet->actor_features()->add(std::string(attribute_names[i]),a_type);
         }
     }
     else if (target=="layer") {
         if (layer_name!="" || layer_name1!="" || layer_name2!="")
             stop("No layers should be specified for target 'layer'");
-        for (int i=0; i<attribute_names.size(); i++) {
+        for (size_t i=0; i<attribute_names.size(); i++) {
             mnet->layer_features()->add(std::string(attribute_names[i]),a_type);
         }
     }
@@ -427,7 +427,7 @@ void newAttributes(RMLNetwork& rmnet, const CharacterVector& attribute_names, co
             stop("layer1 and layer2 should not be specified for target 'node'");
         LayerSharedPtr layer = mnet->get_layer(layer_name);
         if (!layer) stop("layer " + layer_name + " not found");
-        for (int i=0; i<attribute_names.size(); i++) {
+        for (size_t i=0; i<attribute_names.size(); i++) {
             mnet->node_features(layer)->add(std::string(attribute_names[i]),a_type);
         }
     }
@@ -446,7 +446,7 @@ void newAttributes(RMLNetwork& rmnet, const CharacterVector& attribute_names, co
             layer2 = mnet->get_layer(layer_name2);
         }
         else stop("if layer1 is specified, also layer2 is required");
-        for (int i=0; i<attribute_names.size(); i++) {
+        for (size_t i=0; i<attribute_names.size(); i++) {
             mnet->edge_features(layer1,layer2)->add(std::string(attribute_names[i]),a_type);
         }
     }
@@ -639,7 +639,7 @@ void setValues(RMLNetwork& rmnet, const std::string& attribute_name, const Chara
         if (!att) {
             stop("cannot find attribute: " + attribute_name + " for actors");
         }
-        int i=0;
+        size_t i=0;
         for (ActorSharedPtr actor: actors) {
             switch (att->type()) {
                 case NUMERIC_TYPE:
@@ -671,7 +671,7 @@ void setValues(RMLNetwork& rmnet, const std::string& attribute_name, const Chara
         if (!att) {
             stop("cannot find attribute: " + attribute_name + " for layers");
         }
-        int i=0;
+        size_t i=0;
         for (LayerSharedPtr layer: layers) {
             switch (att->type()) {
                 case NUMERIC_TYPE:
@@ -697,7 +697,7 @@ void setValues(RMLNetwork& rmnet, const std::string& attribute_name, const Chara
         std::vector<NodeSharedPtr> nodes = resolve_nodes(mnet,node_matrix);
         if (nodes.size() != values.size() && values.size()!=1)
             stop("wrong number of values");
-        int i=0;
+        size_t i=0;
         for (NodeSharedPtr node: nodes) {
             AttributeStoreSharedPtr store = mnet->node_features(node->layer);
             AttributeSharedPtr att = store->attribute(attribute_name);
@@ -725,7 +725,7 @@ void setValues(RMLNetwork& rmnet, const std::string& attribute_name, const Chara
         std::vector<EdgeSharedPtr> edges = resolve_edges(mnet,edge_matrix);
         if (edges.size() != values.size() && values.size()!=1)
             stop("wrong number of values");
-        int i=0;
+        size_t i=0;
         for (EdgeSharedPtr edge: edges) {
             AttributeStoreSharedPtr store = mnet->edge_features(edge->v1->layer,edge->v2->layer);
             AttributeSharedPtr att = store->attribute(attribute_name);
@@ -845,9 +845,9 @@ NumericVector occupation_ml(const RMLNetwork& rmnet, const NumericMatrix& transi
         stop("dimensions of transition probability matrix do not match the number of layers in the network");
     }
     matrix<double> m(transitions.nrow());
-    for (int i=0; i<transitions.nrow(); i++) {
+    for (size_t i=0; i<transitions.nrow(); i++) {
         std::vector<double> row(transitions.ncol());
-        for (int j=0; j<transitions.ncol(); j++) {
+        for (size_t j=0; j<transitions.ncol(); j++) {
             row[j] = transitions(i,j);
         }
         m[i] = row;
@@ -996,151 +996,151 @@ DataFrame comparison_ml(const RMLNetwork& rmnet, const CharacterVector& layer_na
     MLNetworkSharedPtr mnet = rmnet.get_mlnet();
     std::vector<LayerSharedPtr> layers = resolve_layers(mnet,layer_names);
     std::vector<NumericVector> values;
-    for (int i=0; i<layers.size(); i++) {
+    for (size_t i=0; i<layers.size(); i++) {
         NumericVector v;
         values.push_back(v);
     }
     DataFrame res = DataFrame::create();
     if (method=="jaccard.actors") {
         property_matrix<ActorSharedPtr,LayerSharedPtr,bool> P = actor_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(jaccard(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="coverage.actors") {
         property_matrix<ActorSharedPtr,LayerSharedPtr,bool> P = actor_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(coverage(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="kulczynski2.actors") {
         property_matrix<ActorSharedPtr,LayerSharedPtr,bool> P = actor_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(kulczynski2(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="sm.actors") {
         property_matrix<ActorSharedPtr,LayerSharedPtr,bool> P = actor_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(simple_matching(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="rr.actors") {
         property_matrix<ActorSharedPtr,LayerSharedPtr,bool> P = actor_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(russell_rao(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="hamann.actors") {
         property_matrix<ActorSharedPtr,LayerSharedPtr,bool> P = actor_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(hamann(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="jaccard.edges") {
         property_matrix<dyad,LayerSharedPtr,bool> P = edge_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(jaccard(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="coverage.edges") {
         property_matrix<dyad,LayerSharedPtr,bool> P = edge_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(coverage(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="kulczynski2.edges") {
         property_matrix<dyad,LayerSharedPtr,bool> P = edge_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(kulczynski2(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="sm.edges") {
         property_matrix<dyad,LayerSharedPtr,bool> P = edge_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(simple_matching(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="rr.edges") {
         property_matrix<dyad,LayerSharedPtr,bool> P = edge_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(russell_rao(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="hamann.edges") {
         property_matrix<dyad,LayerSharedPtr,bool> P = edge_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(hamann(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="jaccard.triangles") {
         property_matrix<triad,LayerSharedPtr,bool> P = triangle_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(jaccard(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="coverage.triangles") {
         property_matrix<triad,LayerSharedPtr,bool> P = triangle_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(coverage(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="kulczynski2.triangles") {
         property_matrix<triad,LayerSharedPtr,bool> P = triangle_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(kulczynski2(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="sm.triangles") {
         property_matrix<triad,LayerSharedPtr,bool> P = triangle_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(simple_matching(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="rr.triangles") {
         property_matrix<triad,LayerSharedPtr,bool> P = triangle_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(russell_rao(P,layers[i],layers[j]));
             }
         }
     }
     else if (method=="hamann.triangles") {
         property_matrix<triad,LayerSharedPtr,bool> P = triangle_existence_property_matrix(mnet);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(hamann(P,layers[i],layers[j]));
             }
         }
@@ -1149,8 +1149,8 @@ DataFrame comparison_ml(const RMLNetwork& rmnet, const CharacterVector& layer_na
         edge_mode mode = resolve_mode(type);
         property_matrix<ActorSharedPtr,LayerSharedPtr,double> P = actor_degree_property_matrix(mnet,mode);
         if (K<=0) K=std::ceil(std::log2(P.num_structures) + 1);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(dissimilarity_index(P,layers[i],layers[j],K));
             }
         }
@@ -1159,8 +1159,8 @@ DataFrame comparison_ml(const RMLNetwork& rmnet, const CharacterVector& layer_na
         edge_mode mode = resolve_mode(type);
         property_matrix<ActorSharedPtr,LayerSharedPtr,double> P = actor_degree_property_matrix(mnet,mode);
         if (K<=0) K=std::ceil(std::log2(P.num_structures) + 1);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(KL_divergence(P,layers[i],layers[j],K));
             }
         }
@@ -1169,8 +1169,8 @@ DataFrame comparison_ml(const RMLNetwork& rmnet, const CharacterVector& layer_na
         edge_mode mode = resolve_mode(type);
         property_matrix<ActorSharedPtr,LayerSharedPtr,double> P = actor_degree_property_matrix(mnet,mode);
         if (K<=0) K=std::ceil(std::log2(P.num_structures) + 1);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(jeffrey_divergence(P,layers[i],layers[j],K));
             }
         }
@@ -1178,8 +1178,8 @@ DataFrame comparison_ml(const RMLNetwork& rmnet, const CharacterVector& layer_na
     else if (method=="pearson.degree") {
         edge_mode mode = resolve_mode(type);
         property_matrix<ActorSharedPtr,LayerSharedPtr,double> P = actor_degree_property_matrix(mnet,mode);
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(pearson(P,layers[i],layers[j]));
             }
         }
@@ -1188,8 +1188,8 @@ DataFrame comparison_ml(const RMLNetwork& rmnet, const CharacterVector& layer_na
         edge_mode mode = resolve_mode(type);
         property_matrix<ActorSharedPtr,LayerSharedPtr,double> P = actor_degree_property_matrix(mnet,mode);
         P.rankify();
-        for (int j=0; j<layers.size(); j++) {
-            for (int i=0; i<layers.size(); i++) {
+        for (size_t j=0; j<layers.size(); j++) {
+            for (size_t i=0; i<layers.size(); i++) {
                 values[j].push_back(pearson(P,layers[i],layers[j]));
             }
         }
@@ -1199,14 +1199,14 @@ DataFrame comparison_ml(const RMLNetwork& rmnet, const CharacterVector& layer_na
         CharacterVector names;
         for (LayerSharedPtr l: layers)
             names.push_back(l->name);
-        for (int i=0; i<layers.size(); i++) {
+        for (size_t i=0; i<layers.size(); i++) {
             res.push_back(values[i],std::string(names[i]));
         }
         res.attr("class") = "data.frame";
         res.attr("row.names") = names;
     }
     else {
-        for (int i=0; i<layers.size(); i++) {
+        for (size_t i=0; i<layers.size(); i++) {
             res.push_back(values[i],std::string(layer_names[i]));
         }
         res.attr("class") = "data.frame";
@@ -1273,7 +1273,7 @@ DataFrame distance_ml(const RMLNetwork& rmnet, const std::string& from_actor, co
         
         CharacterVector from, to;
         std::vector<NumericVector> lengths;
-        for (int i=0; i<mnet->get_layers()->size(); i++) {
+        for (size_t i=0; i<mnet->get_layers()->size(); i++) {
             NumericVector v;
             lengths.push_back(v);
         }
@@ -1283,13 +1283,13 @@ DataFrame distance_ml(const RMLNetwork& rmnet, const std::string& from_actor, co
             for (path_length d: dists[actor]) {
                 from.push_back(from_actor);
                 to.push_back(actor->name);
-                for (int i=0; i<mnet->get_layers()->size(); i++) {
+                for (size_t i=0; i<mnet->get_layers()->size(); i++) {
                     lengths[i].push_back(d.length(mnet->get_layers()->get_at_index(i)));
                 }
             }
         }
         DataFrame res = DataFrame::create(_["from"] = from, _["to"] = to);
-        for (int i=0; i<mnet->get_layers()->size(); i++)
+        for (size_t i=0; i<mnet->get_layers()->size(); i++)
             res.push_back(lengths[i],mnet->get_layers()->get_at_index(i)->name);
         
         return DataFrame(res);
@@ -1312,7 +1312,7 @@ DataFrame distance_ml(const RMLNetwork& rmnet, const std::string& from_actor, co
  rownames(2) = "R";
  res.attr("dimnames") = List::create(rownames, colnames);
  
- for (int i=0; i<3; i++) {
+ for (size_t i=0; i<3; i++) {
  for (long j=0; j<num_iterations+1; j++) {
  res(i,j) = stats[i][j];
  }
@@ -1349,9 +1349,16 @@ DataFrame lart_ml(const RMLNetwork& rmnet, int t, double eps, double gamma) {
 DataFrame abacus_ml(const RMLNetwork& rmnet, int min_actors, int min_layers) {
     MLNetworkSharedPtr mnet = rmnet.get_mlnet();
     
-    ActorCommunityStructureSharedPtr community_structure = abacus(mnet, min_actors, min_layers);
+    try {
+        ActorCommunityStructureSharedPtr community_structure = abacus(mnet, min_actors, min_layers);
+        return to_dataframe(to_node_communities(community_structure,mnet));
+    }
+    catch (std::exception& e) {
+        Rcout << "Warning: could not run external library: " << e.what() << std::endl;
+        Rcout << "Returning empty community set." << std::endl;
+    }
+    return to_dataframe(to_node_communities(actor_community_structure::create(),mnet));
     
-    return to_dataframe(to_node_communities(community_structure,mnet));
 }
 
 
@@ -1361,7 +1368,7 @@ List to_list(const DataFrame& cs, const RMLNetwork& rmnet) {
     CharacterVector cs_actor = cs["actor"];
     CharacterVector cs_layer = cs["layer"];
     NumericVector cs_cid = cs["cid"];
-    for (int i=0; i<cs.nrow(); i++) {
+    for (size_t i=0; i<cs.nrow(); i++) {
         int comm_id = cs_cid[i];
         LayerSharedPtr layer = mnet->get_layer(std::string(cs_layer[i]));
         int l = mnet->get_layers()->get_index(layer);
@@ -1386,34 +1393,34 @@ DataFrame multiforce_ml(const RMLNetwork& rmnet, const NumericVector& w_in, cons
     hash_map<LayerSharedPtr,double> weight_in, weight_inter, weight_gr;
     LayerListSharedPtr layers = mnet->get_layers();
     if (w_in.size()==1) {
-        for (int i=0; i<layers->size(); i++) {
+        for (size_t i=0; i<layers->size(); i++) {
             weight_in[layers->get_at_index(i)] = w_in[0];
         }
     }
     else if (w_in.size()==layers->size()) {
-        for (int i=0; i<layers->size(); i++) {
+        for (size_t i=0; i<layers->size(); i++) {
             weight_in[layers->get_at_index(i)] = w_in[i];
         }
     }
     else stop("wrong dimension: internal weights (should contain 1 or num.layers.ml weights)");
     if (w_inter.size()==1) {
-        for (int i=0; i<layers->size(); i++) {
+        for (size_t i=0; i<layers->size(); i++) {
             weight_inter[layers->get_at_index(i)] = w_inter[0];
         }
     }
     else if (w_inter.size()==layers->size()) {
-        for (int i=0; i<layers->size(); i++) {
+        for (size_t i=0; i<layers->size(); i++) {
             weight_inter[layers->get_at_index(i)] = w_inter[i];
         }
     }
     else stop("wrong dimension: external weights (should contain 1 or num.layers.ml weights)");
     if (gravity.size()==1) {
-        for (int i=0; i<layers->size(); i++) {
+        for (size_t i=0; i<layers->size(); i++) {
             weight_gr[layers->get_at_index(i)] = gravity[0];
         }
     }
     else if (gravity.size()==layers->size()) {
-        for (int i=0; i<layers->size(); i++) {
+        for (size_t i=0; i<layers->size(); i++) {
             weight_gr[layers->get_at_index(i)] = gravity[i];
         }
     }

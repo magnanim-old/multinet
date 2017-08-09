@@ -19,6 +19,9 @@ distance.ml(mlnetwork,from,to=character(0),method="multiplex")
 \value{
 A data frame with one row for each non-dominated distance, specifying the number of steps in each layer.
 }
+\references{
+Magnani, Matteo, and Rossi, Luca (2013). Pareto Distance for Multi-layer Network Analysis. In Social Computing, Behavioral-Cultural Modeling and Prediction (Vol. 7812, pp. 249-256). Springer Berlin Heidelberg.
+}
 \examples{
 net <- ml.aucs()
 distance.ml(net,"U54","U3")

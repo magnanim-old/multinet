@@ -19,6 +19,9 @@ layout.circular.ml(mlnetwork)
 \item{gravity}{An array with weights for gravity forces, or a single number if weights are the same for all layers.}
 \item{iterations}{Number of iterations.}
 }
+\references{
+Fatemi, Zahra, Salehi, Mostafa, & Magnani, Matteo (2016). A simple multiforce layout for multiplex networks. arXiv 1607.03914
+}
 \seealso{
 \link{Plotting}
 }
@@ -27,6 +30,5 @@ net <- ml.florentine()
 layout.multiforce.ml(net)
 l <- layout.circular.ml(net)
 \dontrun{
-plot(net,layout=l)
-}
+plot(net,layout=l)}
 }

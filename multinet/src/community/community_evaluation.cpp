@@ -11,6 +11,12 @@ namespace mlnet {
         return (double)common_nodes/(c1->get_nodes().size()+c2->get_nodes().size()-common_nodes);
     }
 
+    /**
+     * Returns the agreement between two clusterings com1 and com2
+     * @param com1
+     * @param com2
+     * @param n number of nodes in the original network
+     */
     double normalized_mutual_information(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2, int n) {
         double entropy_c1 = 0;
 
@@ -47,4 +53,33 @@ namespace mlnet {
         }
         return info/((entropy_c1+entropy_c2)/2);
     }
+    
+    CommunityStructureSharedPtr read_ground_truth(const string& infile, char separator, const MLNetworkSharedPtr& mnet) {
+        CSVReader csv;
+        csv.trimFields(true);
+        csv.setFieldSeparator(separator);
+        csv.open(infile);
+        hash_map<std::string, std::set<NodeSharedPtr> > result;
+        while (csv.hasNext()) {
+            vector<string> v = csv.getNext();
+            ActorSharedPtr a = mnet->get_actor(v.at(0));
+            LayerSharedPtr l = mnet->get_layer(v.at(1));
+            NodeSharedPtr n = mnet->get_node(a,l);
+            result[v.at(2)].insert(n);
+            
+        }
+        
+        CommunityStructureSharedPtr communities = community_structure::create();
+        
+        for (auto pair: result) {
+            CommunitySharedPtr c = community::create();
+            for (NodeSharedPtr node: pair.second) {
+                c->add_node(node);
+            }
+            communities->add_community(c);
+        }
+        
+        return communities;
+    }
+
 }

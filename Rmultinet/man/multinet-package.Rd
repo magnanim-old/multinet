@@ -15,7 +15,7 @@ In this manual, \emph{\link{Getting networks: IO}} describes functions to read a
 Updating and getting information about the basic components of a multilayer network (layers, actors, nodes and edges) can be done using the methods described in \emph{\link{Network management: properties}}, \emph{\link{Network management: updates}} and \emph{\link{Network management: edge directionality}}. \emph{\link{Navigation}} shows how to retrieve the neighbors of a node. Attribute values can also be attached to the basic components of a multilayer network (actors, layers, nodes and edges). Attribute management is described in \emph{\link{Network management: attributes}}.
 
 Each individual layer as well as combination of layers obtained using the data pre-processing (flattening and projection) functions described in \emph{\link{Transformation}} can be analyzed as a single-layer network using the iGraph package, by converting them
-as shown in \emph{\link{Conversion}}. We can also visualize the network using the method described in \emph{\link{Plotting}}, which is also based on the plotting functionality of the iGraph package.
+as shown in \emph{\link{Conversion}}. We can also visualize small networks using the method described in \emph{\link{Plotting}}.
 
 Multilayer network analysis measures are described in \emph{\link{Measures: basic}} (for single-actor, degree-based measures), \emph{\link{Measures: distance-based}} (for measures based on geodesic distances), \emph{\link{Measures: random walks}} (for measures based on random walks) and \emph{\link{Measures: layer comparison}} (to compare different layers).
 
@@ -33,7 +33,7 @@ Most of the methods provided by this package are described in the book "Multilay
 %}
 %}
 \author{
-Matteo Magnani <matteo.magnani@it.uu.se>
+Matteo Magnani \email{matteo.magnani@it.uu.se}
 }
 \references{
 Dickison, Magnani, and Rossi, 2016. Multilayer Social Networks. Cambridge University Press. ISBN: 978-1107438750

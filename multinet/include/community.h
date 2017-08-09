@@ -122,6 +122,7 @@ namespace mlnet {
 
     double fm_index(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
 
+    CommunityStructureSharedPtr read_ground_truth(const string& infile, char separator, const MLNetworkSharedPtr& mnet);
 
     /* ALGORITHMS */
 

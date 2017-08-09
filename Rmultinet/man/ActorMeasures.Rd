@@ -25,7 +25,7 @@ relevance.ml(mlnetwork,actors=character(0),layers=character(0),mode="all")
 xrelevance.ml(mlnetwork,actors=character(0),layers=character(0),mode="all")
 }
 \arguments{
-\item{mlnetwork}{A multilayer network}
+\item{mlnetwork}{A multilayer network.}
 \item{actors}{An array of names of actors.}
 \item{layers}{An array of names of layers.}
 \item{mode}{This argument can take values "in", "out" or "all" to count respectively incoming edges, outgoing edges or both.}
@@ -38,9 +38,9 @@ a high degree deviation, showing an uneven usage of the layers (or layers with d
 
 \code{neighborhood.ml} returns the number of actors adjacent to the input actor restricted to the specified layers. \code{xneighborhood.ml} returns the number of actors adjacent to the input actor restricted to the specified layers and not present in the other layers.
 
-\code{connective.redundancy.ml} returns 1 minus neighborhood/degree.
+\code{connective.redundancy.ml} returns 1 minus neighborhood divided by degree.
 
-\code{relevance.ml} returns the percentage of neighbors present on the specified layers, while \code{xrelevance.ml} returns the percentage of neighbors present on the specified layers and not on others.
+\code{relevance.ml} returns the percentage of neighbors present on the specified layers. \code{xrelevance.ml} returns the percentage of neighbors present on the specified layers and not on others.
 }
 \references{
 Berlingerio, Michele, Michele Coscia, Fosca Giannotti, Anna Monreale, and Dino Pedreschi. 2011. "Foundations of Multidimensional Network Analysis." In International Conference on Social Network Analysis and Mining (ASONAM), 485-89. IEEE Computer Society.
@@ -61,7 +61,7 @@ neighborhood.ml(net,"U54","work")
 xneighborhood.ml(net,"U54","work")
 # percentage of neighbors of U54 who are also co-workers
 relevance.ml(net,"U54","work")
-# Redundancy between work and lunch
+# redundancy between work and lunch
 connective.redundancy.ml(net,"U54",c("work","lunch"))
 # percentage of neighbors of U54 who would no longer
 # be neighbors by removing this layer

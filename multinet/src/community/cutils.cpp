@@ -138,6 +138,7 @@ Eigen::SparseMatrix<double> cutils::ng_modularity(double &twoum, std::vector<Eig
 	return B;
 }
 
+    
 CommunityStructureSharedPtr cutils::nodes2communities(MLNetworkSharedPtr mnet, std::vector<unsigned int> nodes2cid) {
 	size_t L = mnet->get_layers()->size();
 	size_t N = mnet->get_actors()->size();

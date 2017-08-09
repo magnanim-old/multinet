@@ -106,13 +106,13 @@ namespace mlnet {
         
         FILE* f_inp = std::tmpfile();
         if (!f_inp)
-            throw FileNotFoundException("Cannot open tmp file");
+            throw FileNotFoundException("Cannot open input tmp file");
         FILE* f_out = std::tmpfile();
         if (!f_out)
-            throw FileNotFoundException("Cannot open tmp file");
+            throw FileNotFoundException("Cannot open output tmp file");
         FILE* f_tid = std::tmpfile();
         if (!f_tid)
-            throw FileNotFoundException("Cannot open tmp file");
+            throw FileNotFoundException("Cannot open output tmp file for transactions");
         
         int     k = 0;             /* result variable */
         CCHAR   *recseps = NULL;      /* record  separators */
@@ -167,21 +167,21 @@ namespace mlnet {
         /* --- read item selection/appearance indicators --- */
         ibase = ib_create(0, 0);      /* create an item base */
         if (!ibase)
-            ;   /* TODO throw exception */
+            throw ExternalLibException("Cannot create item base");
         tread = trd_create();         /* create a transaction reader */
         if (!tread)
-            ;   /* TODO throw exception */
+            throw ExternalLibException("Cannot create a transaction reader");
         trd_allchs(tread, recseps, fldseps, blanks, "", comment);
 
         /* --- read transaction database --- */
         tabag = tbg_create(ibase);    /* create a transaction bag */
         if (!tabag)
-            ;   /* TODO throw exception */   /* to store the transactions */
+            throw ExternalLibException("Cannot create a transaction bag");
         if (trd_open(tread, f_inp, NULL) != 0)
-            ;   /* TODO throw exception */
+            throw ExternalLibException("Cannot open the input transactions file ");
         k = tbg_read(tabag, tread, mtar);
         if (k < 0)
-            ;   /* TODO throw exception */
+            throw ExternalLibException("Cannot execute eternal function tbg_read");
         trd_delete(tread, 1);         /* read the transaction database, */
         tread = NULL;                 /* then delete the table reader */
         m = ib_cnt(ibase);            /* get the number of items, */
@@ -196,29 +196,29 @@ namespace mlnet {
         eclat = eclat_create(target, -min_actors, smax, conf, min_layers, zmax,
                              eval, agg, thresh, algo, mode);
         if (!eclat)
-            ;   /* TODO throw exception */   /* create an eclat miner */
+            throw ExternalLibException("Cannot create eclat miner");
         k = eclat_data(eclat, tabag, 0, sort);
         if (k)
-            ;   /* TODO throw exception */            /* prepare data for eclat */
+            throw ExternalLibException("Cannot prepare data for eclat ");
         report = isr_create(ibase);   /* create an item set reporter */
         if (!report)
-            ;   /* TODO throw exception */ /* and configure it */
+            throw ExternalLibException("Cannot configure report ");
         k = eclat_report(eclat, report);
         if (k)
-            ;   /* TODO throw exception */            /* prepare reporter for eclat */
+            throw ExternalLibException("Cannot prepare report ");
         if (isr_setfmt(report, scan, hdr, sep, imp, info) != 0)
-            ;   /* TODO throw exception */           /* set the output format strings */
+            throw ExternalLibException("Cannot set the oputput format string");
         k = isr_tidopen(report, f_tid, NULL);  /* open the file for */
         if (k)
-            ;   /* TODO throw exception */   /* transaction ids */
+            throw ExternalLibException("Cannot open transaction ids");
         k = isr_open(report, f_out, NULL);
         if (k)
-            ;   /* TODO throw exception */
+            throw ExternalLibException("Cannot open report");
         if (isr_setup(report) < 0)    /* open the item set file and */
-            ;   /* TODO throw exception */            /* set up the item set reporter */
+            throw ExternalLibException("Cannot setup itemset reporter");
         k = eclat_mine(eclat, prune, 0);
         if (k)
-            ;   /* TODO throw exception */              /* find frequent item sets */
+            throw ExternalLibException("Cannot run eclat_mine");
         //if (stats)                    /* print item set statistics */
         //    isr_prstats(report, stdout, 0);
         isr_flush(report);

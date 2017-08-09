@@ -607,7 +607,7 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, const 
 
 		// generate random ids
 		vector<string> names(mnet->get_actors()->size());
-		for (uint i = 0; i<names.size(); i++) {
+		for (size_t i = 0; i<names.size(); i++) {
 			names[i] = "A" + to_string(i);
 		}
 		std::random_shuffle(names.begin(),names.end());

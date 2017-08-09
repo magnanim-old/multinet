@@ -41,12 +41,12 @@ Magnani, Matteo, and Luca Rossi. 2013. Formation of Multiple Networks. In Social
 # to the Preferential Attachment model and one growing by selecting
 # new edges uniformly at random.
 models <- c(evolution.pa.ml(3,1), evolution.er.ml(50))
-# all the probability vectors must also have the same number of
+# all the probability vectors must have the same number of
 # fields, one for each layer: two in this example
-pr.internal <- c(.5,.5)
 # by defining pr.internal and pr.external, we are also implicitely defining
 # pr.no.action (1 minus the other probabilities, for each field/layer).
 pr.external <- c(.5,0)
+pr.internal <- c(.5,.5)
 # each layer will import edges from the other if needed
 # (not the second layer in this example: it has 0 probability of external events)
 dependency <- matrix(c(0,1,1,0),2,2)

@@ -66,7 +66,14 @@ void test_community() {
     std::cout << normalized_mutual_information(com1,com2,4) << " ";
     std::cout << normalized_mutual_information(com1,com3,4) << " ";
     std::cout << "done!" << std::endl;
-
+    CommunityStructureSharedPtr truth = read_ground_truth("ground_truth.dat",',',mnet);
+    
+    std::cout << "Same info, read from file - it should give the same results...";
+    std::cout << normalized_mutual_information(truth,com1,4) << " ";
+    std::cout << normalized_mutual_information(truth,com2,4) << " ";
+    std::cout << normalized_mutual_information(truth,com3,4) << " ";
+    std::cout << "done!" << std::endl;
+    
     MLNetworkSharedPtr cpm = read_multilayer("florentine_families.mpx","toy",',');
 
     std::cout << "Running algorithms..."<< std::endl;

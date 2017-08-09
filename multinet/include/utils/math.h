@@ -95,15 +95,15 @@ double jaccard_similarity(const std::vector<hash_set<T> >& sets) {
 template <class T>
 hash_set<T> s_intersection(const std::vector<hash_set<T> >& sets) {
 	hash_set<T> result;
-	uint idx = 0; // index of the smallest set
-	for (uint i=1; i<sets.size(); i++) {
+	size_t idx = 0; // index of the smallest set
+	for (size_t i=1; i<sets.size(); i++) {
 		if (sets.at(i).size() < sets.at(idx).size()) {
 			idx=i;
 		}
 	}
 	for (T element: sets.at(idx)) {
 		bool in_intersection = true;
-		for (uint i=0; i<sets.size(); i++) {
+		for (size_t i=0; i<sets.size(); i++) {
 			if (i==idx) continue;
 			if (sets.at(i).count(element)==0) {
 				in_intersection = false;
@@ -126,15 +126,15 @@ template <class T>
 hash_set<T> s_intersection(const vector<sorted_set<T> >& sets) {
 	// NOTE: it can be made more efficient exploiting sorting
 	hash_set<T> result;
-	uint idx = 0; // index of the smallest set
-	for (uint i=1; i<sets.size(); i++) {
+	size_t idx = 0; // index of the smallest set
+	for (size_t i=1; i<sets.size(); i++) {
 		if (sets.at(i).size() < sets.at(idx).size()) {
 			idx=i;
 		}
 	}
 	for (T element: sets.at(idx)) {
 		bool in_intersection = true;
-		for (uint i=0; i<sets.size(); i++) {
+		for (size_t i=0; i<sets.size(); i++) {
 			if (i==idx) continue;
 			if (sets.at(i).count(element)==0) {
 				in_intersection = false;
