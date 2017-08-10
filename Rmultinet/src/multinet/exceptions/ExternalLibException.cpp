@@ -2,15 +2,15 @@
 
 
 namespace mlnet {
-
-ElementNotFoundException::ElementNotFoundException(std::string value) {
-	ElementNotFoundException::value = "Not found: " + value;
-}
-
-ElementNotFoundException::~ElementNotFoundException() throw () {}
-
-const char* ElementNotFoundException::what() const throw() {
-    return value.data();
-}
-
+    
+    ExternalLibException::ExternalLibException(std::string value) {
+        ExternalLibException::value = "Problem in a call to external library: " + value;
+    }
+    
+    ExternalLibException::~ExternalLibException() throw () {}
+    
+    const char* ExternalLibException::what() const throw() {
+        return value.data();
+    }
+    
 }

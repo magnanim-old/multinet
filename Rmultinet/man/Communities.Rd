@@ -37,9 +37,9 @@ All community detection algorithms return a data frame where each row contains a
 \code{get.community.list.ml} transforms the output of a community detection function into a list by grouping all the nodes having the same community identifier and the same layer.
 }
 \references{
-Berlingerio, Michele, Pinelli, Fabio, and Calabrese, Francesco (2013). ABACUS: frequent pAttern mining-BAsed Community discovery in mUltidimensional networkS. Data Mining and Knowledge Discovery, 27(3), 294–320. (for abacus.ml())
+Berlingerio, Michele, Pinelli, Fabio, and Calabrese, Francesco (2013). ABACUS: frequent pAttern mining-BAsed Community discovery in mUltidimensional networkS. Data Mining and Knowledge Discovery, 27(3), 294-320. (for abacus.ml())
 Afsarmanesh, Nazanin, and Magnani, Matteo (2016). Finding overlapping communities in multiplex networks. Retrieved  arXiv 1602.03746 (for clique.percolation.ml())
-Mucha, Peter J., Richardson, Thomas, Macon, Kevin, Porter, Mason A., and Onnela, Jukka-Pekka (2010). Community structure in time-dependent, multiscale, and multiplex networks. Science (New York, N.Y.), 328(5980), 876–8. Data Analysis, Statistics and Probability; Physics and Society. (for glouvain.ml())
+Mucha, Peter J., Richardson, Thomas, Macon, Kevin, Porter, Mason A., and Onnela, Jukka-Pekka (2010). Community structure in time-dependent, multiscale, and multiplex networks. Science (New York, N.Y.), 328(5980), 876-8. Data Analysis, Statistics and Probability; Physics and Society. (for glouvain.ml())
 Kuncheva, Zhana, and Montana, Giovanni (2015). Community detection in multiplex networks using locally adaptive random walks. Physics and Society; Machine Learning. (for lart.ml())
 }
 \seealso{\link{Plotting}}

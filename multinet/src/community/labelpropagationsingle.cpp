@@ -39,7 +39,8 @@ namespace mlnet {
         while (true) {
             
             /* Compute order of node processing */
-            std::random_shuffle(order.begin(), order.end());
+            unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+            std::shuffle(order.begin(), order.end(), std::default_random_engine(seed));
             
             /* re-assign labels */
             for (NodeSharedPtr node: order) {

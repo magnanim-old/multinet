@@ -29,8 +29,8 @@ ml.toy()
 All these functions return a multilayer network.
 }
 \references{
-Rossi, Luca, and Magnani, Matteo (2015). Towards effective visual analytics on multiplex and multilayer networks. Chaos, Solitons and Fractals, 72, 68–76. (for ml.aucs())
-Padgett, John F., and McLean, Paul D. (2006). Organizational Invention and Elite Transformation: The Birth of Partnership Systems in Renaissance Florence. American Journal of Sociology, 111(5), 1463–1568. (for ml.florentine())
+Rossi, Luca, and Magnani, Matteo (2015). Towards effective visual analytics on multiplex and multilayer networks. Chaos, Solitons and Fractals, 72, 68-76. (for ml.aucs())
+Padgett, John F., and McLean, Paul D. (2006). Organizational Invention and Elite Transformation: The Birth of Partnership Systems in Renaissance Florence. American Journal of Sociology, 111(5), 1463-1568. (for ml.florentine())
 }
 \seealso{
 \link{Getting networks: IO}, \link{Getting networks: generation}

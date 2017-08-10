@@ -63,10 +63,17 @@ namespace mlnet {
         while (csv.hasNext()) {
             vector<string> v = csv.getNext();
             ActorSharedPtr a = mnet->get_actor(v.at(0));
-            LayerSharedPtr l = mnet->get_layer(v.at(1));
-            NodeSharedPtr n = mnet->get_node(a,l);
-            result[v.at(2)].insert(n);
-            
+            if (v.size()==3) {
+                LayerSharedPtr l = mnet->get_layer(v.at(1));
+                NodeSharedPtr n = mnet->get_node(a,l);
+                result[v.at(2)].insert(n);
+            }
+            else if (v.size()==2) {
+                for (NodeSharedPtr n: *mnet->get_nodes(a)) {
+                    result[v.at(1)].insert(n);
+                }
+            }
+            else throw WrongFormatException("The ground truth file must specify Actor,Layer,CommunityID or Actor,CommunityID");
         }
         
         CommunityStructureSharedPtr communities = community_structure::create();

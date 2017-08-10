@@ -250,7 +250,8 @@ std::vector<int> cutils::range(size_t size, bool randomize) {
 	std::vector<int> range(size);
 	std::iota(range.begin(), range.end(), 0);
 	if (randomize) {
-		std::random_shuffle (range.begin(), range.end());
+        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+        std::shuffle (range.begin(), range.end(), std::default_random_engine(seed));
 	}
 	return range;
 }

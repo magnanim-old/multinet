@@ -1,9 +1,0 @@
-#!/bin/bash
-gawk '
-{
-  for (i = k = 0; ++i <= NF; ) {
-    if (k++ > 0) printf(" ");
-    printf("X%d=%s", i, $i);
-  }
-  printf("\n");
-}' $1 > $2

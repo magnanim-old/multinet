@@ -610,7 +610,8 @@ void write_multilayer(const MLNetworkSharedPtr& mnet, const string& path, const 
 		for (size_t i = 0; i<names.size(); i++) {
 			names[i] = "A" + to_string(i);
 		}
-		std::random_shuffle(names.begin(),names.end());
+        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+        std::shuffle (names.begin(), names.end(), std::default_random_engine(seed));
 		// map actors to the ids
 		hash_map<ActorSharedPtr,int> map(mnet->get_actors()->size());
 		int i=0;

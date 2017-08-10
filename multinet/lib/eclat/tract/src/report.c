@@ -1772,11 +1772,13 @@ void isr_prstats (ISREPORT *rep, FILE *out, ITEM min)
   ITEM i, n;                    /* loop variables */
 
   assert(rep && out);           /* check the function arguments */
-  fprintf(out, "all: %"SIZE_FMT"\n", rep->repcnt);
+  //fprintf(out, "all: %"SIZE_FMT"\n", rep->repcnt);
+    fprintf(out, "all: %lu\n", rep->repcnt); // ADDED BY MM
   for (n = rep->size+1; --n >= 0; )
     if (rep->stats[n] != 0) break;
   for (i = min; i <= n; i++)    /* print set counters per set size */
-    fprintf(out, "%3"ITEM_FMT": %"SIZE_FMT"\n", i, rep->stats[i]);
+    //fprintf(out, "%3"ITEM_FMT": %"SIZE_FMT"\n", i, rep->stats[i]);
+      fprintf(out, "%3d: %lu\n", i, rep->stats[i]); // ADDED BY MM
 }  /* isr_prstats() */
 
 /*--------------------------------------------------------------------*/
