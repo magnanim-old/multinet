@@ -59,11 +59,11 @@ void BAEvolutionModel::internal_evolution_step(MLNetworkSharedPtr& mnet, const L
     NodeSharedPtr new_node = mnet->add_node(new_actor,layer);
     
     // Randomly select m nodes with probability proportional to their degree...
-    std::set<NodeSharedPtr> nodes;
     // NOTE: this operation may not be very efficient - think of an alternative implementation
+    std::set<NodeSharedPtr> nodes;
     
     while (nodes.size()<m) {
-        EdgeSharedPtr edge = mnet->get_edges()->get_at_random();
+        EdgeSharedPtr edge = mnet->get_edges(layer,layer)->get_at_random();
         nodes.insert(test(.5)?edge->v1:edge->v2);
     }
 

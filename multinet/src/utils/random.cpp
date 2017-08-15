@@ -66,7 +66,7 @@ int random_level(int MAX_LEVEL, double P) {
     return lvl < MAX_LEVEL ? lvl : MAX_LEVEL;
 }
 
-std::set<long> getKRandom(long max, size_t k) {
+std::set<long> getKRandom(size_t max, size_t k) {
 	if (max<k) throw OperationNotSupportedException("Only " + to_string(max) + " values available, requested " + to_string(k));
 	std::set<long> res;
 	while (res.size()<k)

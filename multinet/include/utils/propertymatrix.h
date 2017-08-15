@@ -322,7 +322,7 @@ VALUE property_matrix<STRUCTURE,CONTEXT,VALUE>::get_default() const {
         count.set(P.get_default(),count.count(P.get_default())+(P.num_structures-checked_columns));
         for (auto pair: count.map()) {
             double fr = (double)pair.second/(P.num_structures-P.num_na(c));
-            if (fr!=0) entropy += fr*std::log(fr);
+            if (fr!=0) entropy += -fr*std::log(fr);
         }
         return entropy;
     }

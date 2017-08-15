@@ -1,5 +1,6 @@
 useDynLib(multinet, .registration = TRUE)
-export()
+exportPattern("^ml[[:alpha:]\\.]+")
+exportPattern("^[[:alpha:]\\.]+ml")
 importFrom(Rcpp, loadModule)
 importFrom(Rcpp, evalCpp)
 importFrom(grDevices, rainbow, chull)

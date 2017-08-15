@@ -1371,9 +1371,13 @@ List to_list(const DataFrame& cs, const RMLNetwork& rmnet) {
     for (size_t i=0; i<cs.nrow(); i++) {
         int comm_id = cs_cid[i];
         LayerSharedPtr layer = mnet->get_layer(std::string(cs_layer[i]));
+        if (!layer) stop("cannot find layer " + std::string(cs_layer[i]) + " (community structure not compatible with this network?)");
         int l = mnet->get_layers()->get_index(layer);
         ActorSharedPtr actor = mnet->get_actor(std::string(cs_actor[i]));
-        int n = mnet->get_nodes()->get_index(mnet->get_node(actor,layer))+1;
+        if (!actor) stop("cannot find actor " + std::string(cs_actor[i]) + " (community structure not compatible with this network?)");
+        NodeSharedPtr node = mnet->get_node(actor,layer);
+        if (!node) stop("cannot find node " + std::string(cs_actor[i]) + "::" + std::string(cs_layer[i]) + " (community structure not compatible with this network?)");
+        int n = mnet->get_nodes()->get_index(node)+1;
         list[comm_id][l].push_back(n);
     }
     List res = List::create();
