@@ -229,7 +229,7 @@ namespace dlib
         const double max_range_width
     )
     {
-        DLIB_CASSERT(max_range_width >= 0);
+        DLIB_CASSERT(max_range_width >= 0,"this should never happen");
 
         // create initial ranges, one for each value in x.  So initially, all the ranges have
         // width of 0.

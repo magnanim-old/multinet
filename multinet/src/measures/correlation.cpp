@@ -4,6 +4,7 @@
  */
 
 #include "datastructures.h"
+#include "measures.h"
 #include "utils.h"
 
 namespace mlnet {
@@ -67,5 +68,17 @@ property_matrix<ActorSharedPtr,LayerSharedPtr,double> actor_degree_property_matr
 	}
 	return P;
 }
+
+    property_matrix<ActorSharedPtr,LayerSharedPtr,double> actor_cc_property_matrix(const MLNetworkSharedPtr& mnet) {
+        property_matrix<ActorSharedPtr,LayerSharedPtr,double> P(mnet->get_actors()->size(),mnet->get_layers()->size(),0);
+        for (ActorSharedPtr actor: *mnet->get_actors()) {
+            for (LayerSharedPtr layer: *mnet->get_layers()) {
+                NodeSharedPtr node = mnet->get_node(actor,layer);
+                if (!node) P.set_na(actor,layer);
+                else P.set(actor,layer,cc(mnet,node));
+            }
+        }
+        return P;
+    }
 
 }

@@ -37,6 +37,12 @@ double degree_deviation(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& ac
 hash_map<ActorSharedPtr, int> occupation(const MLNetworkSharedPtr& mnet, double teleportation, matrix<double> transitions, int num_steps);
 
 /**********************************************************************/
+/** Clustering Coefficient ********************************************/
+/**********************************************************************/
+   
+double cc(const MLNetworkSharedPtr& mnet, const NodeSharedPtr& node);
+
+/**********************************************************************/
 /** Neighborhood ******************************************************/
 /**********************************************************************/
 
@@ -62,29 +68,6 @@ double xrelevance(const MLNetworkSharedPtr& mnet, const ActorSharedPtr& actor, c
 /** Layer comparison ************************************************/
 /**********************************************************************/
 
-/**
- * @param mnet
- * @param layers
- * @return , or 0 if all layers have no actors.
- */
-/*
-double jaccard_actor(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double jaccard_edge(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double jaccard_triangle(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double jaccard_triangle(const MLNetworkSharedPtr& mnet, const hash_set<LayerSharedPtr>& layers);
-double coverage_actor(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double coverage_edge(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double coverage_triangle(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double simple_matching_actor(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double simple_matching_edge(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double simple_matching_triangle(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double russell_rao_actor(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double russell_rao_edge(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double russell_rao_triangle(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double kulczynski2_actor(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double kulczynski2_edge(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-double kulczynski2_triangle(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2);
-*/
 double pearson_degree(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode);
 double rho_degree(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, const LayerSharedPtr& layer2, edge_mode mode);
 
@@ -92,7 +75,8 @@ double rho_degree(const MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer1, 
 property_matrix<ActorSharedPtr,LayerSharedPtr,bool> actor_existence_property_matrix(const MLNetworkSharedPtr& mnet);
 property_matrix<dyad,LayerSharedPtr,bool> edge_existence_property_matrix(const MLNetworkSharedPtr& mnet);
 property_matrix<triad,LayerSharedPtr,bool> triangle_existence_property_matrix(const MLNetworkSharedPtr& mnet);
-property_matrix<ActorSharedPtr,LayerSharedPtr,double> actor_degree_property_matrix(const MLNetworkSharedPtr& mnet, edge_mode mode);
+    property_matrix<ActorSharedPtr,LayerSharedPtr,double> actor_degree_property_matrix(const MLNetworkSharedPtr& mnet, edge_mode mode);
+    property_matrix<ActorSharedPtr,LayerSharedPtr,double> actor_cc_property_matrix(const MLNetworkSharedPtr& mnet);
 
 // FROM HERE, PORTING NOT COMPLETED YET
 

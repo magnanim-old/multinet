@@ -194,8 +194,8 @@ namespace dlib
         const std::vector<double>& false_detections 
     )
     {
-        DLIB_CASSERT(true_detections.size() != 0);
-        DLIB_CASSERT(false_detections.size() != 0);
+        DLIB_CASSERT(true_detections.size() != 0,"this should never happen");
+        DLIB_CASSERT(false_detections.size() != 0,"this should never happen");
 
         std::vector<std::pair<double,int> > temp;
         temp.reserve(true_detections.size()+false_detections.size());

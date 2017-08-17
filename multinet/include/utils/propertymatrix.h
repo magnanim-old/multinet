@@ -410,9 +410,31 @@ VALUE property_matrix<STRUCTURE,CONTEXT,VALUE>::get_default() const {
         // compare histograms
         double diss = 0;
         for (int i=0; i<K; i++) {
-            double fr1 = ((double)h.first.count(i)+1)/(K+P.num_structures-P.num_na(c1));
-            double fr2 = ((double)h.second.count(i)+1)/(K+P.num_structures-P.num_na(c2));
+            int num_elements_h1 = K+P.num_structures-P.num_na(c1);
+            int num_elements_h2 = K+P.num_structures-P.num_na(c2);
+            double fr1 = ((double)h.first.count(i)+1)/num_elements_h1;
+            double fr2 = ((double)h.second.count(i)+1)/num_elements_h2;
             if (fr1!=0) diss += fr1*std::log(fr1/fr2);
+        }
+        return diss;
+    }
+    
+    
+    // epsilon correction to avoid division by 0
+    template <class STRUCTURE, class CONTEXT, class VALUE>
+    double JS_divergence(const property_matrix<STRUCTURE,CONTEXT,VALUE>& P, const CONTEXT& c1, const CONTEXT& c2, int K) {
+        
+        std::pair<Counter<int>,Counter<int> > h = histograms(P,c1,c2,K);
+        
+        // compare histograms
+        double diss = 0;
+        for (int i=0; i<K; i++) {
+            int num_elements_h1 = K+P.num_structures-P.num_na(c1);
+            int num_elements_h2 = K+P.num_structures-P.num_na(c2);
+            double fr1 = ((double)h.first.count(i)+1)/num_elements_h1;
+            double fr2 = ((double)h.second.count(i)+1)/num_elements_h2;
+            double fr_joint = .5*fr1+.5*fr2;
+            if (fr_joint!=0) diss += .5*fr1*std::log(fr1/fr_joint) + .5*fr1*std::log(fr1/fr_joint);
         }
         return diss;
     }
@@ -501,6 +523,23 @@ double simple_matching(const property_matrix<STRUCTURE,CONTEXT,bool>& P, const C
         return (double)(comp.yy+comp.nn-comp.yn-comp.ny)/(comp.yy+comp.ny+comp.yn+comp.nn);
     }
 
+    
+    template <class STRUCTURE, class CONTEXT>
+    double L2(const property_matrix<STRUCTURE,CONTEXT,double>& P, const CONTEXT& c1, const CONTEXT& c2) {
+        
+        double dist = 0;
+        for (STRUCTURE s: P.structures()) {
+            pm_value<double> v1 = P.get(s,c1);
+            pm_value<double> v2 = P.get(s,c2);
+            if (!v1.is_na && !v2.is_na) {
+                dist += (v1.val-v2.val)*(v1.val-v2.val);
+            }
+        }
+        
+        return std::sqrt(dist);
+    }
+
+    
 template <class STRUCTURE, class CONTEXT>
 double pearson(const property_matrix<STRUCTURE,CONTEXT,double>& P, const CONTEXT& c1, const CONTEXT& c2) {
 	double cov = 0;
@@ -522,8 +561,8 @@ double pearson(const property_matrix<STRUCTURE,CONTEXT,double>& P, const CONTEXT
         else num_incomplete++;
         checked_columns++;
     }
-    mean1 += P.get_default()*(P.num_structures-checked_columns);
-    mean2 += P.get_default()*(P.num_structures-checked_columns);
+    mean1 += default_val*(P.num_structures-checked_columns);
+    mean2 += default_val*(P.num_structures-checked_columns);
     mean1 /= (P.num_structures-num_incomplete);
     mean2 /= (P.num_structures-num_incomplete);
     

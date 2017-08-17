@@ -618,7 +618,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT(Q_blocks.size() > 0);
+        DLIB_CASSERT(Q_blocks.size() > 0,"this should never happen");
         DLIB_CASSERT(Q_blocks.size() == bs.size() && 
                      Q_blocks.size() == alphas.size() &&
                      Q_blocks.size() == lowers.size() &&
@@ -889,11 +889,11 @@ namespace dlib
         const unsigned long max_iter = 1000
     )
     {
-        DLIB_CASSERT(A.size() != 0);
-        DLIB_CASSERT(B.size() != 0);
+        DLIB_CASSERT(A.size() != 0,"this should never happen");
+        DLIB_CASSERT(B.size() != 0,"this should never happen");
         DLIB_CASSERT(A.nr() == B.nr(), "The dimensionality of the points in both convex hull sets must match");
-        DLIB_CASSERT(eps > 0);
-        DLIB_CASSERT(max_iter > 0);
+        DLIB_CASSERT(eps > 0,"this should never happen");
+        DLIB_CASSERT(max_iter > 0,"this should never happen");
 
         cA.set_size(A.nc());
         cB.set_size(B.nc());
