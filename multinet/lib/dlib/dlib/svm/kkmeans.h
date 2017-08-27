@@ -314,7 +314,6 @@ namespace dlib
 
         */
 
-
         // make sure requires clause is not broken
         DLIB_ASSERT(num_centers > 1 && 0 <= percentile && percentile < 1 && samples.size() > 1,
             "\tvoid pick_initial_centers()"
@@ -328,6 +327,7 @@ namespace dlib
         std::vector<dlib_pick_initial_centers_data> scores_sorted(samples.size());
         centers.clear();
 
+        
         // pick the first sample as one of the centers
         centers.push_back(samples[0]);
 
@@ -359,6 +359,7 @@ namespace dlib
             centers.push_back(samples[scores_sorted[best_idx].idx]);
         }
         
+        std::cout << "c " << centers.size() << " " << centers.capacity() << std::endl;
     }
 
 // ----------------------------------------------------------------------------------------

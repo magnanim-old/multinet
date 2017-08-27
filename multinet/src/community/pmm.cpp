@@ -15,49 +15,57 @@
 namespace mlnet {
 
 CommunityStructureSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, unsigned int ell) {
-	DTRACE3(PMM_START, mnet->name.c_str(), k, ell);
+	//DTRACE3(PMM_START, mnet->name.c_str(), k, ell);
 	std::vector<Eigen::SparseMatrix<double>> a = cutils::ml_network2adj_matrix(mnet);
 
+    if (ell==1) ell=2;
+    
 	if (ell > (a[0].rows() - 1)) {
 		ell = a[0].rows() - 1;
 	}
 
-	Eigen::MatrixXd features = Eigen::MatrixXd::Zero(a[0].rows(), ell * a.size());
+    Eigen::MatrixXd features = Eigen::MatrixXd::Zero(a[0].rows(), ell * a.size());
 
-	#pragma omp parallel for
-	for (size_t i = 0; i < a.size(); i++) {
+    #pragma omp parallel for
+    for (size_t i = 0; i < a.size(); i++) {
 		features.block(0, i * ell, a[i].rows(), ell) = modularitymaximization(a[i], ell);
 	}
 
-	DTRACE0(PMM_SVD_START);
-	Eigen::JacobiSVD<Eigen::MatrixXd> svd(features, Eigen::ComputeThinU);
+    //DTRACE0(PMM_SVD_START);
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(features, Eigen::ComputeThinU);
 	features = svd.matrixU();
-	DTRACE0(PMM_SVD_END);
-
-	if (features.cols() > (k - 1)) {
+	//DTRACE0(PMM_SVD_END);
+    
+    if (features.cols() > (k - 1)) {
 		features.conservativeResize(Eigen::NoChange, k - 1);
 	}
 
-	features.normalize();
-	DTRACE0(PMM_KMEANS_START);
+    
+    features.normalize();
+	//DTRACE0(PMM_KMEANS_START);
 	typedef dlib::matrix<double, 1, 0> sample_type;
 	std::vector<sample_type> samples;
 
-	for (int i = 0; i < features.rows(); ++i) {
+    
+    for (int i = 0; i < features.rows(); ++i) {
 		sample_type s;
 		s.set_size(1, features.cols());
 		for (int j = 0; j < features.cols(); ++j) {
 			s(0, j) = features(i, j);
-		}
+        }
 		samples.push_back(s);
-	}
+    }
+    
+    // assigning the initial centroids manually
+    std::vector<sample_type> centers;
+    for (unsigned int i=0; i<k; i++) {
+        centers.push_back(samples.at(i));
+    }
+    //dlib::pick_initial_centers(k, centers, samples);
+    dlib::find_clusters_using_kmeans(samples, centers);
 
-	std::vector<sample_type> centers;
-
-	dlib::pick_initial_centers(k, centers, samples, dlib::linear_kernel<sample_type>());
-	dlib::find_clusters_using_kmeans(samples, centers);
-
-	std::vector<unsigned int> partition(samples.size(), 0);
+    
+    std::vector<unsigned int> partition(samples.size(), 0);
 	for (unsigned long i = 0; i < samples.size(); ++i) {
 		unsigned long best_idx = -1;
 		double best_dist = 1e100;
@@ -69,8 +77,8 @@ CommunityStructureSharedPtr pmm::fit(MLNetworkSharedPtr mnet, unsigned int k, un
 		}
 		partition[i] = best_idx;
 	}
-
-	DTRACE0(PMM_END);
+    
+    //DTRACE0(PMM_END);
 	return cutils::actors2communities(mnet, partition);
 }
 
