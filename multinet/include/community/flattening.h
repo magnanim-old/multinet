@@ -9,7 +9,8 @@ namespace mlnet {
 enum WeighteningType {ZeroOne=0, NumOfLayers=1, Neighborhood=2};
 enum SingleLayerAlgorithm {LabelPropagation =1};
 
-CommunityStructureSharedPtr flattenAndDetectComs(const MLNetworkSharedPtr& mnet, WeighteningType wType,SingleLayerAlgorithm slAlgo);
+ActorCommunityStructureSharedPtr  flattenAndDetectComs(const MLNetworkSharedPtr& mnet, WeighteningType wType,SingleLayerAlgorithm slAlgo);
+
 }
 
 #endif /* FLATTENING_H_ */
