@@ -7,10 +7,10 @@ void test_flattening() {
 
 	test_begin("Flattening and detecting communities");
 
-	MLNetworkSharedPtr mnet = read_multilayer("toy.mpx","cpm",',');
+	MLNetworkSharedPtr mnet = read_multilayer("dkpol.mpx","dkpol",',');
 
 
-    CommunityStructureSharedPtr c = flattenAndDetectComs(mnet,ZeroOne,LabelPropagation);
+    ActorCommunityStructureSharedPtr c = flattenAndDetectComs(mnet,ZeroOne,LabelPropagation);
 
     std::cout << c->to_string() << std::endl;
 

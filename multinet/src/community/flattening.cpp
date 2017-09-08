@@ -1,10 +1,10 @@
-
 #include "utils.h"
 #include "community.h"
 #include <cstdio>
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
+#include "community/flattening.h"
 
 namespace mlnet {
 
@@ -118,9 +118,11 @@ double neighborhoodWeightening(const MLNetworkSharedPtr& mnet,const ActorSharedP
  * @return:The resulted communities
  **/
 
-CommunityStructureSharedPtr  flattenAndDetectComs(const MLNetworkSharedPtr& mnet, WeighteningType wType,SingleLayerAlgorithm slAlgo){
+ActorCommunityStructureSharedPtr  flattenAndDetectComs(const MLNetworkSharedPtr& mnet, WeighteningType wType,SingleLayerAlgorithm slAlgo){
 
  //STEPS:
+	CommunityStructureSharedPtr singleLayerComs ;
+	ActorCommunityStructureSharedPtr result ;
  //(1) Mapping function : from multi-dimentional(multiplex) to mono-dimentional(flattened layer)
 	 /*add a new layer to the same multi-layer instance*/
 	LayerSharedPtr flattenedLayer =  mnet->add_layer("flattened",UNDIRECTED);
@@ -157,12 +159,41 @@ CommunityStructureSharedPtr  flattenAndDetectComs(const MLNetworkSharedPtr& mnet
  //(2) Perform community detection on the resulted mono-dimentional graph (in other words, the flattened layer)
 	switch (slAlgo) {
 				case LabelPropagation:
-					 return(label_propagation_single(mnet, flattenedLayer));
+					singleLayerComs = label_propagation_single(mnet, flattenedLayer);
+					break;
 				default:
-					 return (label_propagation_single(mnet, flattenedLayer));}
-	return NULL;
+					singleLayerComs = label_propagation_single(mnet, flattenedLayer);
+	}
+
+ //(3) Mapping back : from  mono-dimentional(flattened layer) to multi-dimentional(multiplex)
+	result = actor_community_structure::create();
+	//for each community in the single layer communities instance
+	for(CommunitySharedPtr singleCom:singleLayerComs->get_communities()){
+		ActorCommunitySharedPtr actor_com = actor_community::create();
+		//for each node in the current single layer community
+		for(NodeSharedPtr node:singleCom->get_nodes()){
+			//find the actor of this node in the mnet instance
+			ActorSharedPtr actor = node->actor;
+			//add this actor to the actor_community
+			actor_com->add_actor(actor);
+			//get the nodes of this actor in all the layers in the mnet instance
+			NodeListSharedPtr  actorNodes = mnet->get_nodes();
+			//add the layers where these nodes where found to the actor-community instance (if it is not already added before)
+			hash_set<LayerSharedPtr> layers = actor_com->get_layers();
+			for(NodeSharedPtr node:*actorNodes){
+				if(node->layer->name!="flattened" & layers.find(node->layer)==layers.end()){
+					actor_com->add_layer(node->layer);
+				}
+			}
+		}
+		// add this community to the list of communities to be returned
+		result->add_community(actor_com);
+	}
+   //now, the flattened layer can be safely deleted from the mnet instance
+   mnet->erase(flattenedLayer);
+   return result;
+   }
+
 
 }
 
-
-}
