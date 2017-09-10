@@ -434,7 +434,7 @@ VALUE property_matrix<STRUCTURE,CONTEXT,VALUE>::get_default() const {
             double fr1 = ((double)h.first.count(i)+1)/num_elements_h1;
             double fr2 = ((double)h.second.count(i)+1)/num_elements_h2;
             double fr_joint = .5*fr1+.5*fr2;
-            if (fr_joint!=0) diss += .5*fr1*std::log(fr1/fr_joint) + .5*fr1*std::log(fr1/fr_joint);
+            if (fr_joint!=0) diss += .5*fr1*std::log(fr1/fr_joint) + .5*fr2*std::log(fr2/fr_joint);
         }
         return diss;
     }
@@ -449,9 +449,7 @@ VALUE property_matrix<STRUCTURE,CONTEXT,VALUE>::get_default() const {
         for (int i=0; i<K; i++) {
             double fr1 = (double)h.first.count(i)/(P.num_structures-P.num_na(c1));
             double fr2 = (double)h.second.count(i)/(P.num_structures-P.num_na(c2));
-            double f_comp = (fr1+fr2)/2;
-            if (fr1!=0) diss += fr1*std::log(fr1/f_comp);
-            if (fr2!=0) diss += fr2*std::log(fr2/f_comp);
+            if (fr1!=0 && fr2!=0) diss += fr1*std::log(fr1/fr2) + fr2*std::log(fr2/fr1);
         }
         return diss;
     }
@@ -539,6 +537,30 @@ double simple_matching(const property_matrix<STRUCTURE,CONTEXT,bool>& P, const C
         return std::sqrt(dist);
     }
 
+    template <class STRUCTURE, class CONTEXT>
+    double cosine(const property_matrix<STRUCTURE,CONTEXT,double>& P, const CONTEXT& c1, const CONTEXT& c2) {
+        double product = 0;
+        double norm1 = 0;
+        double norm2 = 0;
+
+        long checked_columns = 0;
+        double default_val = P.get_default();
+        for (STRUCTURE s: P.structures()) {
+            pm_value<double> v1 = P.get(s,c1);
+            pm_value<double> v2 = P.get(s,c2);
+            if (!v1.is_na && !v2.is_na) {
+                product += v1.val*v2.val;
+                norm1 += v1.val*v1.val;
+                norm2 += v2.val*v2.val;
+            }
+            checked_columns++;
+        }
+        product += default_val*default_val*(P.num_structures-checked_columns);
+        norm1 += default_val*default_val*(P.num_structures-checked_columns);
+        norm2 += default_val*default_val*(P.num_structures-checked_columns);
+        
+        return product/std::sqrt(norm1)/std::sqrt(norm2);
+    }
     
 template <class STRUCTURE, class CONTEXT>
 double pearson(const property_matrix<STRUCTURE,CONTEXT,double>& P, const CONTEXT& c1, const CONTEXT& c2) {

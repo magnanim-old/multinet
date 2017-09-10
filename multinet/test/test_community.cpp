@@ -115,8 +115,8 @@ void test_community() {
     
     std::cout << "=====================" << std::endl;
     std::cout << "Flattening" << std::endl;
-    n_communities = flattenAndDetectComs(cpm,ZeroOne,LabelPropagation);
-    std::cout << n_communities->to_string();
+    communities = flattenAndDetectComs(cpm,ZeroOne,LabelPropagation);
+    std::cout << communities->to_string();
     
     //std::cout << "modularity (NOTE: not defined for overlapping communities): ";
     //std::cout << modularity(toy,n_communities,1) << std::endl;
