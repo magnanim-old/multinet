@@ -1,13 +1,13 @@
 cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
+project (multinet LANGUAGES C CXX)
 
-project (multinet LANGUAGES CXX)
 set (PROJECT_VENDOR 			"Matteo Magnani")
 set (PROJECT_CONTACT 			"matteo.magnani@it.uu.se")
-set (PROJECT_URL 				"https://github.com/magnanim/multinet")
-set (PROJECT_DESCRIPTION 		"mlnetwork")
-set (CMAKE_BUILD_TYPE 			"Release")
+set (PROJECT_URL 			"https://github.com/magnanim/multinet")
+set (PROJECT_DESCRIPTION 		"Multilayer social network analysis library")
+set (CMAKE_BUILD_TYPE 			"Debug")
 
-file (READ 						"${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_FULL)
+file (READ 				"${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_FULL)
 string (REGEX REPLACE 			"[\n\r]" "" PROJECT_VERSION_FULL "${PROJECT_VERSION_FULL}")
 string (REGEX REPLACE 			"^([0-9]+)\\.[0-9]+\\.[0-9]+$" "\\1" PROJECT_VERSION_MAJOR "${PROJECT_VERSION_FULL}")
 string (REGEX REPLACE 			"^[0-9]+\\.([0-9]+)\\.[0-9]+$" "\\1" PROJECT_VERSION_MINOR "${PROJECT_VERSION_FULL}")
@@ -21,59 +21,96 @@ set (LIBRARY_VERSION 			"${LIBRARY_VERSION_MAJOR}.${LIBRARY_VERSION_MINOR}")
 set (LIBRARY_VERSION_FULL 		"${LIBRARY_VERSION}.${LIBRARY_VERSION_PATCH}")
 
 if (CMAKE_CXX_COMPILER MATCHES ".*clang.*" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set (CMAKE_COMPILER_IS_CLANGXX 1)
+  set (CMAKE_COMPILER_IS_CLANGXX 1)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-	set(CMAKE_COMPILER_IS_INTEL 1)
+  set(CMAKE_COMPILER_IS_INTEL 1)
 endif()
 
 if ( (CMAKE_COMPILER_IS_GNUCXX AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.7) OR
-	 (CMAKE_COMPILER_IS_CLANGXX AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.2) )
-	 	message (FATAL_ERROR "Your C++ compiler does not support C++11. Please install g++ 4.7 (or greater) or clang 3.2 (or greater)")
+    (CMAKE_COMPILER_IS_CLANGXX AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.2) )
+  message (FATAL_ERROR "Your C++ compiler does not support C++11. Please install g++ 4.7 (or greater) or clang 3.2 (or greater)")
 else()
-		message (STATUS "Compiler is recent enough to support C++11.")
+  message (STATUS "Compiler is recent enough to support C++11.")
 endif()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -DNDEBUG")
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fsanitize=address -fno-omit-frame-pointer")
-
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -march=native -mavx -std=c++11 -Wall -Wextra -DNDEBUG")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fno-omit-frame-pointer")
 else()
-	if (CMAKE_COMPILER_IS_CLANGXX)
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNDEBUG -Wextra -Wall")
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fno-omit-frame-pointer -D__extern_always_inline=\"extern __always_inline\"")
+  if (CMAKE_COMPILER_IS_CLANGXX)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNDEBUG -Wextra -Wall")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fmessage-length=0 -funroll-loops -fno-omit-frame-pointer -D__extern_always_inline=\"extern __always_inline\"")
 
-	else()
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
-		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -fsanitize=address -no-inline-min-size -no-inline-max-size")
-	endif()
+  else()
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -fmessage-length=0 -funroll-loops -no-inline-min-size -no-inline-max-size")
+  endif()
 endif()
 
 include_directories (include)
-file (GLOB_RECURSE SOURCES src/*.cpp)
+include_directories (lib/eigen3)
+include_directories (lib/spectra)
+include_directories (lib/dlib)
+include_directories (lib/eclat/eclat/src)
+include_directories (lib/eclat/tract/src)
+include_directories (lib/eclat/math/src)
+include_directories (lib/eclat/util/src)
+include_directories (lib/eclat/apriori/src)
+file (GLOB_RECURSE SOURCES lib/eclat/*.c src/*.cpp)
 
-find_package (Doxygen)
-if (DOXYGEN_FOUND)
-	set (DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/multinet.doxyfile)
-	set (DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-	configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-	add_custom_target(doc ALL
-		COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMENT "Generating API documentation with Doxygen"
-		VERBATIM)
-else()
-	message (FATAL_ERROR "Doxygen is needed to build the documentation.")
-endif()
+option(DOXY "Generate DoxyGen documentation" OFF)
+if(DOXY)
+	find_package (Doxygen)
+	if (DOXYGEN_FOUND)
+		set (DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/multinet.doxyfile)
+		set (DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+		configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+		add_custom_target(doc ALL
+			COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "Generating API documentation with Doxygen"
+			VERBATIM)
+	else()
+		message (FATAL_ERROR "Doxygen is needed to build the documentation.")
+	endif()
+endif(DOXY)
 
-add_library (multinet SHARED ${SOURCES})
+set(PROBE_PATH "")
+option(dtrace "Add dtrace support to target" OFF)
+if(dtrace)
+	if(NOT WIN32)
+		execute_process(COMMAND which dtrace OUTPUT_VARIABLE out)
+		if (NOT out)
+			message(FATAL_ERROR "dtrace generator not found!")
+		endif()
+
+		execute_process(COMMAND dtrace -h -s include/multinet_probes.d -o include/multinet_probes.h RESULT_VARIABLE dtrace_r)
+
+		if (${dtrace_r})
+			message(FATAL_ERROR "DTrace support requested but tool failed")
+		endif()
+
+
+		add_definitions(-DUSE_DYNAMIC_TRACE)
+
+		message (STATUS "DTrace support is active.")
+	endif()
+endif(dtrace)
+
+find_package(BLAS REQUIRED)
+
+add_library (multinet SHARED ${SOURCES} ${PROBE_PATH})
+
+TARGET_LINK_LIBRARIES(multinet)
 
 install (TARGETS multinet
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib)
-
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
 
 add_subdirectory(test)
+
+

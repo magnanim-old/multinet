@@ -14,10 +14,12 @@ MLNetworkSharedPtr anonymize_actors(const MLNetworkSharedPtr& mnet, const string
 	MLNetworkSharedPtr anonym_net = MLNetwork::create(name);
 	// generate random ids
 	vector<string> names(mnet->get_actors()->size());
-	for (uint i = 0; i<names.size(); i++) {
+	for (size_t i = 0; i<names.size(); i++) {
 		names[i] = "A" + to_string(i);
 	}
-	std::random_shuffle(names.begin(),names.end());
+    
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::shuffle (names.begin(), names.end(), std::default_random_engine(seed));
 	// map actors
 	hash_map<ActorSharedPtr,int> map(mnet->get_actors()->size());
 	int i=0;

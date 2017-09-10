@@ -63,6 +63,30 @@ double jaccard_similarity(const std::vector<hash_set<T> >& sets) {
 	return (double)intersection_size/union_size;
 }
 
+    /**
+     * Set-based intersection, for a combination of sorted and unordered sets.
+     * @param set1 a set of values
+     * @param set2 a set of values
+     * @return the intersection of the two input sets
+     */
+    template <class T>
+    int intersection_size(const hash_set<T>& set1, const hash_set<T>& set2) {
+        int common_elements = 0;
+        if (set1.size()<set2.size()) {
+            for (T el: set1) {
+                if (set2.count(el)>0)
+                    common_elements++;
+            }
+        }
+        else {
+            for (T el: set2) {
+                if (set1.count(el)>0)
+                    common_elements++;
+            }
+        }
+        return common_elements;
+    }
+    
 /**
  * Set-based intersection, for unordered sets.
  * @param sets a vector of sets
@@ -71,15 +95,15 @@ double jaccard_similarity(const std::vector<hash_set<T> >& sets) {
 template <class T>
 hash_set<T> s_intersection(const std::vector<hash_set<T> >& sets) {
 	hash_set<T> result;
-	uint idx = 0; // index of the smallest set
-	for (uint i=1; i<sets.size(); i++) {
+	size_t idx = 0; // index of the smallest set
+	for (size_t i=1; i<sets.size(); i++) {
 		if (sets.at(i).size() < sets.at(idx).size()) {
 			idx=i;
 		}
 	}
 	for (T element: sets.at(idx)) {
 		bool in_intersection = true;
-		for (uint i=0; i<sets.size(); i++) {
+		for (size_t i=0; i<sets.size(); i++) {
 			if (i==idx) continue;
 			if (sets.at(i).count(element)==0) {
 				in_intersection = false;
@@ -102,15 +126,15 @@ template <class T>
 hash_set<T> s_intersection(const vector<sorted_set<T> >& sets) {
 	// NOTE: it can be made more efficient exploiting sorting
 	hash_set<T> result;
-	uint idx = 0; // index of the smallest set
-	for (uint i=1; i<sets.size(); i++) {
+	size_t idx = 0; // index of the smallest set
+	for (size_t i=1; i<sets.size(); i++) {
 		if (sets.at(i).size() < sets.at(idx).size()) {
 			idx=i;
 		}
 	}
 	for (T element: sets.at(idx)) {
 		bool in_intersection = true;
-		for (uint i=0; i<sets.size(); i++) {
+		for (size_t i=0; i<sets.size(); i++) {
 			if (i==idx) continue;
 			if (sets.at(i).count(element)==0) {
 				in_intersection = false;

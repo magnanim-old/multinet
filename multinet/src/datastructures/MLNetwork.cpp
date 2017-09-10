@@ -185,7 +185,8 @@ const EdgeListSharedPtr MLNetwork::get_edges(const LayerSharedPtr& layer1, const
 bool MLNetwork::erase(const NodeSharedPtr& node) {
 	// removing the node
 	bool res = nodes->erase(node);
-	sidx_nodes_by_layer[node->layer->id]->erase(node);
+    sidx_nodes_by_layer[node->layer->id]->erase(node);
+    sidx_nodes_by_actor[node->actor->id]->erase(node);
 	cidx_node_by_actor_and_layer[node->actor->id].erase(node->layer->id);
 
 	// removing adjacent edges
@@ -254,6 +255,7 @@ bool MLNetwork::erase(const ActorSharedPtr& actor) {
 
 bool MLNetwork::erase(const LayerSharedPtr& layer) {
 	bool res = layers->erase(layer);
+    cidx_layer_by_name.erase(layer->name);
 	if (sidx_nodes_by_layer.count(layer->id)>0) {
 		vector<NodeSharedPtr> to_erase;
 		to_erase.reserve(sidx_nodes_by_layer.at(layer->id)->size());

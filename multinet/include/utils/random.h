@@ -57,7 +57,7 @@ int random_level(int MAX_LEVEL, double P);
 * @param max
 * @param k
 */
-std::set<long> getKRandom(long max, long k);
+std::set<long> getKRandom(size_t max, size_t k);
 
 /**
  * Random test: returns TRUE with probability probability.

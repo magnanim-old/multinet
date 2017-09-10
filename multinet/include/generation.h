@@ -32,10 +32,10 @@ NodeSharedPtr choice_degree(MLNetworkSharedPtr mnet, LayerSharedPtr layer);
 /**********************************************************************/
 class EvolutionModel {
 public:
-	virtual ~EvolutionModel() = 0;
-	virtual void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer) = 0;
-	virtual void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges) = 0;
-	virtual void init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer) = 0;
+    virtual ~EvolutionModel() = 0;
+    virtual void init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, ActorListSharedPtr& available_actors) = 0;
+    virtual void internal_evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, ActorListSharedPtr& available_actors) = 0;
+    virtual void external_evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& target_layer, ActorListSharedPtr& available_actors, const LayerSharedPtr& ext_layer) = 0;
 };
 
 typedef std::shared_ptr<EvolutionModel> EvolutionModelSharedPtr;
@@ -48,9 +48,9 @@ class BAEvolutionModel : public EvolutionModel {
 public:
 	BAEvolutionModel(size_t m0, size_t m);
 	~BAEvolutionModel();
-	void init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
-	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
-	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges);
+	void init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, ActorListSharedPtr& available_actors);
+    void internal_evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, ActorListSharedPtr& available_actors);
+    void external_evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& target_layer, ActorListSharedPtr& available_actors, const LayerSharedPtr& ext_layer);
 };
 
 /**
@@ -60,10 +60,10 @@ class UniformEvolutionModel : public EvolutionModel {
 	size_t m0;
 public:
 	UniformEvolutionModel(size_t m0);
-	~UniformEvolutionModel();
-	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
-	void evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, std::set<NodeSharedPtr>& new_nodes, std::set<EdgeSharedPtr>& new_edges);
-	void init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer);
+    ~UniformEvolutionModel();
+    void init_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, ActorListSharedPtr& available_actors);
+    void internal_evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& layer, ActorListSharedPtr& available_actors);
+    void external_evolution_step(MLNetworkSharedPtr& mnet, const LayerSharedPtr& target_layer, ActorListSharedPtr& available_actors, const LayerSharedPtr& ext_layer);
 };
 
 /**********************************************************************/
@@ -78,30 +78,14 @@ public:
  * @param dependency[][] The (i,j) element of this matrix indicates the probability that, given an external evolution event, layer i will consider layer j as a potential candidate to import edges from
  * @param evolution_model[] for each layer, a specification of how the layer should evolve when an internal event happens
  **/
-void evolve(MLNetworkSharedPtr& mnet,
+MLNetworkSharedPtr evolve(
 		long num_of_steps,
-		long num_initial_actors,
+		size_t num_actors,
 		const vector<double>& pr_no_event,
 		const vector<double>& pr_internal_event,
 		const matrix<double>& dependency,
 		const vector<EvolutionModelSharedPtr>& evolution_model);
 
-
-// Some variations yet do implement:
-
-void evolve_edge_import(MLNetwork &mnet,
-		long num_of_steps,
-		std::vector<double> pr_no_event,
-		std::vector<double> pr_internal_event,
-		matrix<double> dependency,
-		std::vector<EvolutionModelSharedPtr> evolution_model);
-
-void evolve_edge_copy(MLNetwork &mnet,
-		long num_of_steps,
-		std::vector<double> pr_no_event,
-		std::vector<double> pr_internal_event,
-		std::vector<std::vector<double> > dependency,
-		std::vector<EvolutionModelSharedPtr> evolution_model);
 } // namespace
 
 #endif /* GENERATION_H_ */

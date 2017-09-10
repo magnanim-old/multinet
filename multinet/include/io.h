@@ -79,8 +79,6 @@ namespace mlnet {
  *
  * ----------------------------------
  *
- * If the type is Multiplex and there is no #NODES section, all actors are automatically added to all layers
- *
  * If the #LAYERS section is empty, undirected layers are created as mentioned in the #EDGES section.
  *
  * If the #LAYER ATTRIBUTES, #ACTOR ATTRIBUTES, #NODE ATTRIBUTES or #EDGE ATTRIBUTES sections are empty, no attributes are created.
@@ -99,9 +97,13 @@ namespace mlnet {
  * @param infile path of the file storing the multilayer network
  * @param network_name name assigned to the network
  * @param separator character used to separate fields in the input file
+ * @param node_aligned if true, all actors are replicated on all layers, otherwise only actors explicitly listed in the #NODES section or with at least an edge are added to a given layer
  *
  */
-MLNetworkSharedPtr read_multilayer(const std::string& infile, const std::string& network_name, char separator);
+MLNetworkSharedPtr read_multilayer(const std::string& infile, const std::string& network_name, char separator, bool node_aligned);
+
+    
+    MLNetworkSharedPtr read_multilayer(const std::string& infile, const std::string& network_name, char separator);
 
 /**
 * Reads a simple FULLMATRIX DIAGONAL PRESENT dl file with multiple matrices. The dl format is more complex than this:
@@ -119,6 +121,9 @@ MLNetworkSharedPtr read_dl(const std::string& infile, const std::string& network
  * @param separator character to be used to separate fields in the output file
  *
  */
+void write_multilayer(const MLNetworkSharedPtr& mlnet, const std::string& outfile, const hash_set<LayerSharedPtr>& layers, char separator);
+    
+    
 void write_multilayer(const MLNetworkSharedPtr& mlnet, const std::string& outfile, char separator);
 
 /**
@@ -129,6 +134,8 @@ void write_multilayer(const MLNetworkSharedPtr& mlnet, const std::string& outfil
  * @param separator character to be used to separate fields in the output file
  *
  */
+void write_multiplex(const MLNetworkSharedPtr& mlnet, const std::string& outfile, const hash_set<LayerSharedPtr>& layers, char separator);
+    
 void write_multiplex(const MLNetworkSharedPtr& mlnet, const std::string& outfile, char separator);
 
 

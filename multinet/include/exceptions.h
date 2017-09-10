@@ -13,6 +13,26 @@
 
 namespace mlnet {
 
+    /**
+     * Exception thrown when a call to an external library fails.
+     */
+    class ExternalLibException: public std::exception {
+    public:
+        /**
+         * @param value path of the file
+         */
+        ExternalLibException(std::string value);
+        ~ExternalLibException() throw ();
+        /**
+         * Information about the exception.
+         * @return an error message describing the occurred problem
+         */
+        virtual const char* what() const throw();
+    private:
+        std::string value;
+    };
+
+    
 /**
  * Exception thrown when a non-existing file is opened.
  */
