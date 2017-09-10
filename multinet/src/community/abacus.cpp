@@ -141,8 +141,7 @@ namespace mlnet {
         int     scan     = 0;         /* flag for scanable item output */
         ITEM    m;                    /* number of items */
         TID     n;                    /* number of transactions */
-        //SUPP    w;                  /* total transaction weight */
-
+        
         TABREAD  *tread  = NULL; /* table/transaction reader */
         ITEMBASE *ibase  = NULL; /* item base */
         TABAG    *tabag  = NULL; /* transaction bag/multiset */
@@ -180,15 +179,12 @@ namespace mlnet {
         if (trd_open(tread, f_inp, NULL) != 0)
             throw ExternalLibException("Cannot open the input transactions file ");
         k = tbg_read(tabag, tread, mtar);
-        if (k < 0)
+        if (k)
             throw ExternalLibException("Cannot execute eternal function tbg_read");
         trd_delete(tread, 1);         /* read the transaction database, */
         tread = NULL;                 /* then delete the table reader */
         m = ib_cnt(ibase);            /* get the number of items, */
         n = tbg_cnt(tabag);           /* the number of transactions, */
-        //w = tbg_wgt(tabag);           /* the total transaction weight */
-        //if (w != (SUPP)n)
-        //    ;
         if ((m <= 0) || (n <= 0))     /* check for at least one item */
             return actor_community_structure::create();
         
@@ -214,7 +210,7 @@ namespace mlnet {
         k = isr_open(report, f_out, NULL);
         if (k)
             throw ExternalLibException("Cannot open report");
-        if (isr_setup(report) < 0)    /* open the item set file and */
+        if (isr_setup(report))    /* open the item set file and */
             throw ExternalLibException("Cannot setup itemset reporter");
         k = eclat_mine(eclat, prune, 0);
         if (k)
@@ -228,12 +224,23 @@ namespace mlnet {
         rewind(report->tidfile);
         ActorCommunityStructureSharedPtr result = read_eclat_communities(actors, layers, report->file, report->tidfile);
         
-        std::fclose(f_inp);
-        std::fclose(f_out);
-        std::fclose(f_tid);
-        //if (isr_close   (report) != 0)/* close item set output file - not needed: temporary file */
+        /*if (f_inp!=NULL) {
+            std::fclose(f_inp);
+            f_inp = NULL;
+        }
+        if (f_out!=NULL) {
+            std::fclose(f_out);
+            f_out = NULL;
+        }
+        if (f_tid!=NULL) {
+            std::fclose(f_tid);
+            f_tid=NULL;
+        }*/
         
-        //if (isr_tidclose(report) != 0)/* close trans. id output file */
+        if (isr_close   (report) != 0)
+            throw ExternalLibException("Cannot close itemset output file");
+        if (isr_tidclose(report) != 0)
+            throw ExternalLibException("Cannot close transaction id output file");
         
         //CLEANUP;
         if (eclat)  eclat_delete(eclat, 0);

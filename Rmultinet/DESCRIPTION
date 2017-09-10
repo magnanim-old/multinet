@@ -1,7 +1,7 @@
 Package: multinet
 Type: Package
 Title: Analysis and Mining of Multilayer Social Networks
-Version: 1.1
+Version: 1.1.1
 Date: 2017-08-08
 Author: Matteo Magnani, Mikael Dubik (lart and glouvain functions). The package uses functions from dlib, Eigen, Spectra and eclat libraries, whose code has been included in our source package.
 Maintainer: Matteo Magnani <matteo.magnani@it.uu.se>

@@ -1,6 +1,7 @@
 \name{Plotting}
 \alias{Plotting}
 \alias{plot.Rcpp_RMLNetwork}
+\alias{plot.ml}
 \title{
 Drawing a multilayer network
 }
