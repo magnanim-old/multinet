@@ -4,8 +4,6 @@
 #include "datastructures.h"
 
 namespace mlnet {
-<<<<<<< HEAD
-=======
 
 /* COMMON DATA STRUCTURES */
 
@@ -34,7 +32,6 @@ namespace mlnet {
         private:
         hash_set<NodeSharedPtr> data;
     };
->>>>>>> development
 
     /**
      * A community, defined as a set of actors in a set of layers.
