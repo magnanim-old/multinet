@@ -35,15 +35,12 @@ private:
 	std::string message;
 };
 
-<<<<<<< HEAD
-=======
 void test_community_single_layer();
 void test_flattening();
 void test_pmm();
 void test_lart();
 void test_glouvain();
 
->>>>>>> development
 void test_math();
 void test_random();
 void test_counter();
