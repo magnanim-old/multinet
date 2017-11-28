@@ -3,6 +3,8 @@
  */
 
 #include "community.h"
+#include "utils/sortedrandomset.h"
+#include <algorithm>
 
 namespace mlnet {
 
@@ -88,5 +90,151 @@ namespace mlnet {
         
         return communities;
     }
+
+
+    double omega_index(const CommunityStructureSharedPtr& partitioning1, const CommunityStructureSharedPtr& partitioning2,const MLNetworkSharedPtr& mnet){
+
+    	//Create a map for to represent pairs agreement in each partitioning
+    	//The map is of the form [ key = pair of nodes (node1,node2) and  value = number of times they co-occured together]
+      	std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int> p1_pairs_cooccurance;
+      	std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int> p2_pairs_cooccurance;
+
+      	//Get the nodes of the multi-net instance
+      	NodeListSharedPtr network_nodes =  mnet->get_nodes();
+
+      	//Initialise both partitioning maps
+      	for (NodeSharedPtr node1:*network_nodes){
+      		for (NodeSharedPtr node2:*network_nodes){
+      		   if(node1!=node2){
+      			   std::pair<NodeSharedPtr,NodeSharedPtr> key (node1 ,node2);
+      			   std::pair<NodeSharedPtr,NodeSharedPtr> key_inversed (node2,node1);
+      			   if(p1_pairs_cooccurance.find(key)== p1_pairs_cooccurance.end() & p1_pairs_cooccurance.find(key_inversed)==p1_pairs_cooccurance.end()){
+      			     p1_pairs_cooccurance[key]=0;
+      			     p2_pairs_cooccurance[key]=0;
+      			   }
+      		   }
+      		}
+      	}
+
+      	//Extract the communities from each partitioning
+      	vector<CommunitySharedPtr> partitioning1_coms = partitioning1->get_communities();
+      	vector<CommunitySharedPtr> partitioning2_coms = partitioning2->get_communities();
+
+      	//Iterate through the first partitioning communities to set the values for the corresponding map
+          for(CommunitySharedPtr com:partitioning1_coms){
+              //For each pair of nodes in the community, increment the corresponding index in the map
+              hash_set<NodeSharedPtr> com_nodes = com->get_nodes();
+              for (hash_set<NodeSharedPtr>::iterator it1 = com_nodes.begin(); it1 != com_nodes.end(); ++it1) {
+                  for (hash_set<NodeSharedPtr>::iterator it2 = std::next(it1); it2 != com_nodes.end(); ++it2) {
+                	  //Only if the corresponding nodes are different
+                	  if(*it1 != *it2){
+						  std::pair<NodeSharedPtr,NodeSharedPtr> key (*it1 ,*it2);
+						  std::pair<NodeSharedPtr,NodeSharedPtr> key_inversed (*it2,*it1);
+
+						  std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int>::const_iterator iter ;
+						  iter= p1_pairs_cooccurance.find(key);
+
+						  if(iter!=p1_pairs_cooccurance.end()){
+							  p1_pairs_cooccurance[key]=p1_pairs_cooccurance[key]+1;
+						  }
+						  else{
+						  iter= p1_pairs_cooccurance.find(key_inversed);
+						  if(iter!=p1_pairs_cooccurance.end()){
+							  p1_pairs_cooccurance[key_inversed]=p1_pairs_cooccurance[key_inversed]+1;
+							  }
+						  }
+                    }
+                  }
+              }
+          }
+
+          //Iterate through the second partitioning communities to set the values for the corresponding map
+			for(CommunitySharedPtr com:partitioning2_coms){
+				//For each pair of nodes in the community, increment the corresponding index in the map
+				hash_set<NodeSharedPtr> com_nodes = com->get_nodes();
+				for (hash_set<NodeSharedPtr>::iterator it1 = com_nodes.begin(); it1 != com_nodes.end(); ++it1) {
+					for (hash_set<NodeSharedPtr>::iterator it2 = std::next(it1); it2 != com_nodes.end(); ++it2) {
+					  //Only if the corresponding nodes are different
+					  if(*it1 != *it2){
+						  std::pair<NodeSharedPtr,NodeSharedPtr> key (*it1 ,*it2);
+						  std::pair<NodeSharedPtr,NodeSharedPtr> key_inversed (*it2,*it1);
+
+						  std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int>::const_iterator iter ;
+						  iter= p2_pairs_cooccurance.find(key);
+
+						  if(iter!=p2_pairs_cooccurance.end()){
+							  p2_pairs_cooccurance[key]=p2_pairs_cooccurance[key]+1;
+						  }
+						  else{
+						  iter= p2_pairs_cooccurance.find(key_inversed);
+						  if(iter!=p2_pairs_cooccurance.end()){
+							  p2_pairs_cooccurance[key_inversed]=p2_pairs_cooccurance[key_inversed]+1;
+							  }
+						  }
+					  }
+					}
+				}
+			}
+
+		//Count the agreements between both partitions
+		int max_cooccurance_value=0;
+		int actual_agreements = 0;
+		int max_possible_num_of_agreements =0;
+		//Iterate through the keys in the first partitioning map
+      	typedef std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int>::const_iterator MapIterator;
+      	for (MapIterator iter = p1_pairs_cooccurance.begin(); iter != p1_pairs_cooccurance.end(); iter++)
+      	{
+      	   max_possible_num_of_agreements++;
+      	  //Get the current key
+      	   std::pair<NodeSharedPtr,NodeSharedPtr> key (iter->first.first ,iter->first.second);
+      	  //Get the value referred to by the current key
+      	  int value_in_p1 = iter->second;
+          //Check the value of the same key in the second partitioning map
+      	  int value_in_p2 = p2_pairs_cooccurance[key];
+      	  if(value_in_p1==value_in_p2){
+      		actual_agreements++;
+      	  }
+      	  //Store the maximum value
+      	  if(value_in_p2>max_cooccurance_value | value_in_p1>max_cooccurance_value)
+      	  max_cooccurance_value=(value_in_p2 > value_in_p1)?value_in_p2:value_in_p1;
+
+      	}
+      	double unadjusted_omega = ((float)actual_agreements/(float)max_possible_num_of_agreements);
+      	std::cout << "unadjusted_omega = " << unadjusted_omega<<std::endl;
+      	std::cout<<"max cooccurance value " << max_cooccurance_value<<std::endl;
+
+      	//calculate the exptected omega index of a null model
+      	double omega_null_model=0;
+      	long sum_of_multiplications =0;
+      	for(int cooccurance_value = 0 ; cooccurance_value<=max_cooccurance_value;cooccurance_value++){
+      		//Count how many times the current co-occurance value appeared in each partitioning
+      		int happened_in_partitioning1 =0;
+      		int happened_in_partitioning2 =0;
+      		typedef std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int>::const_iterator MapIterator;
+			for (MapIterator iter = p1_pairs_cooccurance.begin(); iter != p1_pairs_cooccurance.end(); iter++)
+			{
+				//Get the current key
+				std::pair<NodeSharedPtr,NodeSharedPtr> key (iter->first.first ,iter->first.second);
+				//If the value equal to the current cooccurance value, then increment happened_in_first_partitioning variable
+				if(p1_pairs_cooccurance[key]==cooccurance_value)happened_in_partitioning1++;
+			}
+			for (MapIterator iter = p2_pairs_cooccurance.begin(); iter != p2_pairs_cooccurance.end(); iter++)
+			{
+				//Get the current key
+				std::pair<NodeSharedPtr,NodeSharedPtr> key (iter->first.first ,iter->first.second);
+				//If the value equal to the current cooccurance value, then increment happened_in_first_partitioning variable
+				if(p1_pairs_cooccurance[key]==cooccurance_value)happened_in_partitioning2++;
+			}
+			sum_of_multiplications+=happened_in_partitioning2*happened_in_partitioning2;
+      	}
+      	std::cout<<"sum of multiplications " << sum_of_multiplications<<std::endl;
+      	omega_null_model= ((float)sum_of_multiplications/(float) pow(max_possible_num_of_agreements,2));
+      	std::cout<<"omega_null_model " << omega_null_model<<std::endl;
+
+      	//Calculate the value of omega index
+      	double omega_index = (unadjusted_omega-omega_null_model)/(1-omega_null_model);
+      	std::cout<<"omega index " << omega_index<<std::endl;
+      	return unadjusted_omega;
+      }
 
 }

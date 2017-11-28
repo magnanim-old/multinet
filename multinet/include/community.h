@@ -118,6 +118,8 @@ namespace mlnet {
 
     double normalized_mutual_information(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2, int n);
 
+    double omega_index(const CommunityStructureSharedPtr& partitioning1, const CommunityStructureSharedPtr& partitioning2,const MLNetworkSharedPtr& mnet);
+
     double f_measure(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
 
     double fm_index(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2);
