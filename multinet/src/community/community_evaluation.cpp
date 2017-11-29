@@ -200,8 +200,8 @@ namespace mlnet {
 
       	}
       	double unadjusted_omega = ((float)actual_agreements/(float)max_possible_num_of_agreements);
-      	std::cout << "unadjusted_omega = " << unadjusted_omega<<std::endl;
-      	std::cout<<"max cooccurance value " << max_cooccurance_value<<std::endl;
+      	//std::cout << "unadjusted_omega = " << unadjusted_omega<<std::endl;
+      	//std::cout<<"max cooccurance value " << max_cooccurance_value<<std::endl;
 
       	//calculate the exptected omega index of a null model
       	double omega_null_model=0;
@@ -227,13 +227,13 @@ namespace mlnet {
 			}
 			sum_of_multiplications+=happened_in_partitioning2*happened_in_partitioning2;
       	}
-      	std::cout<<"sum of multiplications " << sum_of_multiplications<<std::endl;
+      	//std::cout<<"sum of multiplications " << sum_of_multiplications<<std::endl;
       	omega_null_model= ((float)sum_of_multiplications/(float) pow(max_possible_num_of_agreements,2));
-      	std::cout<<"omega_null_model " << omega_null_model<<std::endl;
+      	//std::cout<<"omega_null_model " << omega_null_model<<std::endl;
 
       	//Calculate the value of omega index
       	double omega_index = (unadjusted_omega-omega_null_model)/(1-omega_null_model);
-      	std::cout<<"omega index " << omega_index<<std::endl;
+      	//std::cout<<"omega index " << omega_index<<std::endl;
       	return unadjusted_omega;
       }
 
