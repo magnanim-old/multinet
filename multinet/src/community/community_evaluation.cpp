@@ -94,7 +94,7 @@ namespace mlnet {
 
     double omega_index(const CommunityStructureSharedPtr& partitioning1, const CommunityStructureSharedPtr& partitioning2,const MLNetworkSharedPtr& mnet){
 
-    	//Create a map for to represent pairs agreement in each partitioning
+    	//Create a map to represent pairs agreement in each partitioning
     	//The map is of the form [ key = pair of nodes (node1,node2) and  value = number of times they co-occured together]
       	std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int> p1_pairs_cooccurance;
       	std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int> p2_pairs_cooccurance;
@@ -234,7 +234,7 @@ namespace mlnet {
       	//Calculate the value of omega index
       	double omega_index = (unadjusted_omega-omega_null_model)/(1-omega_null_model);
       	//std::cout<<"omega index " << omega_index<<std::endl;
-      	return unadjusted_omega;
+      	return omega_index;
       }
 
 }
