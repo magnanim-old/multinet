@@ -192,6 +192,7 @@ double get_edge_belonging_coefficient(double node1_belonging_co,double node2_bel
 
 /**
 * calculate the modularity for directed graphs with overlapping communities where in this implementation, two communities are overlapping if they share nodes
+* reference :  http://iopscience.iop.org/article/10.1088/1742-5468/2009/03/P03024/meta
 * @param mnet : the multi-layer instance
 * @param communities: set of communities (groups of nodes that belong to mnet)
 * @param nodes_belonging_coefficients (weights given for the nodes that are in the overlapping communities and it express how strongly a node belong to each community it is part of)
