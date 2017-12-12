@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <iostream>
 
+
 #include "community.h"
 
 namespace mlnet {
@@ -219,62 +220,73 @@ double extended_modularity(const MLNetworkSharedPtr& mnet,
 		double expected_out_edge_belonging_co =0;
 		double expected_in_edge_belonging_co =0;
 
+		//build a map for the communities edges
+		std::map<CommunitySharedPtr,std::map<NodeSharedPtr,std::vector<NodeSharedPtr>>> communities_edges;
+		for(CommunitySharedPtr com:communities->get_communities()){
+			for(NodeSharedPtr node1:com->get_nodes()){
+				for(NodeSharedPtr node2:com->get_nodes()){
+				 if(node1!=node2 & mnet->get_edge(node1,node2)!=NULL)
+					 communities_edges[com][node1].push_back(node2);
+				}
+			}
+		}
+
 		//iterate through communities
 		for(CommunitySharedPtr com:communities->get_communities()){
-				for(NodeSharedPtr node1:com->get_nodes()){
-					for(NodeSharedPtr node2:com->get_nodes()){
-						//if it is not the same node and there is an edge between the corresponding two actors
-						if(node1 != node2 &  mnet->get_edge(node1,node2)!=NULL){
-						 //a-calculate the actual belonging co_efficient of the this link (referred to as r(i,j,c) in the paper)
-				            first_node_belonging_co=1;
-				            second_node_belonging_co= 1;
-				           //if the nodes belonging coefficient is already given in the input variable nodes_belonging_coefficients
-						   if(nodes_belonging_coefficients[com].find(node1)!=nodes_belonging_coefficients[com].end())
-							   first_node_belonging_co=nodes_belonging_coefficients[com][node1];
-						   if(nodes_belonging_coefficients[com].find(node2)!=nodes_belonging_coefficients[com].end())
-							   second_node_belonging_co=nodes_belonging_coefficients[com][node2];
+			for(NodeSharedPtr node1:com->get_nodes()){
+				for(NodeSharedPtr node2:com->get_nodes()){
+					//if it is not the same node and there is an edge between the corresponding two actors
+					if(node1 != node2 &  mnet->get_edge(node1,node2)!=NULL){
+					 //a-calculate the actual belonging co_efficient of the this link (referred to as r(i,j,c) in the paper)
+						first_node_belonging_co=1;
+						second_node_belonging_co= 1;
+					   //if the nodes belonging coefficient is already given in the input variable nodes_belonging_coefficients
+					   if(nodes_belonging_coefficients[com].find(node1)!=nodes_belonging_coefficients[com].end())
+						   first_node_belonging_co=nodes_belonging_coefficients[com][node1];
+					   if(nodes_belonging_coefficients[com].find(node2)!=nodes_belonging_coefficients[com].end())
+						   second_node_belonging_co=nodes_belonging_coefficients[com][node2];
 
-						 actual_edge_beloning_co= get_edge_belonging_coefficient(first_node_belonging_co,second_node_belonging_co,func);
+					 actual_edge_beloning_co= get_edge_belonging_coefficient(first_node_belonging_co,second_node_belonging_co,func);
 
 
-						//b-calculate the expected belonging co_efficient of the this link to this community (referred to as s(i,j,c) in the paper)
-						  //b.1- expected belonging co_efficient of any link starting from the node 1  (referred to as B_out_(i,j),c)
-						 	NodeListSharedPtr out_neighbours =  mnet->neighbors(node1,OUT);
-							sum_out_edge_belonging_co = 0;
-							expected_out_edge_belonging_co =0;
-							//if the node has out_neighbours
-							if(out_neighbours->size()!=0){
-								for(NodeSharedPtr neighbour:*out_neighbours){
-									if(nodes_belonging_coefficients[com].find(neighbour)!=nodes_belonging_coefficients[com].end())
-										out_neighbour_belonging_co=nodes_belonging_coefficients[com][neighbour];
-									else out_neighbour_belonging_co=1;
-									sum_out_edge_belonging_co+=get_edge_belonging_coefficient(first_node_belonging_co,out_neighbour_belonging_co,func);;
-								}
-								expected_out_edge_belonging_co=sum_out_edge_belonging_co/out_neighbours->size();
+					//b-calculate the expected belonging co_efficient of the this link to this community (referred to as s(i,j,c) in the paper)
+					  //b.1- expected belonging co_efficient of any link starting from the node 1  (referred to as B_out_(i,j),c)
+						NodeListSharedPtr out_neighbours =  mnet->neighbors(node1,OUT);
+						sum_out_edge_belonging_co = 0;
+						expected_out_edge_belonging_co =0;
+						//if the node has out_neighbours
+						if(out_neighbours->size()!=0){
+							for(vector<NodeSharedPtr>::iterator nbr_iter= communities_edges[com][node1].begin();nbr_iter!= communities_edges[com][node1].end();++nbr_iter){
+								if(nodes_belonging_coefficients[com].find(*nbr_iter)!=nodes_belonging_coefficients[com].end())
+									out_neighbour_belonging_co=nodes_belonging_coefficients[com][*nbr_iter];
+								else out_neighbour_belonging_co=1;
+								sum_out_edge_belonging_co+=get_edge_belonging_coefficient(first_node_belonging_co,out_neighbour_belonging_co,func);;
 							}
-							else expected_out_edge_belonging_co=0;
-
-							//b.2- expected belonging co_efficient of any link ending at node 2  (referred to as B_in_(i,j),c)
-							NodeListSharedPtr in_neighbours =  mnet->neighbors(node2,IN);
-							sum_in_edge_belonging_co = 0;
-							expected_in_edge_belonging_co =0;
-							//if the node has in_neighbours
-							if(in_neighbours->size()!=0){
-								for(NodeSharedPtr neighbour:*in_neighbours){
-									if(nodes_belonging_coefficients[com].find(neighbour)!=nodes_belonging_coefficients[com].end())
-										in_neighbour_belonging_co=nodes_belonging_coefficients[com][neighbour];
-									else in_neighbour_belonging_co=1;
-									sum_in_edge_belonging_co+=get_edge_belonging_coefficient(in_neighbour_belonging_co,second_node_belonging_co,func);;
-								}
-								expected_in_edge_belonging_co=sum_in_edge_belonging_co/out_neighbours->size();
-							}
-							else expected_in_edge_belonging_co=0;
-
-						//c-add the difference between expected and actual to the sum of differences
-							sum_of_differences+= actual_edge_beloning_co - (expected_out_edge_belonging_co*out_neighbours->size())*(expected_in_edge_belonging_co*in_neighbours->size())/mnet->get_edges()->size();
+							expected_out_edge_belonging_co=sum_out_edge_belonging_co/out_neighbours->size();
 						}
+						else expected_out_edge_belonging_co=0;
+
+						//b.2- expected belonging co_efficient of any link ending at node 2  (referred to as B_in_(i,j),c)
+						NodeListSharedPtr in_neighbours =  mnet->neighbors(node2,IN);
+						sum_in_edge_belonging_co = 0;
+						expected_in_edge_belonging_co =0;
+						//if the node has in_neighbours
+						if(in_neighbours->size()!=0){
+							for(vector<NodeSharedPtr>::iterator nbr_iter= communities_edges[com][node2].begin();nbr_iter!= communities_edges[com][node2].end();++nbr_iter){
+								if(nodes_belonging_coefficients[com].find(*nbr_iter)!=nodes_belonging_coefficients[com].end())
+									in_neighbour_belonging_co=nodes_belonging_coefficients[com][*nbr_iter];
+								else in_neighbour_belonging_co=1;
+								sum_in_edge_belonging_co+=get_edge_belonging_coefficient(in_neighbour_belonging_co,second_node_belonging_co,func);;
+							}
+							expected_in_edge_belonging_co=sum_in_edge_belonging_co/out_neighbours->size();
+						}
+						else expected_in_edge_belonging_co=0;
+
+					//c-add the difference between expected and actual to the sum of differences
+						sum_of_differences+= actual_edge_beloning_co - (expected_out_edge_belonging_co*out_neighbours->size())*(expected_in_edge_belonging_co*in_neighbours->size())/mnet->get_edges()->size();
 					}
 				}
+			}
 		}
 		modularity=sum_of_differences/mnet->get_edges()->size();
 	return modularity;
