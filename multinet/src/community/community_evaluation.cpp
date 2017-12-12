@@ -116,11 +116,12 @@ namespace mlnet {
       		}
       	}
 
-      	//Extract the communities from each partitioning
-      	vector<CommunitySharedPtr> partitioning1_coms = partitioning1->get_communities();
-      	vector<CommunitySharedPtr> partitioning2_coms = partitioning2->get_communities();
+      	vector<CommunitySharedPtr> partitioning1_coms;
+      	vector<CommunitySharedPtr> partitioning2_coms;
 
       	//Iterate through the first partitioning communities to set the values for the corresponding map
+        if(partitioning1!=NULL && partitioning1->get_communities().size()!=0){
+          partitioning1_coms= partitioning1->get_communities();
           for(CommunitySharedPtr com:partitioning1_coms){
               //For each pair of nodes in the community, increment the corresponding index in the map
               hash_set<NodeSharedPtr> com_nodes = com->get_nodes();
@@ -131,24 +132,24 @@ namespace mlnet {
 						  std::pair<NodeSharedPtr,NodeSharedPtr> key (*it1 ,*it2);
 						  std::pair<NodeSharedPtr,NodeSharedPtr> key_inversed (*it2,*it1);
 
-						  std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int>::const_iterator iter ;
-						  iter= p1_pairs_cooccurance.find(key);
-
-						  if(iter!=p1_pairs_cooccurance.end()){
+						  if(p1_pairs_cooccurance.find(key)!=p1_pairs_cooccurance.end()){
 							  p1_pairs_cooccurance[key]=p1_pairs_cooccurance[key]+1;
+
 						  }
 						  else{
-						  iter= p1_pairs_cooccurance.find(key_inversed);
-						  if(iter!=p1_pairs_cooccurance.end()){
+						  if(p1_pairs_cooccurance.find(key_inversed)!=p1_pairs_cooccurance.end()){
 							  p1_pairs_cooccurance[key_inversed]=p1_pairs_cooccurance[key_inversed]+1;
-							  }
+							 }
 						  }
                     }
                   }
               }
           }
+        }
 
           //Iterate through the second partitioning communities to set the values for the corresponding map
+        if(partitioning2!=NULL && partitioning2->get_communities().size()!=0){
+        	partitioning2_coms = partitioning2->get_communities();
 			for(CommunitySharedPtr com:partitioning2_coms){
 				//For each pair of nodes in the community, increment the corresponding index in the map
 				hash_set<NodeSharedPtr> com_nodes = com->get_nodes();
@@ -159,22 +160,21 @@ namespace mlnet {
 						  std::pair<NodeSharedPtr,NodeSharedPtr> key (*it1 ,*it2);
 						  std::pair<NodeSharedPtr,NodeSharedPtr> key_inversed (*it2,*it1);
 
-						  std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int>::const_iterator iter ;
-						  iter= p2_pairs_cooccurance.find(key);
-
-						  if(iter!=p2_pairs_cooccurance.end()){
+						  if(p2_pairs_cooccurance.find(key)!=p2_pairs_cooccurance.end()){
 							  p2_pairs_cooccurance[key]=p2_pairs_cooccurance[key]+1;
+
 						  }
 						  else{
-						  iter= p2_pairs_cooccurance.find(key_inversed);
-						  if(iter!=p2_pairs_cooccurance.end()){
+						  if(p2_pairs_cooccurance.find(key_inversed)!=p2_pairs_cooccurance.end()){
 							  p2_pairs_cooccurance[key_inversed]=p2_pairs_cooccurance[key_inversed]+1;
-							  }
+
+							 }
 						  }
 					  }
 					}
 				}
 			}
+        }
 
 		//Count the agreements between both partitions
 		int max_cooccurance_value=0;
@@ -182,7 +182,7 @@ namespace mlnet {
 		int max_possible_num_of_agreements =0;
 		//Iterate through the keys in the first partitioning map
       	typedef std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int>::const_iterator MapIterator;
-      	for (MapIterator iter = p1_pairs_cooccurance.begin(); iter != p1_pairs_cooccurance.end(); iter++)
+      	for (MapIterator iter = p1_pairs_cooccurance.begin(); iter != p1_pairs_cooccurance.end(); ++iter)
       	{
       	   max_possible_num_of_agreements++;
       	  //Get the current key
@@ -198,10 +198,13 @@ namespace mlnet {
       	  if(value_in_p2>max_cooccurance_value | value_in_p1>max_cooccurance_value)
       	  max_cooccurance_value=(value_in_p2 > value_in_p1)?value_in_p2:value_in_p1;
 
+         //std::cout << "< " << iter->first.first->actor->name << ", " << iter->first.second->actor->name <<"> = " << iter->second << std::endl;
+      	 // std::cout << "< " << iter->first.first->actor->name << ", " << iter->first.second->actor->name <<"> = " << p2_pairs_cooccurance[key] << std::endl;
       	}
+
+
+
       	double unadjusted_omega = ((float)actual_agreements/(float)max_possible_num_of_agreements);
-      	//std::cout << "unadjusted_omega = " << unadjusted_omega<<std::endl;
-      	//std::cout<<"max cooccurance value " << max_cooccurance_value<<std::endl;
 
       	//calculate the exptected omega index of a null model
       	double omega_null_model=0;
@@ -223,9 +226,9 @@ namespace mlnet {
 				//Get the current key
 				std::pair<NodeSharedPtr,NodeSharedPtr> key (iter->first.first ,iter->first.second);
 				//If the value equal to the current cooccurance value, then increment happened_in_first_partitioning variable
-				if(p1_pairs_cooccurance[key]==cooccurance_value)happened_in_partitioning2++;
+				if(p2_pairs_cooccurance[key]==cooccurance_value)happened_in_partitioning2++;
 			}
-			sum_of_multiplications+=happened_in_partitioning2*happened_in_partitioning2;
+			sum_of_multiplications+=happened_in_partitioning1*happened_in_partitioning2;
       	}
       	//std::cout<<"sum of multiplications " << sum_of_multiplications<<std::endl;
       	omega_null_model= ((float)sum_of_multiplications/(float) pow(max_possible_num_of_agreements,2));
