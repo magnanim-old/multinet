@@ -221,16 +221,6 @@ double extended_modularity(const MLNetworkSharedPtr& mnet,
 		double expected_out_edge_belonging_co =0;
 		double expected_in_edge_belonging_co =0;
 
-		//build a map for the communities edges
-		std::map<CommunitySharedPtr,std::map<NodeSharedPtr,std::vector<NodeSharedPtr>>> communities_edges;
-		for(CommunitySharedPtr com:communities->get_communities()){
-			for(NodeSharedPtr node1:com->get_nodes()){
-				for(NodeSharedPtr node2:com->get_nodes()){
-				 if(node1!=node2 & mnet->get_edge(node1,node2)!=NULL)
-					 communities_edges[com][node1].push_back(node2);
-				}
-			}
-		}
 
 		//iterate through communities
 		for(CommunitySharedPtr com:communities->get_communities()){
@@ -257,13 +247,13 @@ double extended_modularity(const MLNetworkSharedPtr& mnet,
 						expected_out_edge_belonging_co =0;
 						//if the node has out_neighbours
 						if(out_neighbours->size()!=0){
-							for(vector<NodeSharedPtr>::iterator nbr_iter= communities_edges[com][node1].begin();nbr_iter!= communities_edges[com][node1].end();++nbr_iter){
-								if(nodes_belonging_coefficients[com].find(*nbr_iter)!=nodes_belonging_coefficients[com].end())
-									out_neighbour_belonging_co=nodes_belonging_coefficients[com][*nbr_iter];
+							for(NodeSharedPtr out_neighbour:*out_neighbours){
+								if(nodes_belonging_coefficients[com].find(out_neighbour)!=nodes_belonging_coefficients[com].end())
+									out_neighbour_belonging_co=nodes_belonging_coefficients[com][out_neighbour];
 								else out_neighbour_belonging_co=1;
 								sum_out_edge_belonging_co+=get_edge_belonging_coefficient(first_node_belonging_co,out_neighbour_belonging_co,func);;
 							}
-							expected_out_edge_belonging_co=sum_out_edge_belonging_co/out_neighbours->size();
+							expected_out_edge_belonging_co=sum_out_edge_belonging_co/mnet->get_edges()->size();
 						}
 						else expected_out_edge_belonging_co=0;
 
@@ -273,13 +263,13 @@ double extended_modularity(const MLNetworkSharedPtr& mnet,
 						expected_in_edge_belonging_co =0;
 						//if the node has in_neighbours
 						if(in_neighbours->size()!=0){
-							for(vector<NodeSharedPtr>::iterator nbr_iter= communities_edges[com][node2].begin();nbr_iter!= communities_edges[com][node2].end();++nbr_iter){
-								if(nodes_belonging_coefficients[com].find(*nbr_iter)!=nodes_belonging_coefficients[com].end())
-									in_neighbour_belonging_co=nodes_belonging_coefficients[com][*nbr_iter];
+							for(NodeSharedPtr in_neighbour:*in_neighbours){
+								if(nodes_belonging_coefficients[com].find(in_neighbour)!=nodes_belonging_coefficients[com].end())
+									in_neighbour_belonging_co=nodes_belonging_coefficients[com][in_neighbour];
 								else in_neighbour_belonging_co=1;
 								sum_in_edge_belonging_co+=get_edge_belonging_coefficient(in_neighbour_belonging_co,second_node_belonging_co,func);;
 							}
-							expected_in_edge_belonging_co=sum_in_edge_belonging_co/out_neighbours->size();
+							expected_in_edge_belonging_co=sum_in_edge_belonging_co/mnet->get_edges()->size();
 						}
 						else expected_in_edge_belonging_co=0;
 
