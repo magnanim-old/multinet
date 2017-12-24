@@ -19,7 +19,9 @@ void test_modularity() {
 	// log("TESTING measures");
 	// log("Reading the network...",false);
 	// Creating an empty multiple network and initializing it
+	test_begin("Testing Modularity");
 	MLNetworkSharedPtr mnet = MLNetwork::create("test");
+
 
 	ActorSharedPtr a1 = mnet->add_actor("A1");
 	ActorSharedPtr a2 = mnet->add_actor("A2");
@@ -55,5 +57,19 @@ void test_modularity() {
 
 	//std::cout << "Modularity: " << mod << std::endl;
 
+    double sizeKCmp = 3; //min num of actors in a clique
+    double sizeMCmp = 2;//min num if layers in a clique
+    MLNetworkSharedPtr mnet2 = read_multilayer("aucs.mpx","aucs",',');
+	CommunityStructureSharedPtr groundTruth = read_ground_truth("ground_truth.dat", ',', mnet2);
+	CommunityStructureSharedPtr cmp = mlcpm(mnet2,sizeKCmp,sizeMCmp);
+	hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> node_belonging_co =  get_nodes_belonging_coef(cmp);
+
+	std::cout<< "modularity = " << modularity(mnet2,cmp,1) << std::endl;
+    std::cout<< "extnded_modularity (func = multiply) = " << extended_modularity(mnet2,cmp,node_belonging_co,Multiply) << std::endl;
+    std::cout<< "extnded_modularity (func = sum) = " << extended_modularity(mnet2,cmp,node_belonging_co,Sum) << std::endl;
+    std::cout<< "extnded_modularity (func = average) = " << extended_modularity(mnet2,cmp,node_belonging_co,Average) << std::endl;
+    std::cout<< "extnded_modularity (func = max) = " << extended_modularity(mnet2,cmp,node_belonging_co,Max) << std::endl;
+
+    test_begin("End testing Modularity");
 	//log("TEST SUCCESSFULLY COMPLETED (modularity)");
 }
