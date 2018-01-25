@@ -261,8 +261,7 @@ ActorCommunityStructureSharedPtr  mlp(const MLNetworkSharedPtr& mnet){
 	   label++;
 	 }
 	 //keep updating the labels as long as the stopping condition is not satisfied
-	 int i=0;
-	 while (i<10) {
+	 while (true) {
 
 	            /* shuffle the order of the actors */
 	            unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
