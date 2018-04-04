@@ -177,11 +177,10 @@ ActorCommunityStructureSharedPtr  flattenAndDetectComs(const MLNetworkSharedPtr&
 			//add this actor to the actor_community
 			actor_com->add_actor(actor);
 			//get the nodes of this actor in all the layers in the mnet instance
-			NodeListSharedPtr  actorNodes = mnet->get_nodes();
-			//add the layers where these nodes where found to the actor-community instance (if it is not already added before)
-			hash_set<LayerSharedPtr> layers = actor_com->get_layers();
+			NodeListSharedPtr  actorNodes =  mnet->get_nodes(actor);
+			//add the layers where these nodes were found to the communitiy list of layers
 			for(NodeSharedPtr node:*actorNodes){
-				if(node->layer->name!="flattened" & layers.find(node->layer)==layers.end()){
+				if(node->layer->name!="flattened" & actor_com->get_layers().find(node->layer)==actor_com->get_layers().end()){
 					actor_com->add_layer(node->layer);
 				}
 			}
