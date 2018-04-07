@@ -228,7 +228,7 @@ namespace mlnet {
 			sum_of_multiplications+=happened_in_partitioning2*happened_in_partitioning2;
       	}
       	//std::cout<<"sum of multiplications " << sum_of_multiplications<<std::endl;
-      	omega_null_model= ((float)sum_of_multiplications/(float) pow(max_possible_num_of_agreements,2));
+      	omega_null_model= ((float)sum_of_multiplications/(float) pow((float)max_possible_num_of_agreements,(float)2));
       	//std::cout<<"omega_null_model " << omega_null_model<<std::endl;
 
       	//Calculate the value of omega index

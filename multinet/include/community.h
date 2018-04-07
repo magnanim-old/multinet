@@ -139,6 +139,7 @@ namespace mlnet {
 #include "community/ml-cpm.h"
 #include "community/lart.h"
 #include "community/pmm.h"
+#include "community/mlp.h"
 #include "community/glouvain.h"
 #include "community/abacus.h"
 

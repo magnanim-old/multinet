@@ -135,7 +135,7 @@ double modularity(const MLNetworkSharedPtr& mnet, const hash_map<NodeSharedPtr,l
 hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> get_nodes_belonging_coef(const CommunityStructureSharedPtr& communities){
 
 	//we define node_frequecy here as the number of communities the node is part of
-	std::cout<< "get_nodes_belonging_coef" << std::endl;
+	//std::cout<< "get_nodes_belonging_coef" << std::endl;
 	hash_map<NodeSharedPtr,long> nodes_frequencies;
 	vector<CommunitySharedPtr> communities_list = communities->get_communities();
 	for (CommunitySharedPtr com:communities_list){
@@ -156,7 +156,7 @@ hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> get_nodes_belonging_
 				nodes_belonging_coef[com][node]=1/nodes_frequencies[node];
 			}
 		}
-	std::cout<< "end get_nodes_belonging_coef" << std::endl;
+	//std::cout<< "end get_nodes_belonging_coef" << std::endl;
 	return nodes_belonging_coef;
 }
 

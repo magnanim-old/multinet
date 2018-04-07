@@ -10,13 +10,6 @@
 #include "../algs.h"
 #include "shared_ptr_abstract.h"
 
-// Don't warn about the use of std::auto_ptr in this file.  There is a pragma at the end of
-// this file that re-enables the warning.
-#if (defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || (__GNUC__ > 4))) || \
-    (defined(__clang__) && ((__clang_major__ >= 3 && __clang_minor__ >= 4)))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
 
 namespace dlib 
 {
@@ -303,11 +296,11 @@ namespace dlib
 
         template<typename Y>
         explicit shared_ptr(
-            std::auto_ptr<Y>& r
+            std::unique_ptr<Y>& r
         )
         {
             DLIB_ASSERT(r.get() != 0,
-                "\tshared_ptr::shared_ptr(auto_ptr r)"
+                "\tshared_ptr::shared_ptr(unique_ptr r)"
                 << "\n\tr.get() can't be null"
                 << "\n\tthis: " << this
                 );
@@ -335,11 +328,11 @@ namespace dlib
 
         template<typename Y> 
         shared_ptr& operator= (
-            std::auto_ptr<Y>& r
+            std::unique_ptr<Y>& r
         )
         {
             DLIB_ASSERT(r.get() != 0,
-                "\tshared_ptr::operator=(auto_ptr r)"
+                "\tshared_ptr::operator=(unique_ptr r)"
                 << "\n\tr.get() can't be null"
                 << "\n\tthis: " << this
                 );
@@ -528,10 +521,6 @@ namespace dlib
 
 }
 
-#if (defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || (__GNUC__ > 4))) || \
-    (defined(__clang__) && ((__clang_major__ >= 3 && __clang_minor__ >= 4)))
-#pragma GCC diagnostic pop
-#endif
 
 #endif // DLIB_SHARED_PTr_
 
