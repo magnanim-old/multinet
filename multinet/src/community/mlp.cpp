@@ -139,7 +139,7 @@ double get_dimentions_relevance_for_actor(const vector<LayerSharedPtr>& dims,
  * @return : actor communities
  **/
 
-ActorCommunityStructureSharedPtr to_community_structure(hash_map<ActorSharedPtr,int> membership){
+ActorCommunityStructureSharedPtr to_community_structure(hash_map<ActorSharedPtr,int> membership,hash_map<ActorSharedPtr,vector<LayerSharedPtr>> actors_relevant_layers){
 
 	ActorCommunityStructureSharedPtr result = actor_community_structure::create();
 	hash_map<int,hash_set<ActorSharedPtr> > communities;
@@ -147,9 +147,16 @@ ActorCommunityStructureSharedPtr to_community_structure(hash_map<ActorSharedPtr,
 	     communities[pair.second].insert(pair.first);
 	}
 	for (auto pair: communities) {
-	     ActorCommunitySharedPtr c = actor_community::create();
-	     for (ActorSharedPtr actor: pair.second)
-	         c->add_actor(actor);
+		ActorCommunitySharedPtr c = actor_community::create();
+	    for (ActorSharedPtr actor: pair.second){
+	        c->add_actor(actor);
+			//add the layers of this actor to the community
+			for(LayerSharedPtr layer: actors_relevant_layers[actor]){
+				if(c->get_layers().find(layer)==c->get_layers().end()){
+					c->add_layer(layer);
+				}
+			}
+	    }
 	     result->add_community(c);
 	}
 	return result;
@@ -336,8 +343,9 @@ ActorCommunityStructureSharedPtr  mlp(const MLNetworkSharedPtr& mnet){
 	          break;
 	    }
 
-   return to_community_structure(membership);
+   return to_community_structure(membership,actors_relevant_dimensions);
   }
+
 
 }
 

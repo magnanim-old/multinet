@@ -175,9 +175,10 @@ namespace mlnet {
     CommunitySharedPtr to_node_community(const ActorCommunitySharedPtr& comm, const MLNetworkSharedPtr& net) {
         CommunitySharedPtr result = community::create();
         for (ActorSharedPtr actor: comm->get_actors()) {
-            for (LayerSharedPtr layer: comm->get_layers()) {
-                result->add_node(net->get_node(actor,layer));
-            }
+        	 for (LayerSharedPtr layer: comm->get_layers()) {
+        	    if(net->get_node(actor,layer)){
+        	       result->add_node(net->get_node(actor,layer));}
+        	 }
         }
         return result;
     }
