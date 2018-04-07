@@ -62,23 +62,29 @@ void test_community() {
     std::cout << "done!" << std::endl;
 
     std::cout << "Testing community comparison function...";
-    std::cout << " NMI : "<< normalized_mutual_information(com1,com1,4) << " ";
-    std::cout << " NMI : "<< normalized_mutual_information(com1,com2,4) << " ";
-    std::cout << " NMI : "<< normalized_mutual_information(com1,com3,4) << " " << std::endl;
-    std::cout << " Omega : "<< omega_index(com1,com1,mnet) << " ";
-    std::cout << " Omega : "<< omega_index(com1,com2,mnet) << " ";
-    std::cout << " Omega : "<< omega_index(com1,com3,mnet) << " ";
-    std::cout << "done!" << std::endl;
-    CommunityStructureSharedPtr truth = read_ground_truth("ground_truth.dat",',',mnet);
-    
-    std::cout << "Same info, read from file - it should give the same results...";
-    std::cout << " NMI : "<< normalized_mutual_information(truth,com1,4) << " ";
-    std::cout << " NMI : "<< normalized_mutual_information(truth,com2,4) << " ";
-    std::cout << " NMI : "<<normalized_mutual_information(truth,com3,4) << " "<< std::endl;
-    std::cout << " Omega : "<< omega_index(com1,com1,mnet) << " ";
-    std::cout << " Omega : "<< omega_index(com1,com2,mnet) << " ";
-    std::cout << " Omega : "<< omega_index(com1,com3,mnet) << " ";
-    std::cout << "done!" << std::endl;
+
+	std::cout << " NMI : "<< normalized_mutual_information(com1,com1,4) << " ";
+	std::cout << " NMI : "<< normalized_mutual_information(com1,com2,4) << " ";
+	std::cout << " NMI : "<< normalized_mutual_information(com1,com3,4) << " " << std::endl;
+	std::cout << " Omega : "<< omega_index(com1,com1,mnet) << " ";
+	std::cout << " Omega : "<< omega_index(com1,com2,mnet) << " ";
+	std::cout << " Omega : "<< omega_index(com2,com1,mnet) << " ";
+	std::cout << " Omega : "<< omega_index(com1,com3,mnet) << " ";
+	std::cout << " Omega : "<< omega_index(com3,com1,mnet) << " ";
+
+	std::cout << "done!" << std::endl;
+	CommunityStructureSharedPtr truth = read_ground_truth("ground_truth.dat",',',mnet);
+
+	std::cout << "Same info, read from file - it should give the same results...";
+	std::cout << " NMI : "<< normalized_mutual_information(truth,com1,4) << " ";
+	std::cout << " NMI : "<< normalized_mutual_information(truth,com2,4) << " ";
+	std::cout << " NMI : "<<normalized_mutual_information(truth,com3,4) << " "<< std::endl;
+	std::cout << " Omega : "<< omega_index(com1,com1,mnet) << " ";
+	std::cout << " Omega : "<< omega_index(com1,com2,mnet) << " ";
+	std::cout << " Omega : "<< omega_index(com2,com1,mnet) << " ";
+	std::cout << " Omega : "<< omega_index(com1,com3,mnet) << " ";
+	std::cout << " Omega : "<< omega_index(com3,com1,mnet) << " ";
+	std::cout << "done!" << std::endl;
     
     MLNetworkSharedPtr cpm = read_multilayer("florentine_families.mpx","toy",',');
 
