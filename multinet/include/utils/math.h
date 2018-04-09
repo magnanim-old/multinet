@@ -49,19 +49,6 @@ double mean(const vector<double>& vec);
  */
 double stdev(const vector<double>& vec);
 
-/**
- * Tha Jaccard similarity of a set of sets is the size of their intersection divided by the size of their union.
- * @param sets a vector of sets
- * @return Jaccard similiarity of the input sets. If the sets are all empty, 0 is returned.
- */
-template <class T>
-double jaccard_similarity(const std::vector<hash_set<T> >& sets) {
-	long union_size = s_union(sets).size();
-	if (union_size==0)
-		return 0;
-	long intersection_size = s_intersection(sets).size();
-	return (double)intersection_size/union_size;
-}
 
     /**
      * Set-based intersection, for a combination of sorted and unordered sets.
@@ -265,6 +252,21 @@ hash_set<T> s_union(const sorted_set<T>& set1, const sorted_set<T>& set2) {
 	return result;
 }
 
+    
+    /**
+     * Tha Jaccard similarity of a set of sets is the size of their intersection divided by the size of their union.
+     * @param sets a vector of sets
+     * @return Jaccard similiarity of the input sets. If the sets are all empty, 0 is returned.
+     */
+    template <class T>
+    double jaccard_similarity(const std::vector<hash_set<T> >& sets) {
+        long union_size = s_union(sets).size();
+        if (union_size==0)
+            return 0;
+        long intersection_size = s_intersection(sets).size();
+        return (double)intersection_size/union_size;
+    }
+    
 /**
  * Converts a number to a string representation of it
  * @param number value to be converted

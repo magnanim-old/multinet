@@ -44,6 +44,10 @@ LayerSharedPtr flatten_weighted(MLNetworkSharedPtr& mnet, const std::string& new
  */
 LayerSharedPtr flatten_unweighted(MLNetworkSharedPtr& mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors);
 
+        // Temporary function for ASONAM paper :)
+    LayerSharedPtr flatten_obaida(MLNetworkSharedPtr& mnet, const std::string& new_layer_name, const std::unordered_set<LayerSharedPtr>& layers, bool force_directed, bool force_actors, double threshold);
+        
+        
 /**
  * A projection creates a new layer where actors are taken from one layer and their connections depend
  * on how they are connected to objects in a second layer. An unweighted projection adds an edge between
