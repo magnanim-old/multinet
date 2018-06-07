@@ -115,8 +115,10 @@ void test_community() {
     
     std::cout << "=====================" << std::endl;
     std::cout << "Flattening" << std::endl;
-    communities = flattenAndDetectComs(cpm,ZeroOne,LabelPropagation);
-    std::cout << communities->to_string();
+	MLNetworkSharedPtr fnet = flatten(mnet,ZeroOne);
+	LayerSharedPtr fLayer = fnet->get_layer("flattened");
+	CommunityStructureSharedPtr coms  = label_propagation_single(fnet, fLayer);
+    std::cout << coms->to_string();
     
     //std::cout << "modularity (NOTE: not defined for overlapping communities): ";
     //std::cout << modularity(toy,n_communities,1) << std::endl;
