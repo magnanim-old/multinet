@@ -12,10 +12,10 @@
 
 // GCC 4.8 gives false alarms about some matrix operations going out of bounds.  Disable
 // these false warnings.
-#if defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 8) || (__GNUC__ > 4))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#endif
+//#if defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 8) || (__GNUC__ > 4))
+//#pragma GCC diagnostic push
+//#pragma GCC diagnostic ignored "-Warray-bounds"
+//#endif
 
 namespace dlib
 {
