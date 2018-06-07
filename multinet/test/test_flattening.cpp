@@ -1,6 +1,7 @@
 #include "test.h"
 #include "../include/community/flattening.h"
 
+
 using namespace mlnet;
 
 void test_flattening() {
@@ -9,10 +10,17 @@ void test_flattening() {
 
 	MLNetworkSharedPtr mnet = read_multilayer("dkpol.mpx","dkpol",',');
 
+	std::cout << "before flattening : " <<std::endl << mnet->to_string() <<std::endl;
 
-    ActorCommunityStructureSharedPtr c = flattenAndDetectComs(mnet,ZeroOne,LabelPropagation);
+	MLNetworkSharedPtr fnet = flatten(mnet,NumOfLayers);
 
-    std::cout << c->to_string() << std::endl;
+	std::cout << "before flattening : " <<std::endl << fnet->to_string() <<std::endl;
+
+
+	LayerSharedPtr fLayer = fnet->get_layer("flattened");
+	CommunityStructureSharedPtr coms  = label_propagation_single(fnet, fLayer);
+	std::cout << "communities using label propagation : " <<std::endl << coms->to_string() <<std::endl;
+
 
 	test_end("Flattening and detecting communities");
 
