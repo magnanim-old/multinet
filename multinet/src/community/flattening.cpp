@@ -208,5 +208,6 @@ MLNetworkSharedPtr  flatten(const MLNetworkSharedPtr& mnet, WeighteningType wTyp
 		}
 	}
    return fnet;
+	}
 }
 
