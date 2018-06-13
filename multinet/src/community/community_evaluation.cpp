@@ -20,7 +20,11 @@ namespace mlnet {
      * @param n number of nodes in the original network
      */
     double normalized_mutual_information(const CommunityStructureSharedPtr& com1, const CommunityStructureSharedPtr& com2, int n) {
-        double entropy_c1 = 0;
+
+    	if(com1 == NULL && com2==NULL) return 1;
+    	if(com1 == NULL || com2== NULL) return 0;
+
+    	double entropy_c1 = 0;
 
         for (size_t i = 0; i < com1->get_communities().size(); i++) {
             int size1 = com1->get_community(i)->get_nodes().size();
