@@ -25,10 +25,7 @@ double numOfDimentionsWeightening(const MLNetworkSharedPtr& mnet,const ActorShar
 		/*for each layer in the input multi-layer network try to find the corresponding nodes of input actors*/
 		for(LayerSharedPtr layer: *mnet->get_layers())
 		{
-			if(layer->name!="flattened")
-			{
 			NodeSharedPtr node1 = mnet->get_node(act1,layer);
-
 			NodeSharedPtr node2 = mnet->get_node(act2,layer);
 
 			/*if the corresponding nodes were found, and there is an edge among them, then increase the weight*/
@@ -36,7 +33,6 @@ double numOfDimentionsWeightening(const MLNetworkSharedPtr& mnet,const ActorShar
 				{
 					expectedWeight+=1;
 				}
-			}
 		}
 		return expectedWeight/(double) mnet->get_layers()->size();
 }
@@ -176,8 +172,9 @@ MLNetworkSharedPtr  flatten(const MLNetworkSharedPtr& mnet, WeighteningType wTyp
 		/*consider the edge only if is an intra-layer edge*/
 		if(edge->v1->layer == edge->v2->layer)
 		{
-			ActorSharedPtr act1 = fnet->get_actor(edge->v1->actor->name);
-			ActorSharedPtr act2 = fnet->get_actor(edge->v2->actor->name);
+			ActorSharedPtr act1 = mnet->get_actor(edge->v1->actor->name);
+			ActorSharedPtr act2 = mnet->get_actor(edge->v2->actor->name);
+
 			NodeSharedPtr from = fnet->get_node(act1,flattenedLayer);
 			NodeSharedPtr to = fnet->get_node(act2,flattenedLayer);
 			double expectedWeight=0;
@@ -209,5 +206,42 @@ MLNetworkSharedPtr  flatten(const MLNetworkSharedPtr& mnet, WeighteningType wTyp
 	}
    return fnet;
 	}
-}
 
+
+/**
+ * @brief maps back the communities found in the flattened network into multi-layer communities in the original multi-layer instance.
+ * @fComs: The communities of the flattened graph
+ * @mnet:  The input multi-layer network instance
+ * @return:The mapping as actor communities on the multi-layer instance
+ **/
+ CommunityStructureSharedPtr map_back_to_ml(const CommunityStructureSharedPtr& fComs,const MLNetworkSharedPtr& mnet){
+
+	ActorCommunityStructureSharedPtr result = actor_community_structure::create();
+
+	//for each community in the flattened network
+	for(CommunitySharedPtr singleCom:fComs->get_communities()){
+		ActorCommunitySharedPtr actor_com = actor_community::create();
+
+		//for each node in the current flattened network community
+		for(NodeSharedPtr node:singleCom->get_nodes()){
+			//find the actor of this node in the mnet instance
+			ActorSharedPtr actor = node->actor;
+			//add this actor to the actor_community
+			actor_com->add_actor(actor);
+			//get the nodes of this actor in all the layers in the mnet instance
+			NodeListSharedPtr  actorNodes =  mnet->get_nodes(actor);
+			//add the layers where these nodes were found to the communitiy list of layers
+			for(NodeSharedPtr node:*actorNodes){
+				if(node->layer->name!="flattened" & actor_com->get_layers().find(node->layer)==actor_com->get_layers().end()){
+					actor_com->add_layer(node->layer);
+				}
+			}
+		}
+		// add this community to the list of communities to be returned
+		result->add_community(actor_com);
+	}
+
+	return to_node_communities(result,mnet);
+   }
+
+}

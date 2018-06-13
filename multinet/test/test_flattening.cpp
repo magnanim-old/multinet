@@ -21,7 +21,16 @@ void test_flattening() {
 	CommunityStructureSharedPtr coms  = label_propagation_single(fnet, fLayer);
 	std::cout << "communities using label propagation : " <<std::endl << coms->to_string() <<std::endl;
 
+	std::cout <<std::endl;
+	std::cout <<std::endl;
+	std::cout <<std::endl;
+	std::cout <<std::endl;
+	std::cout <<std::endl;
+	std::cout <<std::endl;
+	std::cout <<std::endl;
 
+	CommunityStructureSharedPtr result = map_back_to_ml(coms,mnet);
+	std::cout << "after_mapping " <<std::endl << result->to_string() <<std::endl;
 	test_end("Flattening and detecting communities");
 
 }
