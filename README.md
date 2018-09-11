@@ -1,6 +1,8 @@
 multinet
 ===============
 
+NOTE: This version is no longer under development. We are in the process of releasing version 2.0, that will mantain (almost) the same API for the R package but with a re-engineered C++ code. We will soon post here the address of the new repository.
+
 A library for the analysis and mining of multilayer networks, based on the book: Multilayer Social Networks, by Dickison, Magnani and Rossi, Cambridge University Press. This is available as a C++ library and as an R library. A stable version of the R library is also available on CRAN.
 
 
