@@ -14,128 +14,15 @@
 
 namespace mlnet {
 
-double modularity(const MLNetworkSharedPtr& mnet, const CommunityStructureSharedPtr& communities, double c) {
-	
-    double res = 0;
-	double mu = 0;
-	hash_map<LayerSharedPtr,long> m_s;
-	for (LayerSharedPtr s: *mnet->get_layers()) {
-		double m = mnet->get_edges(s,s)->size();
-		if (!mnet->is_directed(s,s))
-			m *= 2;
-		// FIX TO THE ORIGINAL EQUATION WHEN THERE ARE NO EDGES
-		if (m == 0)
-			m = 1; // no effect on the formula
-		m_s[s] = m;
-		mu += m;
-	}
-
-		for (CommunitySharedPtr community: communities->get_communities()) {
-            for (NodeSharedPtr i: community->get_nodes()) {
-				for (NodeSharedPtr j: community->get_nodes()) {
-				if (i==j) continue; // not in the original definition - we do this assuming to deal with simple graphs
-				//std::cout << i->to_string() << " " << groups.count(i) << std::endl;
-				//std::cout << j->to_string() << " " << groups.count(j) << std::endl;
-
-				if (i->layer==j->layer) {
-					//std::cout << "Same group!" << std::endl;
-					//if (mnet.getNetwork(net)->containsEdge(*v_i,*v_j))
-					//	std::cout << "Edge" << std::endl;
-					long k_i = mnet->neighbors(i,OUT)->size();
-					long k_j = mnet->neighbors(j,IN)->size();
-					int a_ij = mnet->get_edge(i,j)? 1.0 : 0.0;
-					res += a_ij - (double)k_i * k_j / (m_s.at(i->layer));
-					//std::cout << i->actor->name << " " << j->actor->name << " " << i->layer->name << " "<< k_i << " " <<  k_j << " " <<  m_s.at(i->layer) << std::endl;
-					//std::cout << "->" << res << std::endl;
-				}
-				if (i->actor==j->actor) {
-					res += c;
-				}
-			}
-		}
-		//std::cout << "->" << m_net << std::endl;
-	}
-	//std::cout << "same" << std::endl;
-
-	//std::cout << mu << std::endl;
-	for (ActorSharedPtr actor: *mnet->get_actors()) {
-		int num_nodes = mnet->get_nodes(actor)->size();
-		mu+=num_nodes*(num_nodes-1)*c; // unclear if we should multiply by c
-	}
-	//std::cout << mu << std::endl;
-
-	return 1 / mu * res;
-}
-
-double modularity(const MLNetworkSharedPtr& mnet, const hash_map<NodeSharedPtr,long>& membership, double c) {
-        // partition the nodes by group
-        hash_map<long, std::set<NodeSharedPtr> > groups;
-        for (auto pair: membership) {
-            groups[pair.second].insert(pair.first);
-        }
-        // start computing the modularity
-        double res = 0;
-        double mu = 0;
-        hash_map<LayerSharedPtr,long> m_s;
-        for (LayerSharedPtr s: *mnet->get_layers()) {
-            double m = mnet->get_edges(s,s)->size();
-            if (!mnet->is_directed(s,s))
-                m *= 2;
-            // FIX TO THE ORIGINAL EQUATION WHEN THERE ARE NO EDGES
-            if (m == 0)
-                m = 1; // no effect on the formula
-            m_s[s] = m;
-            mu += m;
-        }
-        
-        for (auto pair: groups) {
-            for (NodeSharedPtr i: pair.second) {
-                for (NodeSharedPtr j: pair.second) {
-                    if (i==j) continue; // not in the original definition - we do this assuming to deal with simple graphs
-                    //std::cout << i->to_string() << " " << groups.count(i) << std::endl;
-                    //std::cout << j->to_string() << " " << groups.count(j) << std::endl;
-                    
-                    if (i->layer==j->layer) {
-                        //std::cout << "Same group!" << std::endl;
-                        //if (mnet.getNetwork(net)->containsEdge(*v_i,*v_j))
-                        //	std::cout << "Edge" << std::endl;
-                        long k_i = mnet->neighbors(i,OUT)->size();
-                        long k_j = mnet->neighbors(j,IN)->size();
-                        int a_ij = mnet->get_edge(i,j)? 1.0 : 0.0;
-                        res += a_ij - (double)k_i * k_j / (m_s.at(i->layer));
-                        //std::cout << i->actor->name << " " << j->actor->name << " " << i->layer->name << " "<< k_i << " " <<  k_j << " " <<  m_s.at(i->layer) << std::endl;
-                        //std::cout << "->" << res << std::endl;
-                    }
-                    if (i->actor==j->actor) {
-                        res += c;
-                    }
-                }
-            }
-            //std::cout << "->" << m_net << std::endl;
-        }
-        //std::cout << "same" << std::endl;
-        
-        //std::cout << mu << std::endl;
-        for (ActorSharedPtr actor: *mnet->get_actors()) {
-            int num_nodes = mnet->get_nodes(actor)->size();
-            mu+=num_nodes*(num_nodes-1)*c; // unclear if we should multiply by c
-        }
-        //std::cout << mu << std::endl;
-        
-        return 1 / mu * res;
-    }
-
-
-
 /**
-* calculates the belonging coefficients for nodes to their communities by setting it equal to 1 if the node is a non-overlapping node,
+* calculates the belonging factors for nodes to their communities by setting it equal to 1 if the node is a non-overlapping node,
 * or 1/#communities_for_the_node when the node is an overlapping node
 * @param communities: set of communities (groups of nodes that belong to mnet)
 */
-hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> get_nodes_belonging_coef(const CommunityStructureSharedPtr& communities){
+hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> get_nodes_belonging_factors(const CommunityStructureSharedPtr& communities){
 
 	//we define node_frequecy here as the number of communities the node is part of
-	//std::cout<< "get_nodes_belonging_coef" << std::endl;
+	//std::cout<< "get_nodes_belonging_factors" << std::endl;
 	hash_map<NodeSharedPtr,long> nodes_frequencies;
 	vector<CommunitySharedPtr> communities_list = communities->get_communities();
 	for (CommunitySharedPtr com:communities_list){
@@ -153,134 +40,160 @@ hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> get_nodes_belonging_
 	//set equal contributions for the node in each community it is part of
 	for (CommunitySharedPtr com:communities_list){
 			for(NodeSharedPtr node:com->get_nodes()){
-				nodes_belonging_coef[com][node]=1/nodes_frequencies[node];
+				nodes_belonging_coef[com][node]= (double)1/nodes_frequencies[node];
 			}
 		}
-	//std::cout<< "end get_nodes_belonging_coef" << std::endl;
+	//std::cout<< "end get_nodes_belonging_factors" << std::endl;
 	return nodes_belonging_coef;
 }
 
 
 /**
-* calculates the edge belonging co_efficient to its community as a function of its corresponding nodes belonging coefficients
-* @param node1_belonging_co: first node belonging coefficient
-* @param node2_belonging_co: second node belonging coefficient
+* calculates the edge belonging factors to its community as a function of its corresponding nodes belonging factors
+* @param node1_belonging_co: first node belonging factor
+* @param node2_belonging_co: second node belonging factor
 * @param func could be one of the following values (Sum,Multiply,Max,Average).
 */
-double get_edge_belonging_coefficient(double node1_belonging_co,double node2_belonging_co, EdgeBelonigngFunc func){
-	double edge_belonging =0;
+double F(double node1_belonging_co,double node2_belonging_co, EdgeBelonigngFunc func){
+	double belonging =0;
 	switch (func) {
 		case Sum:
-			edge_belonging=node1_belonging_co+node2_belonging_co;
+			belonging=node1_belonging_co+node2_belonging_co;
 			break;
 		case Multiply:
-			edge_belonging=node1_belonging_co*node2_belonging_co;
+			belonging=node1_belonging_co*node2_belonging_co;
 			break;
 		case Max:
-			edge_belonging= (node1_belonging_co>node2_belonging_co)? node1_belonging_co:node2_belonging_co;
+			belonging= (node1_belonging_co>node2_belonging_co)? node1_belonging_co:node2_belonging_co;
 			break;
 		case Average:
-			edge_belonging=(node1_belonging_co+node2_belonging_co)/2;
+			belonging=(node1_belonging_co+node2_belonging_co)/2;
 			break;
 		default:
-			edge_belonging=node1_belonging_co*node2_belonging_co;
+			belonging=node1_belonging_co*node2_belonging_co;
 	}
-	return edge_belonging;
+	return belonging;
 }
 
 
-
 /**
-* calculate the modularity for directed graphs with overlapping communities where in this implementation, two communities are overlapping if they share nodes
-* reference :  http://iopscience.iop.org/article/10.1088/1742-5468/2009/03/P03024/meta
+# Implementation of multislice modularity defined in :
+# Mucha, P. J., Richardson, T., Macon, K., Porter, M. A. & Onnela, J.-P.
+# Community structure in time - dependent, multiscale, and multiplex networks.
+# Science 328, 876–8(2010)
 * @param mnet : the multi-layer instance
-* @param communities: set of communities (groups of nodes that belong to mnet)
-* @param nodes_belonging_coefficients (weights given for the nodes that are in the overlapping communities and it express how strongly a node belong to each community it is part of)
-* @param func could be one of the following values (Sum,Multiply,Max,Average) and it specifies how the edge belonging to a cummunity should be calculated as a function of the belonging coefficients of the corresponding nodes
-*/
-double extended_modularity(const MLNetworkSharedPtr& mnet,
-						   const CommunityStructureSharedPtr& communities,
-						   hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> nodes_belonging_coefficients,
-						   EdgeBelonigngFunc func){
+* @param communities: a clustering
+* @param interlayer_weight: 0-1
+ */
+double modularity(const MLNetworkSharedPtr& mnet, const CommunityStructureSharedPtr& communities, double interlayer_weight){
 
+	double gamma=1.0;
 
-		double sum_of_differences =0;
-		double modularity =0;
-
-		//some auxiliary variables
-
-		double first_node_belonging_co=1;
-		double second_node_belonging_co= 1;
-		double out_neighbour_belonging_co =1;
-		double in_neighbour_belonging_co =1;
-
-		double sum_out_edge_belonging_co = 0;
-		double sum_in_edge_belonging_co = 0;
-
-		double actual_edge_beloning_co =  0;
-		double expected_out_edge_belonging_co =0;
-		double expected_in_edge_belonging_co =0;
-
-
-		//iterate through communities
-		for(CommunitySharedPtr com:communities->get_communities()){
-			for(NodeSharedPtr node1:com->get_nodes()){
-				for(NodeSharedPtr node2:com->get_nodes()){
-					//if it is not the same node and there is an edge between the corresponding two actors
-					if(node1 != node2 &  mnet->get_edge(node1,node2)!=NULL){
-					 //a-calculate the actual belonging co_efficient of the this link (referred to as r(i,j,c) in the paper)
-						first_node_belonging_co=1;
-						second_node_belonging_co= 1;
-					   //if the nodes belonging coefficient is already given in the input variable nodes_belonging_coefficients
-					   if(nodes_belonging_coefficients[com].find(node1)!=nodes_belonging_coefficients[com].end())
-						   first_node_belonging_co=nodes_belonging_coefficients[com][node1];
-					   if(nodes_belonging_coefficients[com].find(node2)!=nodes_belonging_coefficients[com].end())
-						   second_node_belonging_co=nodes_belonging_coefficients[com][node2];
-
-					 actual_edge_beloning_co= get_edge_belonging_coefficient(first_node_belonging_co,second_node_belonging_co,func);
-
-
-					//b-calculate the expected belonging co_efficient of the this link to this community (referred to as s(i,j,c) in the paper)
-					  //b.1- expected belonging co_efficient of any link starting from the node 1  (referred to as B_out_(i,j),c)
-						NodeListSharedPtr out_neighbours =  mnet->neighbors(node1,OUT);
-						sum_out_edge_belonging_co = 0;
-						expected_out_edge_belonging_co =0;
-						//if the node has out_neighbours
-						if(out_neighbours->size()!=0){
-							for(NodeSharedPtr out_neighbour:*out_neighbours){
-								if(nodes_belonging_coefficients[com].find(out_neighbour)!=nodes_belonging_coefficients[com].end())
-									out_neighbour_belonging_co=nodes_belonging_coefficients[com][out_neighbour];
-								else out_neighbour_belonging_co=1;
-								sum_out_edge_belonging_co+=get_edge_belonging_coefficient(first_node_belonging_co,out_neighbour_belonging_co,func);;
-							}
-							expected_out_edge_belonging_co=sum_out_edge_belonging_co/mnet->get_edges()->size();
-						}
-						else expected_out_edge_belonging_co=0;
-
-						//b.2- expected belonging co_efficient of any link ending at node 2  (referred to as B_in_(i,j),c)
-						NodeListSharedPtr in_neighbours =  mnet->neighbors(node2,IN);
-						sum_in_edge_belonging_co = 0;
-						expected_in_edge_belonging_co =0;
-						//if the node has in_neighbours
-						if(in_neighbours->size()!=0){
-							for(NodeSharedPtr in_neighbour:*in_neighbours){
-								if(nodes_belonging_coefficients[com].find(in_neighbour)!=nodes_belonging_coefficients[com].end())
-									in_neighbour_belonging_co=nodes_belonging_coefficients[com][in_neighbour];
-								else in_neighbour_belonging_co=1;
-								sum_in_edge_belonging_co+=get_edge_belonging_coefficient(in_neighbour_belonging_co,second_node_belonging_co,func);;
-							}
-							expected_in_edge_belonging_co=sum_in_edge_belonging_co/mnet->get_edges()->size();
-						}
-						else expected_in_edge_belonging_co=0;
-
-					//c-add the difference between expected and actual to the sum of differences
-						sum_of_differences+= actual_edge_beloning_co - (expected_out_edge_belonging_co*out_neighbours->size())*(expected_in_edge_belonging_co*in_neighbours->size())/mnet->get_edges()->size();
+	hash_map<NodeSharedPtr,int> assignments;
+	int c_num = 0;
+	for (CommunitySharedPtr com: communities->get_communities()) {
+		 for (NodeSharedPtr node: com->get_nodes()) {
+			 assignments[node]=c_num;
+		 }
+		 c_num++;
+	}
+	double mu =0.0;
+	double Q = 0.0;
+    //For each layer
+	for (LayerSharedPtr layer: *mnet->get_layers()) {
+		//For each node in that layer
+		for (NodeSharedPtr node:*mnet->get_nodes(layer)){
+			double sum_i = 0.0;
+			//store the degree of this node
+			int deg_node = mnet->neighbors(node,INOUT)->size();
+			//for each neighbour pf this node
+			for (NodeSharedPtr nei: *mnet->neighbors(node,INOUT)){
+				//check if they both (the node and its neighbour) are assigned to a community
+				if(assignments.find(node)!=assignments.end() && assignments.find(nei) != assignments.end()){
+					//check if they both (the node and its neighbour) are in the same community
+					if(assignments[node] == assignments[nei]){
+					 //store the degree of the neighbour
+					 int deg_nei = mnet->neighbors(nei,INOUT)->size();
+					 //calculate the contribution of this edge to the modularity
+					 sum_i+= 1- gamma*((deg_node*deg_nei)/(2*mnet->get_edges(layer,layer)->size()));
 					}
 				}
 			}
+			sum_i+=interlayer_weight;
+			Q+=sum_i;
+			mu+=deg_node+(mnet->get_layers()->size()-1)*interlayer_weight;
 		}
-		modularity=sum_of_differences/mnet->get_edges()->size();
-	return modularity;
+	}
+
+	Q=(double) Q/(2*mu);
+	return Q;
+
+}
+
+/**
+* calculate the modularity for graphs with overlapping communities where in this implementation, two communities are overlapping if they share nodes
+* reference :  http://iopscience.iop.org/article/10.1088/1742-5468/2009/03/P03024/meta
+* @param mnet : the multi-layer instance
+* @param communities: a clustering
+* @param interlayer_weight: 0-1
+*/
+double extended_modularity(const MLNetworkSharedPtr& mnet, const CommunityStructureSharedPtr& communities, double interlayer_weight){
+
+	double gamma=1.0;
+
+	hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> n_bc = get_nodes_belonging_factors(communities);//nodes belonging co-effiecinets to communities
+	hash_map<NodeSharedPtr,hash_set<CommunitySharedPtr>> assignments;
+
+	for (CommunitySharedPtr com: communities->get_communities()) {
+		 for (NodeSharedPtr node: com->get_nodes()) {
+			 assignments[node].insert(com);
+		 }
+	}
+
+	double mu =0.0;
+	double Q = 0.0;
+	//For each layer
+	for (LayerSharedPtr layer: *mnet->get_layers()) {
+		//For each node in that layer
+		for (NodeSharedPtr node:*mnet->get_nodes(layer)){
+			double sum_i = 0.0;
+			//Store the degree of this node
+			int deg_node = mnet->neighbors(node,INOUT)->size();
+			//For each neighbour of this node
+			for (NodeSharedPtr nei: *mnet->neighbors(node,INOUT)){
+				//If they both are assigned to a community
+				if(assignments.find(node)!=assignments.end() && assignments.find(nei) != assignments.end()){
+					//Store the intersection of community assignments for both (the node and its neighcour)
+					hash_set<CommunitySharedPtr> same_coms = s_intersection(assignments[node] ,assignments[nei]);
+					//Get the degree of the neighbour
+					int deg_nei = mnet->neighbors(nei,INOUT)->size();
+					//For each common community assignment for both (the node and its neighbour)
+					for(CommunitySharedPtr shared_com:same_coms){
+
+						long bc_i_c = 0; //expected belonging factor of any link starting from "node" to "shaed_com" (in a null model)
+						for (NodeSharedPtr out_node: shared_com->get_nodes()) {
+						bc_i_c += F(n_bc[shared_com][node],n_bc[shared_com][out_node],Max)/mnet->get_nodes()->size();
+						}
+
+						long bc_j_c = 0; //expected belonging factor of any link ending at "nei" to "shaed_com" (in a null model)
+						for (NodeSharedPtr in_node: shared_com->get_nodes()) {
+						bc_j_c += F(n_bc[shared_com][in_node],n_bc[shared_com][nei],Max)/mnet->get_nodes()->size();
+						}
+
+						long bc_ij_c = F(n_bc[shared_com][node],n_bc[shared_com][nei],Max);// calculates the belonging factor of an edge to a community as a function of the belonging factors of the nodes
+
+						sum_i+= bc_ij_c- gamma*((bc_i_c*deg_node*bc_j_c*deg_nei)/(2*mnet->get_edges(layer,layer)->size()));
+					}
+				}
+			}
+			sum_i+=interlayer_weight;
+			Q+=sum_i;
+			mu+=deg_node+(mnet->get_layers()->size()-1)*interlayer_weight;
+		}
+	}
+	Q=(double) Q/(2*mu);
+	return Q;
+
 }
 
 }
