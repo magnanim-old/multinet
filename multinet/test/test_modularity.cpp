@@ -62,13 +62,9 @@ void test_modularity() {
     MLNetworkSharedPtr mnet2 = read_multilayer("aucs.mpx","aucs",',');
 	CommunityStructureSharedPtr groundTruth = read_ground_truth("ground_truth.dat", ',', mnet2);
 	CommunityStructureSharedPtr cmp = mlcpm(mnet2,sizeKCmp,sizeMCmp);
-	hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> node_belonging_co =  get_nodes_belonging_coef(cmp);
 
 	std::cout<< "modularity = " << modularity(mnet2,cmp,1) << std::endl;
-    std::cout<< "extnded_modularity (func = multiply) = " << extended_modularity(mnet2,cmp,node_belonging_co,Multiply) << std::endl;
-    std::cout<< "extnded_modularity (func = sum) = " << extended_modularity(mnet2,cmp,node_belonging_co,Sum) << std::endl;
-    std::cout<< "extnded_modularity (func = average) = " << extended_modularity(mnet2,cmp,node_belonging_co,Average) << std::endl;
-    std::cout<< "extnded_modularity (func = max) = " << extended_modularity(mnet2,cmp,node_belonging_co,Max) << std::endl;
+    std::cout<< "extnded_modularity (func = multiply) = " << extended_modularity(mnet2,cmp,1) << std::endl;
 
     test_begin("End testing Modularity");
 	//log("TEST SUCCESSFULLY COMPLETED (modularity)");

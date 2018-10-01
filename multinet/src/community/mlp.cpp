@@ -211,15 +211,14 @@ ActorCommunityStructureSharedPtr  mlp(const MLNetworkSharedPtr& mnet){
 				initial_attraction_weights[actor][pair.first]=affinity;
 			}
 		}
-
 	/*(2) recover the relevant dimensions (layers) Dv for each actor using equation(8) in the reference*/
 		for(ActorSharedPtr actor:*mnet->get_actors()){
 			//retrieve the layers in which the actors has neighbours
-			vector<LayerSharedPtr> activ_in_layers;
+			std::vector<LayerSharedPtr> activ_in_layers;
+			if(all_actors_neighbours.find(actor) != all_actors_neighbours.end() && !all_actors_neighbours.at(actor).empty())
 			for(auto pair:all_actors_neighbours.at(actor)){
 				activ_in_layers.push_back(pair.first);
 			}
-
 			//calculate the sum of w0 for neighbours within all subsets of layers in which the actor is active
 			double max_sum_of_w0=0;
 			vector<LayerSharedPtr> subset;
@@ -241,9 +240,8 @@ ActorCommunityStructureSharedPtr  mlp(const MLNetworkSharedPtr& mnet){
 					}
 				}
 			}
-			actors_relevant_dimensions[actor] =actor_relevant_dimentions;
+			actors_relevant_dimensions[actor] = actor_relevant_dimentions;
 		}
-
 	/*(3)  calculate the new attraction weights w for actors (equation (7) in the article)*/
 	for(auto pair:initial_attraction_weights){
 	 for(auto sub_pair: pair.second){
@@ -254,7 +252,6 @@ ActorCommunityStructureSharedPtr  mlp(const MLNetworkSharedPtr& mnet){
 		 updated_attraction_weights[act1][act2]=initial_attraction_weights[act1][act2]*((double)intersect.size()/union_.size());
 	  }
 	}
-
 	 /*(4)The labeling step*/
 	 ActorListSharedPtr actors = mnet->get_actors();
 	 hash_map<ActorSharedPtr,int> membership; // community membership
@@ -273,9 +270,11 @@ ActorCommunityStructureSharedPtr  mlp(const MLNetworkSharedPtr& mnet){
 	            /* shuffle the order of the actors */
 	            unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	            std::shuffle(order.begin(), order.end(), std::default_random_engine(seed));
-
 	            /* re-assign labels */
 	            for (ActorSharedPtr actor: order) {
+	            	//if the actor has neighbours in any layer
+	            	if(all_actors_neighbours.find(actor) != all_actors_neighbours.end() && !all_actors_neighbours.at(actor).empty())
+	    			{
 	            	//group the neighbours according to their labels calculate the sum of w within each group
 	            	hash_map<int,double> neigh_groups_wieghts;
 	            	for(auto pair:updated_attraction_weights[actor]){
@@ -311,11 +310,13 @@ ActorCommunityStructureSharedPtr  mlp(const MLNetworkSharedPtr& mnet){
 	            			 vector<LayerSharedPtr> union_= get_union(actors_relevant_dimensions[actor],actors_shared_layers[actor][neighbour]);
 	            			 updated_attraction_weights[neighbour][actor]=updated_attraction_weights[neighbour][actor]*((double)intersect.size()/union_.size());
 	            	 }
-
+	    			}
 	            }
-
 	         //check the stopping condition
 	          for (ActorSharedPtr actor: order) {
+	        	  //if the actor has neighbours in any layer
+	        	  if(all_actors_neighbours.find(actor) != all_actors_neighbours.end() && !all_actors_neighbours.at(actor).empty())
+	        	  {
 	        	  //group the neighbours according to their labels calculate the sum of w within each group
 					hash_map<int,double> neigh_groups_wieghts;
 					for(auto pair:updated_attraction_weights[actor]){
@@ -340,9 +341,9 @@ ActorCommunityStructureSharedPtr  mlp(const MLNetworkSharedPtr& mnet){
 						continue;
 					}
 	          }
+	 	 	 }
 	          break;
 	    }
-
    return to_community_structure(membership,actors_relevant_dimensions);
   }
 
