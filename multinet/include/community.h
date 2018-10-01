@@ -107,9 +107,7 @@ namespace mlnet {
 
     double modularity(const MLNetworkSharedPtr& mnet, const CommunityStructureSharedPtr& groups, double c);
     double modularity(const MLNetworkSharedPtr& mnet, const hash_map<NodeSharedPtr,long>& groups, double c); // for back-compatibility
-    hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> get_nodes_belonging_coef(const CommunityStructureSharedPtr& communities);
-    double extended_modularity(const MLNetworkSharedPtr& mnet, const CommunityStructureSharedPtr& communities, hash_map<CommunitySharedPtr,hash_map<NodeSharedPtr,double>> nodes_belonging_coefficients,EdgeBelonigngFunc func);
-    /* Community comparison functions (external) */
+    double extended_modularity(const MLNetworkSharedPtr& mnet, const CommunityStructureSharedPtr& communities, double c);
 
     double community_jaccard(const CommunitySharedPtr& c1, const CommunitySharedPtr& c2);
 

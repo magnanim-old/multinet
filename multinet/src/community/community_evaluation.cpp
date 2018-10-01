@@ -94,7 +94,7 @@ namespace mlnet {
 
     double omega_index(const CommunityStructureSharedPtr& partitioning1, const CommunityStructureSharedPtr& partitioning2,const MLNetworkSharedPtr& mnet){
 
-         	//Create a map to represent pairs agreement in each input partitioning
+    		//Create a map to represent pairs agreement in each input partitioning
          	//The map is of the form [ key = pair of nodes (node1,node2) and  value = number of times they co-occured together]
            	std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int> p1_pairs_cooccurance;
            	std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int> p2_pairs_cooccurance;
@@ -102,22 +102,9 @@ namespace mlnet {
            	//Get the nodes of the multi-net instance
            	NodeListSharedPtr network_nodes =  mnet->get_nodes();
 
-           	//Initialise both partitioning maps
-           	for (NodeSharedPtr node1:*network_nodes){
-           		for (NodeSharedPtr node2:*network_nodes){
-           		   if(node1!=node2){
-           			   std::pair<NodeSharedPtr,NodeSharedPtr> key (node1 ,node2);
-           			   std::pair<NodeSharedPtr,NodeSharedPtr> key_inversed (node2,node1);
-           			   if(p1_pairs_cooccurance.find(key)== p1_pairs_cooccurance.end() & p1_pairs_cooccurance.find(key_inversed)==p1_pairs_cooccurance.end()){
-           			     p1_pairs_cooccurance[key]=0;
-           			     p2_pairs_cooccurance[key]=0;
-           			   }
-           		   }
-           		}
-           	}
 
-           	vector<CommunitySharedPtr> partitioning1_coms;
-           	vector<CommunitySharedPtr> partitioning2_coms;
+           	std::vector<CommunitySharedPtr> partitioning1_coms;
+           	std::vector<CommunitySharedPtr> partitioning2_coms;
 
            	//Iterate through the first partitioning communities to set the values for the corresponding map
              if(partitioning1!=NULL && partitioning1->get_communities().size()!=0){
@@ -140,6 +127,7 @@ namespace mlnet {
      						  if(p1_pairs_cooccurance.find(key_inversed)!=p1_pairs_cooccurance.end()){
      							  p1_pairs_cooccurance[key_inversed]=p1_pairs_cooccurance[key_inversed]+1;
      							 }
+     						  else p1_pairs_cooccurance[key]=1;
      						  }
                          }
                        }
@@ -169,6 +157,7 @@ namespace mlnet {
      							  p2_pairs_cooccurance[key_inversed]=p2_pairs_cooccurance[key_inversed]+1;
 
      							 }
+     						 else p2_pairs_cooccurance[key]=1;
      						  }
      					  }
      					}
@@ -178,33 +167,53 @@ namespace mlnet {
 
      		//Count the agreements between both partitions
      		int max_cooccurance_value=0;
-     		int actual_agreements = 0;
-     		int max_possible_num_of_agreements =0;
+     		int actual_non_zero_agreements = 0;
+     		int actual_zero_agreements = 0;
+     		int total_agreemets=0;
+     		int disagreements =0;
+     		int max_possible_num_of_agreements = (network_nodes->size()*(network_nodes->size()-1))/2;
+
      		//Iterate through the keys in the first partitioning map
-           	typedef std::map<std::pair<NodeSharedPtr,NodeSharedPtr>, int>::const_iterator MapIterator;
-           	for (MapIterator iter = p1_pairs_cooccurance.begin(); iter != p1_pairs_cooccurance.end(); ++iter)
+           	for (auto key_value:p1_pairs_cooccurance)
            	{
-           	   max_possible_num_of_agreements++;
            	  //Get the current key
-           	   std::pair<NodeSharedPtr,NodeSharedPtr> key (iter->first.first ,iter->first.second);
+           	   std::pair<NodeSharedPtr,NodeSharedPtr> key (key_value.first.first ,key_value.first.second);
+           	   std::pair<NodeSharedPtr,NodeSharedPtr> inversed_key (key_value.first.second,key_value.first.first);
            	  //Get the value referred to by the current key
-           	  int value_in_p1 = iter->second;
+           	  int value_in_p1 = key_value.second;
+           	  //check if this pair, key, exists in the other paritioning p2
+           	  int value_in_p2 = -1;
+           	  if ( p2_pairs_cooccurance.find(key) != p2_pairs_cooccurance.end()) {
+           		value_in_p2 = p2_pairs_cooccurance[key];
+           	  }
+           	  else if (p2_pairs_cooccurance.find(inversed_key) != p2_pairs_cooccurance.end()) {
+           		  value_in_p2 = p2_pairs_cooccurance[inversed_key];
+           	  }
                //Check the value of the same key in the second partitioning map
-           	  int value_in_p2 = p2_pairs_cooccurance[key];
            	  if(value_in_p1==value_in_p2){
-           		actual_agreements++;
+           		actual_non_zero_agreements++;
+           		p1_pairs_cooccurance[key]=0;
+           		if ( p2_pairs_cooccurance.find(key) != p2_pairs_cooccurance.end()) p2_pairs_cooccurance[key]=0;
+           		else p2_pairs_cooccurance[inversed_key]=0;
            	  }
            	  //Store the maximum value
-           	  if(value_in_p2>max_cooccurance_value | value_in_p1>max_cooccurance_value)
-           	  max_cooccurance_value=(value_in_p2 > value_in_p1)?value_in_p2:value_in_p1;
-
-              //std::cout << "< " << iter->first.first->actor->name << ", " << iter->first.second->actor->name <<"> = " << iter->second << std::endl;
-           	 // std::cout << "< " << iter->first.first->actor->name << ", " << iter->first.second->actor->name <<"> = " << p2_pairs_cooccurance[key] << std::endl;
+           	  if(value_in_p2>max_cooccurance_value || value_in_p1>max_cooccurance_value)
+           	   max_cooccurance_value=(value_in_p2 > value_in_p1)?value_in_p2:value_in_p1;
            	}
 
+           	//count the disagreements
+           	for(auto key_value:p1_pairs_cooccurance){
+           		if(p1_pairs_cooccurance[key_value.first]!=0) disagreements++;
+           	}
+           	for(auto key_value:p2_pairs_cooccurance){
+           	    if(p2_pairs_cooccurance[key_value.first]!=0) disagreements++;
+           	}
 
+         	actual_zero_agreements = max_possible_num_of_agreements - actual_non_zero_agreements - disagreements;
+            total_agreemets = actual_zero_agreements + actual_non_zero_agreements;
 
-           	double unadjusted_omega = ((float)actual_agreements/(float)max_possible_num_of_agreements);
+           	double unadjusted_omega = ((float)total_agreemets/(float)max_possible_num_of_agreements);
+           	//std::cout << "Unadjustd" << unadjusted_omega<<std::endl;
 
            	//calculate the exptected omega index of a null model
            	double omega_null_model=0;
